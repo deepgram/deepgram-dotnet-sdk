@@ -21,11 +21,6 @@ Here are a few types of contributions that we would be interested in hearing abo
     it.
     * If its a trivial change, go ahead and send a Pull Request with the changes you have in mind
     * If not, open a Github Issue to discuss the idea first.
-* Snippets
-  * To add snippets:
-    * Add a directory in the `snippets` folder with the name of the language.
-    * Add one or more files in the language directory with snippets.
-    * Update the `package.json` to include the snippets you added.
 
 We also welcome anyone to work on any existing issues with the `good first issue` tag.
 
