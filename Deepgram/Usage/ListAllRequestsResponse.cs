@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,19 +8,19 @@ namespace Deepgram.Usage
         /// <summary>
         /// Number of results to return per page. 
         /// </summary>
-        [JsonPropertyName("limit")]
+        [JsonProperty("limit")]
         public int Limit { get; set; }
 
         /// <summary>
         /// Page number that should be returned.
         /// </summary>
-        [JsonPropertyName("page")]
+        [JsonProperty("page")]
         public int Page { get; set; }
 
         /// <summary>
         /// Array of requests
         /// </summary>
-        [JsonPropertyName("requests")]
-        public List<UsageRequest> Requests { get; set; }
+        [JsonProperty("requests")]
+        public UsageRequest[] Requests { get; set; }
     }
 }

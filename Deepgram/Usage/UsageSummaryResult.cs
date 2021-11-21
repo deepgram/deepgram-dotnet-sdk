@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,25 +8,25 @@ namespace Deepgram.Usage
         /// <summary>
         /// Start date for included requests.
         /// </summary>
-        [JsonPropertyName("start")]
+        [JsonProperty("start")]
         public DateTime StartDateTime { get; set; }
 
         /// <summary>
         /// End date for included requests.
         /// </summary>
-        [JsonPropertyName("end")]
+        [JsonProperty("end")]
         public DateTime EndDateTime { get; set; }
 
         /// <summary>
         /// Length of time (in hours) of audio processed in included requests.
         /// </summary>
-        [JsonPropertyName("hours")]
+        [JsonProperty("hours")]
         public decimal Hours { get; set; }
 
         /// <summary>
         /// Number of included requests.
         /// </summary>
-        [JsonPropertyName("requests")]
+        [JsonProperty("requests")]
         public int Requests { get; set; }
     }
 }

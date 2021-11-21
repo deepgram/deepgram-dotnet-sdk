@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -12,13 +12,13 @@ namespace Deepgram.Usage
         /// <summary>
         /// Status Code of the callback
         /// </summary>
-        [JsonPropertyName("code")]
+        [JsonProperty("code")]
         public int? Code { get; set; }
 
         /// <summary>
         /// DateTime the callback completed
         /// </summary>
-        [JsonPropertyName("completed")]
+        [JsonProperty("completed")]
         public DateTime? Completed { get; set; }
     }
 }

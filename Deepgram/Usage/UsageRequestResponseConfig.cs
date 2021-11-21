@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,13 +8,13 @@ namespace Deepgram.Usage
         /// <summary>
         /// Was the diarization featured used?
         /// </summary>
-        [JsonPropertyName("diarize")]
+        [JsonProperty("diarize")]
         public bool? Diarize { get; set; }
 
         /// <summary>
         /// Was the multichannel feature used?
         /// </summary>
-        [JsonPropertyName("multichannel")]
+        [JsonProperty("multichannel")]
         public bool? MultiChannel { get; set; }
     }
 }

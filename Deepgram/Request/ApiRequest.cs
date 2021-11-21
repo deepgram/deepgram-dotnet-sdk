@@ -2,9 +2,9 @@
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
-
+using Deepgram.Transcription;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
@@ -57,9 +57,22 @@ namespace Deepgram.Request
         {
             if (null != bodyObject)
             {
-                var payload = JsonSerializer.Serialize(bodyObject);
+                var payload = JsonConvert.SerializeObject(bodyObject, new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                });
                 request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
             }
+        }
+
+        private static void SetContentAsStream(ref HttpRequestMessage request, StreamSource streamSource)
+        {
+            Stream stream = streamSource.Stream;
+            stream.Seek(0, SeekOrigin.Begin);
+            HttpContent httpContent = new StreamContent(stream);
+            httpContent.Headers.Add("Content-Type", streamSource.MimeType);
+            httpContent.Headers.Add("Content-Length", stream.Length.ToString());
+            request.Content = httpContent;
         }
 
         internal static async Task<T> DoRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
@@ -76,7 +89,22 @@ namespace Deepgram.Request
 
             return await SendHttpRequestAsync<T>(req);
         }
-    
+
+        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
+        {
+            uri = GetUriWithQueryString(uri, queryParameters);
+
+            var req = new HttpRequestMessage
+            {
+                RequestUri = uri,
+                Method = method
+            };
+            SetHeaders(ref req, credentials);
+            SetContentAsStream(ref req, streamSource);
+
+            return await SendHttpRequestAsync<T>(req);
+        }
+
         private static Uri GetUriWithQueryString(Uri uri, object? queryParameters)
         {
             if (null != queryParameters)
@@ -95,14 +123,15 @@ namespace Deepgram.Request
 
         private static Dictionary<string, string> GetParameters(object parameters)
         {
-            var json = JsonSerializer.Serialize(parameters);
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            var json = JsonConvert.SerializeObject(parameters, new JsonSerializerSettings() { 
+                NullValueHandling = NullValueHandling.Ignore });
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         }
 
         private static async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
             var json = (await SendHttpRequestAsync(request)).JsonResponse;
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         private static async Task<DeepgramResponse> SendHttpRequestAsync(HttpRequestMessage request)

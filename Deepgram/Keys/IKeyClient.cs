@@ -10,7 +10,7 @@ namespace Deepgram.Keys
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to retrieve keys from</param>
         /// <returns>List of Deepgram API keys</returns>
-        Task<List<Key>> ListKeysAsync(string projectId);
+        Task<Key[]> ListKeysAsync(string projectId);
 
         /// <summary>
         /// Retrieves the Deepgram key associated with the provided keyId
@@ -27,7 +27,7 @@ namespace Deepgram.Keys
         /// <param name="comment">Comment to help identify the API key</param>
         /// <param name="scopes">Scopes associated with the key. Cannot be empty</param>
         /// <returns>A new Deepgram API key</returns>
-        Task<NewKey> CreateKeyAsync(string projectId, string comment, List<string> scopes);
+        Task<NewKey> CreateKeyAsync(string projectId, string comment, string[] scopes);
 
         /// <summary>
         /// Deletes an API key

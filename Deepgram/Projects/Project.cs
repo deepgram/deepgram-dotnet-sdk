@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Projects
 {
@@ -8,19 +8,19 @@ namespace Deepgram.Projects
         /// <summary>
         /// Unique identifier of the Deepgram project
         /// </summary>
-        [JsonPropertyName("project_id")]
-        public string Id { get; set; }
+        [JsonProperty("project_id")]
+        public string Id { get; set; } = string.Empty;
 
         /// <summary>
         /// Name of the Deepgram project
         /// </summary>
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Name of the company associated with the Deepgram project
         /// </summary>
-        [JsonPropertyName("company")]
+        [JsonProperty("company")]
         public string? Company { get; set; }
     }
 }

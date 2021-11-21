@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,13 +8,13 @@ namespace Deepgram.Usage
         /// <summary>
         /// Start date of the requested date range.
         /// </summary>
-        [JsonPropertyName("start")]
+        [JsonProperty("start")]
         public DateTime? StartDateTime { get; set; }
 
         /// <summary>
         /// End date of the requested date range.
         /// </summary>
-        [JsonPropertyName("end")]
+        [JsonProperty("end")]
         public DateTime? EndDateTime { get; set; }
     }
 }

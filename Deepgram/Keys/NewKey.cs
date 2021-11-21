@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Keys
 {
@@ -9,7 +9,7 @@ namespace Deepgram.Keys
         /// API Key
         /// </summary>
         /// <remarks>Only exists on this object. Subsequent requests to get keys will not have this property.</remarks>
-        [JsonPropertyName("key")]
-        public string Key { get; set; }
+        [JsonProperty("key")]
+        public string Key { get; set; } = string.Empty;
     }
 }

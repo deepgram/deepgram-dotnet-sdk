@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,13 +8,13 @@ namespace Deepgram.Usage
         /// <summary>
         /// Units of resolution amount.
         /// </summary>
-        [JsonPropertyName("units")]
-        public string Units { get; set; }
+        [JsonProperty("units")]
+        public string Units { get; set; } = string.Empty;
 
         /// <summary>
         /// Number of days
         /// </summary>
-        [JsonPropertyName("amount")]
+        [JsonProperty("amount")]
         public int Amount { get; set; }
     }
 }

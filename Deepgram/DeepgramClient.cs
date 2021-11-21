@@ -2,6 +2,7 @@
 using Deepgram.Keys;
 using Deepgram.Projects;
 using Deepgram.Request;
+using Deepgram.Transcription;
 using Deepgram.Usage;
 
 namespace Deepgram
@@ -34,6 +35,7 @@ namespace Deepgram
 
         public IKeyClient Keys { get; private set; }
         public IProjectClient Projects { get; private set; }
+        public ITranscriptionClient Transcription { get; private set; }
         public IUsageClient Usage { get; private set; }
 
         private void InitializeCredentials(Credentials? credentials = null)
@@ -72,6 +74,7 @@ namespace Deepgram
         {
             Keys = new KeyClient(_credentials);
             Projects = new ProjectClient(_credentials);
+            Transcription = new TranscriptionClient(_credentials);
             Usage = new UsageClient(_credentials);
         }
     }

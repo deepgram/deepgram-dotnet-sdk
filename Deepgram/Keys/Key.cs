@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Keys
 {
@@ -8,19 +8,19 @@ namespace Deepgram.Keys
         /// <summary>
         /// Unique identifier of the Deepgram API key
         /// </summary>
-        [JsonPropertyName("api_key_id")]
-        public string Id { get; set; }
+        [JsonProperty("api_key_id")]
+        public string Id { get; set; } = string.Empty;
 
         /// <summary>
         /// Comment for the Deepgram API key
         /// </summary>
-        [JsonPropertyName("comment")]
-        public string Comment { get; set; }
+        [JsonProperty("comment")]
+        public string Comment { get; set; } = string.Empty;
 
-        [JsonPropertyName("created")]
+        [JsonProperty("created")]
         public DateTime Created { get; set; }
 
-        [JsonPropertyName("scopes")]
-        public List<string> Scopes { get; set; }
+        [JsonProperty("scopes")]
+        public string[] Scopes { get; set; }
     }
 }

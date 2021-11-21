@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,127 +8,127 @@ namespace Deepgram.Usage
         /// <summary>
         /// Start date of the requested date range.
         /// </summary>
-        [JsonPropertyName("start")]
+        [JsonProperty("start")]
         public DateTime? StartDateTime { get; set; }
 
         /// <summary>
         /// End date of the requested date range.
         /// </summary>
-        [JsonPropertyName("end")]
+        [JsonProperty("end")]
         public DateTime? EndDateTime { get; set; }
 
         /// <summary>
         /// Limits results to requests made using the API key corresponding to the given accessor. 
         /// </summary>
-        [JsonPropertyName("accessor")]
+        [JsonProperty("accessor")]
         public string? ApiKeyId { get; set; }
 
         /// <summary>
         /// Limits results to requests associated with the specified tag. 
         /// </summary>
-        [JsonPropertyName("tag")]
+        [JsonProperty("tag")]
         public string? Tag { get; set; }
 
         /// <summary>
         /// Limits results to requests processed using the specified method.
         /// </summary>
-        [JsonPropertyName("method")]
+        [JsonProperty("method")]
         public RequestMethod? Method { get; set; }
 
         /// <summary>
         /// Limits results to requests run with the specified model applied.
         /// </summary>
-        [JsonPropertyName("model")]
+        [JsonProperty("model")]
         public string? Model { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the multichannel feature.
         /// </summary>
-        [JsonPropertyName("multichannel")]
+        [JsonProperty("multichannel")]
         public bool? MultiChannel { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the interim_results feature.
         /// </summary>
-        [JsonPropertyName("interim_results")]
+        [JsonProperty("interim_results")]
         public bool? InterimResults { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the punctuate feature.
         /// </summary>
-        [JsonPropertyName("punctuate")]
+        [JsonProperty("punctuate")]
         public bool? Punctuate { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the ner feature.
         /// </summary>
-        [JsonPropertyName("ner")]
+        [JsonProperty("ner")]
         public bool? NamedEntityRecognition { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the utterances feature.
         /// </summary>
-        [JsonPropertyName("utterances")]
+        [JsonProperty("utterances")]
         public bool? Utterances { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the replace feature.
         /// </summary>
-        [JsonPropertyName("replace")]
+        [JsonProperty("replace")]
         public bool? Replace { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the profanity_filter feature.
         /// </summary>
-        [JsonPropertyName("profanity_filter")]
+        [JsonProperty("profanity_filter")]
         public bool? ProfanityFilter { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the keywords feature.
         /// </summary>
-        [JsonPropertyName("keywords")]
+        [JsonProperty("keywords")]
         public bool? Keywords { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the sentiment feature.
         /// </summary>
-        [JsonPropertyName("sentiment")]
+        [JsonProperty("sentiment")]
         public bool? Sentiment { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the diarize feature.
         /// </summary>
-        [JsonPropertyName("diarize")]
+        [JsonProperty("diarize")]
         public bool? Diarization { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the detect_language feature.
         /// </summary>
-        [JsonPropertyName("detect_language")]
+        [JsonProperty("detect_language")]
         public bool? DetectLanguage { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the search feature.
         /// </summary>
-        [JsonPropertyName("search")]
+        [JsonProperty("search")]
         public bool? Search { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the redact feature.
         /// </summary>
-        [JsonPropertyName("redact")]
+        [JsonProperty("redact")]
         public bool? Redaction { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the alternatives feature.
         /// </summary>
-        [JsonPropertyName("alternatives")]
+        [JsonProperty("alternatives")]
         public bool? Alternatives { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the numerals feature.
         /// </summary>
-        [JsonPropertyName("numerals")]
+        [JsonProperty("numerals")]
         public bool? Numerals { get; set; }
     }
 }

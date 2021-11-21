@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,25 +8,25 @@ namespace Deepgram.Usage
         /// <summary>
         /// Array of included tags.
         /// </summary>
-        [JsonPropertyName("tags")]
-        public List<string> Tags { get; set; }
+        [JsonProperty("tags")]
+        public string[] Tags { get; set; } 
 
         /// <summary>
         /// Array of included models.
         /// </summary>
-        [JsonPropertyName("models")]
-        public List<string> Models { get; set; }
+        [JsonProperty("models")]
+        public string[] Models { get; set; }
 
         /// <summary>
         /// Array of included processing methods.
         /// </summary>
-        [JsonPropertyName("processing_methods")]
-        public List<RequestMethod> ProcessingMethods { get; set; }
+        [JsonProperty("processing_methods")]
+        public RequestMethod[] ProcessingMethods { get; set; }
 
         /// <summary>
         /// Array of included features.
         /// </summary>
-        [JsonPropertyName("features")]
-        public List<string> Features { get; set; }
+        [JsonProperty("features")]
+        public string[] Features { get; set; }
     }
 }

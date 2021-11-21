@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Projects
 {
@@ -8,8 +8,7 @@ namespace Deepgram.Projects
         /// <summary>
         /// List of Deepgram projects
         /// </summary>
-        [JsonPropertyName("projects")]
-        public List<Project> Projects { get; set; }
-
+        [JsonProperty("projects")]
+        public Project[] Projects { get; set; }
     }
 }

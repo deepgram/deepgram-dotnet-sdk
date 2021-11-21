@@ -1,24 +1,32 @@
-﻿
-var API_KEY = "61290eebdcaf7f458f8adaf8bbc77fc700afb6e6";
+﻿using System.Text;
 
-var deepgram = new DeepgramClient();
+var API_KEY = "YOUR_DEEPGRAM_API_KEY";
 
-var projectList = await deepgram.Projects.ListProjectsAsync();
+var deepgram = new DeepgramClient(new Credentials(API_KEY));
 
-if (projectList.Projects.Count > 0)
+var response = await deepgram.Transcription.GetPrerecordedTranscriptionAsync(
+    new Deepgram.Transcription.UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
+    new Deepgram.Transcription.PrerecordedTranscriptionOptions()
+    {
+        Punctuate = true,
+        Utterances = true
+    });
+
+Console.WriteLine(response.ToWebVTT());
+
+Console.WriteLine("Stream Sample\n");
+
+using (FileStream fs = File.OpenRead("path\\to\\file"))
 {
+    var sResponse = await deepgram.Transcription.GetPrerecordedTranscriptionAsync(
+        new Deepgram.Transcription.StreamSource(
+            fs,
+            "audio/wav"),
+        new Deepgram.Transcription.PrerecordedTranscriptionOptions()
+        {
+            Punctuate = true,
+            Utterances = true,
+        });
 
-    var firstProject = projectList.Projects[0];
-
-    Console.WriteLine(firstProject.Name);
-
-    firstProject.Name = "A different name";
-
-    var result = await deepgram.Projects.UpdateProjectAsync(firstProject);
-
-    var newkey = await deepgram.Keys.CreateKeyAsync(firstProject.Id, "test key dotnet", new List<string>() { "member" });
-
-    var result2 = await deepgram.Keys.DeleteKeyAsync(firstProject.Id, newkey.Id);
-
-
+    Console.WriteLine(response.ToSRT());
 }

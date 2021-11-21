@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Usage
 {
@@ -8,13 +8,13 @@ namespace Deepgram.Usage
         /// <summary>
         /// Details of the request
         /// </summary>
-        [JsonPropertyName("details")]
+        [JsonProperty("details")]
         public UsageRequestResponseDetail? Details {get;set;}
 
         /// <summary>
         /// If the request failed, this will contain the error message.
         /// </summary>
-        [JsonPropertyName("message")]
+        [JsonProperty("message")]
         public string? Message { get; set; }
     }
 }

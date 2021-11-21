@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace Deepgram.Common
 {
@@ -8,7 +8,7 @@ namespace Deepgram.Common
         /// <summary>
         /// A message denoting the success of the operation
         /// </summary>
-        [JsonPropertyName("message")]
+        [JsonProperty("message")]
         public string Message { get; set; }
     }
 }
