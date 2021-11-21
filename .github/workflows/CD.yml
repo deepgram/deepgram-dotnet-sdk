@@ -15,8 +15,11 @@ jobs:
           dotnet-version: '6.x.x'
       - name: Install dependencies
         run: dotnet restore
+      - name: Determine version
+        run: echo "::set-env name=VERSION::$(git describe --tags --dirty)"
       - name: Build
-        run: dotnet pack Deepgram.sln --configuration Release --no-restore --output dist
+        run: |
+          dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=$VERSION
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -31,7 +34,5 @@ jobs:
         with:
           name: dist
           path: 'dist'
-      - name: Publish to Nuget
-        uses: dansiegel/publish-nuget@v1.01
-        with:
-          apiKey: ${{ secrets.NUGET_API_KEY }}
+      - name: Publish packages
+        run: dotnet nuget push ./dist/**.nupkg --source nuget.org --api-key ${{secrets.NUGET_API_KEY}}

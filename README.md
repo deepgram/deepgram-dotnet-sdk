@@ -22,9 +22,7 @@ To setup the configuration of the Deepgram Client you can do one of the followin
 - Create a Deepgram Client instance and pass in credentials in the constructor.
 
 ```csharp
-var credentials = new Credentials(
-	API_KEY
-);
+var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
 var deepgramClient = new DeepgramClient(credentials);
 ```
 
@@ -106,7 +104,7 @@ var deepgramClient = new DeepgramClient(credentials);
 
 using (FileStream fs = File.OpenRead("path\\to\\file"))
 {
-    var sResponse = await deepgramClient.Transcription.GetPrerecordedTranscriptionAsync(
+    var response = await deepgramClient.Transcription.GetPrerecordedTranscriptionAsync(
         new Deepgram.Transcription.StreamSource(
             fs,
             "audio/wav"),
