@@ -1,5 +1,7 @@
 # Deepgram .NET SDK
 
+![Nuget](https://img.shields.io/nuget/v/deepgram) [![Build Status](https://github.com/deepgram-devs/deepgram-dotnet-sdk/workflows/CI/badge.svg)](https://github.com/deepgram-devs/deepgram-dotnet-sdk/actions?query=CI) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+
 ## Installation
 
 To install the C# client library using NuGet:
@@ -53,7 +55,6 @@ Or
 ```csharp
 Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"] = "YOUR_DEEPGRAM_API_KEY";
 Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"] = "https://api.deepgram.com";
-
 ```
 
 ## Logging
