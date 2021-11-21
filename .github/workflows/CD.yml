@@ -15,11 +15,12 @@ jobs:
           dotnet-version: '6.x.x'
       - name: Install dependencies
         run: dotnet restore
-      - name: Determine version
-        run: echo "::set-env name=VERSION::$(git describe --tags --dirty)"
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Build
         run: |
-          dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=$VERSION
+          dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
