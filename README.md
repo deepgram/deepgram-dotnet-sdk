@@ -15,7 +15,8 @@ dotnet add package Deepgram
 ## Targeted Frameworks
 
 - 6.0.0
-- .NET Standard 2.0 - supports everything 4.6.1 and above
+- 5.0.0
+- .NET Core 3.1
 
 ## Configuration
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Deepgram.Request;
 
 namespace Deepgram.Transcription
@@ -36,7 +38,7 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetPrerecordedTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions? options)
         {
-            return await ApiRequest.DoRequestAsync<PrerecordedTranscription>(
+            return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 new Uri(_credentials.ApiUrl, "/v1/listen"),
                 _credentials,

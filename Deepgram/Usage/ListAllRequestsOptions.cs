@@ -29,6 +29,6 @@ namespace Deepgram.Usage
         /// </summary>
         /// <remarks>Possible Values: null, succeeded OR failed</remarks>
         [JsonProperty("status")]
-        public string? Status { get; set; }
+        public string Status { get; set; }
     }
 }

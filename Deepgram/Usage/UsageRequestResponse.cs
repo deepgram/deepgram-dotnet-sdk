@@ -15,6 +15,6 @@ namespace Deepgram.Usage
         /// If the request failed, this will contain the error message.
         /// </summary>
         [JsonProperty("message")]
-        public string? Message { get; set; }
+        public string Message { get; set; }
     }
 }

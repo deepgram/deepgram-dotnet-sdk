@@ -28,8 +28,10 @@ namespace Deepgram.Transcription
 
             var webVTT = "WEBVTT\n\n";
 
-            webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: { this.MetaData?.Id}\nCreated: { this.MetaData?.Created}\nDuration: { Math.Round(this.MetaData.Duration.GetValueOrDefault(0), 3)}\nChannels: { this.MetaData?.Channels}\n\n";
-            
+            if (MetaData != null) { 
+                webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: { MetaData.Id}\nCreated: { MetaData.Created}\nDuration: { Math.Round(MetaData.Duration, 3)}\nChannels: { MetaData.Channels}\n\n";
+            }
+
             int index = 1;
             foreach (var utterance in this.Results.Utterances)
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Deepgram.Common;
 
 namespace Deepgram.Projects

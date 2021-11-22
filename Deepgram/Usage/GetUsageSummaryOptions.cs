@@ -21,13 +21,13 @@ namespace Deepgram.Usage
         /// Limits results to requests made using the API key corresponding to the given accessor. 
         /// </summary>
         [JsonProperty("accessor")]
-        public string? ApiKeyId { get; set; }
+        public string ApiKeyId { get; set; }
 
         /// <summary>
         /// Limits results to requests associated with the specified tag. 
         /// </summary>
         [JsonProperty("tag")]
-        public string? Tag { get; set; }
+        public string Tag { get; set; }
 
         /// <summary>
         /// Limits results to requests processed using the specified method.
@@ -39,7 +39,7 @@ namespace Deepgram.Usage
         /// Limits results to requests run with the specified model applied.
         /// </summary>
         [JsonProperty("model")]
-        public string? Model { get; set; }
+        public string Model { get; set; }
 
         /// <summary>
         /// Limits results to requests that include the multichannel feature.

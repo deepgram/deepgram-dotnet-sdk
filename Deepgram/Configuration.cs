@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using Deepgram.Request;
+using System.Net.Http;
 
 namespace Deepgram
 {

@@ -39,13 +39,13 @@ namespace Deepgram.Usage
         /// Model applied when running the request.
         /// </summary>
         [JsonProperty("model")]
-        public string? Model { get; set; }
+        public string Model { get; set; }
 
         /// <summary>
         /// Processing method used when running the request.
         /// </summary>
         [JsonProperty("methods")]
-        public string? Methods { get; set; }
+        public string Methods { get; set; }
 
         /// <summary>
         /// List of tags applied when running the request.

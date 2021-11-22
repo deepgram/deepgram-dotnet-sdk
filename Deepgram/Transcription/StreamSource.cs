@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Newtonsoft.Json;
 
 namespace Deepgram.Transcription
@@ -6,7 +7,7 @@ namespace Deepgram.Transcription
     
     public class StreamSource
     {
-        public StreamSource(Stream stream, String mimetype)
+        public StreamSource(Stream stream, string mimetype)
         {
             Stream = stream;
             MimeType = mimetype;
@@ -20,6 +21,6 @@ namespace Deepgram.Transcription
         /// <summary>
         /// MIMETYPE of the stream
         /// </summary>
-        public String MimeType { get; set; } = string.Empty;
+        public string MimeType { get; set; } = string.Empty;
     }
 }

@@ -23,12 +23,11 @@ namespace Deepgram
         /// <summary>
         /// Deepgram API Key
         /// </summary>
-        public string? ApiKey { get; set; }
+        public string? ApiKey { get; set; } = null;
 
         /// <summary>
         /// On-premise Url of the Deepgram API
         /// </summary>
-        public string? ApiUrl { get; set; }
-
+        public string? ApiUrl { get; set; } = null;
     }
 }

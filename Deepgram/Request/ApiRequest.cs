@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Deepgram.Transcription;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -77,7 +81,7 @@ namespace Deepgram.Request
 
         internal static async Task<T> DoRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
         {
-            uri = GetUriWithQueryString(uri, queryParameters);
+            uri = GetUriWithQuerystring(uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
@@ -90,9 +94,9 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
+        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
         {
-            uri = GetUriWithQueryString(uri, queryParameters);
+            uri = GetUriWithQuerystring(uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
@@ -105,7 +109,7 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQueryString(Uri uri, object? queryParameters)
+        private static Uri GetUriWithQuerystring(Uri uri, object? queryParameters)
         {
             if (null != queryParameters)
             {

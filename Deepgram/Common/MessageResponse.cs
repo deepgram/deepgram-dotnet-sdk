@@ -9,6 +9,6 @@ namespace Deepgram.Common
         /// A message denoting the success of the operation
         /// </summary>
         [JsonProperty("message")]
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 }

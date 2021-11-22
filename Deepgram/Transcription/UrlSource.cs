@@ -5,7 +5,7 @@ namespace Deepgram.Transcription
 {
     public class UrlSource
     {
-        public UrlSource(String url)
+        public UrlSource(string url)
         {
             Url = url;
         }
@@ -14,6 +14,6 @@ namespace Deepgram.Transcription
         /// Url of the file to transcribe
         /// </summary>
         [JsonProperty("url")]
-        public String Url { get; set; } = String.Empty;
+        public string Url { get; set; } = string.Empty;
     }
 }

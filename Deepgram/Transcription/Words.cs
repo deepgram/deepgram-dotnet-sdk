@@ -33,6 +33,6 @@ namespace Deepgram.Transcription
         /// Punctuated version of the word
         /// </summary>
         [JsonProperty("punctuated_word")]
-        public string? PunctuatedWord { get; set; }
+        public string PunctuatedWord { get; set; }
     }
 }
