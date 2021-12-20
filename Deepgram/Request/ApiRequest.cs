@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Deepgram.Common;
 using Deepgram.Transcription;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -25,29 +24,7 @@ namespace Deepgram.Request
 
         private static void SetUserAgent(ref HttpRequestMessage request)
         {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
-            // TODO: watch the next core release; may have functionality to make this cleaner
-            var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
-                .Replace(" ", "")
-                .Replace("/", "")
-                .Replace(":", "")
-                .Replace(";", "")
-                .Replace("_", "")
-                .Replace("(", "")
-                .Replace(")", "")
-                ;
-#else
-            var languageVersion = System.Diagnostics.FileVersionInfo
-                .GetVersionInfo(typeof(int).Assembly.Location)
-                .ProductVersion;
-#endif
-            var libraryVersion = typeof(ApiRequest)
-                .GetTypeInfo()
-                .Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                .InformationalVersion;
-
-            string userAgent = $"deepgram/{libraryVersion} dotnet/{languageVersion}";
+            var userAgent = Helpers.GetUserAgent();
             request.Headers.UserAgent.ParseAdd(userAgent);
         }
 
@@ -79,13 +56,13 @@ namespace Deepgram.Request
             request.Content = httpContent;
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
+        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
         {
-            uri = GetUriWithQuerystring(uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
-                RequestUri = uri,
+                RequestUri = requestUri,
                 Method = method
             };
             SetHeaders(ref req, credentials);
@@ -94,13 +71,13 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, Uri uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
+        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
         {
-            uri = GetUriWithQuerystring(uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
-                RequestUri = uri,
+                RequestUri = requestUri,
                 Method = method
             };
             SetHeaders(ref req, credentials);
@@ -109,27 +86,20 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(Uri uri, object? queryParameters)
+        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object? queryParameters)
         {
             if (null != queryParameters)
             {
-                var queryParams = GetParameters(queryParameters);
+                var queryParams = Helpers.GetParameters(queryParameters);
                 var sb = new StringBuilder();
                 foreach (var parameter in queryParams)
                 {
                     sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(parameter.Key), WebUtility.UrlEncode(parameter.Value));
                 }
 
-                uri = new Uri($"{uri}?{sb.ToString()}");
+                return new Uri($"https://{credentials.ApiUrl}{uri}?{sb.ToString()}");
             }
-            return uri;
-        }
-
-        private static Dictionary<string, string> GetParameters(object parameters)
-        {
-            var json = JsonConvert.SerializeObject(parameters, new JsonSerializerSettings() { 
-                NullValueHandling = NullValueHandling.Ignore });
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            return new Uri($"https://{credentials.ApiUrl}{uri}");
         }
 
         private static async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)

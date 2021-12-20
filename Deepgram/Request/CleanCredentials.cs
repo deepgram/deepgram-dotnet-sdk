@@ -8,10 +8,18 @@ namespace Deepgram.Request
         /// Constructor
         /// </summary>
         /// <param name="apiKey">Deepgram API Key</param>
-        /// <param name="apiUrl">Uri of Deepgram API</param>
-        public CleanCredentials(string apiKey, Uri apiUrl)
+        /// <param name="apiUrl">Url of Deepgram API</param>
+        public CleanCredentials(string apiKey, string apiUrl)
         {
             ApiKey = apiKey;
+
+            // Remove scheme from apiUrl. We'll append the correct
+            // scheme based on the type of request.
+            if (apiUrl.Contains("://"))
+            {
+                apiUrl = apiUrl.Substring(apiUrl.IndexOf("://") + 3);
+            }
+
             ApiUrl = apiUrl;
         }
 
@@ -23,11 +31,11 @@ namespace Deepgram.Request
         /// <summary>
         /// On-premise Url of the Deepgram API
         /// </summary>
-        public Uri ApiUrl { get; set; }
+        public string ApiUrl { get; set; }
 
         public Credentials ToCredentials()
         {
-            return new Credentials(ApiKey, ApiUrl.ToString());
+            return new Credentials(ApiKey, ApiUrl);
         }
 
     }

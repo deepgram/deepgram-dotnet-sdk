@@ -23,7 +23,7 @@ namespace Deepgram.Projects
         {
             return await ApiRequest.DoRequestAsync<ProjectList>(    
                 HttpMethod.Get,
-                new Uri(_credentials.ApiUrl, "/v1/projects"),
+                "/v1/projects",
                 _credentials
             );
         }
@@ -37,7 +37,7 @@ namespace Deepgram.Projects
         {
             return await ApiRequest.DoRequestAsync<Project>(
                 HttpMethod.Get,
-                new Uri(_credentials.ApiUrl, $"/v1/projects/{projectId}"),
+                $"/v1/projects/{projectId}",
                 _credentials
             );
         }
@@ -51,7 +51,7 @@ namespace Deepgram.Projects
         {
             return await ApiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Patch,
-                new Uri(_credentials.ApiUrl, $"/v1/projects/{project.Id}"),
+                $"/v1/projects/{project.Id}",
                 _credentials,
                 null,
                 project
@@ -66,7 +66,7 @@ namespace Deepgram.Projects
         {
             return await ApiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                new Uri(_credentials.ApiUrl, $"/v1/projects/{projectId}"),
+                $"/v1/projects/{projectId}",
                 _credentials);
         }
     }

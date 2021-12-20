@@ -38,6 +38,11 @@ namespace Deepgram
         public ITranscriptionClient Transcription { get; private set; }
         public IUsageClient Usage { get; private set; }
 
+        public ILiveTranscriptionClient CreateLiveTranscriptionClient()
+        {
+            return new LiveTranscriptionClient(_credentials);
+        }
+
         private void InitializeCredentials(Credentials? credentials = null)
         {
             string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? "" : credentials.ApiUrl;
@@ -60,14 +65,14 @@ namespace Deepgram
                 string possibleUri = Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"];
                 if (string.IsNullOrEmpty(possibleUri))
                 {
-                    apiUrl = "https://api.deepgram.com";
+                    apiUrl = "api.deepgram.com";
                 }
                 else
                 {
                     apiUrl = possibleUri;
                 }
             }
-            _credentials = new CleanCredentials(apiKey, new Uri(apiUrl));
+            _credentials = new CleanCredentials(apiKey, apiUrl);
         }
 
         private void InitializeClients()

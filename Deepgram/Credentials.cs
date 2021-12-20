@@ -13,7 +13,7 @@ namespace Deepgram
         /// Constructor
         /// </summary>
         /// <param name="apiKey">Deepgram API Key</param>
-        /// <param name="apiUrl">Uri of Deepgram API</param>
+        /// <param name="apiUrl">Url of Deepgram API</param>
         public Credentials(string? apiKey = null, string? apiUrl = null)
         {
             ApiKey = apiKey;
