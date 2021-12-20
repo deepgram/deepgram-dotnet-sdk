@@ -34,5 +34,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("punctuated_word")]
         public string PunctuatedWord { get; set; }
+
+        /// <summary>
+        /// Integer indicating the speaker who is saying the word being processed.
+        /// </summary>
+        [JsonProperty("speaker")]
+        public int? Speaker { get; set; }
     }
 }
