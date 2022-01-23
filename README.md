@@ -121,7 +121,7 @@ var credentials = new Credentials(DEEPGRAM_API_KEY);
 
 var deepgramClient = new DeepgramClient(credentials);
 
-using (var deepgramLive = deepgram.CreateLiveTranscriptionClient())
+using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {
     deepgramLive.ConnectionOpened += HandleConnectionOpened;
     deepgramLive.ConnectionClosed += HandleConnectionClosed;
