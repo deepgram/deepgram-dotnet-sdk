@@ -156,6 +156,23 @@ namespace Deepgram.Transcription
         }
 
         /// <summary>
+        /// Signals to Deepgram that the audio has completed so it can return
+        /// the final transcription output
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        public async Task FinishAsync()
+        {
+            if (_clientWebSocket.State != WebSocketState.Open)
+            {
+                var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
+                logger.LogWarning($"Trying to finish when the socket is {_clientWebSocket.State}. Ack for this message will fail shortly.");
+                return;
+            }
+
+            await _clientWebSocket.SendAsync(new ArraySegment<byte>(), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        /// <summary>
         /// Sends a binary message over the websocket connection.
         /// </summary>
         /// <param name="data">The data to be sent over the websocket.</param>
@@ -295,7 +312,7 @@ namespace Deepgram.Transcription
                 throw;
             }
         }
-       
+
         private async Task Send(ArraySegment<byte> data, CancellationToken token)
         {
             if (_clientWebSocket.State != WebSocketState.Open)

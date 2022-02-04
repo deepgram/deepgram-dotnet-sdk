@@ -40,6 +40,13 @@ namespace Deepgram.Transcription
         Task StartConnectionAsync(LiveTranscriptionOptions options);
 
         /// <summary>
+        /// Signals to Deepgram that the audio has completed so it can return
+        /// the final transcription output
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        Task FinishAsync();
+
+        /// <summary>
         /// Closes the Web Socket connection to the Deepgram API
         /// </summary>
         /// <returns>The task object representing the asynchronous operation.</returns>
