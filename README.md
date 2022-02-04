@@ -147,7 +147,7 @@ using (var deepgramLive = deepgram.CreateLiveTranscriptionClient())
             Task.Delay(50).Wait();
         }
 
-        deepgramLive.StopConnectionAsync();
+        deepgramLive.FinishAsync();
     }
 
     void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)
