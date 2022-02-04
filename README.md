@@ -48,7 +48,7 @@ Or
 
 - Provide the Deepgram API key and optional API Url in `appsettings.json`:
 
-```js
+```json
 {
   "appSettings": {
     "Deepgram.Api.Key": "YOUR_DEEPGRAM_API_KEY",
@@ -129,7 +129,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
     deepgramLive.TranscriptReceived += HandleTranscriptReceived;
 
     // Connection opened so start sending audio.
-    void HandleConnectionOpened(object? sender, ConnectionOpenEventArgs e)
+    async void HandleConnectionOpened(object? sender, ConnectionOpenEventArgs e)
     {
         byte[] buffer;
 
@@ -144,10 +144,10 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
         foreach (var chunk in chunks)
         {
             deepgramLive.SendData(chunk);
-            Task.Delay(50).Wait();
+            await Task.Delay(50);
         }
 
-        deepgramLive.FinishAsync();
+        await deepgramLive.FinishAsync();
     }
 
     void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)

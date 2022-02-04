@@ -169,7 +169,7 @@ namespace Deepgram.Transcription
                 return;
             }
 
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
+            await _clientWebSocket.SendAsync(new ArraySegment<byte>(Array.Empty<byte>()), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
