@@ -8,7 +8,7 @@ speech recognition APIs.
 > This SDK only supports hosted usage of api.deepgram.com.
 
 To access the API you will need a Deepgram account. Sign up for free at
-[signup][https://console.deepgram.com/signup?utm_source=dotnet-sdk&utm_content=readme].
+[signup][https://console.deepgram.com/signup?utm_medium=github&utm_source=DEVREL&utm_content=dotnet-sdk].
 
 ## Documentation
 
