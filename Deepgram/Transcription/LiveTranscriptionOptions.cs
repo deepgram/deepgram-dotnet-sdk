@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Deepgram.Transcription
@@ -140,5 +141,130 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("sample_rate")]
         public int? SampleRate { get; set; } = null;
+
+        /// <summary>
+        /// Converts the options to a querystring
+        /// </summary>
+        public string ToQueryString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (!String.IsNullOrEmpty(this.Language))
+            {
+                sb.Append($"&language={this.Language}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Model))
+            {
+                sb.Append($"&model={this.Model}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Encoding))
+            {
+                sb.Append($"&encoding={this.Encoding}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Version))
+            {
+                sb.Append($"&version={this.Version}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Callback))
+            {
+                sb.Append($"&callback={this.Callback}");
+            }
+
+            if (this.Punctuate.HasValue)
+            {
+                sb.Append($"&punctuate={this.Punctuate.ToString().ToLower()}");
+            }
+
+            if (this.InterimResults.HasValue)
+            {
+                sb.Append($"&interim_results={this.InterimResults.ToString().ToLower()}");
+            }
+
+            if (this.Endpointing.HasValue)
+            {
+                sb.Append($"&endpointing={this.Endpointing.ToString().ToLower()}");
+            }
+
+            if (this.VADTurnoff.HasValue)
+            {
+                sb.Append($"&vad_turnoff={this.VADTurnoff.ToString().ToLower()}");
+            }
+
+            if (this.SampleRate.HasValue)
+            {
+                sb.Append($"&sample_rate={this.SampleRate.ToString()}");
+            }
+
+            if (this.Channels.HasValue)
+            {
+                sb.Append($"&channels={this.Channels.ToString()}");
+            }
+
+            if (this.Utterances.HasValue)
+            {
+                sb.Append($"&utterances={this.Utterances.ToString().ToLower()}");
+            }
+
+            if (this.ProfanityFilter.HasValue)
+            {
+                sb.Append($"&profanity_filter={this.ProfanityFilter.ToString().ToLower()}");
+            }
+
+            if (this.NamedEntityRecognition.HasValue)
+            {
+                sb.Append($"&ner={this.NamedEntityRecognition.ToString().ToLower()}");
+            }
+            if (this.Diarize.HasValue)
+            {
+                sb.Append($"&diarize={this.Diarize.ToString().ToLower()}");
+            }
+            if (this.MultiChannel.HasValue)
+            {
+                sb.Append($"&multichannel={this.MultiChannel.ToString().ToLower()}");
+            }
+            if (this.Numerals.HasValue)
+            {
+                sb.Append($"&numerals={this.Numerals.ToString().ToLower()}");
+            }
+
+            if (this.Redaction?.Length > 0)
+            {
+                foreach (string item in this.Redaction)
+                {
+                    sb.Append($"&redact={item.ToLower()}");
+                }
+            }
+
+            if (this.SearchTerms?.Length > 0)
+            {
+                foreach (string item in this.SearchTerms)
+                {
+                    sb.Append($"&search={item.ToLower()}");
+                }
+            }
+
+            if (this.Keywords?.Length > 0)
+            {
+                foreach (string item in this.Keywords)
+                {
+                    sb.Append($"&keywords={item.ToLower()}");
+                }
+            }
+
+            if (this.Alternatives.HasValue)
+            {
+                sb.Append($"&alternatives={this.Alternatives.Value.ToString()}");
+            }
+
+            if (sb.Length > 0)
+            {
+                return sb.ToString().Substring(1);
+            }
+            return "";
+        }
     }
 }

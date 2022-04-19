@@ -14,7 +14,8 @@ namespace SampleApp
                     new PrerecordedTranscriptionOptions()
                     {
                         Punctuate = true,
-                        Utterances = true
+                        Utterances = true,
+                        Redaction = new [] { "pci", "ssn" }
                     });
 
             Console.Write(response.ToWebVTT());
