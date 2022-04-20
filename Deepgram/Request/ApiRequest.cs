@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -56,9 +57,9 @@ namespace Deepgram.Request
             request.Content = httpContent;
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
+        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null, string? querystring = null)
         {
-            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(credentials, uri, querystring, queryParameters);
 
             var req = new HttpRequestMessage
             {
@@ -71,9 +72,9 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
+        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, string querystring)
         {
-            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(credentials, uri, querystring);
 
             var req = new HttpRequestMessage
             {
@@ -86,12 +87,17 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object? queryParameters)
+        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, string? querystring, object? queryParameters = null)
         {
-            if (null != queryParameters)
+            if (!String.IsNullOrEmpty(querystring))
+            {
+                return new Uri($"https://{credentials.ApiUrl}{uri}?{querystring}");
+            }
+            else if (null != queryParameters)
             {
                 var queryParams = Helpers.GetParameters(queryParameters);
                 var sb = new StringBuilder();
+
                 foreach (var parameter in queryParams)
                 {
                     sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(parameter.Key), WebUtility.UrlEncode(parameter.Value));

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Deepgram.Transcription
@@ -107,5 +108,105 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("utt_split")]
         public decimal? UtteranceSplit { get; set; } = null;
+
+        /// <summary>
+        /// Converts the options into a querystring
+        /// </summary>
+        public string ToQueryString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (!String.IsNullOrEmpty(this.Language))
+            {
+                sb.Append($"&language={this.Language}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Model))
+            {
+                sb.Append($"&model={this.Model}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Version))
+            {
+                sb.Append($"&version={this.Version}");
+            }
+
+            if (!String.IsNullOrEmpty(this.Callback))
+            {
+                sb.Append($"&callback={this.Callback}");
+            }
+
+            if (this.Punctuate.HasValue)
+            {
+                sb.Append($"&punctuate={this.Punctuate.ToString().ToLower()}");
+            }
+
+            if (this.Utterances.HasValue)
+            {
+                sb.Append($"&utterances={this.Utterances.ToString().ToLower()}");
+            }
+
+            if (this.ProfanityFilter.HasValue)
+            {
+                sb.Append($"&profanity_filter={this.ProfanityFilter.ToString().ToLower()}");
+            }
+
+            if (this.NamedEntityRecognition.HasValue)
+            {
+                sb.Append($"&ner={this.NamedEntityRecognition.ToString().ToLower()}");
+            }
+            if (this.Diarize.HasValue)
+            {
+                sb.Append($"&diarize={this.Diarize.ToString().ToLower()}");
+            }
+            if (this.MultiChannel.HasValue)
+            {
+                sb.Append($"&multichannel={this.MultiChannel.ToString().ToLower()}");
+            }
+            if (this.Numerals.HasValue)
+            {
+                sb.Append($"&numerals={this.Numerals.ToString().ToLower()}");
+            }
+
+            if (this.Redaction?.Length > 0)
+            {
+                foreach(string item in this.Redaction)
+                {
+                    sb.Append($"&redact={item.ToLower()}");
+                }
+            }
+
+            if (this.SearchTerms?.Length > 0)
+            {
+                foreach (string item in this.SearchTerms)
+                {
+                    sb.Append($"&search={item.ToLower()}");
+                }
+            }
+
+            if (this.Keywords?.Length > 0)
+            {
+                foreach (string item in this.Keywords)
+                {
+                    sb.Append($"&keywords={item.ToLower()}");
+                }
+            }
+
+            if (this.Alternatives.HasValue)
+            {
+                sb.Append($"&alternatives={this.Alternatives.Value.ToString()}");
+            }
+
+            if (this.UtteranceSplit.HasValue)
+            {
+                sb.Append($"&utt_split={this.UtteranceSplit.Value.ToString()}");
+            }
+
+            if (sb.Length > 0)
+            {
+                return sb.ToString().Substring(1);
+            }
+            return "";
+        }
     }
 }
