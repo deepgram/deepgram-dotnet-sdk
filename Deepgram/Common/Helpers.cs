@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Linq;
 using System.Reflection;
+using System.Web;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Deepgram.Common
 {
@@ -35,10 +37,32 @@ namespace Deepgram.Common
             return $"deepgram/{libraryVersion} dotnet/{languageVersion}";
         }
 
-        public static Dictionary<string, string> GetParameters(object? parameters)
+        public static string GetParameters(object? parameters)
         {
             var json = JsonConvert.SerializeObject(parameters);
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            var jObj = (JObject)JsonConvert.DeserializeObject(json);
+            
+            List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
+
+            foreach (var prop in jObj.Properties())
+            {
+                if (prop.HasValues && !String.IsNullOrEmpty(prop.Value.ToString()))
+                {
+                    if (prop.Value.Type == JTokenType.Array)
+                    {
+                        foreach (var value in prop.Values())
+                        {
+                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
+                        }
+                    }
+                    else
+                    {
+                        paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));
+                    }
+                }
+            }
+
+            return String.Join("&", paramList.Select(s => $"{s.Key}={s.Value.ToString()}")).ToLower();
         }
     }
 }

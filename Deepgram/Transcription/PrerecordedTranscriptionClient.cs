@@ -27,9 +27,8 @@ namespace Deepgram.Transcription
                 HttpMethod.Post,
                 "/v1/listen",
                 _credentials,
-                null,
-                source,
-                options.ToQueryString());
+                options,
+                source);
         }
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace Deepgram.Transcription
                 "/v1/listen",
                 _credentials,
                 source,
-                options.ToQueryString());
+                options);
         }
     }
 }

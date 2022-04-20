@@ -24,10 +24,10 @@ namespace Deepgram.Usage
         public string ApiKeyId { get; set; }
 
         /// <summary>
-        /// Limits results to requests associated with the specified tag. 
+        /// Limits results to requests associated with the specified tag(s). 
         /// </summary>
         [JsonProperty("tag")]
-        public string Tag { get; set; }
+        public string[]? Tag { get; set; }
 
         /// <summary>
         /// Limits results to requests processed using the specified method.
