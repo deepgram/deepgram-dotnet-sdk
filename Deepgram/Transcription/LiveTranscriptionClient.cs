@@ -185,7 +185,8 @@ namespace Deepgram.Transcription
         {
             if (null != queryParameters)
             {
-                return new Uri($"wss://{_credentials.ApiUrl}{uri}?{queryParameters?.ToQueryString()}");
+                var queryString = Helpers.GetParameters(queryParameters);
+                return new Uri($"wss://{_credentials.ApiUrl}{uri}?{queryString}");
             }
             return new Uri($"wss://{_credentials.ApiUrl}{uri}");
         }
