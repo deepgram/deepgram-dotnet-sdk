@@ -8,7 +8,7 @@ speech recognition APIs.
 > This SDK only supports hosted usage of api.deepgram.com.
 
 To access the API you will need a Deepgram account. Sign up for free at
-[signup][https://console.deepgram.com/signup?utm_medium=github&utm_source=DEVREL&utm_content=dotnet-sdk].
+[signup](https://console.deepgram.com/signup?utm_medium=github&utm_source=DEVREL&utm_content=dotnet-sdk).
 
 ## Documentation
 
@@ -179,8 +179,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 
 The Library uses Microsoft.Extensions.Logging to preform all of it's logging tasks. To configure
 logging for your app simply create a new ILoggerFactory and call the LogProvider.SetLogFactory()
-method to tell the Deepgram library how to log. For example, to log to the console with serilog
-you can do the following:
+method to tell the Deepgram library how to log. For example, to log to the console with Serilog, you'd need to install the Serilog package with `dotnet add package Serilog` and then do the following:
 
 ```csharp
 using Microsoft.Extensions.Logging;
@@ -216,6 +215,5 @@ project, let us know! You can either:
 ## Further Reading
 
 Check out the Developer Documentation at [https://developers.deepgram.com/](https://developers.deepgram.com/)
-
 
 [signup]: https://console.deepgram.com?utm_source=dotnet-sdk&utm_content=readme
