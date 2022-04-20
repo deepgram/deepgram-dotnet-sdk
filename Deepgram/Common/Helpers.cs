@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Reflection;
-
 using Newtonsoft.Json;
 
 namespace Deepgram.Common
@@ -35,14 +35,10 @@ namespace Deepgram.Common
             return $"deepgram/{libraryVersion} dotnet/{languageVersion}";
         }
 
-        public static Dictionary<string, string> GetParameters(object parameters)
+        public static Dictionary<string, string> GetParameters(object? parameters)
         {
-            var json = JsonConvert.SerializeObject(parameters, new JsonSerializerSettings()
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
+            var json = JsonConvert.SerializeObject(parameters);
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         }
     }
-
 }
