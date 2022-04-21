@@ -34,7 +34,7 @@ namespace Deepgram.Request
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", apiKey);
         }
 
-        private static void SetContent(ref HttpRequestMessage request, object? bodyObject)
+        private static void SetContent(ref HttpRequestMessage request, object bodyObject)
         {
             if (null != bodyObject)
             {
@@ -56,7 +56,7 @@ namespace Deepgram.Request
             request.Content = httpContent;
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object? queryParameters = null, object? bodyObject = null)
+        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object queryParameters = null, object bodyObject = null)
         {
             var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
@@ -71,7 +71,7 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object? queryParameters = null)
+        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
         {
             var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
@@ -86,7 +86,7 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object? queryParameters)
+        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object queryParameters)
         {
             if (null != queryParameters)
             {

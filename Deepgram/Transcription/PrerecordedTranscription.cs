@@ -9,13 +9,13 @@ namespace Deepgram.Transcription
         /// Metadata for the request
         /// </summary>
         [JsonProperty("metadata")]
-        public PrerecordedTranscriptionMetaData? MetaData { get; set; } = null;
+        public PrerecordedTranscriptionMetaData MetaData { get; set; } = null;
 
         /// <summary>
         /// Results of the transcription
         /// </summary>
         [JsonProperty("results")]
-        public PrerecordedTranscriptionResult? Results { get; set; } = null;
+        public PrerecordedTranscriptionResult Results { get; set; } = null;
 
         public string ToWebVTT()
         {

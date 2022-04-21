@@ -181,7 +181,7 @@ namespace Deepgram.Transcription
             EnqueueForSending(new MessageToSend(data));
         }
 
-        private Uri GetWSSUriWithQuerystring(string uri, object? queryParameters)
+        private Uri GetWSSUriWithQuerystring(string uri, object queryParameters)
         {
             if (null != queryParameters)
             {

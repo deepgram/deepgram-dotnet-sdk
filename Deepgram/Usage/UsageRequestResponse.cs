@@ -9,7 +9,7 @@ namespace Deepgram.Usage
         /// Details of the request
         /// </summary>
         [JsonProperty("details")]
-        public UsageRequestResponseDetail? Details {get;set;}
+        public UsageRequestResponseDetail Details {get;set;}
 
         /// <summary>
         /// If the request failed, this will contain the error message.

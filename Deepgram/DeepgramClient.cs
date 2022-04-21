@@ -43,7 +43,7 @@ namespace Deepgram
             return new LiveTranscriptionClient(_credentials);
         }
 
-        private void InitializeCredentials(Credentials? credentials = null)
+        private void InitializeCredentials(Credentials credentials = null)
         {
             string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? "" : credentials.ApiUrl;
             string apiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? "" : credentials.ApiKey;

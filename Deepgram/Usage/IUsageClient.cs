@@ -11,7 +11,7 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>Usage Requests that fit the parameters provided</returns>
-        Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions? options);
+        Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions options);
 
         /// <summary>
         /// Returns details about a specific request to the Deepgram API
@@ -27,7 +27,7 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>Summary of usage statistics</returns>
-        Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions? options);
+        Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions options);
 
         /// <summary>
         /// Retrieves a list of features, models, tags, languages, and processing method used for requests in the specified project.
@@ -35,6 +35,6 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>List of features, models, tags, languages, and processing method used for requests in the specified project.</returns>
-        Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions? options);
+        Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions options);
     }
 }
