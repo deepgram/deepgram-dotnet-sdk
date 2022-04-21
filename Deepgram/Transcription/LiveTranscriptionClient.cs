@@ -181,18 +181,12 @@ namespace Deepgram.Transcription
             EnqueueForSending(new MessageToSend(data));
         }
 
-        private Uri GetWSSUriWithQuerystring(string uri, object queryParameters)
+        private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
         {
             if (null != queryParameters)
             {
-                var queryParams = Helpers.GetParameters(queryParameters);
-                var sb = new StringBuilder();
-                foreach (var parameter in queryParams)
-                {
-                    sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(parameter.Key), WebUtility.UrlEncode(parameter.Value));
-                }
-
-                return new Uri($"wss://{_credentials.ApiUrl}{uri}?{sb.ToString()}");
+                var queryString = Helpers.GetParameters(queryParameters);
+                return new Uri($"wss://{_credentials.ApiUrl}{uri}?{queryString}");
             }
             return new Uri($"wss://{_credentials.ApiUrl}{uri}");
         }

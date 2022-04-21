@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -86,18 +87,12 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object queryParameters)
+        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object queryParameters = null)
         {
             if (null != queryParameters)
             {
-                var queryParams = Helpers.GetParameters(queryParameters);
-                var sb = new StringBuilder();
-                foreach (var parameter in queryParams)
-                {
-                    sb.AppendFormat("{0}={1}&", WebUtility.UrlEncode(parameter.Key), WebUtility.UrlEncode(parameter.Value));
-                }
-
-                return new Uri($"https://{credentials.ApiUrl}{uri}?{sb.ToString()}");
+                var querystring = Helpers.GetParameters(queryParameters);
+                return new Uri($"https://{credentials.ApiUrl}{uri}?{querystring}");
             }
             return new Uri($"https://{credentials.ApiUrl}{uri}");
         }
