@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Deepgram.Transcription
 {
@@ -24,6 +21,12 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("language")]
         public string? Language { get; set; } = null;
+
+        /// <summary>
+        /// Tier of model
+        /// </summary>
+        [JsonProperty("tier")]
+        public string? Tier { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to add punctuation and capitalization to the transcript.
