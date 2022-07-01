@@ -20,7 +20,7 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>Usage Requests that fit the parameters provided</returns>
-        public async Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions? options)
+        public async Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions options)
         {
             return await ApiRequest.DoRequestAsync<ListAllRequestsResponse>(    
                 HttpMethod.Get,
@@ -51,7 +51,7 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>Summary of usage statistics</returns>
-        public async Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions? options)
+        public async Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions options)
         {
             return await ApiRequest.DoRequestAsync<UsageSummary>(
                 HttpMethod.Get,
@@ -67,7 +67,7 @@ namespace Deepgram.Usage
         /// <param name="projectId">Unique identifier of the project to report on</param>
         /// <param name="options">Pagination & filtering options</param>
         /// <returns>List of features, models, tags, languages, and processing method used for requests in the specified project.</returns>
-        public async Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions? options)
+        public async Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions options)
         {
             return await ApiRequest.DoRequestAsync<UsageFields>(
                 HttpMethod.Get,

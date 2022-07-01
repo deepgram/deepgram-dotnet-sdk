@@ -37,29 +37,34 @@ namespace Deepgram.Common
             return $"deepgram/{libraryVersion} dotnet/{languageVersion}";
         }
 
-        public static string GetParameters(object? parameters)
+        public static string GetParameters(object parameters = null)
         {
-            var json = JsonConvert.SerializeObject(parameters);
-            var jObj = (JObject)JsonConvert.DeserializeObject(json);
-            
             List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
 
-            foreach (var prop in jObj.Properties())
+            if (parameters != null)
             {
-                if (prop.HasValues && !String.IsNullOrEmpty(prop.Value.ToString()))
+
+                var json = JsonConvert.SerializeObject(parameters);
+                var jObj = (JObject)JsonConvert.DeserializeObject(json);
+
+                foreach (var prop in jObj.Properties())
                 {
-                    if (prop.Value.Type == JTokenType.Array)
+                    if (prop.HasValues && !String.IsNullOrEmpty(prop.Value.ToString()))
                     {
-                        foreach (var value in prop.Values())
+                        if (prop.Value.Type == JTokenType.Array)
                         {
-                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
+                            foreach (var value in prop.Values())
+                            {
+                                paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
+                            }
+                        }
+                        else
+                        {
+                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));
                         }
                     }
-                    else
-                    {
-                        paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));
-                    }
                 }
+
             }
 
             return String.Join("&", paramList.Select(s => $"{s.Key}={s.Value.ToString()}")).ToLower();

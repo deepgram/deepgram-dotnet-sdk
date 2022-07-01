@@ -21,7 +21,7 @@ namespace Deepgram.Transcription
         /// <param name="source">Url source to send for transcription</param>
         /// <param name="options">Feature options for the transcription</param>
         /// <returns>Transcription of the provided audio</returns>
-        public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions? options)
+        public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
             return await ApiRequest.DoRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
@@ -37,7 +37,7 @@ namespace Deepgram.Transcription
         /// <param name="source">Audio source to send for transcription</param>
         /// <param name="options">Feature options for the transcription</param>
         /// <returns>Transcription of the provided audio</returns>
-        public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions? options)
+        public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
             return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,

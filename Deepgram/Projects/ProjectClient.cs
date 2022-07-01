@@ -50,7 +50,11 @@ namespace Deepgram.Projects
         public async Task<MessageResponse> UpdateProjectAsync(Project project)
         {
             return await ApiRequest.DoRequestAsync<MessageResponse>(
+#if NETSTANDARD2_0
+                new HttpMethod("PATCH"),
+#else
                 HttpMethod.Patch,
+#endif
                 $"/v1/projects/{project.Id}",
                 _credentials,
                 null,
