@@ -9,7 +9,7 @@ namespace Deepgram.Transcription
         /// Array of Search objects.
         /// </summary>
         [JsonProperty("search")]
-        public Search[]? Search { get; set; }
+        public Search[] Search { get; set; }
 
         /// <summary>
         /// Array of Alternative objects.

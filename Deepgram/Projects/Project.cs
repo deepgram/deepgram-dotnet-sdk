@@ -21,6 +21,6 @@ namespace Deepgram.Projects
         /// Name of the company associated with the Deepgram project
         /// </summary>
         [JsonProperty("company")]
-        public string? Company { get; set; }
+        public string Company { get; set; }
     }
 }

@@ -34,12 +34,12 @@ namespace Deepgram.Usage
         /// </summary>
         /// <remarks>If a response has not yet been generated, this object will be empty.</remarks>
         [JsonProperty("response")]
-        public UsageRequestResponse? Response { get; set; }
+        public UsageRequestResponse Response { get; set; }
 
         /// <summary>
         /// Only exists if a callback was included in the request.
         /// </summary>
         [JsonProperty("callback")]
-        public UsageRequestCallback? Callback { get; set; }
+        public UsageRequestCallback Callback { get; set; }
     }
 }
