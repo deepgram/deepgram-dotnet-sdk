@@ -9,126 +9,126 @@ namespace Deepgram.Usage
         /// Start date of the requested date range.
         /// </summary>
         [JsonProperty("start")]
-        public DateTime? StartDateTime { get; set; }
+        public Nullable<DateTime> StartDateTime { get; set; } = null;
 
         /// <summary>
         /// End date of the requested date range.
         /// </summary>
         [JsonProperty("end")]
-        public DateTime? EndDateTime { get; set; }
+        public Nullable<DateTime> EndDateTime { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests made using the API key corresponding to the given accessor. 
         /// </summary>
         [JsonProperty("accessor")]
-        public string ApiKeyId { get; set; }
+        public string ApiKeyId { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests associated with the specified tag(s). 
         /// </summary>
         [JsonProperty("tag")]
-        public string[]? Tag { get; set; }
+        public string[] Tag { get; set; }
 
         /// <summary>
         /// Limits results to requests processed using the specified method.
         /// </summary>
         [JsonProperty("method")]
-        public RequestMethod? Method { get; set; }
+        public Nullable<RequestMethod> Method { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests run with the specified model applied.
         /// </summary>
         [JsonProperty("model")]
-        public string Model { get; set; }
+        public string Model { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the multichannel feature.
         /// </summary>
         [JsonProperty("multichannel")]
-        public bool? MultiChannel { get; set; }
+        public Nullable<bool> MultiChannel { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the interim_results feature.
         /// </summary>
         [JsonProperty("interim_results")]
-        public bool? InterimResults { get; set; }
+        public Nullable<bool> InterimResults { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the punctuate feature.
         /// </summary>
         [JsonProperty("punctuate")]
-        public bool? Punctuate { get; set; }
+        public Nullable<bool> Punctuate { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the ner feature.
         /// </summary>
         [JsonProperty("ner")]
-        public bool? NamedEntityRecognition { get; set; }
+        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the utterances feature.
         /// </summary>
         [JsonProperty("utterances")]
-        public bool? Utterances { get; set; }
+        public Nullable<bool> Utterances { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the replace feature.
         /// </summary>
         [JsonProperty("replace")]
-        public bool? Replace { get; set; }
+        public Nullable<bool> Replace { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the profanity_filter feature.
         /// </summary>
         [JsonProperty("profanity_filter")]
-        public bool? ProfanityFilter { get; set; }
+        public Nullable<bool> ProfanityFilter { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the keywords feature.
         /// </summary>
         [JsonProperty("keywords")]
-        public bool? Keywords { get; set; }
+        public Nullable<bool> Keywords { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the sentiment feature.
         /// </summary>
         [JsonProperty("sentiment")]
-        public bool? Sentiment { get; set; }
+        public Nullable<bool> Sentiment { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the diarize feature.
         /// </summary>
         [JsonProperty("diarize")]
-        public bool? Diarization { get; set; }
+        public Nullable<bool> Diarization { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the detect_language feature.
         /// </summary>
         [JsonProperty("detect_language")]
-        public bool? DetectLanguage { get; set; }
+        public Nullable<bool> DetectLanguage { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the search feature.
         /// </summary>
         [JsonProperty("search")]
-        public bool? Search { get; set; }
+        public Nullable<bool> Search { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the redact feature.
         /// </summary>
         [JsonProperty("redact")]
-        public bool? Redaction { get; set; }
+        public Nullable<bool> Redaction { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the alternatives feature.
         /// </summary>
         [JsonProperty("alternatives")]
-        public bool? Alternatives { get; set; }
+        public Nullable<bool> Alternatives { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the numerals feature.
         /// </summary>
         [JsonProperty("numerals")]
-        public bool? Numerals { get; set; }
+        public Nullable<bool> Numerals { get; set; } = null;
     }
 }

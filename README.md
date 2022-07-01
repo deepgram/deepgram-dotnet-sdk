@@ -32,6 +32,7 @@ dotnet add package Deepgram
 - 6.0.0
 - 5.0.0
 - .NET Core 3.1
+- .NET Standard 2.0
 
 ## Configuration
 
