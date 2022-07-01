@@ -26,7 +26,7 @@ namespace Deepgram.Transcription
         /// Tier of model
         /// </summary>
         [JsonProperty("tier")]
-        public string? Tier { get; set; } = null;
+        public string Tier { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to add punctuation and capitalization to the transcript.
