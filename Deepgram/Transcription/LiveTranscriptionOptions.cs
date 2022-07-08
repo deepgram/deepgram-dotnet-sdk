@@ -24,8 +24,9 @@ namespace Deepgram.Transcription
         public string Language { get; set; } = null;
 
         /// <summary>
-        /// Tier of model
+        /// Level of model you would like to use in your request.
         /// </summary>
+        /// <remarks>Defaults to base. Possible values are: base, enhanced</remarks>
         [JsonProperty("tier")]
         public string Tier { get; set; } = null;
 
@@ -85,6 +86,13 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("search")]
         public string[] SearchTerms { get; set; }
+
+        /// <summary>
+        /// Terms or phrases to search for in the submitted audio and replace.
+        /// </summary>
+        /// <remarks>Phrases should be submitted in the format: searchfor:replacewith</remarks>
+        [JsonProperty("replace")]
+        public string[] Replace { get; set; }
 
         /// <summary>
         /// Callback URL to provide if you would like your submitted audio to be processed asynchronously.
