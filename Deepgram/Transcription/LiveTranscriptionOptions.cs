@@ -50,11 +50,11 @@ namespace Deepgram.Transcription
         public string[] Redaction { get; set; }
 
         /// <summary>
-        /// Indicates whether to recognize speaker changes. When set to true, each word in the transcript
-        /// will be assigned a speaker number starting at 0. 
+        /// Indicates whether to recognize speaker changes.
         /// </summary>
+        /// <remarks>The default value is 'latest'. Other valid responses are the version of diarization.</remarks>
         [JsonProperty("diarize")]
-        public Nullable<bool> Diarize { get; set; } = null;
+        public string Diarize { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to recognize alphanumeric strings. When set to true, whitespace will be removed
