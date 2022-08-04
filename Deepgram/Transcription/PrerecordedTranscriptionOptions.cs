@@ -50,11 +50,19 @@ namespace Deepgram.Transcription
         public string[] Redaction { get; set; }
 
         /// <summary>
-        /// Indicates whether to recognize speaker changes.
+        /// Indicates whether to recognize speaker changes. When set to true, each word in the transcript
+        /// will be assigned a speaker number starting at 0. 
         /// </summary>
-        /// <remarks>The default value is 'latest'. Other valid responses are the version of diarization.</remarks>
         [JsonProperty("diarize")]
-        public string Diarize { get; set; } = null;
+        public Nullable<bool> Diarize { get; set; } = null;
+
+        /// <summary>
+        /// Indicates which version of the diarizer to use. When passed in, each word in the transcript will
+        /// be assigned a speaker number starting at 0. Ex: YYYY-MM-DD.X where YYYY-MM-DD is the version date
+        ///  and X is the version number.
+        /// </summary>
+        [JsonProperty("diarize_version ")]
+        public string DiarizationVersion { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to recognize alphanumeric strings. When set to true, whitespace will be removed
@@ -86,7 +94,7 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("search")]
         public string[] SearchTerms { get; set; }
-        
+
         /// <summary>
         /// Terms or phrases to search for in the submitted audio and replace.
         /// </summary>
