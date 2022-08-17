@@ -40,5 +40,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("speaker")]
         public int? Speaker { get; set; }
+
+        /// <summary>
+        /// Value between 0 and 1 indicating the model's relative confidence in its choice of speaker.
+        /// </summary>
+        [JsonProperty("speaker_confidence")]
+        public decimal SpeakerConfidence { get; set; }
     }
 }
