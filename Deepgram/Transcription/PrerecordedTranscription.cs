@@ -69,7 +69,7 @@ namespace Deepgram.Transcription
 
         private string SecondsToTimestamp(decimal seconds)
         {
-            return new TimeSpan((long)(seconds * 10000000)).ToString().Substring(0, 12);
+            return new TimeSpan((long)(seconds * 10000000)).ToString().Substring(0, (seconds % 1) == 0 ? 8 : 12);
         }
     }
 }
