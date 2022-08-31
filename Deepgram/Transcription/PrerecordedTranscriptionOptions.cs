@@ -90,6 +90,12 @@ namespace Deepgram.Transcription
         public Nullable<bool> Numerals { get; set; } = null;
 
         /// <summary>
+        /// Indicates whether to detect the language of the provided audio.
+        /// </summary>
+        [JsonProperty("detect-language")]
+        public Nullable<bool> DetectLanguage { get; set; } = null;
+
+        /// <summary>
         /// Terms or phrases to search for in the submitted audio.
         /// </summary>
         [JsonProperty("search")]
