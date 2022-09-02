@@ -124,6 +124,14 @@ namespace Deepgram.Transcription
         public Nullable<bool> Utterances { get; set; } = null;
 
         /// <summary>
+        /// Indicates whether Deepgram will split audio into paragraphs to improve transcript
+        /// readability. When paragraphs is set to true, you must also set either punctuate, 
+        /// diarize, or multichannel to true.
+        /// </summary>
+        [JsonProperty("paragraphs")]
+        public Nullable<bool> Paragraphs { get; set; } = null;
+
+        /// <summary>
         /// Length of time in seconds of silence between words that Deepgram will use when determining
         /// where to split utterances.
         /// </summary>
