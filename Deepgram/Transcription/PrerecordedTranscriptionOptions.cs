@@ -90,12 +90,6 @@ namespace Deepgram.Transcription
         public Nullable<bool> Numerals { get; set; } = null;
 
         /// <summary>
-        /// Indicates whether to detect the language of the provided audio.
-        /// </summary>
-        [JsonProperty("detect-language")]
-        public Nullable<bool> DetectLanguage { get; set; } = null;
-
-        /// <summary>
         /// Terms or phrases to search for in the submitted audio.
         /// </summary>
         [JsonProperty("search")]
@@ -128,6 +122,20 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("utterances")]
         public Nullable<bool> Utterances { get; set; } = null;
+        
+        /// <summary>
+        /// Indicates whether to detect the language of the provided audio.
+        /// </summary>
+        [JsonProperty("detect-language")]
+        public Nullable<bool> DetectLanguage { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram will split audio into paragraphs to improve transcript
+        /// readability. When paragraphs is set to true, you must also set either punctuate, 
+        /// diarize, or multichannel to true.
+        /// </summary>
+        [JsonProperty("paragraphs")]
+        public Nullable<bool> Paragraphs { get; set; } = null;
 
         /// <summary>
         /// Length of time in seconds of silence between words that Deepgram will use when determining
