@@ -9,7 +9,7 @@ namespace Deepgram.Transcription
         /// Summary of a section of the transcript
         /// </summary>
         [JsonProperty("summary")]
-        public string Summary { get; set; }
+        public string TextSummary { get; set; }
 
         /// <summary>
         /// Word position in transcript where the summary begins
