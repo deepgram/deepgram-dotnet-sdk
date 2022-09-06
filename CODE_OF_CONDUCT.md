@@ -1,4 +1,3 @@
-
 # Code of Conduct
 
 The Deepgram developer community is filled with amazing, clever and creative people, and we're excited for you to join us. Our goal is to create safe and inclusive spaces, have meaningful conversations, and explore ways to make sure that every voice is heard and understood.
@@ -130,3 +129,4 @@ This Code of Conduct is adapted from:
 Community Impact Guidelines, which were copied from InnerSource Commons, were inspired by Mozilla’s code of conduct enforcement ladder.
 
 For answers to common questions about this code of conduct, see the FAQ at https://www.contributor-covenant.org/faq. Translations are available at https://www.contributor-covenant.org/translations.
+
