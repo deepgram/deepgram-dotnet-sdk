@@ -137,5 +137,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("utt_split")]
         public Nullable<decimal> UtteranceSplit { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram should provide summarizations of sections of the provided audio.
+        /// </summary>
+        [JsonProperty("summarize")]
+        public Nullable<bool> Summarize { get; set; } = null;
     }
 }
