@@ -122,6 +122,12 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("utterances")]
         public Nullable<bool> Utterances { get; set; } = null;
+        
+        /// <summary>
+        /// Indicates whether to detect the language of the provided audio.
+        /// </summary>
+        [JsonProperty("detect_language")]
+        public Nullable<bool> DetectLanguage { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram will split audio into paragraphs to improve transcript
@@ -137,7 +143,7 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("utt_split")]
         public Nullable<decimal> UtteranceSplit { get; set; } = null;
-
+        
         /// <summary>
         /// Indicates whether Deepgram should provide summarizations of sections of the provided audio.
         /// </summary>
