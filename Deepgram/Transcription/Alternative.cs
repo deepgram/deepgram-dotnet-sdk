@@ -22,5 +22,19 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("words")]
         public Words[] Words { get; set; }
+
+        /// <summary>
+        /// Array of Paragraph objects.
+        /// </summary>
+        /// <remark>Only used when the paragraph feature is enabled on the request</remark>
+        [JsonProperty("paragraphs")]
+        public ParagraphGroup[] Paragraphs { get; set; }
+        
+        /// <summary>
+        /// Array of Summary objects.
+        /// </summary>
+        /// <remark>Only used when the summarize feature is enabled on the request</remark>
+        [JsonProperty("summaries")]
+        public Summary[] Summaries { get; set; }
     }
 }
