@@ -18,11 +18,17 @@ namespace Deepgram.Usage
         public DateTime EndDateTime { get; set; }
 
         /// <summary>
-        /// Length of time (in hours) of audio processed in included requests.
+        /// Length of time (in hours) of audio submitted in included requests.
         /// </summary>
         [JsonProperty("hours")]
         public decimal Hours { get; set; }
 
+        /// <summary>
+        /// Length of time (in hours) of audio processed in included requests.
+        /// </summary>
+        [JsonProperty("total_hours")]
+        public decimal TotalHours { get; set; }
+        
         /// <summary>
         /// Number of included requests.
         /// </summary>
