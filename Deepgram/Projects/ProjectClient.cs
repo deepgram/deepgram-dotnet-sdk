@@ -73,5 +73,18 @@ namespace Deepgram.Projects
                 $"/v1/projects/{projectId}",
                 _credentials);
         }
+
+        /// <summary>
+        /// Returns all members of a project
+        /// </summary>
+        /// <returns>List of members</returns>
+        public async Task<MemberList> GetMembersAsync(string projectId)
+        {
+            return await ApiRequest.DoRequestAsync<MemberList>(
+                       HttpMethod.Get,
+                       $"/v1/projects/{projectId}/members",
+                       _credentials
+                   );
+        }
     }
 }

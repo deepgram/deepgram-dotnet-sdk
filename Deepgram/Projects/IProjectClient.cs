@@ -31,5 +31,12 @@ namespace Deepgram.Projects
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to delete</param>
         Task<MessageResponse> DeleteProjectAsync(string projectId);
+
+        /// <summary>
+        /// Returns all members of a project
+        /// </summary>
+        /// <param name="projectId"></param>
+        /// <returns>List of members of a project</returns>
+        Task<MemberList> GetMembersAsync(string projectId);
     }
 }
