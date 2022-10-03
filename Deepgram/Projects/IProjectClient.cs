@@ -38,5 +38,13 @@ namespace Deepgram.Projects
         /// <param name="projectId">Unique identifier of the project for which you want to get members.</param>
         /// <returns>List of members of a project</returns>
         Task<MemberList> GetMembersAsync(string projectId);
+
+        /// <summary>
+        /// Returns member scopes for the specific project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project.</param>
+        /// <param name="memberId">Unique identifier of the member.</param>
+        /// <returns>List of member scopes</returns>
+        Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId);
     }
 }

@@ -87,5 +87,20 @@ namespace Deepgram.Projects
                        _credentials
                    );
         }
+
+        /// <summary>
+        /// Returns member scopes for the specific project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        /// <returns>List of member scopes</returns>
+        public async Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId)
+        {
+            return await ApiRequest.DoRequestAsync<ScopesList>(
+                HttpMethod.Get,
+                $"/v1/projects/{projectId}/members/{memberId}/scopes",
+                _credentials
+                );
+        }
     }
 }
