@@ -202,8 +202,8 @@ LogProvider.SetLogFactory(factory);
 Interested in contributing? We ❤️ pull requests!
 
 To make sure our community is safe for all, be sure to review and agree to our
-[Code of Conduct](./CODE_OF_CONDUCT.md). Then see the
-[Contribution](./CONTRIBUTING.md) guidelines for more information.
+[Code of Conduct](./.github/CODE_OF_CONDUCT.md). Then see the
+[Contribution](./.github/CONTRIBUTING.md) guidelines for more information.
 
 ## Getting Help
 
