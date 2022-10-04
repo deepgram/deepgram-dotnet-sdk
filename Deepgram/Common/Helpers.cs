@@ -58,6 +58,10 @@ namespace Deepgram.Common
                                 paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
                             }
                         }
+                        else if (prop.Value.Type == JTokenType.Date)
+                        {
+                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(((DateTime)prop.Value).ToString("yyyy-MM-dd"))));
+                        }
                         else
                         {
                             paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));

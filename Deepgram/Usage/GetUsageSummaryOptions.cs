@@ -39,7 +39,7 @@ namespace Deepgram.Usage
         /// Limits results to requests run with the specified model applied.
         /// </summary>
         [JsonProperty("model")]
-        public string Model { get; set; } = null;
+        public string[] Model { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the multichannel feature.
