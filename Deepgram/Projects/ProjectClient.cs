@@ -87,5 +87,17 @@ namespace Deepgram.Projects
                        _credentials
                    );
         }
+
+        /// <summary>
+        /// Removes the authenticated account from the specified project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
+        public async Task<MessageResponse> LeaveProjectAsync(string projectId)
+        {
+            return await ApiRequest.DoRequestAsync<MessageResponse>(
+                HttpMethod.Delete,
+                $"/v1/projects/{projectId}/leave",
+                _credentials);
+        }
     }
 }

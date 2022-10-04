@@ -38,5 +38,11 @@ namespace Deepgram.Projects
         /// <param name="projectId">Unique identifier of the project for which you want to get members.</param>
         /// <returns>List of members of a project</returns>
         Task<MemberList> GetMembersAsync(string projectId);
+
+        /// <summary>
+        /// Removes the authenticated account from the specified project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
+        Task<MessageResponse> LeaveProjectAsync(string projectId);
     }
 }
