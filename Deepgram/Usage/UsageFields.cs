@@ -24,6 +24,12 @@ namespace Deepgram.Usage
         public RequestMethod[] ProcessingMethods { get; set; }
 
         /// <summary>
+        /// Array of included languages.
+        /// </summary>
+        [JsonProperty("languages")]
+        public string[] Languages { get; set; }
+
+        /// <summary>
         /// Array of included features.
         /// </summary>
         [JsonProperty("features")]
