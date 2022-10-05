@@ -113,5 +113,18 @@ namespace Deepgram.Projects
                 $"/v1/projects/{projectId}/leave",
                 _credentials);
         }
+
+        /// <summary>
+        /// Removes a member from a project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        public async Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId)
+        {
+            return await ApiRequest.DoRequestAsync<MessageResponse>(
+                HttpMethod.Delete,
+                $"/v1/projects/{projectId}/members/{memberId}",
+                _credentials);
+        }
     }
 }
