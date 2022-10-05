@@ -1,14 +1,12 @@
 # Deepgram .NET SDK
 
-![Nuget](https://img.shields.io/nuget/v/deepgram) [![Build Status](https://github.com/deepgram-devs/deepgram-dotnet-sdk/workflows/CI/badge.svg)](https://github.com/deepgram-devs/deepgram-dotnet-sdk/actions?query=CI) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![Nuget](https://img.shields.io/nuget/v/deepgram)](https://www.nuget.org/packages/Deepgram) [![Build Status](https://github.com/deepgram-devs/deepgram-dotnet-sdk/workflows/CI/badge.svg)](https://github.com/deepgram-devs/deepgram-dotnet-sdk/actions?query=CI) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](./.github/CODE_OF_CONDUCT.md)
 
 Official .NET SDK for [Deepgram](https://www.deepgram.com/)'s automated
 speech recognition APIs.
 
-> This SDK only supports hosted usage of api.deepgram.com.
-
 To access the API you will need a Deepgram account. Sign up for free at
-[signup](https://console.deepgram.com/signup?utm_medium=github&utm_source=DEVREL&utm_content=dotnet-sdk).
+[signup](https://console.deepgram.com/signup?utm_medium=github&utm_source=devrel&utm_content=dotnet-sdk).
 
 ## Documentation
 
