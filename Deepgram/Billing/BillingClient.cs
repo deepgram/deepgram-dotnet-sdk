@@ -18,9 +18,9 @@ namespace Deepgram.Billing
         /// </summary>
         /// <param name="projectId">Unique identifier of the project for which you want to retrieve outstanding balances</param>
         /// <returns>List of Deepgram balances</returns>
-        public async Task<Billing[]> GetAllBalancesAsync(string projectId)
+        public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<Billing[]>(
+            return await ApiRequest.DoRequestAsync<BillingList>(
                    HttpMethod.Get,
                    $"/v1/projects/{projectId}/balances",
                    _credentials

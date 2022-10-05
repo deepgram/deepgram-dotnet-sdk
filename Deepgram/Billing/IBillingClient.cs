@@ -9,7 +9,7 @@ namespace Deepgram.Billing
         /// </summary>
         /// <param name="projectId">Unique identifier of the project for which you want to retrieve outstanding balances</param>
         /// <returns>List of Deepgram balances</returns>
-        Task<Billing[]> GetAllBalancesAsync(string projectId);
+        Task<BillingList> GetAllBalancesAsync(string projectId);
 
         /// <summary>
         /// Retrieves details about the specified balance. To see balances, the authenticated account must be a project owner or administrator
