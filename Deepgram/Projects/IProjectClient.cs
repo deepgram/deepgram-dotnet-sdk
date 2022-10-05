@@ -51,5 +51,20 @@ namespace Deepgram.Projects
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
         Task<MessageResponse> LeaveProjectAsync(string projectId);
+
+        /// <summary>
+        /// Removes a member from a project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId);
+
+        /// <summary>
+        /// Updates member scopes on a project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        /// <param name="options">Scope options to update</param>
+        Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options);
     }
 }
