@@ -126,5 +126,21 @@ namespace Deepgram.Projects
                 $"/v1/projects/{projectId}/members/{memberId}",
                 _credentials);
         }
+
+        /// <summary>
+        /// Updates member scopes on a project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        /// <param name="options">Scope options to update</param>
+        public async Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options)
+        {
+            return await ApiRequest.DoRequestAsync<MessageResponse>(
+                HttpMethod.Put,
+                $"/v1/projects/{projectId}/members/{memberId}/scopes",
+                _credentials,
+                null,
+                options);
+        }
     }
 }

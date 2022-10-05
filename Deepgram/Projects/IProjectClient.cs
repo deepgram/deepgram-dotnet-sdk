@@ -58,5 +58,13 @@ namespace Deepgram.Projects
         /// <param name="projectId">Unique identifier of the project</param>
         /// <param name="memberId">Unique identifier of the member</param>
         Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId);
+
+        /// <summary>
+        /// Updates member scopes on a project
+        /// </summary>
+        /// <param name="projectId">Unique identifier of the project</param>
+        /// <param name="memberId">Unique identifier of the member</param>
+        /// <param name="options">Scope options to update</param>
+        Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options);
     }
 }
