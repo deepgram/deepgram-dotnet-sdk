@@ -148,5 +148,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("summarize")]
         public Nullable<bool> Summarize { get; set; } = null;
+
+        /// <summary>
+        /// Limits results to requests that include the topic detection feature.
+        /// </summary>
+        [JsonProperty("detect_topics")]
+        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }

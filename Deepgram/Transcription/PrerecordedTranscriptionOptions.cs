@@ -155,5 +155,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("detect_entities")]
         public Nullable<bool> DetectEntities { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram should detect topics within the provided audio.
+        /// </summary>
+        [JsonProperty("detect_topics")]
+        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }
