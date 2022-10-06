@@ -106,5 +106,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("utterances")]
         public Nullable<bool> Utterances { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether topic detection was requested.
+        /// </summary>
+        [JsonProperty("detect_topics")]
+        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }
