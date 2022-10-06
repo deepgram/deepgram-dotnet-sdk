@@ -112,5 +112,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("translation")]
         public string[] Translation { get; set; } = null;
+        
+        /// <summary>
+        /// Indicates whether topic detection was requested.
+        /// </summary>
+        [JsonProperty("detect_topics")]
+        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }

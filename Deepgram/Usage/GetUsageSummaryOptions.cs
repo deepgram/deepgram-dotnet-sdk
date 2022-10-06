@@ -154,5 +154,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("translation")]
         public Nullable<bool> Translation { get; set; } = null;
+        
+        /// <summary>
+        /// Limits results to requests that include the topic detection feature.
+        /// </summary>
+        [JsonProperty("detect_topics")]
+        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }
