@@ -130,5 +130,23 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("numerals")]
         public Nullable<bool> Numerals { get; set; } = null;
+
+        /// <summary>
+        /// Limits results to requests that include the paragraphs feature.
+        /// </summary>
+        [JsonProperty("paragraphs")]
+        public Nullable<bool> Paragraphs { get; set; } = null;
+
+        /// <summary>
+        /// Limits results to requests that include the detect entities feature.
+        /// </summary>
+        [JsonProperty("detect_entities")]
+        public Nullable<bool> DetectEntities { get; set; } = null;
+
+        /// <summary>
+        /// Limits results to requests that include the summarize feature.
+        /// </summary>
+        [JsonProperty("summarize")]
+        public Nullable<bool> Summarize { get; set; } = null;
     }
 }
