@@ -43,5 +43,12 @@ namespace Deepgram.Transcription
         /// <remark>Only used when the detect entities feature is enabled on the request</remark>
         [JsonProperty("entities")]
         public Entity[] Entities { get; set; }
+
+        /// <summary>
+        /// Array of Translation objects.
+        /// </summary>
+        /// <remark>Only used when the translation feature is enabled on the request</remark>
+        [JsonProperty("translations")]
+        public Translation[] Translations { get; set; }
     }
 }

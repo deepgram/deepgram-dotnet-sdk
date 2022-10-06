@@ -108,6 +108,12 @@ namespace Deepgram.Usage
         public Nullable<bool> Utterances { get; set; } = null;
 
         /// <summary>
+        /// Array of translations associated with the request.
+        /// </summary>
+        [JsonProperty("translation")]
+        public string[] Translation { get; set; } = null;
+        
+        /// <summary>
         /// Indicates whether topic detection was requested.
         /// </summary>
         [JsonProperty("detect_topics")]
