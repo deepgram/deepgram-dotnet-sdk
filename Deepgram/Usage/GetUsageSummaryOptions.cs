@@ -148,5 +148,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("summarize")]
         public Nullable<bool> Summarize { get; set; } = null;
+
+        /// <summary>
+        /// Limits results to requests that include the translation feature.
+        /// </summary>
+        [JsonProperty("translation")]
+        public Nullable<bool> Translation { get; set; } = null;
     }
 }

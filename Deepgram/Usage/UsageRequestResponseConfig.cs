@@ -106,5 +106,11 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("utterances")]
         public Nullable<bool> Utterances { get; set; } = null;
+
+        /// <summary>
+        /// Array of translations associated with the request.
+        /// </summary>
+        [JsonProperty("translation")]
+        public string[] Translation { get; set; } = null;
     }
 }

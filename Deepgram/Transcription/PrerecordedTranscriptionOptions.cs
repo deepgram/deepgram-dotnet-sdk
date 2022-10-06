@@ -93,14 +93,14 @@ namespace Deepgram.Transcription
         /// Terms or phrases to search for in the submitted audio.
         /// </summary>
         [JsonProperty("search")]
-        public string[] SearchTerms { get; set; }
+        public string[] SearchTerms { get; set; } = null;
 
         /// <summary>
         /// Terms or phrases to search for in the submitted audio and replace.
         /// </summary>
         /// <remarks>Phrases should be submitted in the format: searchfor:replacewith</remarks>
         [JsonProperty("replace")]
-        public string[] Replace { get; set; }
+        public string[] Replace { get; set; } = null;
 
         /// <summary>
         /// Callback URL to provide if you would like your submitted audio to be processed asynchronously.
@@ -114,7 +114,7 @@ namespace Deepgram.Transcription
         /// it understand context.
         /// </summary>
         [JsonProperty("keywords")]
-        public string[] Keywords { get; set; }
+        public string[] Keywords { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram will segment speech into meaningful semantic units, which allows
@@ -155,5 +155,12 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("detect_entities")]
         public Nullable<bool> DetectEntities { get; set; } = null;
+
+        /// <summary>
+        /// Language codes to which transcripts should be translated to.
+        /// </summary>
+        /// <remarks>If a provided language code matches the language code of the request, an error will be thrown.</remarks>
+        [JsonProperty("translation")]
+        public string[] Translation { get; set; } = null;
     }
 }
