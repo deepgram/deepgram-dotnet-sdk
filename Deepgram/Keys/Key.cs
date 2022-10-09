@@ -1,26 +1,19 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Deepgram.Keys
 {
     public class Key
     {
         /// <summary>
-        /// Unique identifier of the Deepgram API key
+        /// member object
         /// </summary>
-        [JsonProperty("api_key_id")]
-        public string Id { get; set; } = string.Empty;
+        [JsonProperty("member")]
+        public KeyMember Member { get; set; }
 
         /// <summary>
-        /// Comment for the Deepgram API key
+        /// api key object
         /// </summary>
-        [JsonProperty("comment")]
-        public string Comment { get; set; } = string.Empty;
-
-        [JsonProperty("created")]
-        public DateTime Created { get; set; }
-
-        [JsonProperty("scopes")]
-        public string[] Scopes { get; set; }
+        [JsonProperty("api_key")]
+        public ApiKey ApiKey { get; set; }
     }
 }

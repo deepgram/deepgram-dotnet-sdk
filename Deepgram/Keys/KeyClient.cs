@@ -20,9 +20,9 @@ namespace Deepgram.Keys
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to retrieve keys from</param>
         /// <returns>List of Deepgram API keys</returns>
-        public async Task<Key[]> ListKeysAsync(string projectId)
+        public async Task<KeyList> ListKeysAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<Key[]>(    
+            return await ApiRequest.DoRequestAsync<KeyList>(    
                 HttpMethod.Get,
                 $"/v1/projects/{projectId}/keys",
                 _credentials
@@ -51,9 +51,9 @@ namespace Deepgram.Keys
         /// <param name="comment">Comment to help identify the API key</param>
         /// <param name="scopes">Scopes associated with the key. Cannot be empty</param>
         /// <returns>A new Deepgram API key</returns>
-        public async Task<NewKey> CreateKeyAsync(string projectId, string comment, string[] scopes)
+        public async Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes)
         {
-            return await ApiRequest.DoRequestAsync<NewKey>(
+            return await ApiRequest.DoRequestAsync<ApiKey>(
                 HttpMethod.Post,
                 $"/v1/projects/{projectId}/keys",
                 _credentials,
