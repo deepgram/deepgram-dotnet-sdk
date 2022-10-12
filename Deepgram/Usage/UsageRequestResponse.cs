@@ -12,9 +12,15 @@ namespace Deepgram.Usage
         public UsageRequestResponseDetail Details {get;set;}
 
         /// <summary>
-        /// If the request failed, this will contain the error message.
+        /// Status Code of the response
         /// </summary>
-        [JsonProperty("message")]
-        public string Message { get; set; }
+        [JsonProperty("code")]
+        public int? Code { get; set; }
+
+        /// <summary>
+        /// DateTime the response completed
+        /// </summary>
+        [JsonProperty("completed")]
+        public DateTime? Completed { get; set; }
     }
 }
