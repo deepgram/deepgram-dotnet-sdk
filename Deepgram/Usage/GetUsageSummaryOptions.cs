@@ -92,7 +92,7 @@ namespace Deepgram.Usage
         /// <summary>
         /// Limits results to requests that include the sentiment feature.
         /// </summary>
-        [JsonProperty("sentiment")]
+        [JsonProperty("analyze_sentiment")]
         public Nullable<bool> Sentiment { get; set; } = null;
 
         /// <summary>

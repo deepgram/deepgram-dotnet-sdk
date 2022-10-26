@@ -170,6 +170,12 @@ namespace Deepgram.Transcription
         public Nullable<bool> DetectTopics { get; set; } = null;
 
         /// <summary>
+        /// Indicates whether Deepgram will identify sentiment in the transcript.
+        /// </summary>
+        [JsonProperty("analyze_sentiment")]
+        public Nullable<decimal> Sentiment { get; set; } = null;
+
+        /// <summary>
         /// Indicates the confidence requirement for non-neutral sentiment. 
         /// Setting this variable turns sentiment analysis on.
         /// </summary>
