@@ -96,6 +96,12 @@ namespace Deepgram.Usage
         public Nullable<bool> Sentiment { get; set; } = null;
 
         /// <summary>
+        /// Limits results to requests that include the sentiment threshold feature.
+        /// </summary>
+        [JsonProperty("sent_thresh")]
+        public Nullable<bool> SentimentThreshold { get; set; } = null;
+
+        /// <summary>
         /// Limits results to requests that include the diarize feature.
         /// </summary>
         [JsonProperty("diarize")]
@@ -154,7 +160,7 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("translation")]
         public Nullable<bool> Translation { get; set; } = null;
-        
+
         /// <summary>
         /// Limits results to requests that include the topic detection feature.
         /// </summary>
