@@ -162,11 +162,24 @@ namespace Deepgram.Transcription
         /// <remarks>If a provided language code matches the language code of the request, an error will be thrown.</remarks>
         [JsonProperty("translation")]
         public string[] Translation { get; set; } = null;
-        
+
         /// <summary>
         /// Indicates whether Deepgram should detect topics within the provided audio.
         /// </summary>
         [JsonProperty("detect_topics")]
         public Nullable<bool> DetectTopics { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram will identify sentiment in the transcript.
+        /// </summary>
+        [JsonProperty("analyze_sentiment")]
+        public Nullable<decimal> Sentiment { get; set; } = null;
+
+        /// <summary>
+        /// Indicates the confidence requirement for non-neutral sentiment. 
+        /// Setting this variable turns sentiment analysis on.
+        /// </summary>
+        [JsonProperty("sent_thresh")]
+        public Nullable<decimal> SentimentThreshold { get; set; } = null;
     }
 }
