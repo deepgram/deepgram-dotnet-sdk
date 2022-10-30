@@ -24,34 +24,16 @@ namespace Deepgram.Usage
         public Nullable<bool> MultiChannel { get; set; } = null;
 
         /// <summary>
-        /// Indicates whether detect language feature was requested.
-        /// </summary>
-        [JsonProperty("detect_language")]
-        public Nullable<bool> DetectLanguage { get; set; } = null;
-
-        /// <summary>
-        /// Indicates whether paragraphs feature was requested.
-        /// </summary>
-        [JsonProperty("paragraphs")]
-        public Nullable<bool> Paragraphs { get; set; } = null;
-
-        /// <summary>
-        /// Indicates whether detect entities feature was requested.
-        /// </summary>
-        [JsonProperty("detect_entities")]
-        public Nullable<bool> DetectEntities { get; set; } = null;
-
-        /// <summary>
-        /// Indicates whether summarize feature was requested.
-        /// </summary>
-        [JsonProperty("summarize")]
-        public Nullable<bool> Summarize { get; set; } = null;
-
-        /// <summary>
         /// Array of keywords associated with the request.
         /// </summary>
         [JsonProperty("keywords")]
         public string[] Keywords { get; set; } = null;
+
+        /// <summary>
+        /// Array of topics associated with the request.
+        /// </summary>
+        [JsonProperty("topics")]
+        public string[] Topics { get; set; } = null;
 
         /// <summary>
         /// Language associated with the request.
@@ -106,17 +88,5 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("utterances")]
         public Nullable<bool> Utterances { get; set; } = null;
-
-        /// <summary>
-        /// Array of translations associated with the request.
-        /// </summary>
-        [JsonProperty("translation")]
-        public string[] Translation { get; set; } = null;
-        
-        /// <summary>
-        /// Indicates whether topic detection was requested.
-        /// </summary>
-        [JsonProperty("detect_topics")]
-        public Nullable<bool> DetectTopics { get; set; } = null;
     }
 }

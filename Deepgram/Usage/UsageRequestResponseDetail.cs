@@ -38,14 +38,14 @@ namespace Deepgram.Usage
         /// <summary>
         /// Model applied when running the request.
         /// </summary>
-        [JsonProperty("model")]
-        public string Model { get; set; }
+        [JsonProperty("models")]
+        public string[] Models { get; set; }
 
         /// <summary>
         /// Processing method used when running the request.
         /// </summary>
-        [JsonProperty("methods")]
-        public string Methods { get; set; }
+        [JsonProperty("method")]
+        public string Method { get; set; }
 
         /// <summary>
         /// List of tags applied when running the request.

@@ -10,6 +10,12 @@ namespace Deepgram.Usage
     public class UsageRequestCallback
     {
         /// <summary>
+        /// Number of attempts of the callback
+        /// </summary>
+        [JsonProperty("attempts")]
+        public int? attempts { get; set; }
+
+        /// <summary>
         /// Status Code of the callback
         /// </summary>
         [JsonProperty("code")]
