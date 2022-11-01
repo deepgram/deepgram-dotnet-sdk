@@ -85,9 +85,54 @@ namespace Deepgram.Transcription
 
         /// <summary>
         /// Indicates whether to convert numbers from written format (e.g., one) to numerical format (e.g., 1).
+        /// Same as numbers. This option will be deprecated in the future.
         /// </summary>
         [JsonProperty("numerals")]
         public Nullable<bool> Numerals { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether to convert numbers from written format (e.g., one) to numerical format (e.g., 1).
+        /// Same as numerals. 
+        /// </summary>
+        [JsonProperty("numbers")]
+        public Nullable<bool> Numerals { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether to add spaces between spoken numbers
+        /// </summary>
+        [JsonProperty("numbers_spaces")]
+        public Nullable<bool> NumbersSpaces { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether to convert dates from written format(e.g., January first) to numerical format(e.g., 01/01).
+        /// </summary>
+        [JsonProperty("dates")]
+        public Nullable<bool> Dates { get; set; } = null;
+
+        /// <summary>
+        /// Indicates the format to use for dates. 
+        /// Formatted string is specified using chrono strftime notation https://docs.rs/chrono/latest/chrono/format/strftime/index.html
+        /// </summary>
+        [JsonProperty("date_format")]
+        public string DateFormat { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether to convert times from written format(e.g., three oclock) to numerical format(e.g., 3:00).
+        /// </summary>
+        [JsonProperty("times")]
+        public Nullable<bool> Times { get; set; } = null;
+
+        /// <summary>
+        /// Option to show dictation in the transcript.
+        /// </summary>
+        [JsonProperty("dictation")]
+        public Nullable<bool> Dictation { get; set; } = null;
+
+        /// <summary>
+        /// Option to convert measurments to numerical format.
+        /// </summary>
+        [JsonProperty("measurements")]
+        public Nullable<bool> Measurements { get; set; } = null;
 
         /// <summary>
         /// Terms or phrases to search for in the submitted audio.
