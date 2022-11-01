@@ -123,7 +123,9 @@ namespace Deepgram.Transcription
         public Nullable<bool> Times { get; set; } = null;
 
         /// <summary>
-        /// Option to show dictation in the transcript.
+        /// Option to format punctuated commands
+        /// Example: Before - “i went to the store period new paragraph then i went home”
+        ///          After - “i went to the store. <\n> then i went home”
         /// </summary>
         [JsonProperty("dictation")]
         public Nullable<bool> Dictation { get; set; } = null;
