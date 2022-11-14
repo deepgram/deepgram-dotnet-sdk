@@ -95,7 +95,7 @@ namespace Deepgram.Transcription
         /// Same as numerals. 
         /// </summary>
         [JsonProperty("numbers")]
-        public Nullable<bool> Numerals { get; set; } = null;
+        public Nullable<bool> Numbers { get; set; } = null;
 
         /// <summary>
         /// Indicates whether to add spaces between spoken numbers
