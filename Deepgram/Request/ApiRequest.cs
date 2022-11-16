@@ -15,7 +15,7 @@ namespace Deepgram.Request
     public class ApiRequest
     {
         const string LOGGER_CATEGORY = "Deepgram.Request.ApiRequest";
-      
+
         private static void SetHeaders(ref HttpRequestMessage request, CleanCredentials credentials)
         {
             request.Headers.Add("Accept", "application/json");
@@ -89,12 +89,14 @@ namespace Deepgram.Request
 
         private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object queryParameters = null)
         {
+            string protocol = credentials.RequireSSL ? "https" : "http";
+
             if (null != queryParameters)
             {
                 var querystring = Helpers.GetParameters(queryParameters);
-                return new Uri($"https://{credentials.ApiUrl}{uri}?{querystring}");
+                return new Uri($"{protocol}://{credentials.ApiUrl}{uri}?{querystring}");
             }
-            return new Uri($"https://{credentials.ApiUrl}{uri}");
+            return new Uri($"{protocol}://{credentials.ApiUrl}{uri}");
         }
 
         private static async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
