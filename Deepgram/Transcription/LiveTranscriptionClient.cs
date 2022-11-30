@@ -183,12 +183,14 @@ namespace Deepgram.Transcription
 
         private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
         {
+            string protocol = _credentials.RequireSSL ? "wss" : "ws";
+
             if (null != queryParameters)
             {
                 var queryString = Helpers.GetParameters(queryParameters);
-                return new Uri($"wss://{_credentials.ApiUrl}{uri}?{queryString}");
+                return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}?{queryString}");
             }
-            return new Uri($"wss://{_credentials.ApiUrl}{uri}");
+            return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}");
         }
 
         private async Task ProcessSenderQueue()

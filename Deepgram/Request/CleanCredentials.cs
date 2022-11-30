@@ -9,7 +9,8 @@ namespace Deepgram.Request
         /// </summary>
         /// <param name="apiKey">Deepgram API Key</param>
         /// <param name="apiUrl">Url of Deepgram API</param>
-        public CleanCredentials(string apiKey, string apiUrl)
+        /// <param name="requireSSL">Require SSL on requests</param>
+        public CleanCredentials(string apiKey, string apiUrl, bool requireSSL)
         {
             ApiKey = apiKey;
 
@@ -21,6 +22,7 @@ namespace Deepgram.Request
             }
 
             ApiUrl = apiUrl;
+            RequireSSL = requireSSL;
         }
 
         /// <summary>
@@ -33,10 +35,14 @@ namespace Deepgram.Request
         /// </summary>
         public string ApiUrl { get; set; }
 
+        /// <summary>
+        /// Require SSL on requests
+        /// </summary>
+        public bool RequireSSL { get; set; }
+
         public Credentials ToCredentials()
         {
-            return new Credentials(ApiKey, ApiUrl);
+            return new Credentials(ApiKey, ApiUrl, RequireSSL);
         }
-
     }
 }

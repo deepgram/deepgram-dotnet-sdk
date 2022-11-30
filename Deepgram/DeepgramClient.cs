@@ -47,6 +47,7 @@ namespace Deepgram
         {
             string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? "" : credentials.ApiUrl;
             string apiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? "" : credentials.ApiKey;
+            Nullable<bool> requireSSL = credentials?.RequireSSL;
 
             if (string.IsNullOrEmpty(apiKey))
             {
@@ -72,7 +73,19 @@ namespace Deepgram
                     apiUrl = possibleUri;
                 }
             }
-            _credentials = new CleanCredentials(apiKey, apiUrl);
+            if (!requireSSL.HasValue)
+            {
+                string possibleRequireSSL = Configuration.Instance.Settings["appSettings:Deepgram.Api.RequireSSL"];
+                if (string.IsNullOrEmpty(possibleRequireSSL))
+                {
+                    requireSSL = true;
+                }
+                else
+                {
+                    requireSSL = Convert.ToBoolean(possibleRequireSSL);
+                }
+            }
+            _credentials = new CleanCredentials(apiKey, apiUrl, requireSSL.Value);
         }
 
         private void InitializeClients()
