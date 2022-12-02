@@ -207,8 +207,8 @@ namespace Deepgram.Transcription
         /// Language codes to which transcripts should be translated to.
         /// </summary>
         /// <remarks>If a provided language code matches the language code of the request, an error will be thrown.</remarks>
-        [JsonProperty("translation")]
-        public string[] Translation { get; set; } = null;
+        [JsonProperty("translate")]
+        public string[] Translate { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram should detect topics within the provided audio.
