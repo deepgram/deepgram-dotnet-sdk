@@ -137,6 +137,14 @@ namespace Deepgram.Transcription
         public Nullable<bool> Measurements { get; set; } = null;
 
         /// <summary>
+        /// Indicates whether to use Smart Format on the transcript. When enabled,
+        /// Smart Format will add punctuation and formatting to entities like dates, times,
+        /// tracking numbers, and more.
+        /// </summary>
+        [JsonProperty("smart_format")]
+        public Nullable<bool> SmartFormat { get; set; } = null;
+
+        /// <summary>
         /// Terms or phrases to search for in the submitted audio.
         /// </summary>
         [JsonProperty("search")]
