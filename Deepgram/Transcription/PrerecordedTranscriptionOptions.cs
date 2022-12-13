@@ -234,7 +234,7 @@ namespace Deepgram.Transcription
         /// Indicates the confidence requirement for non-neutral sentiment. 
         /// Setting this variable turns sentiment analysis on.
         /// </summary>
-        [JsonProperty("sent_thresh")]
+        [JsonProperty("sentiment_threshold")]
         public Nullable<decimal> SentimentThreshold { get; set; } = null;
     }
 }

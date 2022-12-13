@@ -98,7 +98,7 @@ namespace Deepgram.Usage
         /// <summary>
         /// Limits results to requests that include the sentiment threshold feature.
         /// </summary>
-        [JsonProperty("sent_thresh")]
+        [JsonProperty("sentiment_threshold")]
         public Nullable<bool> SentimentThreshold { get; set; } = null;
 
         /// <summary>
