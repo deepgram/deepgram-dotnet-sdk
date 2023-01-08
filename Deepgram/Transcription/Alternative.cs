@@ -24,11 +24,11 @@ namespace Deepgram.Transcription
         public Words[] Words { get; set; }
 
         /// <summary>
-        /// Array of Paragraph objects.
+        /// <see cref="ParagraphGroup"/> containing /n seperated transcript and <see cref="Paragraph"/> objects.
         /// </summary>
         /// <remark>Only used when the paragraph feature is enabled on the request</remark>
         [JsonProperty("paragraphs")]
-        public ParagraphGroup[] Paragraphs { get; set; }
+        public ParagraphGroup Paragraphs { get; set; }
 
         /// <summary>
         /// Array of Summary objects.
