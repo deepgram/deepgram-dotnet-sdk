@@ -21,16 +21,23 @@ namespace Deepgram
             }
         }
 
-        public DeepgramClient()
+        public DeepgramClient() : this(null)
         {
-            InitializeCredentials();
-            InitializeClients();
         }
 
         public DeepgramClient(Credentials credentials)
         {
             InitializeCredentials(credentials);
             InitializeClients();
+        }
+
+        /// <summary>
+        /// Sets the Timeout of the HTTPClient used to send HTTP requests
+        /// </summary>
+        /// <param name="timeout">Timespan to wait before the request times out.</param>
+        public void SetHttpClientTimeout(TimeSpan timeout)
+        {
+            Configuration.Instance.Client.Timeout = timeout;
         }
 
         public IKeyClient Keys { get; private set; }
