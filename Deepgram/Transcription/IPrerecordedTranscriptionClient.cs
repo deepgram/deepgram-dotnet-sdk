@@ -20,5 +20,21 @@ namespace Deepgram.Transcription
         /// <param name="options">Feature options for the transcription</param>
         /// <returns>Transcription of the provided audio</returns>
         Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options);
+        
+        /// <summary>
+        /// Submits a request to the Deepgram API to transcribe prerecorded audio with callback url
+        /// </summary>
+        /// <param name="source">Url source to send for transcription</param>
+        /// <param name="options">Feature options for the transcription</param>
+        /// <returns>Transcription request id</returns>
+        Task<PrerecordedTranscriptionRequest> GetTranscriptionWithCallbackAsync(UrlSource source, PrerecordedTranscriptionOptionsWithCallback options);
+        
+        /// <summary>
+        /// Submits a request to the Deepgram API to transcribe prerecorded audio with callback url
+        /// </summary>
+        /// <param name="source">Audio source to send for transcription</param>
+        /// <param name="options">Feature options for the transcription</param>
+        /// <returns>Transcription request id</returns>
+        Task<PrerecordedTranscriptionRequest> GetTranscriptionWithCallbackAsync(StreamSource source, PrerecordedTranscriptionOptionsWithCallback options);
     }
 }

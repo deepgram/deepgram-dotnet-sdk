@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Deepgram.Request;
 
@@ -45,6 +44,40 @@ namespace Deepgram.Transcription
                 _credentials,
                 source,
                 options);
+        }
+
+        /// <inheritdoc />
+        public async Task<PrerecordedTranscriptionRequest> GetTranscriptionWithCallbackAsync(UrlSource source, PrerecordedTranscriptionOptionsWithCallback options)
+        {
+            ValidationOptionsWithCallback(options);
+    
+            return await ApiRequest.DoRequestAsync<PrerecordedTranscriptionRequest>(
+                HttpMethod.Post,
+                "/v1/listen",
+                _credentials,
+                options,
+                source);
+        }
+
+        /// <inheritdoc />
+        public async Task<PrerecordedTranscriptionRequest> GetTranscriptionWithCallbackAsync(StreamSource source, PrerecordedTranscriptionOptionsWithCallback options)
+        {
+            ValidationOptionsWithCallback(options);
+
+            return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscriptionRequest>(
+                HttpMethod.Post,
+                "/v1/listen",
+                _credentials,
+                source,
+                options);
+        }
+
+        private void ValidationOptionsWithCallback(PrerecordedTranscriptionOptionsWithCallback options)
+        {
+            if (string.IsNullOrEmpty(options.Callback))
+            {
+                throw new ArgumentException("Callback is required", nameof(options));
+            }
         }
     }
 }

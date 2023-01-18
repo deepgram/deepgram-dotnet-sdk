@@ -39,4 +39,9 @@
     <EditorConfigFiles Remove="D:\Sources\deepgram\deepgram-dotnet-sdk\Deepgram\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
