@@ -228,6 +228,12 @@ namespace Deepgram.Transcription
         /// Indicates whether Deepgram will identify sentiment in the transcript.
         /// </summary>
         [JsonProperty("analyze_sentiment")]
+        public Nullable<bool> AnalyzeSentiment { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram will identify sentiment in the audio.
+        /// </summary>
+        [JsonProperty("sentiment")]
         public Nullable<bool> Sentiment { get; set; } = null;
 
         /// <summary>
