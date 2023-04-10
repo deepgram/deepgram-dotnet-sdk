@@ -195,10 +195,11 @@ namespace Deepgram.Transcription
 
         /// <summary>
         /// Indicates whether Deepgram will detect whether a speaker has finished speaking (or paused 
-        /// for a significant period of time, indicating the completion of an idea).
+        /// for a significant period of time, indicating the completion of an idea). 
+        /// Can be "false" to disable endpointing, or can be the milliseconds of silence to wait before returning a transcript. Default is 10 milliseconds. Is string here so it can accept "false" as a value.
         /// </summary>
         [JsonProperty("endpointing")]
-        public Nullable<bool> Endpointing { get; set; } = null;
+        public Nullable<string> Endpointing { get; set; } = null;
 
         /// <summary>
         /// Length of time in milliseconds of silence that voice activation detection (VAD) will use 
