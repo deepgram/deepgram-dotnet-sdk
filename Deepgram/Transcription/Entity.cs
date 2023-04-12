@@ -16,7 +16,7 @@ namespace Deepgram.Transcription
         /// This is the value of the detected entity.
         /// </summary>
         [JsonProperty("value")]
-        public decimal Value { get; set; }
+        public string Value { get; set; }
 
         /// <summary>
         /// Starting index of the entities words within the transcript.
