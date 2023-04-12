@@ -199,7 +199,7 @@ namespace Deepgram.Transcription
         /// Can be "false" to disable endpointing, or can be the milliseconds of silence to wait before returning a transcript. Default is 10 milliseconds. Is string here so it can accept "false" as a value.
         /// </summary>
         [JsonProperty("endpointing")]
-        public Nullable<string> Endpointing { get; set; } = null;
+        public string Endpointing { get; set; } = null;
 
         /// <summary>
         /// Length of time in milliseconds of silence that voice activation detection (VAD) will use 
