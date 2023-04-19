@@ -50,7 +50,10 @@ namespace Deepgram.Request
         private static void SetContentAsStream(ref HttpRequestMessage request, StreamSource streamSource)
         {
             Stream stream = streamSource.Stream;
-            stream.Seek(0, SeekOrigin.Begin);
+            if (stream.CanSeek) 
+            {    
+                stream.Seek(0, SeekOrigin.Begin);                
+            }
             HttpContent httpContent = new StreamContent(stream);
             httpContent.Headers.Add("Content-Type", streamSource.MimeType);
             httpContent.Headers.Add("Content-Length", stream.Length.ToString());
