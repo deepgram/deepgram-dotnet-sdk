@@ -8,7 +8,7 @@ public class HelperTests
     public void Return_String_When_Passing_String_Parameter_Success()
     {
         //Arrange 
-        //only creating a limited object so to test each value is being proccessed
+        //only creating a limited object so to test each value is being processed
         var obj = new LiveTranscriptionOptions()
         {
             Model = "Model"
@@ -25,7 +25,7 @@ public class HelperTests
     public void Return_String_When_Passing_Int_Parameter_Success()
     {
         //Arrange 
-        //only creating a limited object so to test each value is being proccessed
+        //only creating a limited object so to test each value is being processed
         var obj = new LiveTranscriptionOptions()
         {
             Channels = 1,
@@ -43,7 +43,7 @@ public class HelperTests
     public void Return_String_When_Passing_Array_Parameter_Success()
     {
         //Arrange 
-        //only creating a limited object so to test each value is being proccessed
+        //only creating a limited object so to test each value is being processed
         var obj = new LiveTranscriptionOptions()
         {
             Keywords = new[] { "key", "word" }
@@ -91,7 +91,7 @@ public class HelperTests
 
         //Assert
         Assert.NotNull(SUT);
-        Assert.Contains($"{nameof(obj.Paragraphs).ToLower()}={obj.Paragraphs.ToString().ToLower()}", SUT);
+        Assert.Contains($"{nameof(obj.Paragraphs).ToLower()}={obj.Paragraphs.ToString()?.ToLower()}", SUT);
     }
 
     [Fact]
