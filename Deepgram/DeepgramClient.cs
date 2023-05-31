@@ -58,7 +58,7 @@ namespace Deepgram
 
             if (string.IsNullOrEmpty(apiKey))
             {
-                string possibleApiKey = Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"];
+                string possibleApiKey = Configuration.Instance.Settings[Constants.API_KEY_SECTION];
                 if (!string.IsNullOrEmpty(possibleApiKey))
                 {
                     apiKey = possibleApiKey;
@@ -70,7 +70,7 @@ namespace Deepgram
             }
             if (string.IsNullOrEmpty(apiUrl))
             {
-                string possibleUri = Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"];
+                string possibleUri = Configuration.Instance.Settings[Constants.API_URI_SECTION];
                 if (string.IsNullOrEmpty(possibleUri))
                 {
                     apiUrl = "api.deepgram.com";
@@ -82,7 +82,7 @@ namespace Deepgram
             }
             if (!requireSSL.HasValue)
             {
-                string possibleRequireSSL = Configuration.Instance.Settings["appSettings:Deepgram.Api.RequireSSL"];
+                string possibleRequireSSL = Configuration.Instance.Settings[Constants.API_REQUIRE_SSL];
                 if (string.IsNullOrEmpty(possibleRequireSSL))
                 {
                     requireSSL = true;

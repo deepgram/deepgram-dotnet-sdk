@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Net.Http;
+using Deepgram.Request;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-
-using Deepgram.Request;
-using System.Net.Http;
 
 namespace Deepgram
 {
@@ -22,12 +21,11 @@ namespace Deepgram
             var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("settings.json", true, true)
-                .AddJsonFile("appsettings.json", true, true)
-            ;
+                .AddJsonFile("appsettings.json", true, true);
 
             Settings = builder.Build();
 
-            if (string.IsNullOrWhiteSpace(Settings["appSettings:Deepgram.Api.Key"]))
+            if (string.IsNullOrWhiteSpace(Settings[Constants.API_KEY_SECTION]))
             {
                 logger.LogInformation("No authentication found via configuration. Remember to provide your own.");
             }
@@ -48,7 +46,7 @@ namespace Deepgram
         {
             get
             {
-                var reqPerSec = Instance.Settings["appSettings:Deepgram.RequestsPerSecond"];
+                var reqPerSec = Instance.Settings[Constants.REQUESTS_PER_SECOND_SECTION];
                 if (string.IsNullOrEmpty(reqPerSec))
                     return _client ?? (_client = ClientHandler == null ? new HttpClient() : new HttpClient(ClientHandler));
 

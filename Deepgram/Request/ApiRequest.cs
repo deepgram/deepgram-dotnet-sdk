@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +29,7 @@ namespace Deepgram.Request
 
         private static void SetCredentials(ref HttpRequestMessage request, CleanCredentials credentials)
         {
-            var apiKey = (credentials.ApiKey != null ? credentials.ApiKey : Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"])?.ToLower();
+            var apiKey = (credentials.ApiKey != null ? credentials.ApiKey : Configuration.Instance.Settings[Constants.API_KEY_SECTION])?.ToLower();
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", apiKey);
         }
 
