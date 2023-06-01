@@ -1,7 +1,9 @@
 ﻿using System;
+using Deepgram.Common;
+using Deepgram.Interfaces;
 using Deepgram.Keys;
+using Deepgram.Models;
 using Deepgram.Projects;
-using Deepgram.Request;
 using Deepgram.Transcription;
 using Deepgram.Usage;
 

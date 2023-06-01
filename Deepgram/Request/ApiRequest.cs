@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Deepgram.Common;
-using Deepgram.Transcription;
+using Deepgram.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

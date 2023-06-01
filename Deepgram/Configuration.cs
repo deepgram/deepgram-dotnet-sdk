@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using Deepgram.Common;
 using Deepgram.Request;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
