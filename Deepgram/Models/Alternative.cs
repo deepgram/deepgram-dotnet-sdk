@@ -1,7 +1,6 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Deepgram.Transcription
+namespace Deepgram.Models
 {
     public class Alternative
     {

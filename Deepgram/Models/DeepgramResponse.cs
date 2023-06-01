@@ -1,7 +1,6 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 
-namespace Deepgram.Request
+namespace Deepgram.Models
 {
     internal class DeepgramResponse
     {

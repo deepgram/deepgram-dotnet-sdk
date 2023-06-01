@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deepgram.Transcription
+namespace Deepgram.CustomEventArgs
 {
     /// <summary>
     /// Signifies Deepgram API WebSocket opening

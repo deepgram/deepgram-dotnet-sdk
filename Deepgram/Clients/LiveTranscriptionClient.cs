@@ -1,21 +1,18 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-
+using Deepgram.Common;
+using Deepgram.CustomEventArgs;
+using Deepgram.Interfaces;
+using Deepgram.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-using Deepgram.Common;
-using Deepgram.Models;
-using Deepgram.Interfaces;
-using Deepgram.CustomEventArgs;
-
-namespace Deepgram.Transcription
+namespace Deepgram.Clients
 {
     internal class LiveTranscriptionClient : ILiveTranscriptionClient, IDisposable
     {
@@ -185,7 +182,7 @@ namespace Deepgram.Transcription
 
         private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
         {
-            string protocol = _credentials.RequireSSL ? "wss" : "ws";
+            var protocol = _credentials.RequireSSL ? "wss" : "ws";
 
             if (null != queryParameters)
             {

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using Deepgram.CustomEventArgs;
+using Deepgram.Models;
 
-namespace Deepgram.Transcription
+namespace Deepgram.Interfaces
 {
-    public interface ILiveTranscriptionClient: IDisposable
+    public interface ILiveTranscriptionClient : IDisposable
     {
         /// <summary>
         /// Fires when the WebSocket connection to Deepgram has been opened

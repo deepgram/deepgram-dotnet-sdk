@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Deepgram.Projects
+namespace Deepgram.Models
 {
     public class UpdateScopeOptions
     {

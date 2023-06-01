@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Deepgram.Keys
+namespace Deepgram.Models
 {
     public class ApiKey
     {

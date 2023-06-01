@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Deepgram.Request
+﻿namespace Deepgram.Models
 {
     internal class CleanCredentials
     {

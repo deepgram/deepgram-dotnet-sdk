@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Deepgram.Usage
+namespace Deepgram.Models
 {
     public class UsageSummaryResult
     {
@@ -28,7 +28,7 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("total_hours")]
         public decimal TotalHours { get; set; }
-        
+
         /// <summary>
         /// Number of included requests.
         /// </summary>

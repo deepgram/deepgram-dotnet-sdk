@@ -1,3 +1,5 @@
+using Deepgram.Models;
+
 namespace Deepgram.Tests;
 
 public class DeepgramClientTests

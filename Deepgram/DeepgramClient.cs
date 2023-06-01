@@ -1,11 +1,9 @@
 ﻿using System;
+using Deepgram.Clients;
 using Deepgram.Common;
 using Deepgram.Interfaces;
-using Deepgram.Keys;
 using Deepgram.Models;
-using Deepgram.Projects;
-using Deepgram.Transcription;
-using Deepgram.Usage;
+
 
 namespace Deepgram
 {

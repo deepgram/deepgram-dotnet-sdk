@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Deepgram
+﻿namespace Deepgram.Models
 {
     public class Credentials
     {
@@ -35,6 +33,6 @@ namespace Deepgram
         /// <summary>
         /// Require SSL on requests
         /// </summary>
-        public Nullable<bool> RequireSSL { get; set; } = null;
+        public bool? RequireSSL { get; set; } = null;
     }
 }

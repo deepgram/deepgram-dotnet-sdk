@@ -1,5 +1,5 @@
 ﻿using Deepgram.Common;
-using Deepgram.Transcription;
+using Deepgram.Models;
 
 namespace Deepgram.Tests;
 public class HelperTests
