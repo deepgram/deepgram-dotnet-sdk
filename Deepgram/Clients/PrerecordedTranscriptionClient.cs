@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.WebSockets;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -10,9 +8,9 @@ namespace Deepgram.Clients
 {
     internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public PrerecordedTranscriptionClient(CleanCredentials credentials)
+        public PrerecordedTranscriptionClient(Credentials credentials)
         {
             _credentials = credentials;
         }

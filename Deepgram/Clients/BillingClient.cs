@@ -8,9 +8,9 @@ namespace Deepgram.Clients
 {
     internal class BillingClient : IBillingClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public BillingClient(CleanCredentials credentials)
+        public BillingClient(Credentials credentials)
         {
             _credentials = credentials;
         }

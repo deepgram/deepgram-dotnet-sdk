@@ -11,14 +11,6 @@
         public CleanCredentials(string apiKey, string apiUrl, bool requireSSL)
         {
             ApiKey = apiKey;
-
-            // Remove scheme from apiUrl. We'll append the correct
-            // scheme based on the type of request.
-            if (apiUrl.Contains("://"))
-            {
-                apiUrl = apiUrl.Substring(apiUrl.IndexOf("://") + 3);
-            }
-
             ApiUrl = apiUrl;
             RequireSSL = requireSSL;
         }

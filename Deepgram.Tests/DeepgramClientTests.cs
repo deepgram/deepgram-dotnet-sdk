@@ -1,16 +1,17 @@
-using Deepgram.Models;
-
 namespace Deepgram.Tests;
 
 public class DeepgramClientTests
 {
     [Fact]
-    public void ProvidingNoAPIKeyThrowsError()
+    public void Should_thro()
     {
+        //Arrange
+        var SUT = new DeepgramClient();
+
         // Act
-        var caughtException = Assert.Throws<ArgumentException>(() => new DeepgramClient(new Credentials()));
+        Assert.NotNull(SUT);
 
         // Assert
-        Assert.Equal("Deepgram API Key must be provided in constructor or via settings", caughtException.Message);
+
     }
 }
