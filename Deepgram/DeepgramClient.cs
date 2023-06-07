@@ -1,6 +1,6 @@
 ﻿using System;
 using Deepgram.Clients;
-using Deepgram.Common;
+using Deepgram.Extensions;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;

@@ -25,7 +25,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
-                "/v1/listen",
+                "/listen",
                 options,
                 source);
         }
@@ -40,7 +40,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
-                "/v1/listen",
+                "/listen",
                 source,
                 options);
         }

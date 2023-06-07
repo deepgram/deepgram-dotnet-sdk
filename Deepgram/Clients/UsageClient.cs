@@ -25,7 +25,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<ListAllRequestsResponse>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/requests",
+                $"/projects/{projectId}/requests",
                 options);
         }
 
@@ -39,7 +39,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<UsageRequest>(
                 HttpMethod.Get,
-                $"/v/projects/{projectId}/requests/{requestId}");
+                $"/projects/{projectId}/requests/{requestId}");
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<UsageSummary>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/usage",
+                $"/projects/{projectId}/usage",
                 options);
         }
 
@@ -66,7 +66,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<UsageFields>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/usage/fields",
+                $"/projects/{projectId}/usage/fields",
                 options);
         }
     }

@@ -1,7 +1,8 @@
 ﻿using System;
+using Deepgram.Common;
 using Deepgram.Models;
 
-namespace Deepgram.Common
+namespace Deepgram.Extensions
 {
     public static class CredentialsExtension
     {
@@ -27,12 +28,12 @@ namespace Deepgram.Common
         }
 
         internal static string CleanApiUrl(string apiUrl = null) =>
-            string.IsNullOrEmpty(apiUrl) ? "api.deepgram.com" : TrimApiUrl(apiUrl);
+            string.IsNullOrEmpty(apiUrl) ? Constants.DEFAULT_URI : TrimApiUrl(apiUrl);
 
         internal static string TrimApiUrl(string apiUrl) =>
             apiUrl.Contains("://") ? apiUrl.Substring(apiUrl.IndexOf("://") + 3) : apiUrl;
 
-        internal static bool CleanRequireSSL(Nullable<bool> requireSSL = null) =>
+        internal static bool CleanRequireSSL(bool? requireSSL = null) =>
             !requireSSL.HasValue ? true : Convert.ToBoolean(requireSSL);
 
     }

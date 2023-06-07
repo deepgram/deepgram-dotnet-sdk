@@ -7,6 +7,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Deepgram.Common;
 using Deepgram.CustomEventArgs;
+using Deepgram.Extensions;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Microsoft.Extensions.Logging;
@@ -87,7 +88,7 @@ namespace Deepgram.Clients
             _tokenSource = new CancellationTokenSource();
             try
             {
-                var wssUri = GetWSSUriWithQuerystring("/v1/listen", options);
+                var wssUri = GetWSSUriWithQuerystring("/listen", options);
                 await _clientWebSocket.ConnectAsync(wssUri, CancellationToken.None).ConfigureAwait(false);
                 StartSenderBackgroundThread();
                 StartReceiverBackgroundThread();
@@ -180,17 +181,12 @@ namespace Deepgram.Clients
             EnqueueForSending(new MessageToSend(data));
         }
 
-        private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
-        {
-            var protocol = (bool)_credentials.RequireSSL ? "wss" : "ws";
+        private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters) =>
+            UriExtension.ResolveUri(
+               _credentials, uri,
+               Convert.ToBoolean(_credentials.RequireSSL) ? "wss" : "ws",
+               queryParameters);
 
-            if (null != queryParameters)
-            {
-                var queryString = Helpers.GetParameters(queryParameters);
-                return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}?{queryString}");
-            }
-            return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}");
-        }
 
         private async Task ProcessSenderQueue()
         {

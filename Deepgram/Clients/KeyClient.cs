@@ -25,7 +25,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<KeyList>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/keys");
+                $"/projects/{projectId}/keys");
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<Key>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/keys/{keyId}");
+                $"/projects/{projectId}/keys/{keyId}");
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<ApiKey>(
                 HttpMethod.Post,
-                $"/v1/projects/{projectId}/keys",
+                $"/projects/{projectId}/keys",
                 null,
                 new { comment, scopes }
             );
@@ -67,7 +67,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/v1/projects/{projectId}/keys/{keyId}");
+                $"/projects/{projectId}/keys/{keyId}");
         }
     }
 }

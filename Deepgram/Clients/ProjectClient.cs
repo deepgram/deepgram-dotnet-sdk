@@ -24,7 +24,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<ProjectList>(
                 HttpMethod.Get,
-                "/v1/projects");
+                "/projects");
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<Project>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}");
+                $"/projects/{projectId}");
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Deepgram.Clients
 #else
                 HttpMethod.Patch,
 #endif
-                $"/v1/projects/{project.Id}",
+                $"/projects/{project.Id}",
                 null,
                 project
             );
@@ -66,7 +66,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/v1/projects/{projectId}");
+                $"/projects/{projectId}");
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MemberList>(
                        HttpMethod.Get,
-                       $"/v1/projects/{projectId}/members");
+                       $"/projects/{projectId}/members");
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<ScopesList>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/members/{memberId}/scopes");
+                $"/projects/{projectId}/members/{memberId}/scopes");
         }
 
         /// Removes the authenticated account from the specified project
@@ -101,7 +101,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/v1/projects/{projectId}/leave");
+                $"/projects/{projectId}/leave");
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/v1/projects/{projectId}/members/{memberId}");
+                $"/projects/{projectId}/members/{memberId}");
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Deepgram.Clients
         {
             return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Put,
-                $"/v1/projects/{projectId}/members/{memberId}/scopes",
+                $"/projects/{projectId}/members/{memberId}/scopes",
                 null,
                 options);
         }

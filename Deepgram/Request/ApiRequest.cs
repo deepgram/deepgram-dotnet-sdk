@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Deepgram.Common;
+using Deepgram.Extensions;
 using Deepgram.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -91,16 +92,11 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private Uri GetUriWithQuerystring(string uri, object queryParameters = null)
-        {
-            string protocol = Convert.ToBoolean(_credentials.RequireSSL) ? "https" : "http";
-            if (null != queryParameters)
-            {
-                var querystring = Helpers.GetParameters(queryParameters);
-                return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}?{querystring}");
-            }
-            return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}");
-        }
+        private Uri GetUriWithQuerystring(string uri, object queryParameters = null) =>
+            UriExtension.ResolveUri(
+                _credentials, uri,
+                Convert.ToBoolean(_credentials.RequireSSL) ? "https" : "http",
+                queryParameters);
 
         private async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
