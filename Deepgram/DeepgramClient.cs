@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Deepgram.Clients;
 using Deepgram.Common;
 using Deepgram.Interfaces;
@@ -39,6 +39,14 @@ namespace Deepgram
             InitializeClients();
         }
 
+        private void InitializeClients()
+        {
+            Keys = new KeyClient(_credentials);
+            Projects = new ProjectClient(_credentials);
+            Transcription = new TranscriptionClient(_credentials);
+            Usage = new UsageClient(_credentials);
+        }
+
         private void InitializeCredentials(Credentials credentials = null)
         {
             //if no credentials are passed in the constructor create a empty credentials
@@ -52,10 +60,7 @@ namespace Deepgram
                 CleanCredentials.CleanRequireSSL(credentials.RequireSSL));
         }
 
-        public void SetHttpClientTimeout(TimeSpan timeout)
-        {
-            TimeoutSingleton.Instance.Timeout = timeout;
-        }
+
         public ILiveTranscriptionClient CreateLiveTranscriptionClient()
         {
             return new LiveTranscriptionClient(_credentials);
