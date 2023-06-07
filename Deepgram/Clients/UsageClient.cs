@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -9,9 +8,9 @@ namespace Deepgram.Clients
 {
     internal class UsageClient : IUsageClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public UsageClient(CleanCredentials credentials)
+        public UsageClient(Credentials credentials)
         {
             _credentials = credentials;
         }

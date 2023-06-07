@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Deepgram.Logger
 {
-    public class LogProvider
+    public interface ILogProvider
+    {
+    }
+    public class LogProvider : ILogProvider
     {
         private static IDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
         private static ILoggerFactory _loggerFactory = new LoggerFactory();

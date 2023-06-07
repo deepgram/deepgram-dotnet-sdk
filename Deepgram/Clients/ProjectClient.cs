@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Common;
 using Deepgram.Interfaces;
@@ -10,9 +9,9 @@ namespace Deepgram.Clients
 {
     internal class ProjectClient : IProjectClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public ProjectClient(CleanCredentials credentials)
+        public ProjectClient(Credentials credentials)
         {
             _credentials = credentials;
         }

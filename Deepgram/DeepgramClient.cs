@@ -4,20 +4,23 @@ using Deepgram.Common;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 
-
 namespace Deepgram
 {
     public class DeepgramClient
     {
-        private CleanCredentials _credentials;
+        public IKeyClient Keys { get; private set; }
+        public IProjectClient Projects { get; private set; }
+        public ITranscriptionClient Transcription { get; private set; }
+        public IUsageClient Usage { get; private set; }
 
+
+        public Credentials _credentials;
         public Credentials Credentials
         {
-            get => _credentials.ToCredentials();
+            get => _credentials;
             set
             {
-                InitializeCredentials(value);
-                InitializeClients();
+                Initialize(value);
             }
         }
 
@@ -27,18 +30,20 @@ namespace Deepgram
 
         public DeepgramClient(Credentials credentials)
         {
+            Initialize(credentials);
+        }
+
+        private void Initialize(Credentials credentials)
+        {
             InitializeCredentials(credentials);
             InitializeClients();
         }
 
-        /// <summary>
-        /// Sets the Timeout of the HTTPClient used to send HTTP requests
-        /// </summary>
-        /// <param name="timeout">Timespan to wait before the request times out.</param>
-        public void SetHttpClientTimeout(TimeSpan timeout)
+        private void InitializeCredentials(Credentials credentials = null)
         {
-            Configuration.Instance.Client.Timeout = timeout;
-        }
+            //if no credentials are passed in the constructor create a empty credentials
+            if (credentials == null)
+                _credentials = new Credentials();
 
             //Set values and clean them up 
             _credentials = new Credentials(
@@ -47,12 +52,9 @@ namespace Deepgram
                 CleanCredentials.CleanRequireSSL(credentials.RequireSSL));
         }
 
-        private void InitializeClients()
+        public void SetHttpClientTimeout(TimeSpan timeout)
         {
-            Keys = new KeyClient(_credentials);
-            Projects = new ProjectClient(_credentials);
-            Transcription = new TranscriptionClient(_credentials);
-            Usage = new UsageClient(_credentials);
+            TimeoutSingleton.Instance.Timeout = timeout;
         }
         public ILiveTranscriptionClient CreateLiveTranscriptionClient()
         {

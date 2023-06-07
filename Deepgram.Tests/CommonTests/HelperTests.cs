@@ -1,7 +1,7 @@
 ﻿using Deepgram.Common;
 using Deepgram.Models;
 
-namespace Deepgram.Tests;
+namespace Deepgram.Tests.CommonTests;
 public class HelperTests
 {
     [Fact]

@@ -1,19 +1,16 @@
-﻿namespace Deepgram.Models
+﻿using System;
+
+namespace Deepgram.Models
 {
     public class Credentials
     {
-        public Credentials()
-        {
-
-        }
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="apiKey">Deepgram API Key</param>
         /// <param name="apiUrl">Url of Deepgram API</param>
         /// <param name="requireSSL">Require SSL on requests</param>
-        public Credentials(string apiKey = null, string apiUrl = null, bool requireSSL = true)
+        public Credentials(string apiKey = null, string apiUrl = null, Nullable<bool> requireSSL = null)
         {
             ApiKey = apiKey;
             ApiUrl = apiUrl;
@@ -33,6 +30,6 @@
         /// <summary>
         /// Require SSL on requests
         /// </summary>
-        public bool? RequireSSL { get; set; } = null;
+        public Nullable<bool> RequireSSL { get; set; } = null;
     }
 }
