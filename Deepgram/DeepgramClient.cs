@@ -1,4 +1,5 @@
-﻿using Deepgram.Clients;
+﻿using System;
+using Deepgram.Clients;
 using Deepgram.Common;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -44,16 +45,11 @@ namespace Deepgram
             if (credentials == null)
                 _credentials = new Credentials();
 
-            //get any settings from json files
-            var appSettings = new AppSettingsHelper().FetchAppSettings();
-
             //Set values and clean them up 
-            var apiKey = ConfigureCredentials.ConfigureApiKey(appSettings, credentials.ApiKey);
-            var apiUrl = ConfigureCredentials.ConfigureApiUrl(appSettings, credentials.ApiUrl);
-            var requireSSL = ConfigureCredentials.ConfigureRequireSSL(appSettings, credentials.RequireSSL);
-
-
-            _credentials = new Credentials(apiKey, apiUrl, requireSSL);
+            _credentials = new Credentials(
+                CleanCredentials.CheckApiKey(credentials.ApiKey),
+                CleanCredentials.CleanApiUrl(credentials.ApiUrl),
+                CleanCredentials.CleanRequireSSL(credentials.RequireSSL));
         }
 
         private void InitializeClients()
@@ -73,10 +69,10 @@ namespace Deepgram
         /// </summary>
         /// <param name="timeout">Timespan to wait before the request times out.</param>
 
-        //TODO: Not Being Used
-        //public void SetHttpClientTimeout(TimeSpan timeout)
-        //{
-        //    Configuration.Instance.Client.Timeout = timeout;
-        //}
+
+        public void SetHttpClientTimeout(TimeSpan timeout)
+        {
+            TimeoutSingleton.Instance.Timeout = timeout;
+        }
     }
 }
