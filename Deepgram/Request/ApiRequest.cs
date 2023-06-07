@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -107,7 +107,9 @@ namespace Deepgram.Request
         {
             var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
             logger.LogDebug($"SendHttpRequestAsync: {request.RequestUri}");
-            var response = await Configuration.Instance.Client.SendAsync(request);
+
+            var httpClient = GetHttpClient();
+            var response = await httpClient.SendAsync(request);
             var stream = await response.Content.ReadAsStreamAsync();
             string json;
             using (var sr = new StreamReader(stream))
@@ -129,6 +131,17 @@ namespace Deepgram.Request
                 logger.LogError($"FAIL: {response.StatusCode}");
                 throw new DeepgramHttpRequestException(exception.Message) { HttpStatusCode = response.StatusCode, Json = json };
             }
+        }
+
+        private static HttpClient GetHttpClient()
+        {
+            var timeout = TimeoutSingleton.Instance.Timeout;
+
+            var httpClient = new HttpClient();
+            if (timeout == TimeSpan.Zero)
+                httpClient.Timeout = timeout;
+
+            return httpClient;
         }
     }
 }
