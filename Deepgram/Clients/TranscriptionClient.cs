@@ -1,15 +1,15 @@
 ﻿using Deepgram.Interfaces;
-using Deepgram.Models;
+using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
     internal class TranscriptionClient : ITranscriptionClient
     {
-        private Credentials _credentials;
+        private ApiRequest _apiRequest;
 
-        public TranscriptionClient(Credentials credentials)
+        public TranscriptionClient(ApiRequest apiRequest)
         {
-            _credentials = credentials;
+            _apiRequest = apiRequest;
             InitializeClients();
         }
 
@@ -17,7 +17,7 @@ namespace Deepgram.Clients
 
         private void InitializeClients()
         {
-            Prerecorded = new PrerecordedTranscriptionClient(_credentials);
+            Prerecorded = new PrerecordedTranscriptionClient(_apiRequest);
         }
     }
 }

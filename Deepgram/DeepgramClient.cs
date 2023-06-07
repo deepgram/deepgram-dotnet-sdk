@@ -3,6 +3,7 @@ using Deepgram.Clients;
 using Deepgram.Common;
 using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Request;
 
 namespace Deepgram
 {
@@ -13,16 +14,10 @@ namespace Deepgram
         public ITranscriptionClient Transcription { get; private set; }
         public IUsageClient Usage { get; private set; }
 
+        private TimeSpan Timeout = TimeSpan.Zero;
 
-        public Credentials _credentials;
-        public Credentials Credentials
-        {
-            get => _credentials;
-            set
-            {
-                Initialize(value);
-            }
-        }
+        private Credentials Credentials;
+
 
         public DeepgramClient() : this(null)
         {
@@ -35,46 +30,33 @@ namespace Deepgram
 
         private void Initialize(Credentials credentials)
         {
-            InitializeCredentials(credentials);
+            Credentials = CredentialsExtension.Clean(credentials);
             InitializeClients();
         }
 
         private void InitializeClients()
         {
-            Keys = new KeyClient(_credentials);
-            Projects = new ProjectClient(_credentials);
-            Transcription = new TranscriptionClient(_credentials);
-            Usage = new UsageClient(_credentials);
-        }
-
-        private void InitializeCredentials(Credentials credentials = null)
-        {
-            //if no credentials are passed in the constructor create a empty credentials
-            if (credentials == null)
-                _credentials = new Credentials();
-
-            //Set values and clean them up 
-            _credentials = new Credentials(
-                CleanCredentials.CheckApiKey(credentials.ApiKey),
-                CleanCredentials.CleanApiUrl(credentials.ApiUrl),
-                CleanCredentials.CleanRequireSSL(credentials.RequireSSL));
+            var apiRequest = new ApiRequest(Credentials, Timeout);
+            Keys = new KeyClient(apiRequest);
+            Projects = new ProjectClient(apiRequest);
+            Transcription = new TranscriptionClient(apiRequest);
+            Usage = new UsageClient(apiRequest);
         }
 
 
         public ILiveTranscriptionClient CreateLiveTranscriptionClient()
         {
-            return new LiveTranscriptionClient(_credentials);
+            return new LiveTranscriptionClient(Credentials);
         }
 
         /// <summary>
         /// Sets the Timeout of the HTTPClient used to send HTTP requests
         /// </summary>
         /// <param name="timeout">Timespan to wait before the request times out.</param>
-
-
         public void SetHttpClientTimeout(TimeSpan timeout)
         {
-            TimeoutSingleton.Instance.Timeout = timeout;
+            Timeout = timeout;
+            InitializeClients();
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -12,27 +12,34 @@ namespace Deepgram.Request
 {
     public class ApiRequest
     {
+        private Credentials _credentials;
+        private TimeSpan _timeout;
+        public ApiRequest(Credentials credentials, TimeSpan timeSpan)
+        {
+            _timeout = timeSpan;
+            _credentials = credentials;
+        }
         const string LOGGER_CATEGORY = "Deepgram.Request.ApiRequest";
 
-        private static void SetHeaders(ref HttpRequestMessage request, Credentials credentials)
+        private void SetHeaders(ref HttpRequestMessage request)
         {
             request.Headers.Add("Accept", "application/json");
             SetUserAgent(ref request);
-            SetCredentials(ref request, credentials);
+            SetCredentials(ref request);
         }
 
-        private static void SetUserAgent(ref HttpRequestMessage request)
+        private void SetUserAgent(ref HttpRequestMessage request)
         {
             var userAgent = Helpers.GetUserAgent();
             request.Headers.UserAgent.ParseAdd(userAgent);
         }
 
-        private static void SetCredentials(ref HttpRequestMessage request, Credentials credentials)
+        private void SetCredentials(ref HttpRequestMessage request)
         {
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", credentials.ApiKey);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", _credentials.ApiKey);
         }
 
-        private static void SetContent(ref HttpRequestMessage request, object bodyObject)
+        private void SetContent(ref HttpRequestMessage request, object bodyObject)
         {
             if (null != bodyObject)
             {
@@ -44,7 +51,7 @@ namespace Deepgram.Request
             }
         }
 
-        private static void SetContentAsStream(ref HttpRequestMessage request, StreamSource streamSource)
+        private void SetContentAsStream(ref HttpRequestMessage request, StreamSource streamSource)
         {
             Stream stream = streamSource.Stream;
             stream.Seek(0, SeekOrigin.Begin);
@@ -54,54 +61,54 @@ namespace Deepgram.Request
             request.Content = httpContent;
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, Credentials credentials, object queryParameters = null, object bodyObject = null)
+        internal async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, object queryParameters = null, object bodyObject = null)
         {
-            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
                 RequestUri = requestUri,
                 Method = method
             };
-            SetHeaders(ref req, credentials);
+            SetHeaders(ref req);
             SetContent(ref req, bodyObject);
 
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, Credentials credentials, StreamSource streamSource, object queryParameters = null)
+        internal async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, StreamSource streamSource, object queryParameters = null)
         {
-            var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
+            var requestUri = GetUriWithQuerystring(uri, queryParameters);
 
             var req = new HttpRequestMessage
             {
                 RequestUri = requestUri,
                 Method = method
             };
-            SetHeaders(ref req, credentials);
+            SetHeaders(ref req);
             SetContentAsStream(ref req, streamSource);
 
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(Credentials credentials, string uri, object queryParameters = null)
+        private Uri GetUriWithQuerystring(string uri, object queryParameters = null)
         {
-            string protocol = Convert.ToBoolean(credentials.RequireSSL) ? "https" : "http";
+            string protocol = Convert.ToBoolean(_credentials.RequireSSL) ? "https" : "http";
             if (null != queryParameters)
             {
                 var querystring = Helpers.GetParameters(queryParameters);
-                return new Uri($"{protocol}://{credentials.ApiUrl}{uri}?{querystring}");
+                return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}?{querystring}");
             }
-            return new Uri($"{protocol}://{credentials.ApiUrl}{uri}");
+            return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}");
         }
 
-        private static async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+        private async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
             var json = (await SendHttpRequestAsync(request)).JsonResponse;
             return JsonConvert.DeserializeObject<T>(json);
         }
 
-        private static async Task<DeepgramResponse> SendHttpRequestAsync(HttpRequestMessage request)
+        private async Task<DeepgramResponse> SendHttpRequestAsync(HttpRequestMessage request)
         {
             var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
             logger.LogDebug($"SendHttpRequestAsync: {request.RequestUri}");
@@ -131,13 +138,13 @@ namespace Deepgram.Request
             }
         }
 
-        private static HttpClient GetHttpClient()
+        private HttpClient GetHttpClient()
         {
-            var timeout = TimeoutSingleton.Instance.Timeout;
+
 
             var httpClient = new HttpClient();
-            if (timeout == TimeSpan.Zero)
-                httpClient.Timeout = timeout;
+            if (_timeout == TimeSpan.Zero)
+                httpClient.Timeout = _timeout;
 
             return httpClient;
         }

@@ -8,11 +8,11 @@ namespace Deepgram.Clients
 {
     internal class UsageClient : IUsageClient
     {
-        private Credentials _credentials;
+        private ApiRequest _apiRequest;
 
-        public UsageClient(Credentials credentials)
+        public UsageClient(ApiRequest apiRequest)
         {
-            _credentials = credentials;
+            _apiRequest = apiRequest;
         }
 
         /// <summary>
@@ -23,12 +23,10 @@ namespace Deepgram.Clients
         /// <returns>Usage Requests that fit the parameters provided</returns>
         public async Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions options)
         {
-            return await ApiRequest.DoRequestAsync<ListAllRequestsResponse>(
+            return await _apiRequest.DoRequestAsync<ListAllRequestsResponse>(
                 HttpMethod.Get,
                 $"/v1/projects/{projectId}/requests",
-                _credentials,
-                options
-            );
+                options);
         }
 
         /// <summary>
@@ -39,11 +37,9 @@ namespace Deepgram.Clients
         /// <returns>Usage Request identified</returns>
         public async Task<UsageRequest> GetUsageRequestAsync(string projectId, string requestId)
         {
-            return await ApiRequest.DoRequestAsync<UsageRequest>(
+            return await _apiRequest.DoRequestAsync<UsageRequest>(
                 HttpMethod.Get,
-                $"/v/projects/{projectId}/requests/{requestId}",
-                _credentials
-            );
+                $"/v/projects/{projectId}/requests/{requestId}");
         }
 
         /// <summary>
@@ -54,12 +50,10 @@ namespace Deepgram.Clients
         /// <returns>Summary of usage statistics</returns>
         public async Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions options)
         {
-            return await ApiRequest.DoRequestAsync<UsageSummary>(
+            return await _apiRequest.DoRequestAsync<UsageSummary>(
                 HttpMethod.Get,
                 $"/v1/projects/{projectId}/usage",
-                _credentials,
-                options
-            );
+                options);
         }
 
         /// <summary>
@@ -70,12 +64,10 @@ namespace Deepgram.Clients
         /// <returns>List of features, models, tags, languages, and processing method used for requests in the specified project.</returns>
         public async Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions options)
         {
-            return await ApiRequest.DoRequestAsync<UsageFields>(
+            return await _apiRequest.DoRequestAsync<UsageFields>(
                 HttpMethod.Get,
                 $"/v1/projects/{projectId}/usage/fields",
-                _credentials,
-                options
-            );
+                options);
         }
     }
 }

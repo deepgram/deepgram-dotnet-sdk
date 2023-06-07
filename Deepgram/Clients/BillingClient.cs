@@ -8,11 +8,11 @@ namespace Deepgram.Clients
 {
     internal class BillingClient : IBillingClient
     {
-        private Credentials _credentials;
+        private ApiRequest _apiRequest;
 
-        public BillingClient(Credentials credentials)
+        public BillingClient(ApiRequest apiRequest)
         {
-            _credentials = credentials;
+            _apiRequest = apiRequest;
         }
 
         /// <summary>
@@ -22,11 +22,9 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<BillingList>(
+            return await _apiRequest.DoRequestAsync<BillingList>(
                    HttpMethod.Get,
-                   $"/v1/projects/{projectId}/balances",
-                   _credentials
-               );
+                   $"/v1/projects/{projectId}/balances");
         }
 
         /// <summary>
@@ -37,10 +35,9 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            return await ApiRequest.DoRequestAsync<Billing>(
+            return await _apiRequest.DoRequestAsync<Billing>(
                   HttpMethod.Get,
-                  $"/v1/projects/{projectId}/balances/{balanceId}",
-                  _credentials
+                  $"/v1/projects/{projectId}/balances/{balanceId}"
               );
         }
     }

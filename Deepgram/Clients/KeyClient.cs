@@ -9,11 +9,11 @@ namespace Deepgram.Clients
 {
     internal class KeyClient : IKeyClient
     {
-        private Credentials _credentials;
+        private ApiRequest _apiRequest;
 
-        public KeyClient(Credentials credentials)
+        public KeyClient(ApiRequest apiRequest)
         {
-            _credentials = credentials;
+            _apiRequest = apiRequest;
         }
 
         /// <summary>
@@ -23,11 +23,9 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram API keys</returns>
         public async Task<KeyList> ListKeysAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<KeyList>(
+            return await _apiRequest.DoRequestAsync<KeyList>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/keys",
-                _credentials
-            );
+                $"/v1/projects/{projectId}/keys");
         }
 
         /// <summary>
@@ -38,11 +36,9 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram API key</returns>
         public async Task<Key> GetKeyAsync(string projectId, string keyId)
         {
-            return await ApiRequest.DoRequestAsync<Key>(
+            return await _apiRequest.DoRequestAsync<Key>(
                 HttpMethod.Get,
-                $"/v1/projects/{projectId}/keys/{keyId}",
-                _credentials
-            );
+                $"/v1/projects/{projectId}/keys/{keyId}");
         }
 
         /// <summary>
@@ -54,10 +50,9 @@ namespace Deepgram.Clients
         /// <returns>A new Deepgram API key</returns>
         public async Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes)
         {
-            return await ApiRequest.DoRequestAsync<ApiKey>(
+            return await _apiRequest.DoRequestAsync<ApiKey>(
                 HttpMethod.Post,
                 $"/v1/projects/{projectId}/keys",
-                _credentials,
                 null,
                 new { comment, scopes }
             );
@@ -70,10 +65,9 @@ namespace Deepgram.Clients
         /// <param name="keyId">Unique identifier of the API key to delete</param>
         public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/v1/projects/{projectId}/keys/{keyId}",
-                _credentials);
+                $"/v1/projects/{projectId}/keys/{keyId}");
         }
     }
 }
