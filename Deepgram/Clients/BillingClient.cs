@@ -24,7 +24,7 @@ namespace Deepgram.Clients
         {
             return await ApiRequest.DoRequestAsync<BillingList>(
                    HttpMethod.Get,
-                   $"/v1/projects/{projectId}/balances",
+                   $"/projects/{projectId}/balances",
                    _credentials
                );
         }
@@ -39,7 +39,7 @@ namespace Deepgram.Clients
         {
             return await ApiRequest.DoRequestAsync<Billing>(
                   HttpMethod.Get,
-                  $"/v1/projects/{projectId}/balances/{balanceId}",
+                  $"/projects/{projectId}/balances/{balanceId}",
                   _credentials
               );
         }
