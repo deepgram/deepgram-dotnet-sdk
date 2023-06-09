@@ -8,9 +8,9 @@ namespace Deepgram.Clients
 {
     internal class UsageClient : IUsageClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public UsageClient(CleanCredentials credentials)
+        public UsageClient(Credentials credentials)
         {
             _credentials = credentials;
         }

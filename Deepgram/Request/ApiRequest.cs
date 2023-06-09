@@ -14,7 +14,7 @@ namespace Deepgram.Request
     {
         const string LOGGER_CATEGORY = "Deepgram.Request.ApiRequest";
 
-        private static void SetHeaders(ref HttpRequestMessage request, CleanCredentials credentials)
+        private static void SetHeaders(ref HttpRequestMessage request, Credentials credentials)
         {
             request.Headers.Add("Accept", "application/json");
             SetUserAgent(ref request);
@@ -27,9 +27,9 @@ namespace Deepgram.Request
             request.Headers.UserAgent.ParseAdd(userAgent);
         }
 
-        private static void SetCredentials(ref HttpRequestMessage request, CleanCredentials credentials)
+        private static void SetCredentials(ref HttpRequestMessage request, Credentials credentials)
         {
-            var apiKey = (credentials.ApiKey != null ? credentials.ApiKey : Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"])?.ToLower();
+            var apiKey = credentials.ApiKey;
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("token", apiKey);
         }
 
@@ -55,7 +55,7 @@ namespace Deepgram.Request
             request.Content = httpContent;
         }
 
-        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object queryParameters = null, object bodyObject = null)
+        internal static async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, Credentials credentials, object queryParameters = null, object bodyObject = null)
         {
             var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
@@ -70,7 +70,7 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
+        internal static async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, Credentials credentials, StreamSource streamSource, object queryParameters = null)
         {
             var requestUri = GetUriWithQuerystring(credentials, uri, queryParameters);
 
@@ -85,9 +85,9 @@ namespace Deepgram.Request
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private static Uri GetUriWithQuerystring(CleanCredentials credentials, string uri, object queryParameters = null)
+        private static Uri GetUriWithQuerystring(Credentials credentials, string uri, object queryParameters = null)
         {
-            string protocol = credentials.RequireSSL ? "https" : "http";
+            string protocol = Convert.ToBoolean(credentials.RequireSSL) ? "https" : "http";
 
             if (null != queryParameters)
             {
@@ -107,7 +107,8 @@ namespace Deepgram.Request
         {
             var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
             logger.LogDebug($"SendHttpRequestAsync: {request.RequestUri}");
-            var response = await Configuration.Instance.Client.SendAsync(request);
+            var httpClient = GetHttpClient();
+            var response = await httpClient.SendAsync(request);
             var stream = await response.Content.ReadAsStreamAsync();
             string json;
             using (var sr = new StreamReader(stream))
@@ -129,6 +130,17 @@ namespace Deepgram.Request
                 logger.LogError($"FAIL: {response.StatusCode}");
                 throw new DeepgramHttpRequestException(exception.Message) { HttpStatusCode = response.StatusCode, Json = json };
             }
+        }
+
+        private static HttpClient GetHttpClient()
+        {
+
+
+            var httpClient = new HttpClient();
+            if (Config.HttpClientTimeOut == TimeSpan.Zero)
+                httpClient.Timeout = Config.HttpClientTimeOut;
+
+            return httpClient;
         }
     }
 }

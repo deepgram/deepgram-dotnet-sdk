@@ -9,9 +9,9 @@ namespace Deepgram.Clients
 {
     internal class KeyClient : IKeyClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public KeyClient(CleanCredentials credentials)
+        public KeyClient(Credentials credentials)
         {
             _credentials = credentials;
         }

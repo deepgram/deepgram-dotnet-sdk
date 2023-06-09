@@ -5,9 +5,9 @@ namespace Deepgram.Clients
 {
     internal class TranscriptionClient : ITranscriptionClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public TranscriptionClient(CleanCredentials credentials)
+        public TranscriptionClient(Credentials credentials)
         {
             _credentials = credentials;
             InitializeClients();

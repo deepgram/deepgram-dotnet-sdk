@@ -9,9 +9,9 @@ namespace Deepgram.Clients
 {
     internal class ProjectClient : IProjectClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public ProjectClient(CleanCredentials credentials)
+        public ProjectClient(Credentials credentials)
         {
             _credentials = credentials;
         }

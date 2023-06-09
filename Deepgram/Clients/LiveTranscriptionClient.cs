@@ -9,7 +9,6 @@ using Deepgram.Common;
 using Deepgram.CustomEventArgs;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -19,7 +18,7 @@ namespace Deepgram.Clients
     {
         const string LOGGER_CATEGORY = "Deepgram.Transcription.LiveTranscriptionClient";
 
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
         internal ClientWebSocket _clientWebSocket { get; set; }
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();
         private bool _disposed;
@@ -31,7 +30,7 @@ namespace Deepgram.Clients
                 SingleWriter = true,
             });
 
-        public LiveTranscriptionClient(CleanCredentials credentials)
+        public LiveTranscriptionClient(Credentials credentials)
         {
             _credentials = credentials;
         }
@@ -183,7 +182,7 @@ namespace Deepgram.Clients
 
         private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
         {
-            var protocol = _credentials.RequireSSL ? "wss" : "ws";
+            var protocol = Convert.ToBoolean(_credentials.RequireSSL) ? "wss" : "ws";
 
             if (null != queryParameters)
             {

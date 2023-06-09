@@ -8,9 +8,9 @@ namespace Deepgram.Clients
 {
     internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
-        private CleanCredentials _credentials;
+        private Credentials _credentials;
 
-        public PrerecordedTranscriptionClient(CleanCredentials credentials)
+        public PrerecordedTranscriptionClient(Credentials credentials)
         {
             _credentials = credentials;
         }
