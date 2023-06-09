@@ -1,9 +1,9 @@
 ﻿using System;
-using Deepgram.Keys;
-using Deepgram.Projects;
+using Deepgram.Clients;
+using Deepgram.Interfaces;
 using Deepgram.Request;
-using Deepgram.Transcription;
-using Deepgram.Usage;
+
+
 
 namespace Deepgram
 {
@@ -52,8 +52,8 @@ namespace Deepgram
 
         private void InitializeCredentials(Credentials credentials = null)
         {
-            string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? "" : credentials.ApiUrl;
-            string apiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? "" : credentials.ApiKey;
+            string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? string.Empty : credentials.ApiUrl;
+            string apiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? string.Empty : credentials.ApiKey;
             Nullable<bool> requireSSL = credentials?.RequireSSL;
 
             if (string.IsNullOrEmpty(apiKey))

@@ -1,10 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Web;
-using Newtonsoft.Json;
+
+/* Unmerged change from project 'Deepgram (netstandard2.0)'
+Before:
 using Newtonsoft.Json.Linq;
+After:
+using System.Web;
+*/
+using System.Web;
 
 namespace Deepgram.Common
 {
@@ -15,13 +22,13 @@ namespace Deepgram.Common
 #if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
             // TODO: watch the next core release; may have functionality to make this cleaner
             var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
-                .Replace(" ", "")
-                .Replace("/", "")
-                .Replace(":", "")
-                .Replace(";", "")
-                .Replace("_", "")
-                .Replace("(", "")
-                .Replace(")", "")
+                .Replace(" ", string.Empty)
+                .Replace("/", string.Empty)
+                .Replace(":", string.Empty)
+                .Replace(";", string.Empty)
+                .Replace("_", string.Empty)
+                .Replace("(", string.Empty)
+                .Replace(")", string.Empty)
                 ;
 #else
             var languageVersion = System.Diagnostics.FileVersionInfo
