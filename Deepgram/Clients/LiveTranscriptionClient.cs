@@ -83,7 +83,14 @@ namespace Deepgram.Clients
 
             _clientWebSocket = new ClientWebSocket();
             _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_credentials.ApiKey}");
+
+/* Unmerged change from project 'Deepgram (net6.0)'
+Before:
             _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.GetUserAgent());
+After:
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgent.GetUserAgent());
+*/
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", Common.UserAgentHelper.GetUserAgent());
 
             _tokenSource = new CancellationTokenSource();
             try

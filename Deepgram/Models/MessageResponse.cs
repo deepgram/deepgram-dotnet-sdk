@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 
-namespace Deepgram.Common
+namespace Deepgram.Models
 {
     public class MessageResponse
     {

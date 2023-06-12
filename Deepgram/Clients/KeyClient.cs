@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Deepgram.Common;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;

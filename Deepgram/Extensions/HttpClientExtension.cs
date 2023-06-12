@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
-using Deepgram.Common;
 
 namespace Deepgram.Extensions
 {
@@ -10,7 +9,7 @@ namespace Deepgram.Extensions
         {
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Helpers.GetUserAgent());
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Common.UserAgentHelper.GetUserAgent());
             return httpClient;
         }
     }

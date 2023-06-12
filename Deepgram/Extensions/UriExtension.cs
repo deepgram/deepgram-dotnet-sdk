@@ -10,7 +10,7 @@ namespace Deepgram.Extensions
             var startUri = $@"{protocol}://{apiUrl}/v1/{uriSegment}";
             if (null != queryParameters)
             {
-                var querystring = Helpers.GetParameters(queryParameters);
+                var querystring = QueryParameterHelper.GetParameters(queryParameters);
 
                 return new Uri($"{startUri}?{querystring}");
             }
