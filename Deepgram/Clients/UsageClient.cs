@@ -41,7 +41,7 @@ namespace Deepgram.Clients
         {
             return await ApiRequest.DoRequestAsync<UsageRequest>(
                 HttpMethod.Get,
-                $"/v/projects/{projectId}/requests/{requestId}",
+                $"/projects/{projectId}/requests/{requestId}",
                 _credentials
             );
         }

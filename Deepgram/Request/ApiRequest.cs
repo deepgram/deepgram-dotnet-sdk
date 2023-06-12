@@ -133,7 +133,7 @@ namespace Deepgram.Request
 
 
             var httpClient = new HttpClient();
-            if (Config.HttpClientTimeOut == TimeSpan.Zero)
+            if (Config.HttpClientTimeOut != TimeSpan.Zero)
                 httpClient.Timeout = Config.HttpClientTimeOut;
 
             return httpClient;
