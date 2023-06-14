@@ -1,4 +1,5 @@
 ﻿using Deepgram.Interfaces;
+using Deepgram.Models;
 
 namespace Deepgram.Clients
 {

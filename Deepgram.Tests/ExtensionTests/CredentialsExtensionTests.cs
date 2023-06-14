@@ -3,8 +3,6 @@
 namespace Deepgram.Tests.ExtensionTests;
 public class CredentialsExtensionTests
 {
-    private readonly object CleanCredentials;
-
     [Fact]
     public void Should_Return_Same_APIKey_That_Passed_As_Parameter()
     {
@@ -27,7 +25,7 @@ public class CredentialsExtensionTests
 
         //Assert
         Assert.IsType<ArgumentException>(result);
-        Assert.Equal(result.Message, "Deepgram API Key must be provided in constructor");
+        Assert.Equal("Deepgram API Key must be provided in constructor", result.Message);
     }
 
     [Fact]

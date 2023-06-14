@@ -1,5 +1,4 @@
-﻿using Deepgram.Common;
-using Deepgram.Extensions;
+﻿using Deepgram.Extensions;
 
 namespace Deepgram.Tests.ExtensionTests;
 public class HttpClientExtensionTests
@@ -8,7 +7,7 @@ public class HttpClientExtensionTests
     public void Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
     {
         //Arrange 
-        var agent = UserAgentHelper.GetUserAgent();
+        var agent = Helpers.UserAgentHelper.GetUserAgent();
 
         //Act
         var sut = HttpClientExtension.Create();

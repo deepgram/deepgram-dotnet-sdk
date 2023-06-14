@@ -1,5 +1,4 @@
-﻿using Deepgram.Common;
-using Deepgram.Models;
+﻿using Deepgram.Models;
 
 
 namespace Deepgram.Tests.CommonTests;
@@ -16,7 +15,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -33,7 +32,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -51,7 +50,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -70,7 +69,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -88,7 +87,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -107,7 +106,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);
@@ -125,7 +124,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var SUT = QueryParameterHelper.GetParameters(obj);
+        var SUT = Helpers.QueryParameterHelper.GetParameters(obj);
 
         //Assert
         Assert.NotNull(SUT);

@@ -2,6 +2,7 @@
 using Deepgram.Clients;
 using Deepgram.Extensions;
 using Deepgram.Interfaces;
+using Deepgram.Models;
 using Deepgram.Request;
 
 namespace Deepgram

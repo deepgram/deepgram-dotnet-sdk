@@ -9,7 +9,7 @@ namespace Deepgram.Extensions
         {
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Common.UserAgentHelper.GetUserAgent());
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(Helpers.UserAgentHelper.GetUserAgent());
             return httpClient;
         }
     }

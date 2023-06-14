@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Deepgram.Common
+namespace Deepgram.Helpers
 {
     internal static class UserAgentHelper
     {
