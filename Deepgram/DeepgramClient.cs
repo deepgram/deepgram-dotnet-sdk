@@ -9,19 +9,12 @@ namespace Deepgram
     public class DeepgramClient
     {
         private Credentials Credentials;
-
         public IKeyClient Keys { get; private set; }
         public IProjectClient Projects { get; private set; }
         public ITranscriptionClient Transcription { get; private set; }
         public IUsageClient Usage { get; private set; }
-
-        public ILiveTranscriptionClient CreateLiveTranscriptionClient()
-        {
-            return new LiveTranscriptionClient(Credentials);
-        }
-        public DeepgramClient() : this(null)
-        {
-        }
+        public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
+        public DeepgramClient() : this(null) { }
 
         public DeepgramClient(Credentials credentials)
         {
