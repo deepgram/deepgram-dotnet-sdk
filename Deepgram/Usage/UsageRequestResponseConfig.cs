@@ -66,12 +66,6 @@ namespace Deepgram.Usage
         public string Model { get; set; } = null;
 
         /// <summary>
-        /// Indicates whether named-entity recognition (NER) was requested.
-        /// </summary>
-        [JsonProperty("ner")]
-        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
-
-        /// <summary>
         /// Indicates whether numeral conversion was requested.
         /// </summary>
         [JsonProperty("numerals")]

@@ -65,13 +65,6 @@ namespace Deepgram.Transcription
         public string DiarizationVersion { get; set; } = null;
 
         /// <summary>
-        /// Indicates whether to recognize alphanumeric strings. When set to true, whitespace will be removed
-        /// between characters identified as part of an alphanumeric string. 
-        /// </summary>
-        [JsonProperty("ner")]
-        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
-
-        /// <summary>
         /// Indicates whether to transcribe each audio channel independently.
         /// </summary>
         [JsonProperty("multichannel")]

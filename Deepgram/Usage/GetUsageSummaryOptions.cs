@@ -60,12 +60,6 @@ namespace Deepgram.Usage
         public Nullable<bool> Punctuate { get; set; } = null;
 
         /// <summary>
-        /// Limits results to requests that include the ner feature.
-        /// </summary>
-        [JsonProperty("ner")]
-        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
-
-        /// <summary>
         /// Limits results to requests that include the utterances feature.
         /// </summary>
         [JsonProperty("utterances")]
