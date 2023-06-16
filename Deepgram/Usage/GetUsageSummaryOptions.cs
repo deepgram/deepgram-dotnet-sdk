@@ -72,6 +72,13 @@ namespace Deepgram.Usage
         public Nullable<bool> Replace { get; set; } = null;
 
         /// <summary>
+        /// Limits results to requests that include the ner feature.
+        /// </summary>
+        [Obsolete("NamedEntityRecognition is deprecated in favor of SmartFormat.")]
+        [JsonProperty("ner")]
+        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
+
+        /// <summary>
         /// Limits results to requests that include the profanity_filter feature.
         /// </summary>
         [JsonProperty("profanity_filter")]
