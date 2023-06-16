@@ -60,6 +60,13 @@ namespace Deepgram.Usage
         public Nullable<bool> Punctuate { get; set; } = null;
 
         /// <summary>
+        /// Limits results to requests that include the ner feature.
+        /// </summary>
+        [Obsolete("NamedEntityRecognition is deprecated in favor of SmartFormat.")]
+        [JsonProperty("ner")]
+        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
+
+        /// <summary>
         /// Limits results to requests that include the utterances feature.
         /// </summary>
         [JsonProperty("utterances")]
@@ -70,13 +77,6 @@ namespace Deepgram.Usage
         /// </summary>
         [JsonProperty("replace")]
         public Nullable<bool> Replace { get; set; } = null;
-
-        /// <summary>
-        /// Limits results to requests that include the ner feature.
-        /// </summary>
-        [Obsolete("NamedEntityRecognition is deprecated in favor of SmartFormat.")]
-        [JsonProperty("ner")]
-        public Nullable<bool> NamedEntityRecognition { get; set; } = null;
 
         /// <summary>
         /// Limits results to requests that include the profanity_filter feature.
