@@ -25,6 +25,7 @@ namespace Deepgram.Request
             }
 
             return req;
+
         }
 
         internal static HttpRequestMessage CreateStreamHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, StreamSource streamSource, object queryParameters = null)

@@ -4,7 +4,7 @@ namespace Deepgram.Tests.ExtensionTests;
 public class CredentialsExtensionTests
 {
     [Fact]
-    public void Should_Return_Same_APIKey_That_Passed_As_Parameter()
+    public void CheckApiKey_Should_Return_Same_APIKey_That_Passed_As_Parameter()
     {
         //Act
         var fakeKey = Guid.NewGuid().ToString();
@@ -17,7 +17,7 @@ public class CredentialsExtensionTests
     }
 
     [Fact]
-    public void Should_Throw_ArgumentException_If_No_ApiKey_Found()
+    public void CheckApiKey_Should_Throw_ArgumentException_If_No_ApiKey_Found()
     {
         //Act
 
@@ -29,7 +29,7 @@ public class CredentialsExtensionTests
     }
 
     [Fact]
-    public void Should_Return_TrimmedApiUrl_That_Passed_As_Parameter()
+    public void CheckApiUrl_Should_Return_TrimmedApiUrl_That_Passed_As_Parameter()
     {
         //Act
         var fakeUrl = "http://test.com";
@@ -44,7 +44,7 @@ public class CredentialsExtensionTests
 
 
     [Fact]
-    public void Should_Return_DefaultApiUrl_If_NO_ApiUrl_Present_In_Parameters()
+    public void CheckApiUrl_Should_Return_DefaultApiUrl_If_NO_ApiUrl_Present_In_Parameters()
     {
         //Act
 
@@ -62,7 +62,7 @@ public class CredentialsExtensionTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void Should_Return_RequireSSL_That_Passed_As_Parameter(bool? requireSSL)
+    public void CheckApiUrl_Should_Return_RequireSSL_That_Passed_As_Parameter(bool? requireSSL)
     {
         //Act
 

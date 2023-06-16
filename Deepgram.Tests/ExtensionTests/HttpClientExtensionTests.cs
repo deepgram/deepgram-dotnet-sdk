@@ -4,20 +4,20 @@ namespace Deepgram.Tests.ExtensionTests;
 public class HttpClientExtensionTests
 {
     [Fact]
-    public void Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
+    public void GetUserAgent_Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
     {
         //Arrange 
         var agent = Helpers.UserAgentHelper.GetUserAgent();
 
         //Act
-        var sut = HttpClientExtension.Create();
+        var result = HttpClientExtension.Create();
 
 
         //Assert
-        Assert.NotNull(sut);
-        Assert.IsAssignableFrom<HttpClient>(sut);
-        Assert.Equal("application/json", sut.DefaultRequestHeaders.Accept.ToString());
-        Assert.Equal(agent, sut.DefaultRequestHeaders.UserAgent.ToString());
+        Assert.NotNull(result);
+        Assert.IsAssignableFrom<HttpClient>(result);
+        Assert.Equal("application/json", result.DefaultRequestHeaders.Accept.ToString());
+        Assert.Equal(agent, result.DefaultRequestHeaders.UserAgent.ToString());
 
     }
 }
