@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace Deepgram.Helpers
+namespace Deepgram.Utillities
 {
-    internal static class UserAgentHelper
+    internal static class UserAgentUtil
     {
         public static string GetUserAgent()
         {
@@ -22,7 +22,7 @@ namespace Deepgram.Helpers
                 .GetVersionInfo(typeof(int).Assembly.Location)
                 .ProductVersion;
 #endif
-            var libraryVersion = typeof(UserAgentHelper)
+            var libraryVersion = typeof(UserAgentUtil)
                 .GetTypeInfo()
                 .Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()

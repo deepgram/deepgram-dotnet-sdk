@@ -3,13 +3,13 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using Deepgram.Extensions;
 using Deepgram.Models;
+using Deepgram.Utillities;
 using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    internal static class HttpRequestMessageBuilder
+    internal static class RequestMessageBuilder
     {
         internal static HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object body = null, object queryParameters = null)
         {
@@ -42,9 +42,9 @@ namespace Deepgram.Request
             return req;
         }
 
-        internal static HttpRequestMessage ConfigureHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object queryParameters = null)
+        private static HttpRequestMessage ConfigureHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object queryParameters = null)
         {
-            var requestUri = UriExtension.ResolveUri(
+            var requestUri = UriUtil.ResolveUri(
                 credentials.ApiUrl,
                 uri,
                 Convert.ToBoolean(credentials.RequireSSL) ? "https" : "http",
@@ -59,11 +59,5 @@ namespace Deepgram.Request
             req.Headers.Authorization = new AuthenticationHeaderValue("token", credentials.ApiKey);
             return req;
         }
-
-
-
-
-
-
     }
 }

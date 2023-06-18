@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Deepgram.CustomEventArgs;
-using Deepgram.Extensions;
 using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Utillities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -96,7 +96,7 @@ namespace Deepgram.Clients
             After:
                         _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgentHelper.GetUserAgent());
             */
-            _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.UserAgentHelper.GetUserAgent());
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgentUtil.GetUserAgent());
 
             _tokenSource = new CancellationTokenSource();
             try
@@ -195,7 +195,7 @@ namespace Deepgram.Clients
         }
 
         private Uri GetWSSUriWithQuerystring(string uriSegment, LiveTranscriptionOptions queryParameters) =>
-        UriExtension.ResolveUri(
+        UriUtil.ResolveUri(
            _credentials.ApiUrl, uriSegment,
            Convert.ToBoolean(_credentials.RequireSSL) ? "wss" : "ws",
            queryParameters);

@@ -2,9 +2,9 @@
 using Deepgram.Common;
 using Deepgram.Models;
 
-namespace Deepgram.Extensions
+namespace Deepgram.Utillities
 {
-    public class CredentialsExtension
+    public class CredentialsUtil
     {
         public static Credentials Clean(Credentials credentials = null)
         {

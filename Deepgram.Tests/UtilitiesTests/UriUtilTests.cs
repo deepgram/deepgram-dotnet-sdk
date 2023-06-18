@@ -1,7 +1,7 @@
-﻿using Deepgram.Extensions;
+﻿using Deepgram.Utillities;
 
 namespace Deepgram.Tests.ExtensionTests;
-public class UriExtensionTests
+public class UriUtilTests
 {
     [Theory]
     [InlineData("https")]
@@ -16,7 +16,7 @@ public class UriExtensionTests
         var uriSegment = "segment";
 
         //Act
-        var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol);
+        var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol);
 
         //Assert
         Assert.NotNull(result);
@@ -43,7 +43,7 @@ public class UriExtensionTests
             { "key", "value" }
         };
         //Act
-        var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol, parameters);
+        var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol, parameters);
 
         //Assert
         Assert.NotNull(result);

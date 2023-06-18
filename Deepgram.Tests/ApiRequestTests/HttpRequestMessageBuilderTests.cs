@@ -17,95 +17,6 @@ public class HttpRequestMessageBuilderTests
         Segment = "test";
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ConfigureHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod__Is_Get(bool requireSSL)
-    {
-        //Arrange
-        Credentials.RequireSSL = requireSSL;
-
-        //Act
-        var result = HttpRequestMessageBuilder.ConfigureHttpRequestMessage(HttpMethod.Get, Segment, Credentials);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<HttpRequestMessage>(result);
-        Assert.Equal(HttpMethod.Get, result.Method);
-        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ConfigureHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Post(bool requireSSL)
-    {
-        //Arrange
-        Credentials.RequireSSL = requireSSL;
-
-        //Act
-        var result = HttpRequestMessageBuilder.ConfigureHttpRequestMessage(HttpMethod.Post, Segment, Credentials);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<HttpRequestMessage>(result);
-        Assert.Equal(HttpMethod.Post, result.Method);
-        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ConfigureHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Patch(bool requireSSL)
-    {
-        //Arrange
-        Credentials.RequireSSL = requireSSL;
-
-        //Act
-        var result = HttpRequestMessageBuilder.ConfigureHttpRequestMessage(HttpMethod.Patch, Segment, Credentials);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<HttpRequestMessage>(result);
-        Assert.Equal(HttpMethod.Patch, result.Method);
-        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ConfigureHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Put(bool requireSSL)
-    {
-        //Arrange
-        Credentials.RequireSSL = requireSSL;
-
-        //Act
-        var result = HttpRequestMessageBuilder.ConfigureHttpRequestMessage(HttpMethod.Put, Segment, Credentials);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<HttpRequestMessage>(result);
-        Assert.Equal(HttpMethod.Put, result.Method);
-        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ConfigureHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Delete(bool requireSSL)
-    {
-        //Arrange
-        Credentials.RequireSSL = requireSSL;
-
-        //Act
-        var result = HttpRequestMessageBuilder.ConfigureHttpRequestMessage(HttpMethod.Delete, Segment, Credentials);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<HttpRequestMessage>(result);
-        Assert.Equal(HttpMethod.Delete, result.Method);
-        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-    }
 
     [Theory]
     [InlineData(true)]
@@ -116,11 +27,13 @@ public class HttpRequestMessageBuilderTests
         Credentials.RequireSSL = requireSSL;
 
         //Act
-        var result = HttpRequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials);
+        var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Get, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
     }
 
     [Theory]
@@ -135,11 +48,13 @@ public class HttpRequestMessageBuilderTests
             Keywords = new[] { "key", "word" }
         };
         //Act
-        var result = HttpRequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, null, queryParameters);
+        var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, null, queryParameters);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Get, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
     }
 
     [Theory]
@@ -157,11 +72,13 @@ public class HttpRequestMessageBuilderTests
             Redaction = new[] { "pci", "ssn" }
         };
         //Act
-        var result = HttpRequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, urlSource, queryParameters);
+        var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Post, Segment, Credentials, urlSource, queryParameters);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Post, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
         var content = result.Content;
         Assert.NotNull(result.Content);
         Assert.Equal("application/json", content.Headers.ContentType.MediaType);
@@ -177,11 +94,13 @@ public class HttpRequestMessageBuilderTests
         Credentials.RequireSSL = requireSSL;
         var body = new UpdateScopeOptions() { Scope = "owner" };
         //Act
-        var result = HttpRequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, body, null);
+        var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Put, Segment, Credentials, body, null);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Put, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
         var content = result.Content;
         Assert.NotNull(result.Content);
         Assert.Equal("application/json", content.Headers.ContentType.MediaType);
@@ -202,11 +121,13 @@ public class HttpRequestMessageBuilderTests
             Name = "test"
         };
         //Act
-        var result = HttpRequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, body, null);
+        var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Patch, Segment, Credentials, body, null);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Patch, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
         var content = result.Content;
         Assert.NotNull(result.Content);
         Assert.Equal("application/json", content.Headers.ContentType.MediaType);
@@ -227,11 +148,13 @@ public class HttpRequestMessageBuilderTests
 
 
         //Act
-        var result = HttpRequestMessageBuilder.CreateStreamHttpRequestMessage(HttpMethod.Get, Segment, Credentials, streamSource);
+        var result = RequestMessageBuilder.CreateStreamHttpRequestMessage(HttpMethod.Post, Segment, Credentials, streamSource);
 
         //Assert
         Assert.NotNull(result);
         Assert.IsType<HttpRequestMessage>(result);
+        Assert.Equal(HttpMethod.Post, result.Method);
+        Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
         var content = result.Content;
         Assert.NotNull(result.Content);
         Assert.Equal("text/plain", content.Headers.ContentType.MediaType);

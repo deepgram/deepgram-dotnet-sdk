@@ -1,16 +1,16 @@
-﻿using Deepgram.Extensions;
+﻿using Deepgram.Utillities;
 
 namespace Deepgram.Tests.ExtensionTests;
-public class HttpClientExtensionTests
+public class HttpClientUtilTests
 {
     [Fact]
     public void GetUserAgent_Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
     {
         //Arrange 
-        var agent = Helpers.UserAgentHelper.GetUserAgent();
+        var agent = UserAgentUtil.GetUserAgent();
 
         //Act
-        var result = HttpClientExtension.Create();
+        var result = new HttpClientUtil().GetHttpClient();
 
 
         //Assert

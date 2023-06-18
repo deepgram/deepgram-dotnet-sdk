@@ -1,8 +1,8 @@
 ﻿using Deepgram.Models;
-
+using Deepgram.Utillities;
 
 namespace Deepgram.Tests.CommonTests;
-public class QueryParameterHelperTests
+public class QueryParameterUtilTests
 {
     [Fact]
     public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_String_Parameter()
@@ -15,7 +15,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -32,7 +32,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -50,7 +50,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -69,7 +69,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -87,7 +87,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -106,7 +106,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);
@@ -124,7 +124,7 @@ public class QueryParameterHelperTests
         };
 
         //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+        var result = QueryParameterUtil.GetParameters(obj);
 
         //Assert
         Assert.NotNull(result);

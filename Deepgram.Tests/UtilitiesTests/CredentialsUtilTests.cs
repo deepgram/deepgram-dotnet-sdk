@@ -1,14 +1,14 @@
-﻿using Deepgram.Extensions;
+﻿using Deepgram.Utillities;
 
 namespace Deepgram.Tests.ExtensionTests;
-public class CredentialsExtensionTests
+public class CredentialsUtilTests
 {
     [Fact]
     public void CheckApiKey_Should_Return_Same_APIKey_That_Passed_As_Parameter()
     {
         //Act
         var fakeKey = Guid.NewGuid().ToString();
-        var result = CredentialsExtension.CheckApiKey(fakeKey);
+        var result = CredentialsUtil.CheckApiKey(fakeKey);
 
         //Assert
         Assert.NotNull(result);
@@ -21,7 +21,7 @@ public class CredentialsExtensionTests
     {
         //Act
 
-        var result = Assert.Throws<ArgumentException>(() => CredentialsExtension.CheckApiKey(null));
+        var result = Assert.Throws<ArgumentException>(() => CredentialsUtil.CheckApiKey(null));
 
         //Assert
         Assert.IsType<ArgumentException>(result);
@@ -33,7 +33,7 @@ public class CredentialsExtensionTests
     {
         //Act
         var fakeUrl = "http://test.com";
-        var result = CredentialsExtension.CleanApiUrl(fakeUrl);
+        var result = CredentialsUtil.CleanApiUrl(fakeUrl);
 
         //Assert
         Assert.NotNull(result);
@@ -48,7 +48,7 @@ public class CredentialsExtensionTests
     {
         //Act
 
-        var result = CredentialsExtension.CleanApiUrl(null);
+        var result = CredentialsUtil.CleanApiUrl(null);
 
         //Assert
         Assert.NotNull(result);
@@ -66,7 +66,7 @@ public class CredentialsExtensionTests
     {
         //Act
 
-        var result = CredentialsExtension.CleanRequireSSL(requireSSL);
+        var result = CredentialsUtil.CleanRequireSSL(requireSSL);
 
         //Assert
         Assert.IsType<bool>(result);
