@@ -2,11 +2,11 @@
 using Deepgram.Request;
 
 namespace Deepgram.Tests.ApiRequestTests;
-public class HttpRequestMessageBuilderTests
+public class RequestMessageBuilderTests
 {
     Credentials Credentials;
     string Segment;
-    public HttpRequestMessageBuilderTests()
+    public RequestMessageBuilderTests()
     {
         Credentials = new Credentials()
         {

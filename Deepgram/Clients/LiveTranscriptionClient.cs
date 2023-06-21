@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Deepgram.CustomEventArgs;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Utillities;
+using Deepgram.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

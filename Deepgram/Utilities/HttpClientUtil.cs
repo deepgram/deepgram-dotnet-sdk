@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Deepgram.Interfaces;
 
-namespace Deepgram.Utillities
+namespace Deepgram.Utilities
 {
-    public class HttpClientUtil : IHttpClientUtil
+    public class HttpClientUtil
     {
         // Global client used in all instance when needed
-        private static HttpClient _httpClient = Create();
+        internal static HttpClient HttpClient = Create();
         static HttpClientUtil() { }
         private static HttpClient Create()
         {
@@ -18,10 +17,9 @@ namespace Deepgram.Utillities
             return httpClient;
         }
 
-        //Testable Wrapper around the httpClient
-        public HttpClient GetHttpClient() { return _httpClient; }
-
         public static void SetTimeOut(TimeSpan timeSpan) =>
-          _httpClient.Timeout = timeSpan;
+          HttpClient.Timeout = timeSpan;
+
+
     }
 }

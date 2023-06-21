@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Models;
-using Deepgram.Utillities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -10,27 +9,34 @@ namespace Deepgram.Request
 {
     public class ApiRequest
     {
+        readonly HttpClient _httpClient;
+        public ApiRequest(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+
         internal async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
-            var json = (await SendHttpRequestAsync(request)).JsonResponse;
-            return JsonConvert.DeserializeObject<T>(json);
+
+            var response = await _httpClient.SendAsync(request);
+
+            var stream = await response.Content.ReadAsStreamAsync();
+            string json;
+            using (var sr = new StreamReader(stream))
+            {
+                json = await sr.ReadToEndAsync();
+            }
+
+
+            var deepgramResponse = ProcessResponse(response, json);
+
+            return JsonConvert.DeserializeObject<T>(deepgramResponse.JsonResponse);
         }
 
-        internal async Task<DeepgramResponse> SendHttpRequestAsync(HttpRequestMessage request)
+        private static DeepgramResponse ProcessResponse(HttpResponseMessage response, string json)
         {
             var logger = Logger.LogProvider.GetLogger(typeof(ApiRequest).Name);
-            logger.LogDebug($"{nameof(SendHttpRequestAsync)}: {request.RequestUri}");
-
-            // uses the Wrapper around the httpclient so method can be tested
-            var httpClient = new HttpClientUtil().GetHttpClient();
-            var response = await httpClient.SendAsync(request);
-            var json = await GetJsonStringFromResponse(response);
-
-            return GetDeepgramResponseFromJson(logger, response, json);
-        }
-
-        private static DeepgramResponse GetDeepgramResponseFromJson(ILogger logger, HttpResponseMessage response, string json)
-        {
             try
             {
                 logger.LogDebug(json);
@@ -47,20 +53,6 @@ namespace Deepgram.Request
                 throw new DeepgramHttpRequestException(exception.Message) { HttpStatusCode = response.StatusCode, Json = json };
             }
         }
-
-        private static async Task<string> GetJsonStringFromResponse(HttpResponseMessage response)
-        {
-            var stream = await response.Content.ReadAsStreamAsync();
-            string json;
-            using (var sr = new StreamReader(stream))
-            {
-                json = await sr.ReadToEndAsync();
-            }
-
-            return json;
-        }
-
-
 
     }
 }

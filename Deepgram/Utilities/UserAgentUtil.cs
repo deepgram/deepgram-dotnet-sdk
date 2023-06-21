@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 
-namespace Deepgram.Utillities
+namespace Deepgram.Utilities
 {
     internal static class UserAgentUtil
     {
         public static string GetUserAgent()
         {
-#if NETSTANDARD1_6 || NETSTANDARD2_0 || NETSTANDARD2_1
+
             // TODO: watch the next core release; may have functionality to make this cleaner
             var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
                 .Replace(" ", string.Empty)
@@ -15,13 +15,10 @@ namespace Deepgram.Utillities
                 .Replace(";", string.Empty)
                 .Replace("_", string.Empty)
                 .Replace("(", string.Empty)
-                .Replace(")", string.Empty)
-                ;
-#else
-            var languageVersion = System.Diagnostics.FileVersionInfo
-                .GetVersionInfo(typeof(int).Assembly.Location)
-                .ProductVersion;
-#endif
+                .Replace(")", string.Empty);
+
+
+
             var libraryVersion = typeof(UserAgentUtil)
                 .GetTypeInfo()
                 .Assembly

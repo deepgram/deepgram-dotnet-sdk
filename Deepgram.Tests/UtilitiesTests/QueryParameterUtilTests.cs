@@ -1,5 +1,5 @@
 ﻿using Deepgram.Models;
-using Deepgram.Utillities;
+using Deepgram.Utilities;
 
 namespace Deepgram.Tests.CommonTests;
 public class QueryParameterUtilTests

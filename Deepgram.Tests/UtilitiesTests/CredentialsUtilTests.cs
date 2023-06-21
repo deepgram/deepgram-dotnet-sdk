@@ -1,4 +1,4 @@
-﻿using Deepgram.Utillities;
+﻿using Deepgram.Utilities;
 
 namespace Deepgram.Tests.ExtensionTests;
 public class CredentialsUtilTests

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
@@ -13,7 +14,8 @@ namespace Deepgram.Clients
         public BillingClient(Credentials credentials)
         {
             _credentials = credentials;
-            _apiRequest = new ApiRequest();
+
+            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
         }
 
         /// <summary>

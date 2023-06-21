@@ -2,7 +2,7 @@
 using Deepgram.Common;
 using Deepgram.Models;
 
-namespace Deepgram.Utillities
+namespace Deepgram.Utilities
 {
     public class CredentialsUtil
     {

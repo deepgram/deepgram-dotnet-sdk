@@ -2,13 +2,14 @@
 using Deepgram.Clients;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Utillities;
+using Deepgram.Utilities;
 
 namespace Deepgram
 {
     public class DeepgramClient
     {
         private Credentials Credentials;
+
         public IKeyClient Keys { get; private set; }
         public IProjectClient Projects { get; private set; }
         public ITranscriptionClient Transcription { get; private set; }
@@ -18,6 +19,7 @@ namespace Deepgram
 
         public DeepgramClient(Credentials credentials)
         {
+
             Initialize(credentials);
         }
 

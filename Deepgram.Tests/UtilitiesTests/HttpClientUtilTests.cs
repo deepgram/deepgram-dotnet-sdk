@@ -1,4 +1,4 @@
-﻿using Deepgram.Utillities;
+﻿using Deepgram.Utilities;
 
 namespace Deepgram.Tests.ExtensionTests;
 public class HttpClientUtilTests
@@ -10,7 +10,7 @@ public class HttpClientUtilTests
         var agent = UserAgentUtil.GetUserAgent();
 
         //Act
-        var result = new HttpClientUtil().GetHttpClient();
+        var result = HttpClientUtil.HttpClient;
 
 
         //Assert

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deepgram.Utillities
+namespace Deepgram.Utilities
 {
     internal static class UriUtil
     {

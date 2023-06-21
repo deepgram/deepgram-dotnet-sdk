@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Deepgram.Models;
-using Deepgram.Utillities;
+using Deepgram.Utilities;
 using Newtonsoft.Json;
 
 namespace Deepgram.Request

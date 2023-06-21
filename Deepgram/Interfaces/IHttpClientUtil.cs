@@ -5,5 +5,6 @@ namespace Deepgram.Interfaces
     public interface IHttpClientUtil
     {
         HttpClient GetHttpClient();
+
     }
 }
