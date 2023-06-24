@@ -83,12 +83,19 @@ namespace Deepgram.Clients
 
             _clientWebSocket = new ClientWebSocket();
             _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_credentials.ApiKey}");
+
+/* Unmerged change from project 'Deepgram (net6.0)'
+Before:
             _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.GetUserAgent());
+After:
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgent.GetUserAgent());
+*/
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", Common.UserAgentHelper.GetUserAgent());
 
             _tokenSource = new CancellationTokenSource();
             try
             {
-                var wssUri = GetWSSUriWithQuerystring("/listen", options);
+                var wssUri = GetWSSUriWithQuerystring("listen", options);
                 await _clientWebSocket.ConnectAsync(wssUri, CancellationToken.None).ConfigureAwait(false);
                 StartSenderBackgroundThread();
                 StartReceiverBackgroundThread();
@@ -181,9 +188,9 @@ namespace Deepgram.Clients
             EnqueueForSending(new MessageToSend(data));
         }
 
-        private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters) =>
+        private Uri GetWSSUriWithQuerystring(string uriSegment, LiveTranscriptionOptions queryParameters) =>
         UriExtension.ResolveUri(
-           _credentials, uri,
+           _credentials.ApiUrl, uriSegment,
            Convert.ToBoolean(_credentials.RequireSSL) ? "wss" : "ws",
            queryParameters);
 

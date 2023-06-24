@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Deepgram.Common;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
@@ -9,11 +8,11 @@ namespace Deepgram.Clients
 {
     internal class ProjectClient : IProjectClient
     {
-        private Credentials _credentials;
 
+        private ApiRequest _apiRequest;
         public ProjectClient(Credentials credentials)
         {
-            _credentials = credentials;
+            _apiRequest = new ApiRequest(credentials);
         }
 
         /// <summary>
@@ -22,11 +21,9 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram projects</returns>
         public async Task<ProjectList> ListProjectsAsync()
         {
-            return await ApiRequest.DoRequestAsync<ProjectList>(
+            return await _apiRequest.DoRequestAsync<ProjectList>(
                 HttpMethod.Get,
-                "/projects",
-                _credentials
-            );
+                "projects");
         }
 
         /// <summary>
@@ -36,11 +33,9 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram project</returns>
         public async Task<Project> GetProjectAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<Project>(
+            return await _apiRequest.DoRequestAsync<Project>(
                 HttpMethod.Get,
-                $"/projects/{projectId}",
-                _credentials
-            );
+                $"projects/{projectId}");
         }
 
         /// <summary>
@@ -50,17 +45,14 @@ namespace Deepgram.Clients
         /// <returns>A message denoting the success of the operation</returns>
         public async Task<MessageResponse> UpdateProjectAsync(Project project)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
 #if NETSTANDARD2_0
                 new HttpMethod("PATCH"),
 #else
                 HttpMethod.Patch,
 #endif
-                $"/projects/{project.Id}",
-                _credentials,
-                null,
-                project
-            );
+                $"projects/{project.Id}",
+                project);
         }
 
         /// <summary>
@@ -69,10 +61,9 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project to delete</param>
         public async Task<MessageResponse> DeleteProjectAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/projects/{projectId}",
-                _credentials);
+                $"projects/{projectId}");
         }
 
         /// <summary>
@@ -82,11 +73,9 @@ namespace Deepgram.Clients
         /// <returns>List of members</returns>
         public async Task<MemberList> GetMembersAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<MemberList>(
+            return await _apiRequest.DoRequestAsync<MemberList>(
                        HttpMethod.Get,
-                       $"/projects/{projectId}/members",
-                       _credentials
-                   );
+                       $"projects/{projectId}/members");
         }
 
         /// <summary>
@@ -97,11 +86,9 @@ namespace Deepgram.Clients
         /// <returns>List of member scopes</returns>
         public async Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId)
         {
-            return await ApiRequest.DoRequestAsync<ScopesList>(
+            return await _apiRequest.DoRequestAsync<ScopesList>(
                 HttpMethod.Get,
-                $"/projects/{projectId}/members/{memberId}/scopes",
-                _credentials
-                );
+                $"projects/{projectId}/members/{memberId}/scopes");
         }
 
         /// Removes the authenticated account from the specified project
@@ -109,10 +96,9 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
         public async Task<MessageResponse> LeaveProjectAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/projects/{projectId}/leave",
-                _credentials);
+                $"projects/{projectId}/leave");
         }
 
         /// <summary>
@@ -122,10 +108,9 @@ namespace Deepgram.Clients
         /// <param name="memberId">Unique identifier of the member</param>
         public async Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"/projects/{projectId}/members/{memberId}",
-                _credentials);
+                $"projects/{projectId}/members/{memberId}");
         }
 
         /// <summary>
@@ -136,11 +121,9 @@ namespace Deepgram.Clients
         /// <param name="options">Scope options to update</param>
         public async Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Put,
-                $"/projects/{projectId}/members/{memberId}/scopes",
-                _credentials,
-                null,
+                $"projects/{projectId}/members/{memberId}/scopes",
                 options);
         }
     }

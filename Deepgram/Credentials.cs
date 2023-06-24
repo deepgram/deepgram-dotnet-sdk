@@ -4,11 +4,6 @@ namespace Deepgram
 {
     public class Credentials
     {
-        public Credentials()
-        {
-
-        }
-
         /// <summary>
         /// Constructor
         /// </summary>

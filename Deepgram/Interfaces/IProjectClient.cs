@@ -1,5 +1,4 @@
-﻿using Deepgram.Common;
-using Deepgram.Models;
+﻿using Deepgram.Models;
 using System;
 using System.Threading.Tasks;
 
