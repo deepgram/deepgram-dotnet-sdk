@@ -172,6 +172,14 @@ namespace Deepgram.Models
         public string[] Keywords { get; set; }
 
         /// <summary>
+        /// Support for out-of-vocabulary (OOV) keyword boosting when processing streaming audio is 
+        /// currently in beta; to fall back to previous keyword behavior append the 
+        /// query parameter keyword_boost=legacy to your API request.
+        /// </summary>
+        [JsonProperty("keyword_boost")]
+        public string KeywordBoost { get; set; }
+
+        /// <summary>
         /// Indicates whether Deepgram will segment speech into meaningful semantic units, which allows
         /// the model to interact more naturally and effectively with speakers' spontaneous speech patterns.
         /// </summary>
