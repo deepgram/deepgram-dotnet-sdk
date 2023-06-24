@@ -68,6 +68,7 @@ namespace Deepgram.Models
         /// Indicates whether to recognize alphanumeric strings. When set to true, whitespace will be removed
         /// between characters identified as part of an alphanumeric string. 
         /// </summary>
+        [Obsolete("NamedEntityRecognition is deprecated in favor of SmartFormat.")]
         [JsonProperty("ner")]
         public bool? NamedEntityRecognition { get; set; } = null;
 
