@@ -28,11 +28,11 @@ dotnet add package Deepgram
 ```
 
 ## Targeted Frameworks
-- 7.0.0
-- 6.0.0
-- 5.0.0
+
+- 7.0.x
+- 6.0.x
+- 5.0.x
 - .NET Core 3.1
-- .NET Standard 2.0
 
 ## Configuration
 
@@ -85,8 +85,8 @@ using (FileStream fs = File.OpenRead("path\\to\\file"))
 ### Real-time Transcription
 
 > The example below demonstrates sending a pre-recorded audio to simulate a real-time
-stream of audio. In a real application, this type of audio is better handled using the
-pre-recorded transcription.
+> stream of audio. In a real application, this type of audio is better handled using the
+> pre-recorded transcription.
 
 ```csharp
 var credentials = new Credentials(DEEPGRAM_API_KEY);
@@ -184,6 +184,5 @@ project, let us know! You can either:
 - [Open an issue in this repository](https://github.com/deepgram-devs/deepgram-dotnet-sdk/issues/new)
 - [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
 - [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
-
 
 [license]: LICENSE.txt
