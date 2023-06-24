@@ -68,7 +68,6 @@ namespace Deepgram.Models
         /// Indicates whether to recognize alphanumeric strings. When set to true, whitespace will be removed
         /// between characters identified as part of an alphanumeric string. 
         /// </summary>
-        [Obsolete("NamedEntityRecognition is deprecated in favor of SmartFormat.")]
         [JsonProperty("ner")]
         public bool? NamedEntityRecognition { get; set; } = null;
 
@@ -171,14 +170,6 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("keywords")]
         public string[] Keywords { get; set; }
-
-        /// <summary>
-        /// Support for out-of-vocabulary (OOV) keyword boosting when processing streaming audio is 
-        /// currently in beta; to fall back to previous keyword behavior append the 
-        /// query parameter keyword_boost=legacy to your API request.
-        /// </summary>
-        [JsonProperty("keyword_boost")]
-        public string KeywordBoost { get; set; }
 
         /// <summary>
         /// Indicates whether Deepgram will segment speech into meaningful semantic units, which allows
