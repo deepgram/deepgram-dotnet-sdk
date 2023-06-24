@@ -8,10 +8,12 @@ namespace Deepgram.Clients
 {
     internal class BillingClient : IBillingClient
     {
+        private Credentials _credentials;
         private ApiRequest _apiRequest;
         public BillingClient(Credentials credentials)
         {
-            _apiRequest = new ApiRequest(credentials);
+            _credentials = credentials;
+            _apiRequest = new ApiRequest();
         }
 
         /// <summary>
@@ -21,9 +23,12 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            return await _apiRequest.DoRequestAsync<BillingList>(
-                   HttpMethod.Get,
-                   $"projects/{projectId}/balances");
+            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                $"projects/{projectId}/balances",
+                _credentials);
+
+            return await _apiRequest.SendHttpRequestAsync<BillingList>(req);
         }
 
         /// <summary>
@@ -34,9 +39,12 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            return await _apiRequest.DoRequestAsync<Billing>(
-                  HttpMethod.Get,
-                  $"projects/{projectId}/balances/{balanceId}");
+            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+               HttpMethod.Get,
+               $"projects/{projectId}/balances/{balanceId}",
+               _credentials);
+
+            return await _apiRequest.SendHttpRequestAsync<Billing>(req);
         }
     }
 }

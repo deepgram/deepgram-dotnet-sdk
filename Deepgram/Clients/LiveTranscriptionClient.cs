@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Deepgram.Common;
 using Deepgram.CustomEventArgs;
 using Deepgram.Extensions;
 using Deepgram.Interfaces;
@@ -84,13 +83,20 @@ namespace Deepgram.Clients
             _clientWebSocket = new ClientWebSocket();
             _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_credentials.ApiKey}");
 
-/* Unmerged change from project 'Deepgram (net6.0)'
-Before:
-            _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.GetUserAgent());
-After:
-            _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgent.GetUserAgent());
-*/
-            _clientWebSocket.Options.SetRequestHeader("User-Agent", Common.UserAgentHelper.GetUserAgent());
+            /* Unmerged change from project 'Deepgram (net6.0)'
+            Before:
+                        _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.GetUserAgent());
+            After:
+                        _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgent.GetUserAgent());
+            */
+
+            /* Unmerged change from project 'Deepgram (netcoreapp3.1)'
+            Before:
+                        _clientWebSocket.Options.SetRequestHeader("User-Agent", Common.UserAgentHelper.GetUserAgent());
+            After:
+                        _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgentHelper.GetUserAgent());
+            */
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.UserAgentHelper.GetUserAgent());
 
             _tokenSource = new CancellationTokenSource();
             try

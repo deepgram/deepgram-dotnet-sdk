@@ -8,11 +8,12 @@ namespace Deepgram.Clients
 {
     internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
+        private Credentials _credentials;
         private ApiRequest _apiRequest;
-
         public PrerecordedTranscriptionClient(Credentials credentials)
         {
-            _apiRequest = new ApiRequest(credentials);
+            _credentials = credentials;
+            _apiRequest = new ApiRequest();
         }
 
         /// <summary>
@@ -23,11 +24,14 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            return await _apiRequest.DoRequestAsync<PrerecordedTranscription>(
-                HttpMethod.Post,
+            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+               HttpMethod.Post,
                 "listen",
+                _credentials,
                 source,
                 options);
+
+            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
 
         /// <summary>
@@ -38,11 +42,14 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            return await _apiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
-                HttpMethod.Post,
-                "listen",
-                source,
-                options);
+            var req = HttpRequestMessageBuilder.CreateStreamHttpRequestMessage(
+             HttpMethod.Post,
+              "listen",
+              _credentials,
+              source,
+              options);
+
+            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
     }
 }

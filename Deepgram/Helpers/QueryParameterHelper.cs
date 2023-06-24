@@ -5,7 +5,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Deepgram.Common
+namespace Deepgram.Helpers
 {
     internal static class QueryParameterHelper
 
