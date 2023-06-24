@@ -28,7 +28,7 @@ dotnet add package Deepgram
 ```
 
 ## Targeted Frameworks
-
+- 7.0.0
 - 6.0.0
 - 5.0.0
 - .NET Core 3.1
@@ -43,35 +43,6 @@ To setup the configuration of the Deepgram Client you can do one of the followin
 ```csharp
 var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
 var deepgramClient = new DeepgramClient(credentials);
-```
-
-Or
-
-- Provide the Deepgram API key and optional API Url in `appsettings.json`:
-
-```json
-{
-  "appSettings": {
-    "Deepgram.Api.Key": "YOUR_DEEPGRAM_API_KEY",
-    "Deepgram.Api.Uri": "api.deepgram.com"
-  }
-}
-```
-
-> Note: In the event multiple configuration files are found, the order of precedence is as follows:
-
-```
-* ```appsettings.json``` which overrides
-* ```settings.json```
-```
-
-Or
-
-- Access the Configuration instance and set the appropriate key in your code for example:
-
-```csharp
-Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"] = "YOUR_DEEPGRAM_API_KEY";
-Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"] = "api.deepgram.com";
 ```
 
 ## Examples
