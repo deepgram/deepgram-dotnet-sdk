@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Deepgram.Common
 {
@@ -24,7 +22,7 @@ namespace Deepgram.Common
         /// <summary>
         /// adaptive multi-rate narrowband codec (sample rate must be 8000)
         /// </summary>
-        public static readonly string AMRNB= "amr-nb";
+        public static readonly string AMRNB = "amr-nb";
         /// <summary>
         /// adaptive multi-rate wideband codec (sample rate must be 16000)
         /// </summary>

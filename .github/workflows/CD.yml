@@ -8,11 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.release.target_commitish }}      
+          ref: ${{ github.event.release.target_commitish }}
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.x.x'
+          dotnet-version: "7.x.x"
       - name: Install dependencies
         run: dotnet restore
       - name: Get the version
@@ -34,6 +34,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dist
-          path: 'dist'
+          path: "dist"
       - name: Publish packages
         run: dotnet nuget push ./dist/**.nupkg --source nuget.org --api-key ${{secrets.NUGET_API_KEY}}

@@ -2,16 +2,18 @@
 
 [![Nuget](https://img.shields.io/nuget/v/deepgram)](https://www.nuget.org/packages/Deepgram) [![Build Status](https://github.com/deepgram-devs/deepgram-dotnet-sdk/workflows/CI/badge.svg)](https://github.com/deepgram-devs/deepgram-dotnet-sdk/actions?query=CI) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](./.github/CODE_OF_CONDUCT.md)
 
-Official .NET SDK for [Deepgram](https://www.deepgram.com/)'s automated
-speech recognition APIs.
+Official .NET SDK for [Deepgram](https://www.deepgram.com/). Start building with our powerful transcription & speech understanding API.
 
-To access the API you will need a Deepgram account. Sign up for free at
-[signup](https://console.deepgram.com/signup?utm_medium=github&utm_source=devrel&utm_content=dotnet-sdk).
+> This SDK only supports hosted usage of api.deepgram.com.
+
+## Getting an API Key
+
+🔑 To access the Deepgram API you will need a [free Deepgram API Key](https://console.deepgram.com/signup?jump=keys).
 
 ## Documentation
 
-Full documentation of the .NET SDK can be found on the
-[Deepgram Developer Portal](https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/).
+Complete documentation of the .NET SDK can be found on the
+[Deepgram Docs](https://developers.deepgram.com/docs/dotnet-sdk).
 
 You can learn more about the full Deepgram API at [https://developers.deepgram.com](https://developers.deepgram.com).
 
@@ -26,7 +28,7 @@ dotnet add package Deepgram
 ```
 
 ## Targeted Frameworks
-
+- 7.0.0
 - 6.0.0
 - 5.0.0
 - .NET Core 3.1
@@ -41,35 +43,6 @@ To setup the configuration of the Deepgram Client you can do one of the followin
 ```csharp
 var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
 var deepgramClient = new DeepgramClient(credentials);
-```
-
-Or
-
-- Provide the Deepgram API key and optional API Url in `appsettings.json`:
-
-```json
-{
-  "appSettings": {
-    "Deepgram.Api.Key": "YOUR_DEEPGRAM_API_KEY",
-    "Deepgram.Api.Uri": "api.deepgram.com"
-  }
-}
-```
-
-> Note: In the event multiple configuration files are found, the order of precedence is as follows:
-
-```
-* ```appsettings.json``` which overrides
-* ```settings.json```
-```
-
-Or
-
-- Access the Configuration instance and set the appropriate key in your code for example:
-
-```csharp
-Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"] = "YOUR_DEEPGRAM_API_KEY";
-Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"] = "api.deepgram.com";
 ```
 
 ## Examples
@@ -151,7 +124,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 
     void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)
     {
-        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0) { 
+        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0) {
             var transcript = e.Transcript;
             Console.WriteLine($"[Speaker: {transcript.Channel.Alternatives.First().Words.First().Speaker}] {transcript.Channel.Alternatives.First().Transcript}");
         }
@@ -208,11 +181,9 @@ To make sure our community is safe for all, be sure to review and agree to our
 We love to hear from you so if you have questions, comments or find a bug in the
 project, let us know! You can either:
 
-- [Open an issue](https://github.com/deepgram-devs/deepgram-dotnet-sdk/issues/new) on this repository
-- Tweet at us! We're [@DeepgramAI on Twitter](https://twitter.com/DeepgramAI)
+- [Open an issue in this repository](https://github.com/deepgram-devs/deepgram-dotnet-sdk/issues/new)
+- [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
+- [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
 
-## Further Reading
 
-Check out the Developer Documentation at [https://developers.deepgram.com/](https://developers.deepgram.com/)
-
-[signup]: https://console.deepgram.com?utm_source=dotnet-sdk&utm_content=readme
+[license]: LICENSE.txt
