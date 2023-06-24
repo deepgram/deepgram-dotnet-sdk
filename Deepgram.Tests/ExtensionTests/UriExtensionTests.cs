@@ -1,57 +1,62 @@
-﻿using Deepgram.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using Deepgram.Extensions;
+using Xunit;
 
-namespace Deepgram.Tests.ExtensionTests;
-public class UriExtensionTests
+namespace Deepgram.Tests.ExtensionTests
 {
-    [Theory]
-    [InlineData("https")]
-    [InlineData("http")]
-    [InlineData("ws")]
-    [InlineData("wss")]
-
-    public void ResolveUri_Should_Return_Uri_Without_Parameters(string protocol)
+    public class UriExtensionTests
     {
-        //Arrange
-        var apiUrl = "test.com";
-        var uriSegment = "segment";
+        [Theory]
+        [InlineData("https")]
+        [InlineData("http")]
+        [InlineData("ws")]
+        [InlineData("wss")]
 
-        //Act
-        var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol);
+        public void ResolveUri_Should_Return_Uri_Without_Parameters(string protocol)
+        {
+            //Arrange
+            var apiUrl = "test.com";
+            var uriSegment = "segment";
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<Uri>(result);
-        Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}", result.AbsoluteUri);
-        Assert.Equal(protocol, result.Scheme);
-        Assert.Equal(apiUrl, result.Host);
-        Assert.Contains(uriSegment, result.Segments);
-    }
+            //Act
+            var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol);
 
-    [Theory]
-    [InlineData("https")]
-    [InlineData("http")]
-    [InlineData("ws")]
-    [InlineData("wss")]
+            //Assert
+            Assert.NotNull(result);
+            Assert.IsType<Uri>(result);
+            Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}", result.AbsoluteUri);
+            Assert.Equal(protocol, result.Scheme);
+            Assert.Equal(apiUrl, result.Host);
+            Assert.Contains(uriSegment, result.Segments);
+        }
 
-    public void ResolveUri_Should_Return_Uri_With_Parameters(string protocol)
-    {
-        //Arrange
-        var apiUrl = "test.com";
-        var uriSegment = "segment";
-        var parameters = new Dictionary<string, string>
+        [Theory]
+        [InlineData("https")]
+        [InlineData("http")]
+        [InlineData("ws")]
+        [InlineData("wss")]
+
+        public void ResolveUri_Should_Return_Uri_With_Parameters(string protocol)
+        {
+            //Arrange
+            var apiUrl = "test.com";
+            var uriSegment = "segment";
+            var parameters = new Dictionary<string, string>
         {
             { "key", "value" }
         };
-        //Act
-        var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol, parameters);
+            //Act
+            var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol, parameters);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsType<Uri>(result);
-        Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}?key=value", result.AbsoluteUri);
-        Assert.Equal(protocol, result.Scheme);
-        Assert.Equal(apiUrl, result.Host);
-        Assert.Contains(uriSegment, result.Segments);
-        Assert.Contains("key=value", result.Query);
+            //Assert
+            Assert.NotNull(result);
+            Assert.IsType<Uri>(result);
+            Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}?key=value", result.AbsoluteUri);
+            Assert.Equal(protocol, result.Scheme);
+            Assert.Equal(apiUrl, result.Host);
+            Assert.Contains(uriSegment, result.Segments);
+            Assert.Contains("key=value", result.Query);
+        }
     }
 }

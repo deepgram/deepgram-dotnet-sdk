@@ -1,140 +1,143 @@
-﻿using Deepgram.Models;
+﻿using System;
+using Deepgram.Models;
+using Xunit;
 
-
-namespace Deepgram.Tests.CommonTests;
-public class QueryParameterHelperTests
+namespace Deepgram.Tests.CommonTests
 {
-    [Fact]
-    public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_String_Parameter()
+    public class QueryParameterHelperTests
     {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new LiveTranscriptionOptions()
+        [Fact]
+        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_String_Parameter()
         {
-            Model = "Model"
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new LiveTranscriptionOptions()
+            {
+                Model = "Model"
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"{nameof(obj.Model).ToLower()}={obj.Model.ToLower()}", result);
-    }
-    [Fact]
-    public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Int_Parameter()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new LiveTranscriptionOptions()
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"{nameof(obj.Model).ToLower()}={obj.Model.ToLower()}", result);
+        }
+        [Fact]
+        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Int_Parameter()
         {
-            Channels = 1,
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new LiveTranscriptionOptions()
+            {
+                Channels = 1,
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"{nameof(obj.Channels).ToLower()}={obj.Channels}", result);
-    }
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"{nameof(obj.Channels).ToLower()}={obj.Channels}", result);
+        }
 
-    [Fact]
-    public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Array_Parameter()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new LiveTranscriptionOptions()
+        [Fact]
+        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Array_Parameter()
         {
-            Keywords = new[] { "key", "word" }
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new LiveTranscriptionOptions()
+            {
+                Keywords = new[] { "key", "word" }
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[0].ToLower()}", result);
-        Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[1].ToLower()}", result);
-    }
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[0].ToLower()}", result);
+            Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[1].ToLower()}", result);
+        }
 
-    [Fact]
-    public void GetParameters_Should_Return_String_When_Passing_Decimal_Parameter()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new PrerecordedTranscriptionOptions()
+        [Fact]
+        public void GetParameters_Should_Return_String_When_Passing_Decimal_Parameter()
         {
-            UtteranceSplit = (decimal)2.223
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new PrerecordedTranscriptionOptions()
+            {
+                UtteranceSplit = (decimal)2.223
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"utt_split={obj.UtteranceSplit}", result);
-    }
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"utt_split={obj.UtteranceSplit}", result);
+        }
 
-    [Fact]
-    public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new PrerecordedTranscriptionOptions()
+        [Fact]
+        public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
         {
-            Paragraphs = true
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new PrerecordedTranscriptionOptions()
+            {
+                Paragraphs = true
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"{nameof(obj.Paragraphs).ToLower()}={obj.Paragraphs.ToString()?.ToLower()}", result);
-    }
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"{nameof(obj.Paragraphs).ToLower()}={obj.Paragraphs.ToString()?.ToLower()}", result);
+        }
 
-    [Fact]
-    public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-
-        var obj = new DateTimeObject()
+        [Fact]
+        public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
         {
-            Time = new DateTime(2023, 5, 23)
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var obj = new DateTimeObject()
+            {
+                Time = new DateTime(2023, 5, 23)
+            };
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Contains($"{nameof(obj.Time).ToLower()}=2023-05-23", result);
-    }
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-    [Fact]
-    public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()
-    {
-        //Arrange 
-        //only creating a limited object so to test each value is being processed
-        var obj = new LiveTranscriptionOptions()
+            //Assert
+            Assert.NotNull(result);
+            Assert.Contains($"{nameof(obj.Time).ToLower()}=2023-05-23", result);
+        }
+
+        [Fact]
+        public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()
         {
-            Version = null
-        };
+            //Arrange 
+            //only creating a limited object so to test each value is being processed
+            var obj = new LiveTranscriptionOptions()
+            {
+                Version = null
+            };
 
-        //Act
-        var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            //Act
+            var result = Helpers.QueryParameterHelper.GetParameters(obj);
 
-        //Assert
-        Assert.NotNull(result);
-        Assert.Equal(string.Empty, result);
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(string.Empty, result);
+
+        }
+
+        public class DateTimeObject
+        {
+            public DateTime Time { get; set; }
+        }
 
     }
-
-    public class DateTimeObject
-    {
-        public DateTime Time { get; set; }
-    }
-
 }
