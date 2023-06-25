@@ -1,15 +1,15 @@
 ﻿using System;
 using Deepgram.Clients;
-using Deepgram.Extensions;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram
 {
     public class DeepgramClient
     {
         private Credentials Credentials;
+
         public IKeyClient Keys { get; private set; }
         public IProjectClient Projects { get; private set; }
         public ITranscriptionClient Transcription { get; private set; }
@@ -19,6 +19,7 @@ namespace Deepgram
 
         public DeepgramClient(Credentials credentials)
         {
+
             Initialize(credentials);
         }
 
@@ -27,11 +28,11 @@ namespace Deepgram
         /// </summary>
         /// <param name="timeout">Timespan to wait before the request times out.</param>
         public void SetHttpClientTimeout(TimeSpan timeout) =>
-            ApiRequest.SetTimeOut(timeout);
+            HttpClientUtil.SetTimeOut(timeout);
 
         private void Initialize(Credentials credentials)
         {
-            Credentials = CredentialsExtension.Clean(credentials);
+            Credentials = CredentialsUtil.Clean(credentials);
             InitializeClients();
         }
 
