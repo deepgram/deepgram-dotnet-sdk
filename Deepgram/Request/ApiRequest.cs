@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    public class ApiRequest : IApiRequest
+    public class ApiRequest
     {
         readonly HttpClient _httpClient;
         public ApiRequest(HttpClient httpClient)
@@ -16,7 +16,7 @@ namespace Deepgram.Request
         }
 
 
-        public async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+        internal async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
 
             var response = await _httpClient.SendAsync(request);
