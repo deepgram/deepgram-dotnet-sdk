@@ -1,10 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Deepgram.Models
 {
     public class PrerecordedTranscription
     {
+        /// <summary>
+        /// Id Reuturn When Callback option used in Request
+        /// </summary>
+        [JsonProperty("request_id")]
+        public string RequestID { get; set; } = null;
+
+
         /// <summary>
         /// Metadata for the request
         /// </summary>
