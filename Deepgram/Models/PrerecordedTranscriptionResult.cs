@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 
 namespace Deepgram.Models
 {
@@ -16,5 +15,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("utterances")]
         public Utterance[] Utterances { get; set; }
+
+        /// <summary>
+        /// Summary of Transcription.
+        /// </summary>
+        [JsonProperty("summary")]
+        public Summary Summary { get; set; }
     }
 }

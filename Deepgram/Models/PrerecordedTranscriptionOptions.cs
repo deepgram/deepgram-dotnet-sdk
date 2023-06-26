@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Deepgram.Models
 {
@@ -212,7 +212,7 @@ namespace Deepgram.Models
         /// Indicates whether Deepgram should provide summarizations of sections of the provided audio.
         /// </summary>
         [JsonProperty("summarize")]
-        public bool? Summarize { get; set; } = null;
+        public object Summarize { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram should detect entities within the provided audio.
