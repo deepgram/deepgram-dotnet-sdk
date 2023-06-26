@@ -16,5 +16,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("utterances")]
         public Utterance[] Utterances { get; set; }
+
+        /// <summary>
+        /// Summarize object.
+        /// </summary>
+        [JsonProperty("summary")]
+        public Summary Summary { get; set; }
     }
 }

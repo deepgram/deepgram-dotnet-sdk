@@ -213,6 +213,7 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("summarize")]
         public bool? Summarize { get; set; } = null;
+        public string? Summarize { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram should detect entities within the provided audio.

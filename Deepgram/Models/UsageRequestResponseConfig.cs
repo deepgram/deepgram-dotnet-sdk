@@ -42,10 +42,16 @@ namespace Deepgram.Models
         public bool? DetectEntities { get; set; } = null;
 
         /// <summary>
-        /// Indicates whether summarize feature was requested.
+        /// Indicates whether summarize v1 feature was requested.
         /// </summary>
         [JsonProperty("summarize")]
         public bool? Summarize { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether summarize v2 feature was requested.
+        /// </summary>
+        [JsonProperty("summarize")]
+        public string? Summarize { get; set; } = null;
 
         /// <summary>
         /// Array of keywords associated with the request.

@@ -23,5 +23,11 @@ namespace Deepgram.Models
         [JsonProperty("end_word")]
         public int EndWord { get; set; }
 
+        /// <summary>
+        /// Summary of the entire transcript
+        /// </summary>
+        [JsonProperty("short")]
+        public string Short { get; set; }
+
     }
 }
