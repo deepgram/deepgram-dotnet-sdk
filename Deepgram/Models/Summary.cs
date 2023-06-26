@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 
 namespace Deepgram.Models
 {
@@ -22,6 +21,12 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("end_word")]
         public int EndWord { get; set; }
+
+        /// <summary>
+        /// Array of Channel objects.
+        /// </summary>
+        [JsonProperty("short")]
+        public string Short { get; set; }
 
     }
 }
