@@ -1,19 +1,19 @@
 ﻿using System.Net.Http;
-using Deepgram.Extensions;
+using Deepgram.Utilities;
 using Xunit;
 
-namespace Deepgram.Tests.ExtensionTests
+namespace Deepgram.Tests.UtilitiesTests
 {
-    public class HttpClientExtensionTests
+    public class HttpClientUtilTests
     {
         [Fact]
         public void GetUserAgent_Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
         {
             //Arrange 
-            var agent = Helpers.UserAgentHelper.GetUserAgent();
+            var agent = UserAgentUtil.GetUserAgent();
 
             //Act
-            var result = HttpClientExtension.Create();
+            var result = HttpClientUtil.HttpClient;
 
 
             //Assert

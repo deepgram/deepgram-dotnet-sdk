@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
@@ -13,7 +14,8 @@ namespace Deepgram.Clients
         public BillingClient(Credentials credentials)
         {
             _credentials = credentials;
-            _apiRequest = new ApiRequest();
+
+            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
         }
 
         /// <summary>
@@ -23,7 +25,7 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/balances",
                 _credentials);
@@ -39,7 +41,7 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                $"projects/{projectId}/balances/{balanceId}",
                _credentials);

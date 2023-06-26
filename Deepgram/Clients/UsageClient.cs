@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
@@ -14,7 +15,7 @@ namespace Deepgram.Clients
         public UsageClient(Credentials credentials)
         {
             _credentials = credentials;
-            _apiRequest = new ApiRequest();
+            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
 
         }
 
@@ -26,7 +27,7 @@ namespace Deepgram.Clients
         /// <returns>Usage Requests that fit the parameters provided</returns>
         public async Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions options)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests",
                 _credentials,
@@ -46,7 +47,7 @@ namespace Deepgram.Clients
         /// <returns>Usage Request identified</returns>
         public async Task<UsageRequest> GetUsageRequestAsync(string projectId, string requestId)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests/{requestId}",
                 _credentials);
@@ -64,7 +65,7 @@ namespace Deepgram.Clients
         /// <returns>Summary of usage statistics</returns>
         public async Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions options)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                   $"projects/{projectId}/usage",
                 _credentials,
@@ -83,7 +84,7 @@ namespace Deepgram.Clients
         /// <returns>List of features, models, tags, languages, and processing method used for requests in the specified project.</returns>
         public async Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions options)
         {
-            var req = HttpRequestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                     $"projects/{projectId}/usage/fields",
                _credentials,

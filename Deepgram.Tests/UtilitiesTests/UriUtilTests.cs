@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Deepgram.Extensions;
+using Deepgram.Utilities;
 using Xunit;
 
-namespace Deepgram.Tests.ExtensionTests
+namespace Deepgram.Tests.UtilitiesTests
 {
-    public class UriExtensionTests
+    public class UriUtilTests
     {
         [Theory]
         [InlineData("https")]
@@ -20,7 +20,7 @@ namespace Deepgram.Tests.ExtensionTests
             var uriSegment = "segment";
 
             //Act
-            var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol);
+            var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol);
 
             //Assert
             Assert.NotNull(result);
@@ -47,7 +47,7 @@ namespace Deepgram.Tests.ExtensionTests
             { "key", "value" }
         };
             //Act
-            var result = UriExtension.ResolveUri(apiUrl, uriSegment, protocol, parameters);
+            var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol, parameters);
 
             //Assert
             Assert.NotNull(result);

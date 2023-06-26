@@ -1,13 +1,14 @@
 ﻿using System;
 using Deepgram.Models;
+using Deepgram.Utilities;
 using Xunit;
 
-namespace Deepgram.Tests.CommonTests
+namespace Deepgram.Tests.UtilitiesTests
 {
-    public class QueryParameterHelperTests
+    public class QueryParameterUtilTests
     {
         [Fact]
-        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_String_Parameter()
+        public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
         {
             //Arrange 
             //only creating a limited object so to test each value is being processed
@@ -17,14 +18,14 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
             Assert.Contains($"{nameof(obj.Model).ToLower()}={obj.Model.ToLower()}", result);
         }
         [Fact]
-        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Int_Parameter()
+        public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
         {
             //Arrange 
             //only creating a limited object so to test each value is being processed
@@ -34,7 +35,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
@@ -42,7 +43,7 @@ namespace Deepgram.Tests.CommonTests
         }
 
         [Fact]
-        public void GetParameters_Should_GetParameters_Should_Return_String_When_Passing_Array_Parameter()
+        public void GetParameters_Should_Return_String_When_Passing_Array_Parameter()
         {
             //Arrange 
             //only creating a limited object so to test each value is being processed
@@ -52,7 +53,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
@@ -71,7 +72,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
@@ -89,7 +90,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
@@ -108,7 +109,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
@@ -126,7 +127,7 @@ namespace Deepgram.Tests.CommonTests
             };
 
             //Act
-            var result = Helpers.QueryParameterHelper.GetParameters(obj);
+            var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
