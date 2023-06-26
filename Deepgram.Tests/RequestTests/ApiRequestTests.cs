@@ -1,13 +1,6 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.Http;
 using Deepgram.Models;
 using Deepgram.Request;
-using Moq;
-using Moq.Protected;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace Deepgram.Tests.RequestTests
@@ -16,11 +9,11 @@ namespace Deepgram.Tests.RequestTests
     {
         [Fact]
 
-        public async void Should()
+        public async void Should_Return_A_Valid_Object_When_Deserialized()
         {
             //Arrange
             var responseObject = new Project() { Company = "testCompany", Id = "fakeId", Name = "fakeName" };
-            var client = CreateHttpClientWithResult(responseObject);
+            var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
             var SUT = new ApiRequest(client);
 
             //Act
@@ -31,34 +24,9 @@ namespace Deepgram.Tests.RequestTests
             Assert.IsAssignableFrom<Project>(result);
         }
 
-        public static Mock<HttpMessageHandler> CreateMessageHandlerWithResult<T>(
-        T result, HttpStatusCode code = HttpStatusCode.OK)
-        {
-            var messageHandler = new Mock<HttpMessageHandler>();
-            messageHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
-                    "SendAsync",
-                    ItExpr.IsAny<HttpRequestMessage>(),
-                    ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(new HttpResponseMessage()
-                {
-                    StatusCode = code,
-                    Content = new StringContent(JsonConvert.SerializeObject(result)),
-                });
 
-            return messageHandler;
-        }
 
-        public static HttpClient CreateHttpClientWithResult<T>(
-            T result, HttpStatusCode code = HttpStatusCode.OK)
-        {
-            var httpClient = new HttpClient(CreateMessageHandlerWithResult(result, code).Object)
-            {
-                BaseAddress = new Uri("https://api-client-under-test.com"),
-            };
 
-            return httpClient;
-        }
 
 
 
