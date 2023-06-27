@@ -16,8 +16,8 @@ namespace Deepgram.Tests.UtilitiesTests
         public void ResolveUri_Should_Return_Uri_Without_Parameters(string protocol)
         {
             //Arrange
-            var apiUrl = "test.com";
-            var uriSegment = "segment";
+            var apiUrl = FakeModels.CleanedUrl;
+            var uriSegment = FakeModels.UriSegment;
 
             //Act
             var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol);
@@ -40,8 +40,8 @@ namespace Deepgram.Tests.UtilitiesTests
         public void ResolveUri_Should_Return_Uri_With_Parameters(string protocol)
         {
             //Arrange
-            var apiUrl = "test.com";
-            var uriSegment = "segment";
+            var apiUrl = FakeModels.CleanedUrl;
+            var uriSegment = FakeModels.UriSegment;
             var parameters = new Dictionary<string, string>
         {
             { "key", "value" }

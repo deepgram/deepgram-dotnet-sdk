@@ -43,9 +43,4 @@
       <_Parameter1>Deepgram.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.PrivatesVisibleTo">
-      <_Parameter1>Deepgram.Tests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
 </Project>

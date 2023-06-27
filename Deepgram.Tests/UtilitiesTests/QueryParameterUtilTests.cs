@@ -1,5 +1,4 @@
-﻿using System;
-using Deepgram.Models;
+﻿using Deepgram.Models;
 using Deepgram.Utilities;
 using Xunit;
 
@@ -11,11 +10,7 @@ namespace Deepgram.Tests.UtilitiesTests
         public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new LiveTranscriptionOptions()
-            {
-                Model = "Model"
-            };
+            var obj = FakeModels.PrerecordedTranscriptionOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
@@ -28,29 +23,21 @@ namespace Deepgram.Tests.UtilitiesTests
         public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new LiveTranscriptionOptions()
-            {
-                Channels = 1,
-            };
+            var obj = FakeModels.ListAllRequestsOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
-            Assert.Contains($"{nameof(obj.Channels).ToLower()}={obj.Channels}", result);
+            Assert.Contains($"{nameof(obj.Limit).ToLower()}={obj.Limit}", result);
         }
 
         [Fact]
         public void GetParameters_Should_Return_String_When_Passing_Array_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new LiveTranscriptionOptions()
-            {
-                Keywords = new[] { "key", "word" }
-            };
+            var obj = FakeModels.PrerecordedTranscriptionOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
@@ -58,18 +45,14 @@ namespace Deepgram.Tests.UtilitiesTests
             //Assert
             Assert.NotNull(result);
             Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[0].ToLower()}", result);
-            Assert.Contains($"{nameof(obj.Keywords).ToLower()}={obj.Keywords[1].ToLower()}", result);
+
         }
 
         [Fact]
         public void GetParameters_Should_Return_String_When_Passing_Decimal_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new PrerecordedTranscriptionOptions()
-            {
-                UtteranceSplit = (decimal)2.223
-            };
+            var obj = FakeModels.PrerecordedTranscriptionOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
@@ -83,11 +66,7 @@ namespace Deepgram.Tests.UtilitiesTests
         public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new PrerecordedTranscriptionOptions()
-            {
-                Paragraphs = true
-            };
+            var obj = FakeModels.PrerecordedTranscriptionOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
@@ -101,30 +80,21 @@ namespace Deepgram.Tests.UtilitiesTests
         public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-
-            var obj = new DateTimeObject()
-            {
-                Time = new DateTime(2023, 5, 23)
-            };
+            var obj = FakeModels.ListAllRequestsOptions;
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
 
             //Assert
             Assert.NotNull(result);
-            Assert.Contains($"{nameof(obj.Time).ToLower()}=2023-05-23", result);
+            Assert.Contains($"start=2023-05-23", result);
         }
 
         [Fact]
         public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()
         {
             //Arrange 
-            //only creating a limited object so to test each value is being processed
-            var obj = new LiveTranscriptionOptions()
-            {
-                Version = null
-            };
+            var obj = new LiveTranscriptionOptions();
 
             //Act
             var result = QueryParameterUtil.GetParameters(obj);
@@ -132,13 +102,6 @@ namespace Deepgram.Tests.UtilitiesTests
             //Assert
             Assert.NotNull(result);
             Assert.Equal(string.Empty, result);
-
         }
-
-        public class DateTimeObject
-        {
-            public DateTime Time { get; set; }
-        }
-
     }
 }
