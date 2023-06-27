@@ -3,21 +3,12 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
-    internal class UsageClient : IUsageClient
+    internal class UsageClient : BaseClient, IUsageClient
     {
-        private Credentials _credentials;
-        private ApiRequest _apiRequest;
-
-        public UsageClient(Credentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-
-        }
+        public UsageClient(Credentials credentials) : base(credentials) { }
 
         /// <summary>
         /// Generates a list of requests sent to the Deepgram API for the specified project over a given time range. 

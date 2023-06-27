@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Tests.Fakes;
 using Xunit;
 
 namespace Deepgram.Tests.RequestTests

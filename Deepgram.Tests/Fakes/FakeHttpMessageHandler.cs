@@ -7,7 +7,7 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 
-namespace Deepgram.Tests
+namespace Deepgram.Tests.Fakes
 {
     public static class FakeHttpMessageHandler
     {

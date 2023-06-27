@@ -1,13 +1,14 @@
 ﻿using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Deepgram.Interfaces;
 using Deepgram.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    public class ApiRequest
+    public class ApiRequest : IApiRequest
     {
         readonly HttpClient _httpClient;
         public ApiRequest(HttpClient httpClient)
@@ -16,7 +17,7 @@ namespace Deepgram.Request
         }
 
 
-        internal async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+        public async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
 
             var response = await _httpClient.SendAsync(request);

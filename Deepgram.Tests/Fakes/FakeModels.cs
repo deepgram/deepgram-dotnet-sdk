@@ -2,7 +2,7 @@
 using System.IO;
 using Deepgram.Models;
 
-namespace Deepgram.Tests
+namespace Deepgram.Tests.Fakes
 {
     public static class FakeModels
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deepgram.Tests.Fakes;
+using System;
 using Deepgram.Utilities;
 using Xunit;
 

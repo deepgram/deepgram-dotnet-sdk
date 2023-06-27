@@ -2,6 +2,7 @@
 using Deepgram.Clients;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Tests.Fakes;
 using Xunit;
 
 namespace Deepgram.Tests

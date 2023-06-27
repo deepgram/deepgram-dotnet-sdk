@@ -1,4 +1,5 @@
 ﻿using Deepgram.Models;
+using Deepgram.Tests.Fakes;
 using Deepgram.Utilities;
 using Xunit;
 
