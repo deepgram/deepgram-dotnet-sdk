@@ -77,9 +77,9 @@ Run the following command from your terminal in your projects directory:
 dotnet add package Deepgram
 ```
 
-or use the Nuget package Manager
+Or use the Nuget package Manager.
 
-right click on project and select manage nuget packages
+Right click on project and select manage nuget packages
 
 # Targeted Frameworks
 

@@ -1,4 +1,4 @@
-﻿using Deepgram.Transcription;
+﻿using Deepgram.Models;
 
 namespace SampleApp
 {
@@ -15,7 +15,7 @@ namespace SampleApp
                     {
                         Punctuate = true,
                         Utterances = true,
-                        Redaction = new [] { "pci", "ssn" }
+                        Redaction = new[] { "pci", "ssn" }
                     });
 
             Console.Write(response.ToWebVTT());

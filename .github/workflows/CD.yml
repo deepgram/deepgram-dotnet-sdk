@@ -5,14 +5,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ["3.1.x", "5.0.x", "6.0.x", "7.0.x"]
+
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.release.target_commitish }}      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+          ref: ${{ github.event.release.target_commitish }}
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.x.x'
+          dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore
       - name: Get the version
@@ -34,6 +38,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dist
-          path: 'dist'
+          path: "dist"
       - name: Publish packages
         run: dotnet nuget push ./dist/**.nupkg --source nuget.org --api-key ${{secrets.NUGET_API_KEY}}
