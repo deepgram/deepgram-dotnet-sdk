@@ -6,8 +6,9 @@ using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
-    internal class UsageClient : BaseClient, IUsageClient
+    public class UsageClient : BaseClient, IUsageClient
     {
+
         public UsageClient(Credentials credentials) : base(credentials) { }
 
         /// <summary>

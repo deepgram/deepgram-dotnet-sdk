@@ -1,16 +1,18 @@
-﻿using Deepgram.Models;
+﻿using Deepgram.Interfaces;
+using Deepgram.Models;
 using Deepgram.Request;
 using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
-    internal abstract class BaseClient
+    public abstract class BaseClient
     {
         internal Credentials _credentials;
-        internal ApiRequest _apiRequest;
+        internal IApiRequest _apiRequest;
 
         public BaseClient(Credentials credentials)
         {
+            _credentials = credentials;
             _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
         }
 

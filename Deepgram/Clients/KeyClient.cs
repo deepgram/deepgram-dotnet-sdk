@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
-
 namespace Deepgram.Clients
 {
-    internal class KeyClient : BaseClient, IKeyClient
+    public class KeyClient : BaseClient, IKeyClient
     {
-        public KeyClient(Credentials credentials) : base(credentials) { }
+        public KeyClient(Credentials credentials) : base(credentials)
+        {
+        }
 
 
         /// <summary>

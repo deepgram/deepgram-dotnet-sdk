@@ -6,10 +6,9 @@ using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
-    internal class ProjectClient : BaseClient, IProjectClient
+    public class ProjectClient : BaseClient, IProjectClient
     {
         public ProjectClient(Credentials credentials) : base(credentials) { }
-
         /// <summary>
         /// Returns all Deepgram projects
         /// </summary>

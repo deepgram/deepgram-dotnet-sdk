@@ -1,4 +1,5 @@
 ﻿using System;
+using Deepgram.Clients;
 using Deepgram.Interfaces;
 using Deepgram.Tests.Fakes;
 using Deepgram.Utilities;
@@ -29,10 +30,10 @@ namespace Deepgram.Tests.ClientTests
 
             //Assert
             Assert.NotNull(result);
-            Assert.IsAssignableFrom<IKeyClient>(result.Keys);
-            Assert.IsAssignableFrom<IProjectClient>(result.Projects);
-            Assert.IsAssignableFrom<ITranscriptionClient>(result.Transcription);
-            Assert.IsAssignableFrom<IUsageClient>(result.Usage);
+            Assert.IsAssignableFrom<KeyClient>(result.Keys);
+            Assert.IsAssignableFrom<ProjectClient>(result.Projects);
+            Assert.IsAssignableFrom<TranscriptionClient>(result.Transcription);
+            Assert.IsAssignableFrom<UsageClient>(result.Usage);
         }
 
         [Fact]

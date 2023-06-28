@@ -6,10 +6,9 @@ using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
-    internal class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
+    public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
     {
         public PrerecordedTranscriptionClient(Credentials credentials) : base(credentials) { }
-
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio
         /// </summary>

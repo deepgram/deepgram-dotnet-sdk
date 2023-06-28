@@ -1,5 +1,4 @@
-﻿using System;
-using Deepgram.Clients;
+﻿using Deepgram.Clients;
 using Deepgram.Models;
 using Deepgram.Request;
 using Deepgram.Tests.Fakes;
@@ -22,25 +21,17 @@ namespace Deepgram.Tests
 
             var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
 
-            var creds = new Credentials()
-            {
-                ApiKey = Guid.NewGuid().ToString(),
-                ApiUrl = "test.com",
-                RequireSSL = true,
-            };
-
-            var fakeSource = new UrlSource("https://test.com");
-
             var fakeOptions = new PrerecordedTranscriptionOptions()
             {
                 Summarize = "v2"
             };
 
-            var SUT = new PrerecordedTranscriptionClient(creds);
+            var SUT = new PrerecordedTranscriptionClient(FakeModels.Credentials);
             SUT._apiRequest = new ApiRequest(client);
 
+
             //Act
-            var result = await SUT.GetTranscriptionAsync(fakeSource, fakeOptions);
+            var result = await SUT.GetTranscriptionAsync(FakeModels.UrlSource, fakeOptions);
 
             //Assert         
             Assert.NotNull(result);
@@ -74,25 +65,17 @@ namespace Deepgram.Tests
 
             var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
 
-            var creds = new Credentials()
-            {
-                ApiKey = Guid.NewGuid().ToString(),
-                ApiUrl = "test.com",
-                RequireSSL = true,
-            };
-
-            var fakeSource = new UrlSource("https://test.com");
-
             var fakeOptions = new PrerecordedTranscriptionOptions()
             {
                 Summarize = value
             };
 
-            var SUT = new PrerecordedTranscriptionClient(creds);
+            var SUT = new PrerecordedTranscriptionClient(FakeModels.Credentials);
             SUT._apiRequest = new ApiRequest(client);
 
+
             //Act
-            var result = await SUT.GetTranscriptionAsync(fakeSource, fakeOptions);
+            var result = await SUT.GetTranscriptionAsync(FakeModels.UrlSource, fakeOptions);
 
             //Assert         
             Assert.NotNull(result);
