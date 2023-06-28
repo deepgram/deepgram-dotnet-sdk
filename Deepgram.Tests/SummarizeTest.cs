@@ -1,6 +1,8 @@
-﻿using Deepgram.Clients;
+﻿using Bogus;
+using Deepgram.Clients;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Tests.Fakers;
 using Deepgram.Tests.Fakes;
 using Xunit;
 
@@ -8,6 +10,12 @@ namespace Deepgram.Tests
 {
     public class SummarizeTest
     {
+        UrlSource _urlSource;
+        public SummarizeTest()
+        {
+            _urlSource = new UrlSource(new Faker().Internet.Url());
+        }
+
         [Fact]
         public async void Should_Return_A_Summary_Short_When_Summarize_Set_To_v2()
         {
@@ -26,12 +34,12 @@ namespace Deepgram.Tests
                 Summarize = "v2"
             };
 
-            var SUT = new PrerecordedTranscriptionClient(FakeModels.Credentials);
+            var SUT = new PrerecordedTranscriptionClient(new CredentialsFaker().Generate());
             SUT._apiRequest = new ApiRequest(client);
 
 
             //Act
-            var result = await SUT.GetTranscriptionAsync(FakeModels.UrlSource, fakeOptions);
+            var result = await SUT.GetTranscriptionAsync(_urlSource, fakeOptions);
 
             //Assert         
             Assert.NotNull(result);
@@ -70,12 +78,12 @@ namespace Deepgram.Tests
                 Summarize = value
             };
 
-            var SUT = new PrerecordedTranscriptionClient(FakeModels.Credentials);
+            var SUT = new PrerecordedTranscriptionClient(new CredentialsFaker().Generate());
             SUT._apiRequest = new ApiRequest(client);
 
 
             //Act
-            var result = await SUT.GetTranscriptionAsync(FakeModels.UrlSource, fakeOptions);
+            var result = await SUT.GetTranscriptionAsync(_urlSource, fakeOptions);
 
             //Assert         
             Assert.NotNull(result);

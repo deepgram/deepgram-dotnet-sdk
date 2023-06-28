@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 namespace Deepgram.Clients
 {
     public class KeyClient : BaseClient, IKeyClient
@@ -19,7 +18,7 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram API keys</returns>
         public async Task<KeyList> ListKeysAsync(string projectId)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys",
             _credentials);
@@ -37,7 +36,7 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram API key</returns>
         public async Task<Key> GetKeyAsync(string projectId, string keyId)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys{keyId}",
             _credentials);
@@ -54,7 +53,7 @@ namespace Deepgram.Clients
         /// <returns>A new Deepgram API key</returns>
         public async Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
               HttpMethod.Post,
               $"projects/{projectId}/keys",
               _credentials,
@@ -70,7 +69,7 @@ namespace Deepgram.Clients
         /// <param name="keyId">Unique identifier of the API key to delete</param>
         public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Delete,
                 $"projects/{projectId}/keys/{keyId}",
             _credentials);

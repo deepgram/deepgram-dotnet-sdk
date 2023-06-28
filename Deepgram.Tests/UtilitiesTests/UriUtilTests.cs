@@ -1,6 +1,6 @@
-﻿using Deepgram.Tests.Fakes;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Bogus;
 using Deepgram.Utilities;
 using Xunit;
 
@@ -8,6 +8,15 @@ namespace Deepgram.Tests.UtilitiesTests
 {
     public class UriUtilTests
     {
+        string _uriSegment;
+        string _apiUrl;
+
+        public UriUtilTests()
+        {
+            _uriSegment = new Faker().Lorem.Word();
+            var domain = new Faker().Internet.Url();
+            _apiUrl = domain.Substring(domain.IndexOf("//") + 2);
+        }
         [Theory]
         [InlineData("https")]
         [InlineData("http")]
@@ -16,20 +25,16 @@ namespace Deepgram.Tests.UtilitiesTests
 
         public void ResolveUri_Should_Return_Uri_Without_Parameters(string protocol)
         {
-            //Arrange
-            var apiUrl = FakeModels.CleanedUrl;
-            var uriSegment = FakeModels.UriSegment;
-
             //Act
-            var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol);
+            var result = UriUtil.ResolveUri(_apiUrl, _uriSegment, protocol);
 
             //Assert
             Assert.NotNull(result);
             Assert.IsType<Uri>(result);
-            Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}", result.AbsoluteUri);
+            Assert.Equal($"{protocol}://{_apiUrl}/v1/{_uriSegment}", result.AbsoluteUri);
             Assert.Equal(protocol, result.Scheme);
-            Assert.Equal(apiUrl, result.Host);
-            Assert.Contains(uriSegment, result.Segments);
+            Assert.Equal(_apiUrl, result.Host);
+            Assert.Contains(_uriSegment, result.Segments);
         }
 
         [Theory]
@@ -40,23 +45,20 @@ namespace Deepgram.Tests.UtilitiesTests
 
         public void ResolveUri_Should_Return_Uri_With_Parameters(string protocol)
         {
-            //Arrange
-            var apiUrl = FakeModels.CleanedUrl;
-            var uriSegment = FakeModels.UriSegment;
             var parameters = new Dictionary<string, string>
         {
             { "key", "value" }
         };
             //Act
-            var result = UriUtil.ResolveUri(apiUrl, uriSegment, protocol, parameters);
+            var result = UriUtil.ResolveUri(_apiUrl, _uriSegment, protocol, parameters);
 
             //Assert
             Assert.NotNull(result);
             Assert.IsType<Uri>(result);
-            Assert.Equal($"{protocol}://{apiUrl}/v1/{uriSegment}?key=value", result.AbsoluteUri);
+            Assert.Equal($"{protocol}://{_apiUrl}/v1/{_uriSegment}?key=value", result.AbsoluteUri);
             Assert.Equal(protocol, result.Scheme);
-            Assert.Equal(apiUrl, result.Host);
-            Assert.Contains(uriSegment, result.Segments);
+            Assert.Equal(_apiUrl, result.Host);
+            Assert.Contains(_uriSegment, result.Segments);
             Assert.Contains("key=value", result.Query);
         }
     }

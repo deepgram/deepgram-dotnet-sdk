@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
@@ -17,7 +16,7 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
                 "listen",
                 _credentials,
@@ -35,7 +34,7 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
               "listen",
               _credentials,

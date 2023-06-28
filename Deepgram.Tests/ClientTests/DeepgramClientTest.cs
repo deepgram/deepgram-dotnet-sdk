@@ -1,7 +1,7 @@
 ﻿using System;
 using Deepgram.Clients;
 using Deepgram.Interfaces;
-using Deepgram.Tests.Fakes;
+using Deepgram.Tests.Fakers;
 using Deepgram.Utilities;
 using Xunit;
 
@@ -26,7 +26,7 @@ namespace Deepgram.Tests.ClientTests
         {
 
             //Act
-            var result = new DeepgramClient(FakeModels.Credentials);
+            var result = new DeepgramClient(new CredentialsFaker().Generate());
 
             //Assert
             Assert.NotNull(result);
@@ -41,7 +41,7 @@ namespace Deepgram.Tests.ClientTests
         {
             //Arrange
 
-            var SUT = new DeepgramClient(FakeModels.Credentials);
+            var SUT = new DeepgramClient(new CredentialsFaker().Generate());
             //Act
 
             var result = SUT.CreateLiveTranscriptionClient();
@@ -62,7 +62,7 @@ namespace Deepgram.Tests.ClientTests
         {
 
             //Arrange
-            var SUT = new DeepgramClient(FakeModels.Credentials);
+            var SUT = new DeepgramClient(new CredentialsFaker().Generate());
 
             //Act
             SUT.SetHttpClientTimeout(TimeSpan.FromSeconds(timeSpan));

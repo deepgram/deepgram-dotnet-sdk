@@ -3,13 +3,14 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Utilities;
 using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    internal class RequestMessageBuilder
+    public class RequestMessageBuilder : IRequestMessageBuilder
     {
         /// <summary>
         /// Creates a Http Request Message for the Api calls
@@ -20,7 +21,7 @@ namespace Deepgram.Request
         /// <param name="body"></param>
         /// <param name="queryParameters"></param>
         /// <returns></returns>
-        public static HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object body = null, object queryParameters = null)
+        public HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object body = null, object queryParameters = null)
         {
             var req = ConfigureHttpRequestMessage(method, uri, credentials, queryParameters);
 
@@ -47,7 +48,7 @@ namespace Deepgram.Request
         /// <param name="streamSource"></param>
         /// <param name="queryParameters"></param>
         /// <returns></returns>
-        internal static HttpRequestMessage CreateStreamHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, StreamSource streamSource, object queryParameters = null)
+        public HttpRequestMessage CreateStreamHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, StreamSource streamSource, object queryParameters = null)
         {
             var req = ConfigureHttpRequestMessage(method, uri, credentials, queryParameters);
 
@@ -61,7 +62,7 @@ namespace Deepgram.Request
             return req;
         }
 
-        private static HttpRequestMessage ConfigureHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object queryParameters = null)
+        private HttpRequestMessage ConfigureHttpRequestMessage(HttpMethod method, string uri, Credentials credentials, object queryParameters = null)
         {
             var requestUri = UriUtil.ResolveUri(
                 credentials.ApiUrl,

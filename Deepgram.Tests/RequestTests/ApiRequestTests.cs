@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using AutoBogus;
 using Deepgram.Models;
 using Deepgram.Request;
 using Deepgram.Tests.Fakes;
@@ -13,7 +14,7 @@ namespace Deepgram.Tests.RequestTests
         public async void Should_Return_A_Valid_Object_When_Deserialized()
         {
             //Arrange
-            var responseObject = FakeModels.Project;
+            var responseObject = new AutoFaker<Project>().Generate();
             var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
             var SUT = new ApiRequest(client);
 

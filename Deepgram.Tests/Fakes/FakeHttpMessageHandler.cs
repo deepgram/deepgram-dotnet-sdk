@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Bogus;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
@@ -34,7 +35,7 @@ namespace Deepgram.Tests.Fakes
         {
             var httpClient = new HttpClient(CreateMessageHandlerWithResult(result, code).Object)
             {
-                BaseAddress = new Uri(FakeModels.FullUrl),
+                BaseAddress = new Uri(new Faker().Internet.Url()),
             };
 
             return httpClient;

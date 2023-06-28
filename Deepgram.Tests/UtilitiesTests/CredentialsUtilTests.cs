@@ -1,5 +1,5 @@
-﻿using Deepgram.Tests.Fakes;
-using System;
+﻿using System;
+using Bogus;
 using Deepgram.Utilities;
 using Xunit;
 
@@ -11,7 +11,7 @@ namespace Deepgram.Tests.UtilitiesTests
         public void CheckApiKey_Should_Return_Same_APIKey_That_Passed_As_Parameter()
         {
             //Act
-            var fakeKey = FakeModels.ApiKey;
+            var fakeKey = Guid.NewGuid().ToString();
             var result = CredentialsUtil.CheckApiKey(fakeKey);
 
             //Assert
@@ -34,13 +34,15 @@ namespace Deepgram.Tests.UtilitiesTests
         [Fact]
         public void CheckApiUrl_Should_Return_TrimmedApiUrl_That_Passed_As_Parameter()
         {
+            var url = new Faker().Internet.Url();
+            var domain = url.Substring(url.IndexOf("//") + 2);
             //Act            
-            var result = CredentialsUtil.CleanApiUrl(FakeModels.FullUrl);
+            var result = CredentialsUtil.CleanApiUrl(url);
 
             //Assert
             Assert.NotNull(result);
             Assert.IsType<string>(result);
-            Assert.Equal("test.com", result);
+            Assert.Equal(domain, result);
         }
 
 

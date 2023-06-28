@@ -16,7 +16,7 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/balances",
                 _credentials);
@@ -32,7 +32,7 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                $"projects/{projectId}/balances/{balanceId}",
                _credentials);
