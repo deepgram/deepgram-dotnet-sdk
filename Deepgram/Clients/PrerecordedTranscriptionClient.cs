@@ -10,7 +10,7 @@ namespace Deepgram.Clients
     internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
         private Credentials _credentials;
-        private ApiRequest _apiRequest;
+        internal ApiRequest _apiRequest;
         public PrerecordedTranscriptionClient(Credentials credentials)
         {
             _credentials = credentials;
