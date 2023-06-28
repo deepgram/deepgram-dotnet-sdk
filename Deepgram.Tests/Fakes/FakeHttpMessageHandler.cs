@@ -7,7 +7,7 @@ using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
 
-namespace Deepgram.Tests
+namespace Deepgram.Tests.Fakes
 {
     public static class FakeHttpMessageHandler
     {
@@ -34,7 +34,7 @@ namespace Deepgram.Tests
         {
             var httpClient = new HttpClient(CreateMessageHandlerWithResult(result, code).Object)
             {
-                BaseAddress = new Uri("https://api-client-under-test.com"),
+                BaseAddress = new Uri(FakeModels.FullUrl),
             };
 
             return httpClient;

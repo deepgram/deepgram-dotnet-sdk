@@ -4,6 +4,10 @@ namespace Deepgram.Utilities
 {
     internal static class UserAgentUtil
     {
+        /// <summary>
+        /// determines the useragent for the httpclient
+        /// </summary>
+        /// <returns></returns>
         public static string GetUserAgent()
         {
 

@@ -3,21 +3,12 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
-    internal class ProjectClient : IProjectClient
+    public class ProjectClient : BaseClient, IProjectClient
     {
-
-        private Credentials _credentials;
-        private ApiRequest _apiRequest;
-        public ProjectClient(Credentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-        }
-
+        public ProjectClient(Credentials credentials) : base(credentials) { }
         /// <summary>
         /// Returns all Deepgram projects
         /// </summary>

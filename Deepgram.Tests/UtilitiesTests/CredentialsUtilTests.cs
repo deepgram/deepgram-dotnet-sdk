@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deepgram.Tests.Fakes;
+using System;
 using Deepgram.Utilities;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace Deepgram.Tests.UtilitiesTests
         public void CheckApiKey_Should_Return_Same_APIKey_That_Passed_As_Parameter()
         {
             //Act
-            var fakeKey = Guid.NewGuid().ToString();
+            var fakeKey = FakeModels.ApiKey;
             var result = CredentialsUtil.CheckApiKey(fakeKey);
 
             //Assert
@@ -23,7 +24,6 @@ namespace Deepgram.Tests.UtilitiesTests
         public void CheckApiKey_Should_Throw_ArgumentException_If_No_ApiKey_Found()
         {
             //Act
-
             var result = Assert.Throws<ArgumentException>(() => CredentialsUtil.CheckApiKey(null));
 
             //Assert
@@ -34,9 +34,8 @@ namespace Deepgram.Tests.UtilitiesTests
         [Fact]
         public void CheckApiUrl_Should_Return_TrimmedApiUrl_That_Passed_As_Parameter()
         {
-            //Act
-            var fakeUrl = "http://test.com";
-            var result = CredentialsUtil.CleanApiUrl(fakeUrl);
+            //Act            
+            var result = CredentialsUtil.CleanApiUrl(FakeModels.FullUrl);
 
             //Assert
             Assert.NotNull(result);
@@ -50,7 +49,6 @@ namespace Deepgram.Tests.UtilitiesTests
         public void CheckApiUrl_Should_Return_DefaultApiUrl_If_NO_ApiUrl_Present_In_Parameters()
         {
             //Act
-
             var result = CredentialsUtil.CleanApiUrl(null);
 
             //Assert
@@ -68,7 +66,6 @@ namespace Deepgram.Tests.UtilitiesTests
         public void CheckApiUrl_Should_Return_RequireSSL_That_Passed_As_Parameter(bool? requireSSL)
         {
             //Act
-
             var result = CredentialsUtil.CleanRequireSSL(requireSSL);
 
             //Assert

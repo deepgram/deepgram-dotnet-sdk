@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Tests.Fakes;
 using Xunit;
 
 namespace Deepgram.Tests.RequestTests
@@ -12,7 +13,7 @@ namespace Deepgram.Tests.RequestTests
         public async void Should_Return_A_Valid_Object_When_Deserialized()
         {
             //Arrange
-            var responseObject = new Project() { Company = "testCompany", Id = "fakeId", Name = "fakeName" };
+            var responseObject = FakeModels.Project;
             var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
             var SUT = new ApiRequest(client);
 

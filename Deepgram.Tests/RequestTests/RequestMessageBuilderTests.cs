@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Net.Http;
+﻿using System.Net.Http;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Tests.Fakes;
 using Xunit;
 
 namespace Deepgram.Tests.RequestTests
@@ -9,30 +9,22 @@ namespace Deepgram.Tests.RequestTests
     public class RequestMessageBuilderTests
     {
         Credentials Credentials;
-        string Segment;
+
         public RequestMessageBuilderTests()
         {
-            Credentials = new Credentials()
-            {
-                ApiKey = "apikey",
-                ApiUrl = "apiurl.com"
-            };
-
-            Segment = "test";
+            Credentials = FakeModels.Credentials;
         }
-
-
 
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Get_No_QueryParameters(bool requireSSL)
         {
-            //Arrange
+            //Arrange            
             Credentials.RequireSSL = requireSSL;
 
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials);
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, FakeModels.UriSegment, Credentials);
 
             //Assert
             Assert.NotNull(result);
@@ -48,12 +40,9 @@ namespace Deepgram.Tests.RequestTests
         {
             //Arrange
             Credentials.RequireSSL = requireSSL;
-            var queryParameters = new LiveTranscriptionOptions()
-            {
-                Keywords = new[] { "key", "word" }
-            };
+
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, Segment, Credentials, null, queryParameters);
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, FakeModels.UriSegment, Credentials, null, FakeModels.PrerecordedTranscriptionOptions);
 
             //Assert
             Assert.NotNull(result);
@@ -69,15 +58,9 @@ namespace Deepgram.Tests.RequestTests
         {
             //Arrange
             Credentials.RequireSSL = requireSSL;
-            var urlSource = new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav");
-            var queryParameters = new PrerecordedTranscriptionOptions()
-            {
-                Punctuate = true,
-                Utterances = true,
-                Redaction = new[] { "pci", "ssn" }
-            };
+
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Post, Segment, Credentials, urlSource, queryParameters);
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Post, FakeModels.UriSegment, Credentials, FakeModels.UrlSource, FakeModels.PrerecordedTranscriptionOptions);
 
             //Assert
             Assert.NotNull(result);
@@ -97,9 +80,9 @@ namespace Deepgram.Tests.RequestTests
         {
             //Arrange
             Credentials.RequireSSL = requireSSL;
-            var body = new UpdateScopeOptions() { Scope = "owner" };
+
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Put, Segment, Credentials, body, null);
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Put, FakeModels.UriSegment, Credentials, FakeModels.UpdateScopeOptions, null);
 
             //Assert
             Assert.NotNull(result);
@@ -119,21 +102,12 @@ namespace Deepgram.Tests.RequestTests
         {
             //Arrange
             Credentials.RequireSSL = requireSSL;
-            var body = new Project()
-            {
-                Company = "testCompany",
-                Id = "testId",
-                Name = "test"
-            };
             //Act
 
 #if NETSTANDARD2_0
-                   var result = RequestMessageBuilder.CreateHttpRequestMessage(new HttpMethod("PATCH"), Segment, Credentials, body, null);
-
-
-#else
-            //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Patch, Segment, Credentials, body, null);
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(new HttpMethod("PATCH"), FakeModels.UriSegment, Credentials, FakeModels.Project, null);
+#else            
+            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Patch, FakeModels.UriSegment, Credentials, FakeModels.Project, null);
 #endif
 
 
@@ -143,7 +117,7 @@ namespace Deepgram.Tests.RequestTests
             var content = result.Content;
             Assert.NotNull(result.Content);
 #if NETSTANDARD2_0
-  Assert.Equal(new HttpMethod("PATCH"), result.Method);
+            Assert.Equal(new HttpMethod("PATCH"), result.Method);
 #else
             Assert.Equal(HttpMethod.Patch, result.Method);
 
@@ -161,13 +135,8 @@ namespace Deepgram.Tests.RequestTests
             //Arrange
             Credentials.RequireSSL = requireSSL;
 
-            var stream = new MemoryStream(new byte[] { 0b1, 0b10, 0b11, 0b100 });
-
-            var streamSource = new StreamSource(stream, "text/plain");
-
-
             //Act
-            var result = RequestMessageBuilder.CreateStreamHttpRequestMessage(HttpMethod.Post, Segment, Credentials, streamSource);
+            var result = RequestMessageBuilder.CreateStreamHttpRequestMessage(HttpMethod.Post, FakeModels.UriSegment, Credentials, FakeModels.StreamSource);
 
             //Assert
             Assert.NotNull(result);

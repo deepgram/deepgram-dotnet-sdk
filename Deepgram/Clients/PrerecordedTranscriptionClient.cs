@@ -3,20 +3,12 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
-    internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
+    public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
     {
-        private Credentials _credentials;
-        internal ApiRequest _apiRequest;
-        public PrerecordedTranscriptionClient(Credentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-        }
-
+        public PrerecordedTranscriptionClient(Credentials credentials) : base(credentials) { }
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio
         /// </summary>

@@ -3,18 +3,12 @@ using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Utilities;
-
 namespace Deepgram.Clients
 {
-    internal class KeyClient : IKeyClient
+    public class KeyClient : BaseClient, IKeyClient
     {
-        private Credentials _credentials;
-        private ApiRequest _apiRequest;
-        public KeyClient(Credentials credentials)
+        public KeyClient(Credentials credentials) : base(credentials)
         {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
         }
 
 
