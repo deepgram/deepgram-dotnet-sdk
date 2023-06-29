@@ -20,7 +20,7 @@ namespace Deepgram.Transcription
         /// <summary>
         /// Summary of Transcription.
         /// </summary>
-        [JsonProperty("summary")]
+        [JsonProperty("summary", NullValueHandling=NullValueHandling.Ignore)]
         public Summary Summary { get; set; }
     }
 }
