@@ -10,10 +10,10 @@ namespace Deepgram
     {
         private Credentials Credentials;
 
-        public IKeyClient Keys { get; private set; }
-        public IProjectClient Projects { get; private set; }
-        public ITranscriptionClient Transcription { get; private set; }
-        public IUsageClient Usage { get; private set; }
+        public IKeyClient Keys { get; protected set; }
+        public IProjectClient Projects { get; protected set; }
+        public ITranscriptionClient Transcription { get; protected set; }
+        public IUsageClient Usage { get; protected set; }
         public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
         public DeepgramClient() : this(null) { }
 
@@ -36,7 +36,7 @@ namespace Deepgram
             InitializeClients();
         }
 
-        private void InitializeClients()
+        protected void InitializeClients()
         {
 
             Keys = new KeyClient(Credentials);

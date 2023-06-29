@@ -1,10 +1,9 @@
-﻿using Deepgram.Models;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Deepgram.Models;
 
 namespace Deepgram.Interfaces
 {
-    public interface IKeyClient
+    public interface IKeyClient : IBaseClient
     {
         /// <summary>
         /// Returns all Deepgram API keys associated with the project provided

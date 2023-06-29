@@ -16,14 +16,14 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
                 "listen",
-                _credentials,
+                Credentials,
                 source,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
 
         /// <summary>
@@ -34,14 +34,14 @@ namespace Deepgram.Clients
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            var req = _requestMessageBuilder.CreateStreamHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
               "listen",
-              _credentials,
+              Credentials,
               source,
               options);
 
-            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
     }
 }

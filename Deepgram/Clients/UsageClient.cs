@@ -18,14 +18,14 @@ namespace Deepgram.Clients
         /// <returns>Usage Requests that fit the parameters provided</returns>
         public async Task<ListAllRequestsResponse> ListAllRequestsAsync(string projectId, ListAllRequestsOptions options)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests",
-                _credentials,
+                Credentials,
                 null,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<ListAllRequestsResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<ListAllRequestsResponse>(req);
 
 
         }
@@ -38,12 +38,12 @@ namespace Deepgram.Clients
         /// <returns>Usage Request identified</returns>
         public async Task<UsageRequest> GetUsageRequestAsync(string projectId, string requestId)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests/{requestId}",
-                _credentials);
+                Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageRequest>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageRequest>(req);
 
 
         }
@@ -56,14 +56,14 @@ namespace Deepgram.Clients
         /// <returns>Summary of usage statistics</returns>
         public async Task<UsageSummary> GetUsageSummaryAsync(string projectId, GetUsageSummaryOptions options)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                   $"projects/{projectId}/usage",
-                _credentials,
+                Credentials,
                 null,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageSummary>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageSummary>(req);
 
         }
 
@@ -75,14 +75,14 @@ namespace Deepgram.Clients
         /// <returns>List of features, models, tags, languages, and processing method used for requests in the specified project.</returns>
         public async Task<UsageFields> GetUsageFieldsAsync(string projectId, GetUsageFieldsOptions options)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                     $"projects/{projectId}/usage/fields",
-               _credentials,
+               Credentials,
                null,
                options);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageFields>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageFields>(req);
 
         }
     }

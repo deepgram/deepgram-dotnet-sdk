@@ -43,6 +43,10 @@ namespace Deepgram.Tests.UtilitiesTests
         [Fact]
         public void GetParameters_Should_Return_String_When_Passing_Array_Parameter()
         {
+            //Arrange
+            //need to manual assign this as bogus can put phrase in as words
+            prerecordedTranscriptionOptions.Keywords = new string[] { "test" };
+
             //Act
             var result = QueryParameterUtil.GetParameters(prerecordedTranscriptionOptions);
 

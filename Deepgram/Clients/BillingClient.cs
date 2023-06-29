@@ -16,12 +16,12 @@ namespace Deepgram.Clients
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/balances",
-                _credentials);
+                Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<BillingList>(req);
+            return await ApiRequest.SendHttpRequestAsync<BillingList>(req);
         }
 
         /// <summary>
@@ -32,12 +32,12 @@ namespace Deepgram.Clients
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                $"projects/{projectId}/balances/{balanceId}",
-               _credentials);
+               Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<Billing>(req);
+            return await ApiRequest.SendHttpRequestAsync<Billing>(req);
         }
     }
 }
