@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
@@ -22,11 +21,11 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests",
-                _credentials,
+                Credentials,
                 null,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<ListAllRequestsResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<ListAllRequestsResponse>(req);
 
 
         }
@@ -42,9 +41,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/requests/{requestId}",
-                _credentials);
+                Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageRequest>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageRequest>(req);
 
 
         }
@@ -60,11 +59,11 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                   $"projects/{projectId}/usage",
-                _credentials,
+                Credentials,
                 null,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageSummary>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageSummary>(req);
 
         }
 
@@ -79,11 +78,11 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                     $"projects/{projectId}/usage/fields",
-               _credentials,
+               Credentials,
                null,
                options);
 
-            return await _apiRequest.SendHttpRequestAsync<UsageFields>(req);
+            return await ApiRequest.SendHttpRequestAsync<UsageFields>(req);
 
         }
     }

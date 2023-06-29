@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
@@ -20,11 +19,11 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
                 "listen",
-                _credentials,
+                Credentials,
                 source,
                 options);
 
-            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
 
         /// <summary>
@@ -38,11 +37,11 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
               "listen",
-              _credentials,
+              Credentials,
               source,
               options);
 
-            return await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
     }
 }

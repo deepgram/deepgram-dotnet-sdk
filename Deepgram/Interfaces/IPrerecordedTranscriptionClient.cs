@@ -1,10 +1,9 @@
-﻿using Deepgram.Models;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Deepgram.Models;
 
 namespace Deepgram.Interfaces
 {
-    public interface IPrerecordedTranscriptionClient
+    public interface IPrerecordedTranscriptionClient : IBaseClient
     {
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio

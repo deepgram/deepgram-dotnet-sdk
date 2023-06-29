@@ -5,15 +5,17 @@ using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
-    public abstract class BaseClient
+    public abstract class BaseClient : IBaseClient
     {
-        internal Credentials _credentials;
-        internal IApiRequest _apiRequest;
+        public Credentials Credentials { get; set; }
+        public IApiRequest ApiRequest { get; set; }
+        public IRequestMessageBuilder RequestMessageBuilder { get; set; }
 
         public BaseClient(Credentials credentials)
         {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
+            Credentials = credentials;
+            ApiRequest = new ApiRequest(HttpClientUtil.HttpClient);
+            RequestMessageBuilder = new RequestMessageBuilder();
         }
 
     }

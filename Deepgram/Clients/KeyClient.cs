@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 namespace Deepgram.Clients
 {
     public class KeyClient : BaseClient, IKeyClient
@@ -22,9 +21,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys",
-            _credentials);
+            Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<KeyList>(req);
+            return await ApiRequest.SendHttpRequestAsync<KeyList>(req);
 
 
         }
@@ -40,9 +39,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys{keyId}",
-            _credentials);
+            Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<Key>(req);
+            return await ApiRequest.SendHttpRequestAsync<Key>(req);
         }
 
         /// <summary>
@@ -57,10 +56,10 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
               HttpMethod.Post,
               $"projects/{projectId}/keys",
-              _credentials,
+              Credentials,
               new { comment, scopes });
 
-            return await _apiRequest.SendHttpRequestAsync<ApiKey>(req);
+            return await ApiRequest.SendHttpRequestAsync<ApiKey>(req);
         }
 
         /// <summary>
@@ -73,9 +72,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Delete,
                 $"projects/{projectId}/keys/{keyId}",
-            _credentials);
+            Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
         }
     }
 }

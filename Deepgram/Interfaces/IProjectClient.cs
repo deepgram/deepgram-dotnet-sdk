@@ -1,10 +1,9 @@
-﻿using Deepgram.Models;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Deepgram.Models;
 
 namespace Deepgram.Interfaces
 {
-    public interface IProjectClient
+    public interface IProjectClient : IBaseClient
     {
         /// <summary>
         /// Returns all Deepgram projects

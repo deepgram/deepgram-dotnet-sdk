@@ -26,7 +26,7 @@ namespace Deepgram.Models
         /// Array of Channel objects.
         /// </summary>
         [JsonProperty("short")]
-        public string Short { get; set; }
+        public string Short { get; set; } = null;
 
     }
 }

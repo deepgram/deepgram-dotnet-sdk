@@ -1,9 +1,9 @@
-﻿using Deepgram.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Deepgram.Models;
 
 namespace Deepgram.Interfaces
 {
-    public interface IBillingClient
+    public interface IBillingClient : IBaseClient
     {
         /// <summary>
         /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator

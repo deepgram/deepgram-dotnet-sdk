@@ -19,9 +19,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/balances",
-                _credentials);
+                Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<BillingList>(req);
+            return await ApiRequest.SendHttpRequestAsync<BillingList>(req);
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace Deepgram.Clients
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                $"projects/{projectId}/balances/{balanceId}",
-               _credentials);
+               Credentials);
 
-            return await _apiRequest.SendHttpRequestAsync<Billing>(req);
+            return await ApiRequest.SendHttpRequestAsync<Billing>(req);
         }
     }
 }

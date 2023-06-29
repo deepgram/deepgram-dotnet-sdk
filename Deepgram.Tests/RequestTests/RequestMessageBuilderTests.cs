@@ -1,18 +1,28 @@
 ﻿using System.Net.Http;
+using AutoBogus;
+using Bogus;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Tests.Fakes;
+using Deepgram.Tests.Fakers;
 using Xunit;
 
 namespace Deepgram.Tests.RequestTests
 {
     public class RequestMessageBuilderTests
     {
-        Credentials Credentials;
+        Credentials _credentials;
+        RequestMessageBuilder SUT;
+        string _uriSegment;
+        UrlSource _urlSource;
+        PrerecordedTranscriptionOptions _prerecordedTranscriptionOptions;
 
         public RequestMessageBuilderTests()
         {
-            Credentials = FakeModels.Credentials;
+            _credentials = new CredentialsFaker().Generate();
+            SUT = new RequestMessageBuilder();
+            _uriSegment = new Faker().Lorem.Word();
+            _urlSource = new UrlSource(new Faker().Internet.Url());
+            _prerecordedTranscriptionOptions = new PrerecordedTranscriptionOptionsFaker().Generate();
         }
 
         [Theory]
@@ -21,16 +31,16 @@ namespace Deepgram.Tests.RequestTests
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Get_No_QueryParameters(bool requireSSL)
         {
             //Arrange            
-            Credentials.RequireSSL = requireSSL;
-
+            _credentials.RequireSSL = requireSSL;
+            var SUT = new RequestMessageBuilder();
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, FakeModels.UriSegment, Credentials);
+            var result = SUT.CreateHttpRequestMessage(HttpMethod.Get, _uriSegment, _credentials);
 
             //Assert
             Assert.NotNull(result);
             Assert.IsType<HttpRequestMessage>(result);
             Assert.Equal(HttpMethod.Get, result.Method);
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
         }
 
         [Theory]
@@ -39,16 +49,16 @@ namespace Deepgram.Tests.RequestTests
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Get_With_QueryParameters(bool requireSSL)
         {
             //Arrange
-            Credentials.RequireSSL = requireSSL;
+            _credentials.RequireSSL = requireSSL;
 
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Get, FakeModels.UriSegment, Credentials, null, FakeModels.PrerecordedTranscriptionOptions);
+            var result = SUT.CreateHttpRequestMessage(HttpMethod.Get, _uriSegment, _credentials, null, _prerecordedTranscriptionOptions);
 
             //Assert
             Assert.NotNull(result);
             Assert.IsType<HttpRequestMessage>(result);
             Assert.Equal(HttpMethod.Get, result.Method);
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
         }
 
         [Theory]
@@ -57,10 +67,11 @@ namespace Deepgram.Tests.RequestTests
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Post_With_Body(bool requireSSL)
         {
             //Arrange
-            Credentials.RequireSSL = requireSSL;
+            _credentials.RequireSSL = requireSSL;
+
 
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Post, FakeModels.UriSegment, Credentials, FakeModels.UrlSource, FakeModels.PrerecordedTranscriptionOptions);
+            var result = SUT.CreateHttpRequestMessage(HttpMethod.Post, _uriSegment, _credentials, _urlSource, _prerecordedTranscriptionOptions);
 
             //Assert
             Assert.NotNull(result);
@@ -68,7 +79,7 @@ namespace Deepgram.Tests.RequestTests
             var content = result.Content;
             Assert.NotNull(result.Content);
             Assert.Equal(HttpMethod.Post, result.Method);
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
             Assert.Equal("application/json", content.Headers.ContentType.MediaType);
 
         }
@@ -79,10 +90,10 @@ namespace Deepgram.Tests.RequestTests
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Put_With_Body(bool requireSSL)
         {
             //Arrange
-            Credentials.RequireSSL = requireSSL;
-
+            _credentials.RequireSSL = requireSSL;
+            var options = new AutoFaker<UpdateScopeOptions>().Generate();
             //Act
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Put, FakeModels.UriSegment, Credentials, FakeModels.UpdateScopeOptions, null);
+            var result = SUT.CreateHttpRequestMessage(HttpMethod.Put, _uriSegment, _credentials, options, null);
 
             //Assert
             Assert.NotNull(result);
@@ -90,7 +101,7 @@ namespace Deepgram.Tests.RequestTests
             var content = result.Content;
             Assert.NotNull(result.Content);
             Assert.Equal(HttpMethod.Put, result.Method);
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
             Assert.Equal("application/json", content.Headers.ContentType.MediaType);
 
         }
@@ -101,13 +112,15 @@ namespace Deepgram.Tests.RequestTests
         public void CreateHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Patch_With_Body(bool requireSSL)
         {
             //Arrange
-            Credentials.RequireSSL = requireSSL;
+            _credentials.RequireSSL = requireSSL;
+            var project = new AutoFaker<Project>().Generate();
+
             //Act
 
 #if NETSTANDARD2_0
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(new HttpMethod("PATCH"), FakeModels.UriSegment, Credentials, FakeModels.Project, null);
+            var result = SUT.CreateHttpRequestMessage(new HttpMethod("PATCH"), _uriSegment, _credentials, project, null);
 #else            
-            var result = RequestMessageBuilder.CreateHttpRequestMessage(HttpMethod.Patch, FakeModels.UriSegment, Credentials, FakeModels.Project, null);
+            var result = SUT.CreateHttpRequestMessage(HttpMethod.Patch, _uriSegment, _credentials, project, null);
 #endif
 
 
@@ -122,7 +135,7 @@ namespace Deepgram.Tests.RequestTests
             Assert.Equal(HttpMethod.Patch, result.Method);
 
 #endif
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
             Assert.Equal("application/json", content.Headers.ContentType.MediaType);
 
         }
@@ -133,10 +146,10 @@ namespace Deepgram.Tests.RequestTests
         public void CreateStreamHttpRequestMessage_Should_Return_HttpRequestMessage_When_HttpMethod_Is_Post_With_Body(bool requireSSL)
         {
             //Arrange
-            Credentials.RequireSSL = requireSSL;
-
+            _credentials.RequireSSL = requireSSL;
+            var streamSource = new StreamSourceFaker().Generate();
             //Act
-            var result = RequestMessageBuilder.CreateStreamHttpRequestMessage(HttpMethod.Post, FakeModels.UriSegment, Credentials, FakeModels.StreamSource);
+            var result = SUT.CreateStreamHttpRequestMessage(HttpMethod.Post, _uriSegment, _credentials, streamSource);
 
             //Assert
             Assert.NotNull(result);
@@ -144,8 +157,8 @@ namespace Deepgram.Tests.RequestTests
             var content = result.Content;
             Assert.NotNull(result.Content);
             Assert.Equal(HttpMethod.Post, result.Method);
-            Assert.Equal(Credentials.ApiKey, result.Headers.Authorization.Parameter);
-            Assert.Equal("text/plain", content.Headers.ContentType.MediaType);
+            Assert.Equal(_credentials.ApiKey, result.Headers.Authorization.Parameter);
+            Assert.Equal(streamSource.MimeType, content.Headers.ContentType.MediaType);
 
         }
 
