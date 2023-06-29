@@ -203,7 +203,7 @@ namespace Deepgram.Transcription
         /// Indicates whether Deepgram should provide summarizations of sections of the provided audio.
         /// </summary>
         [JsonProperty("summarize")]
-        public Nullable<bool> Summarize { get; set; } = null;
+        public object Summarize { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram should detect entities within the provided audio.

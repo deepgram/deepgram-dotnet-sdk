@@ -8,7 +8,7 @@ namespace Deepgram.Transcription
         /// <summary>
         /// Summary of a section of the transcript
         /// </summary>
-        [JsonProperty("summary")]
+        [JsonProperty("summary", NullValueHandling=NullValueHandling.Ignore)]
         public string TextSummary { get; set; }
 
         /// <summary>
@@ -23,5 +23,13 @@ namespace Deepgram.Transcription
         [JsonProperty("end_word")]
         public int EndWord { get; set; }
 
+        /// <summary>
+        /// Array of Channel objects.
+        /// </summary>
+        [JsonProperty("short", NullValueHandling=NullValueHandling.Ignore)]
+        public string Short { get; set; }
+
     }
 }
+
+
