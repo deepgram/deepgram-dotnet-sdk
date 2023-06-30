@@ -14,6 +14,8 @@ namespace Deepgram
         public IProjectClient Projects { get; protected set; }
         public ITranscriptionClient Transcription { get; protected set; }
         public IUsageClient Usage { get; protected set; }
+        public IBillingClient Billing { get; protected set; }
+
         public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
         public DeepgramClient() : this(null) { }
 
@@ -43,6 +45,8 @@ namespace Deepgram
             Projects = new ProjectClient(Credentials);
             Transcription = new TranscriptionClient(Credentials);
             Usage = new UsageClient(Credentials);
+            Billing = new BillingClient(Credentials);
+
         }
     }
 }

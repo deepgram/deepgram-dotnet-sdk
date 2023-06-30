@@ -1,11 +1,11 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Deepgram.Interfaces;
 using Deepgram.Models;
-using Deepgram.Request;
 
 namespace Deepgram.Clients
 {
-    public class BillingClient : BaseClient
+    public class BillingClient : BaseClient, IBillingClient
     {
         public BillingClient(Credentials credentials) : base(credentials) { }
 
