@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class BillingList
 {
-    public class BillingList
-    {
-        /// <summary>
-        /// List of balances
-        /// </summary>
-        [JsonProperty("balances")]
-        public Billing[] Billings { get; set; }
-    }
+    /// <summary>
+    /// List of balances
+    /// </summary>
+    [JsonProperty("balances")]
+    public Billing[] Billings { get; set; }
 }

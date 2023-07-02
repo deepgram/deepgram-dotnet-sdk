@@ -1,10 +1,7 @@
-﻿namespace Deepgram.Common
+﻿namespace Deepgram.Common;
+
+public static class Constants
 {
-    public static class Constants
-    {
 
-        public const string DEFAULT_URI = "api.deepgram.com";
-
-
-    }
+    public const string DEFAULT_URI = "api.deepgram.com";
 }

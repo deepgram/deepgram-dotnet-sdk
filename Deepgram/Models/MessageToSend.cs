@@ -1,14 +1,11 @@
-﻿using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+internal readonly struct MessageToSend
 {
-    internal readonly struct MessageToSend
+    public MessageToSend(byte[] message)
     {
-        public MessageToSend(byte[] message)
-        {
-            Message = new ArraySegment<byte>(message);
-        }
-
-        public ArraySegment<byte> Message { get; }
+        Message = new ArraySegment<byte>(message);
     }
+
+    public ArraySegment<byte> Message { get; }
 }

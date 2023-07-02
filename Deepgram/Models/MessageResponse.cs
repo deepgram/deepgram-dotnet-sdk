@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class MessageResponse
 {
-    public class MessageResponse
-    {
-        /// <summary>
-        /// A message denoting the success of the operation
-        /// </summary>
-        [JsonProperty("message")]
-        public string Message { get; set; } = string.Empty;
-    }
+    /// <summary>
+    /// A message denoting the success of the operation
+    /// </summary>
+    [JsonProperty("message")]
+    public string Message { get; set; } = string.Empty;
 }

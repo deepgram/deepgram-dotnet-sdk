@@ -1,11 +1,8 @@
-﻿using Deepgram.Models;
+﻿namespace Deepgram.Interfaces;
 
-namespace Deepgram.Interfaces
+public interface IBaseClient
 {
-    public interface IBaseClient
-    {
-        IApiRequest ApiRequest { get; set; }
-        Credentials Credentials { get; set; }
-        IRequestMessageBuilder RequestMessageBuilder { get; set; }
-    }
+    IApiRequest ApiRequest { get; set; }
+    CleanCredentials Credentials { get; set; }
+    IRequestMessageBuilder RequestMessageBuilder { get; set; }
 }

@@ -1,17 +1,13 @@
-﻿using Deepgram.Interfaces;
-using Deepgram.Models;
+﻿namespace Deepgram.Clients;
 
-namespace Deepgram.Clients
+public class TranscriptionClient : ITranscriptionClient
 {
-    public class TranscriptionClient : ITranscriptionClient
+    public IPrerecordedTranscriptionClient Prerecorded { get; protected set; }
+
+    public TranscriptionClient(CleanCredentials credentials)
     {
-        public IPrerecordedTranscriptionClient Prerecorded { get; protected set; }
-
-        public TranscriptionClient(Credentials credentials)
-        {
-            Prerecorded = new PrerecordedTranscriptionClient(credentials);
-        }
-
-
+        Prerecorded = new PrerecordedTranscriptionClient(credentials);
     }
+
+
 }

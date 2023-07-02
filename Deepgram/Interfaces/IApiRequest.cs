@@ -1,10 +1,6 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿namespace Deepgram.Interfaces;
 
-namespace Deepgram.Interfaces
+public interface IApiRequest
 {
-    public interface IApiRequest
-    {
-        Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request);
-    }
+    Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request);
 }

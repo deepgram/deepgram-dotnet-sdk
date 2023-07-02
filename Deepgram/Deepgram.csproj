@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <ImplicitUsings>disable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>    
     <Description>.NET SDK for the Deepgram API</Description>
     <Copyright>2021 Deepgram</Copyright>
     <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
@@ -14,8 +15,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Product>Deepgram.NET SDK</Product>
     <PackageId>Deepgram</PackageId>
-    <Title>Deepgram.NET</Title>   
+    <Title>Deepgram.NET</Title>       
   </PropertyGroup>
+  
 
   <ItemGroup>
     <None Include="..\extras\dg_logo.png">

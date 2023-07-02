@@ -1,8 +1,8 @@
 ﻿namespace Deepgram.Tests.Fakers;
 
-public class CredentialsFaker : AutoFaker<Credentials>
+public class CleanCredentialsFaker : AutoFaker<CleanCredentials>
 {
-    public CredentialsFaker()
+    public CleanCredentialsFaker()
     {
         RuleFor(c => c.ApiKey, f => f.Random.Guid().ToString());
         RuleFor(c => c.ApiUrl, f => f.Internet.DomainName());

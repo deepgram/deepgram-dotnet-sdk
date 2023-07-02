@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class KeyList
 {
-    public class KeyList
-    {
-        /// <summary>
-        /// List of Deepgram api keys
-        /// </summary>
-        [JsonProperty("api_keys")]
-        public Key[] ApiKeys { get; set; }
-    }
+    /// <summary>
+    /// List of Deepgram api keys
+    /// </summary>
+    [JsonProperty("api_keys")]
+    public Key[] ApiKeys { get; set; }
 }

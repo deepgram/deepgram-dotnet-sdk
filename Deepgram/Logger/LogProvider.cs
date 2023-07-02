@@ -1,30 +1,27 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
-namespace Deepgram.Logger
+namespace Deepgram.Logger;
+
+public class LogProvider
 {
-    public class LogProvider
+    static IDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
+    private static ILoggerFactory _loggerFactory = new LoggerFactory();
+
+    public static void SetLogFactory(ILoggerFactory factory)
     {
-        private static IDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
-        private static ILoggerFactory _loggerFactory = new LoggerFactory();
+        _loggerFactory?.Dispose();
+        _loggerFactory = factory;
+        _loggers.Clear();
+    }
 
-        public static void SetLogFactory(ILoggerFactory factory)
+    public static ILogger GetLogger(string category)
+    {
+        if (!_loggers.TryGetValue(category, out var value))
         {
-            _loggerFactory?.Dispose();
-            _loggerFactory = factory;
-            _loggers.Clear();
+            value = _loggerFactory?.CreateLogger(category) ?? NullLogger.Instance;
+            _loggers[category] = value;
         }
-
-        public static ILogger GetLogger(string category)
-        {
-            if (!_loggers.ContainsKey(category))
-            {
-                _loggers[category] = _loggerFactory?.CreateLogger(category) ?? NullLogger.Instance;
-            }
-            return _loggers[category];
-        }
+        return value;
     }
 }

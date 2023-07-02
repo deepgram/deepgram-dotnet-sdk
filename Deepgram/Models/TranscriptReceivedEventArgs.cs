@@ -1,14 +1,11 @@
-﻿using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class TranscriptReceivedEventArgs : EventArgs
 {
-    public class TranscriptReceivedEventArgs : EventArgs
+    public TranscriptReceivedEventArgs(LiveTranscriptionResult transcript)
     {
-        public TranscriptReceivedEventArgs(LiveTranscriptionResult transcript)
-        {
-            Transcript = transcript;
-        }
-
-        public LiveTranscriptionResult Transcript { get; set; }
+        Transcript = transcript;
     }
+
+    public LiveTranscriptionResult Transcript { get; set; }
 }

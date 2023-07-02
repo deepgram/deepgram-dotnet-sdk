@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class MemberList
 {
-    public class MemberList
-    {
-        /// <summary>
-        /// List of members
-        /// </summary>
-        [JsonProperty("members")]
-        public Member[] Members { get; set; }
-    }
+    /// <summary>
+    /// List of members
+    /// </summary>
+    [JsonProperty("members")]
+    public Member[] Members { get; set; }
 }

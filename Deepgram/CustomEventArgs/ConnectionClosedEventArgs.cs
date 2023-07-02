@@ -1,8 +1,5 @@
-﻿using System;
+﻿namespace Deepgram.CustomEventArgs;
 
-namespace Deepgram.CustomEventArgs
+public class ConnectionClosedEventArgs : EventArgs
 {
-    public class ConnectionClosedEventArgs : EventArgs
-    {
-    }
 }

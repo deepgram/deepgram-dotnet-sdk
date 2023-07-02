@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Newtonsoft.Json;
+﻿using System.Web;
 using Newtonsoft.Json.Linq;
 
-namespace Deepgram.Utilities
+namespace Deepgram.Utilities;
+
+internal static class QueryParameterUtil
+
 {
-    internal static class QueryParameterUtil
-
+    public static string GetParameters(object? parameters = null)
     {
-        public static string GetParameters(object parameters = null)
+        List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
+
+        if (parameters is not null)
         {
-            List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
 
-            if (parameters != null)
+            var json = JsonConvert.SerializeObject(parameters);
+
+            if (json is not null)
             {
-
-                var json = JsonConvert.SerializeObject(parameters);
-                var jObj = (JObject)JsonConvert.DeserializeObject(json);
+                var jObj = JsonConvert.DeserializeObject(json) as JObject;
 
                 foreach (var prop in jObj.Properties())
                 {
-                    if (prop.HasValues && !String.IsNullOrEmpty(prop.Value.ToString()))
+                    if (prop.HasValues && !string.IsNullOrEmpty(prop.Value.ToString()))
                     {
                         if (prop.Value.Type == JTokenType.Array)
                         {
@@ -41,10 +40,9 @@ namespace Deepgram.Utilities
                         }
                     }
                 }
-
             }
-
-            return String.Join("&", paramList.Select(s => $"{s.Key}={s.Value.ToString()}")).ToLower();
         }
+
+        return string.Join("&", paramList.Select(s => $"{s.Key}={s.Value}")).ToLower();
     }
 }

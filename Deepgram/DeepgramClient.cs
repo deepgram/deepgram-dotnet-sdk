@@ -1,52 +1,46 @@
-﻿using System;
-using Deepgram.Clients;
-using Deepgram.Interfaces;
-using Deepgram.Models;
-using Deepgram.Utilities;
+﻿using Deepgram.Clients;
 
-namespace Deepgram
+namespace Deepgram;
+
+public class DeepgramClient
 {
-    public class DeepgramClient
+    private CleanCredentials Credentials;
+
+    public IKeyClient Keys { get; protected set; }
+    public IProjectClient Projects { get; protected set; }
+    public ITranscriptionClient Transcription { get; protected set; }
+    public IUsageClient Usage { get; protected set; }
+    public IBillingClient Billing { get; protected set; }
+
+    public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
+
+    public DeepgramClient(Credentials credentials)
     {
-        private Credentials Credentials;
 
-        public IKeyClient Keys { get; protected set; }
-        public IProjectClient Projects { get; protected set; }
-        public ITranscriptionClient Transcription { get; protected set; }
-        public IUsageClient Usage { get; protected set; }
-        public IBillingClient Billing { get; protected set; }
+        Initialize(credentials);
+    }
 
-        public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
-        public DeepgramClient() : this(null) { }
+    /// <summary>
+    /// Sets the Timeout of the HTTPClient used to send HTTP requests
+    /// </summary>
+    /// <param name="timeout">Timespan to wait before the request times out.</param>
+    public void SetHttpClientTimeout(TimeSpan timeout) =>
+        HttpClientUtil.SetTimeOut(timeout);
 
-        public DeepgramClient(Credentials credentials)
-        {
+    private void Initialize(Credentials credentials)
+    {
+        Credentials = CredentialsUtil.Clean(credentials);
+        InitializeClients();
+    }
 
-            Initialize(credentials);
-        }
+    protected void InitializeClients()
+    {
 
-        /// <summary>
-        /// Sets the Timeout of the HTTPClient used to send HTTP requests
-        /// </summary>
-        /// <param name="timeout">Timespan to wait before the request times out.</param>
-        public void SetHttpClientTimeout(TimeSpan timeout) =>
-            HttpClientUtil.SetTimeOut(timeout);
+        Keys = new KeyClient(Credentials);
+        Projects = new ProjectClient(Credentials);
+        Transcription = new TranscriptionClient(Credentials);
+        Usage = new UsageClient(Credentials);
+        Billing = new BillingClient(Credentials);
 
-        private void Initialize(Credentials credentials)
-        {
-            Credentials = CredentialsUtil.Clean(credentials);
-            InitializeClients();
-        }
-
-        protected void InitializeClients()
-        {
-
-            Keys = new KeyClient(Credentials);
-            Projects = new ProjectClient(Credentials);
-            Transcription = new TranscriptionClient(Credentials);
-            Usage = new UsageClient(Credentials);
-            Billing = new BillingClient(Credentials);
-
-        }
     }
 }

@@ -1,16 +1,7 @@
-﻿using System;
-using AutoBogus;
-using Bogus;
-using Deepgram.Models;
-using Deepgram.Tests.Fakers;
-using Deepgram.Tests.Fakes;
-using Xunit;
-
-namespace Deepgram.Tests.ClientTests;
+﻿namespace Deepgram.Tests.ClientTests;
 
 public class KeyClientTests
 {
-
 
 
     [Fact]
@@ -19,7 +10,7 @@ public class KeyClientTests
         //Arrange
         var returnObject = new AutoFaker<KeyList>().Generate();
         var SUT = GetDeepgramClient(returnObject);
-        var projectId = Guid.NewGuid().ToString();
+        var projectId = new Faker().Random.Guid().ToString();
 
         //Act
         var result = await SUT.Keys.ListKeysAsync(projectId);

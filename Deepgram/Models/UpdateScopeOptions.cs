@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class UpdateScopeOptions
 {
-    public class UpdateScopeOptions
-    {
-        /// <summary>
-        /// New scope
-        /// </summary>
-        [JsonProperty("scope")]
-        public string Scope { get; set; }
-    }
+    /// <summary>
+    /// New scope
+    /// </summary>
+    [JsonProperty("scope")]
+    public string Scope { get; set; }
 }

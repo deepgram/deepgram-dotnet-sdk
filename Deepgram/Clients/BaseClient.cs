@@ -1,22 +1,16 @@
-﻿using Deepgram.Interfaces;
-using Deepgram.Models;
-using Deepgram.Request;
-using Deepgram.Utilities;
+﻿namespace Deepgram.Clients;
 
-namespace Deepgram.Clients
+public abstract class BaseClient : IBaseClient
 {
-    public abstract class BaseClient : IBaseClient
+    public CleanCredentials Credentials { get; set; }
+    public IApiRequest ApiRequest { get; set; }
+    public IRequestMessageBuilder RequestMessageBuilder { get; set; }
+
+    public BaseClient(CleanCredentials credentials)
     {
-        public Credentials Credentials { get; set; }
-        public IApiRequest ApiRequest { get; set; }
-        public IRequestMessageBuilder RequestMessageBuilder { get; set; }
-
-        public BaseClient(Credentials credentials)
-        {
-            Credentials = credentials;
-            ApiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-            RequestMessageBuilder = new RequestMessageBuilder();
-        }
-
+        Credentials = credentials;
+        ApiRequest = new ApiRequest(HttpClientUtil.HttpClient);
+        RequestMessageBuilder = new RequestMessageBuilder();
     }
+
 }

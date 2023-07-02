@@ -1,8 +1,7 @@
-﻿namespace Deepgram.Interfaces
-{
-    public interface ITranscriptionClient
-    {
-        IPrerecordedTranscriptionClient Prerecorded { get; }
+﻿namespace Deepgram.Interfaces;
 
-    }
+public interface ITranscriptionClient
+{
+    IPrerecordedTranscriptionClient Prerecorded { get; }
+
 }

@@ -1,20 +1,17 @@
-﻿using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public enum RequestMethod
 {
-    public enum RequestMethod
-    {
-        /// <summary>
-        /// Synchronous
-        /// </summary>
-        sync,
-        /// <summary>
-        /// Asynchronus
-        /// </summary>
-        async,
-        /// <summary>
-        /// Streaming
-        /// </summary>
-        streaming
-    }
+    /// <summary>
+    /// Synchronous
+    /// </summary>
+    sync,
+    /// <summary>
+    /// Asynchronus
+    /// </summary>
+    async,
+    /// <summary>
+    /// Streaming
+    /// </summary>
+    streaming
 }

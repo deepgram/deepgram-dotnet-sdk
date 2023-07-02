@@ -1,24 +1,20 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+/// <summary>
+///  If a callback was included in the request, but the request has not completed yet, 
+///  then this object will exist, but it will be empty.
+/// </summary>
+public class UsageRequestCallback
 {
     /// <summary>
-    ///  If a callback was included in the request, but the request has not completed yet, 
-    ///  then this object will exist, but it will be empty.
+    /// Status Code of the callback
     /// </summary>
-    public class UsageRequestCallback
-    {
-        /// <summary>
-        /// Status Code of the callback
-        /// </summary>
-        [JsonProperty("code")]
-        public int? Code { get; set; }
+    [JsonProperty("code")]
+    public int? Code { get; set; }
 
-        /// <summary>
-        /// DateTime the callback completed
-        /// </summary>
-        [JsonProperty("completed")]
-        public DateTime? Completed { get; set; }
-    }
+    /// <summary>
+    /// DateTime the callback completed
+    /// </summary>
+    [JsonProperty("completed")]
+    public DateTime? Completed { get; set; }
 }
