@@ -19,7 +19,7 @@ public class ListAllRequestsOptions
     /// </summary>
     /// <remarks>Defaults to 10</remarks>
     [JsonProperty("limit")]
-    public int? Limit { get; set; }
+    public int Limit { get; set; } = 10;
 
     /// <summary>
     /// Status of requests to return.

@@ -1,9 +1,6 @@
 ﻿namespace Deepgram.Tests.ClientTests;
-
 public class KeyClientTests
 {
-
-
     [Fact]
     public async void ListKeysAsync_Should_Return_KeyList()
     {

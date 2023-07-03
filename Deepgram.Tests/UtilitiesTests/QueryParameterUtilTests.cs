@@ -83,13 +83,12 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
         //Arrange 
-#pragma warning disable CS8629 // Nullable value type may be null.
-        var date = new AutoFaker<ListAllRequestsOptions>().Generate()
-            .StartDateTime.Value.ToString("yyyy-MM-dd");
-#pragma warning restore CS8629 // Nullable value type may be null.
+        var listAllRequestsOptions = new AutoFaker<ListAllRequestsOptions>().Generate();
+        var date = listAllRequestsOptions.StartDateTime.Value.ToString("yyyy-MM-dd");
+
 
         //Act
-        var result = QueryParameterUtil.GetParameters(new AutoFaker<ListAllRequestsOptions>().Generate());
+        var result = QueryParameterUtil.GetParameters(listAllRequestsOptions);
 
         //Assert
         Assert.NotNull(result);
