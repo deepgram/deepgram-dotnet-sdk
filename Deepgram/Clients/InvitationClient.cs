@@ -6,6 +6,17 @@ public class InvitationClient : BaseClient, IInvitationClient
     {
     }
 
+    public async Task<MessageResponse> DeleteInvitationAsync(string projectId, string email)
+    {
+        var req = RequestMessageBuilder.CreateHttpRequestMessage(
+      HttpMethod.Delete,
+      $"projects/{projectId}/invites/{email}",
+      Credentials);
+
+        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+
+    }
+
     public async Task<InvitationList> ListInvitationsAsync(string projectId)
     {
         var req = RequestMessageBuilder.CreateHttpRequestMessage(

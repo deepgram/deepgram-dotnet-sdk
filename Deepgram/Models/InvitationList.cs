@@ -2,6 +2,9 @@
 
 public class InvitationList
 {
+    /// <summary>
+    /// Options for Invitation
+    /// </summary>
     [JsonProperty("invites")]
     public InvitationOptions[] Invites { get; set; }
 
