@@ -1,17 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-
+using Deepgram.Request;
+using Deepgram.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-
-using Deepgram.Common;
-using Deepgram.Request;
 
 namespace Deepgram.Transcription
 {
@@ -83,12 +80,12 @@ namespace Deepgram.Transcription
 
             _clientWebSocket = new ClientWebSocket();
             _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_credentials.ApiKey}");
-            _clientWebSocket.Options.SetRequestHeader("User-Agent", Helpers.GetUserAgent());
+            _clientWebSocket.Options.SetRequestHeader("User-Agent", UserAgentUtil.GetUserAgent());
 
             _tokenSource = new CancellationTokenSource();
             try
             {
-                var wssUri = GetWSSUriWithQuerystring("/v1/listen", options);
+                var wssUri = GetWSSUriWithQuerystring("listen", options);
                 await _clientWebSocket.ConnectAsync(wssUri, CancellationToken.None).ConfigureAwait(false);
                 StartSenderBackgroundThread();
                 StartReceiverBackgroundThread();
@@ -181,17 +178,11 @@ namespace Deepgram.Transcription
             EnqueueForSending(new MessageToSend(data));
         }
 
-        private Uri GetWSSUriWithQuerystring(string uri, LiveTranscriptionOptions queryParameters)
-        {
-            string protocol = _credentials.RequireSSL ? "wss" : "ws";
-
-            if (null != queryParameters)
-            {
-                var queryString = Helpers.GetParameters(queryParameters);
-                return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}?{queryString}");
-            }
-            return new Uri($"{protocol}://{_credentials.ApiUrl}{uri}");
-        }
+        private Uri GetWSSUriWithQuerystring(string uriSegment, LiveTranscriptionOptions queryParameters) =>
+    UriUtil.ResolveUri(
+       _credentials.ApiUrl, uriSegment,
+       Convert.ToBoolean(_credentials.RequireSSL) ? "wss" : "ws",
+       queryParameters);
 
         private async Task ProcessSenderQueue()
         {

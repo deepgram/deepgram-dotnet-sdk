@@ -1,18 +1,18 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.WebSockets;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram.Transcription
 {
     internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
         private CleanCredentials _credentials;
-
-        public PrerecordedTranscriptionClient(CleanCredentials credentials)
+        public ApiRequest _apiRequest;
+        internal PrerecordedTranscriptionClient(CleanCredentials credentials)
         {
             _credentials = credentials;
+            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
         }
 
         /// <summary>
@@ -23,12 +23,13 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            return await ApiRequest.DoRequestAsync<PrerecordedTranscription>(
+            return await _apiRequest.DoRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
-                "/v1/listen",
+                "listen",
                 _credentials,
-                options,
-                source);
+                source,
+                options
+                );
         }
 
         /// <summary>
@@ -39,9 +40,9 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
+            return await _apiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
-                "/v1/listen",
+                "listen",
                 _credentials,
                 source,
                 options);

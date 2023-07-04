@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Deepgram.Common;
 
 namespace Deepgram.Keys
@@ -28,7 +27,7 @@ namespace Deepgram.Keys
         /// <param name="comment">Comment to help identify the API key</param>
         /// <param name="scopes">Scopes associated with the key. Cannot be empty</param>
         /// <returns>A new Deepgram API key</returns>
-        Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes);
+        Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes, CreateKeyOptions createKeyOptions = null);
 
         /// <summary>
         /// Deletes an API key

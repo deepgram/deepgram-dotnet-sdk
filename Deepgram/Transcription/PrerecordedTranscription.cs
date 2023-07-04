@@ -6,6 +6,11 @@ namespace Deepgram.Transcription
     public class PrerecordedTranscription
     {
         /// <summary>
+        /// Id Return When Callback option used in Request
+        /// </summary>
+        [JsonProperty("request_id")]
+        public string RequestID { get; set; } = null;
+        /// <summary>
         /// Metadata for the request
         /// </summary>
         [JsonProperty("metadata")]
@@ -28,8 +33,9 @@ namespace Deepgram.Transcription
 
             var webVTT = "WEBVTT\n\n";
 
-            if (MetaData != null) { 
-                webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: { MetaData.Id}\nCreated: { MetaData.Created}\nDuration: { Math.Round(MetaData.Duration, 3)}\nChannels: { MetaData.Channels}\n\n";
+            if (MetaData != null)
+            {
+                webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: {MetaData.Id}\nCreated: {MetaData.Created}\nDuration: {Math.Round(MetaData.Duration, 3)}\nChannels: {MetaData.Channels}\n\n";
             }
 
             int index = 1;

@@ -11,4 +11,5 @@ public class DeepgramClientTests
         // Assert
         Assert.Equal("Deepgram API Key must be provided in constructor or via settings", caughtException.Message);
     }
+
 }

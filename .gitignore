@@ -193,3 +193,4 @@ app.config
 settings.json
 appsettings.json
 project.lock.json
+.cr/personal/FavoritesList/
