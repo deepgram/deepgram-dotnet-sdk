@@ -7,28 +7,32 @@ using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    internal class ApiRequest : IApiRequest
+    public class ApiRequest : IApiRequest
     {
         readonly HttpClient _httpClient;
+        public IRequestMessageBuilder _requestMessageBuilder { get; set; }
+
+
         public ApiRequest(HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _requestMessageBuilder = new RequestMessageBuilder();
         }
 
         const string LOGGER_CATEGORY = "Deepgram.Request.ApiRequest";
 
 
 
-        public async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object body = null, object queryParameters = null, object bodyObject = null)
+        public async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object body = null, object queryParameters = null)
         {
-            var req = RequestMessageBuilder.CreateHttpRequestMessage(method, uri, credentials, body, queryParameters);
+            var req = _requestMessageBuilder.CreateHttpRequestMessage(method, uri, credentials, body, queryParameters);
 
             return await SendHttpRequestAsync<T>(req);
         }
 
         public async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
         {
-            var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(method, uri, credentials, streamSource, queryParameters);
+            var req = _requestMessageBuilder.CreateStreamHttpRequestMessage(method, uri, credentials, streamSource, queryParameters);
 
             return await SendHttpRequestAsync<T>(req);
         }

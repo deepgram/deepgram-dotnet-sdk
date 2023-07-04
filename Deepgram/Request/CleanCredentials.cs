@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Deepgram.Request
+﻿namespace Deepgram.Request
 {
-    internal class CleanCredentials
+    public class CleanCredentials
     {
         /// <summary>
         /// Constructor

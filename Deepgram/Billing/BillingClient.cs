@@ -1,20 +1,14 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Deepgram.Common;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Billing
 {
-    internal class BillingClient : IBillingClient
+    public sealed class BillingClient : BaseClient, IBillingClient
     {
-        private CleanCredentials _credentials;
-        private ApiRequest _apiRequest;
+        public BillingClient(CleanCredentials credentials) : base(credentials) { }
 
-        public BillingClient(CleanCredentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-        }
 
         /// <summary>
         /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator
@@ -23,10 +17,10 @@ namespace Deepgram.Billing
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            return await _apiRequest.DoRequestAsync<BillingList>(
+            return await ApiRequest.DoRequestAsync<BillingList>(
                    HttpMethod.Get,
                    $"projects/{projectId}/balances",
-                   _credentials
+                   Credentials
                );
         }
 
@@ -38,10 +32,10 @@ namespace Deepgram.Billing
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            return await _apiRequest.DoRequestAsync<Billing>(
+            return await ApiRequest.DoRequestAsync<Billing>(
                   HttpMethod.Get,
                   $"projects/{projectId}/balances/{balanceId}",
-                  _credentials
+                  Credentials
               );
         }
     }

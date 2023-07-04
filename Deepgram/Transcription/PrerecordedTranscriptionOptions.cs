@@ -177,7 +177,7 @@ namespace Deepgram.Transcription
         /// query parameter keyword_boost=legacy to your API request.
         /// </summary>
         [JsonProperty("keyword_boost")]
-        public string? KeywordBoost { get; set; }
+        public string KeywordBoost { get; set; } = null;
 
         /// <summary>
         /// Indicates whether Deepgram will segment speech into meaningful semantic units, which allows

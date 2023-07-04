@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Deepgram.Common;
 
 namespace Deepgram.Billing
 {
-    public interface IBillingClient
+    public interface IBillingClient : IBaseClient
     {
         /// <summary>
         /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Deepgram.Common;
 
 namespace Deepgram.Projects
 {
-    public interface IProjectClient
+    public interface IProjectClient : IBaseClient
     {
+
         /// <summary>
         /// Returns all Deepgram projects
         /// </summary>
@@ -46,7 +46,7 @@ namespace Deepgram.Projects
         /// <param name="memberId">Unique identifier of the member.</param>
         /// <returns>List of member scopes</returns>
         Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId);
-        
+
         /// Removes the authenticated account from the specified project
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>

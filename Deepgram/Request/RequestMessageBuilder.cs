@@ -9,8 +9,7 @@ using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-
-    internal class RequestMessageBuilder
+    public class RequestMessageBuilder : IRequestMessageBuilder
     {
         /// <summary>
         /// Creates a Http Request Message for the Api calls
@@ -21,7 +20,7 @@ namespace Deepgram.Request
         /// <param name="body"></param>
         /// <param name="queryParameters"></param>
         /// <returns></returns>
-        internal static HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string uri, CleanCredentials credentials, object body = null, object queryParameters = null)
+        public HttpRequestMessage CreateHttpRequestMessage(HttpMethod method, string uri, CleanCredentials credentials, object body = null, object queryParameters = null)
         {
             var req = ConfigureHttpRequestMessage(method, uri, credentials, queryParameters);
 
@@ -45,7 +44,7 @@ namespace Deepgram.Request
         /// <param name="streamSource"></param>
         /// <param name="queryParameters"></param>
         /// <returns></returns>
-        internal static HttpRequestMessage CreateStreamHttpRequestMessage(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
+        public HttpRequestMessage CreateStreamHttpRequestMessage(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
         {
             var req = ConfigureHttpRequestMessage(method, uri, credentials, queryParameters);
 

@@ -2,45 +2,38 @@
 using System.Threading.Tasks;
 using Deepgram.Common;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Invitation
 {
-    internal class InvitationClient : IInvitationClient
+    public sealed class InvitationClient : BaseClient, IInvitationClient
     {
+        public InvitationClient(CleanCredentials credentials) : base(credentials) { }
 
-        private CleanCredentials _credentials;
-        public ApiRequest _apiRequest;
-        internal InvitationClient(CleanCredentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-        }
 
         public async Task<MessageResponse> DeleteInvitationAsync(string projectId, string email)
         {
 
-            return await _apiRequest.DoRequestAsync<MessageResponse>(
+            return await ApiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
                 $"projects/{projectId}/invites/{email}",
-                _credentials);
+                Credentials);
         }
 
         public async Task<InvitationList> ListInvitationsAsync(string projectId)
         {
-            return await _apiRequest.DoRequestAsync<InvitationList>(
+            return await ApiRequest.DoRequestAsync<InvitationList>(
                   HttpMethod.Get,
                   $"projects/{projectId}/invites",
-                  _credentials
+                  Credentials
               );
         }
 
         public async Task<InvitationResponse> SendInvitationAsync(string projectId, InvitationOptions invitationOptions)
         {
-            return await _apiRequest.DoRequestAsync<InvitationResponse>(
+            return await ApiRequest.DoRequestAsync<InvitationResponse>(
           HttpMethod.Post,
           $"projects/{projectId}/invites",
-          _credentials,
+          Credentials,
           invitationOptions);
 
         }

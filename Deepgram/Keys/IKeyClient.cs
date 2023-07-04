@@ -3,8 +3,9 @@ using Deepgram.Common;
 
 namespace Deepgram.Keys
 {
-    public interface IKeyClient
+    public interface IKeyClient : IBaseClient
     {
+
         /// <summary>
         /// Returns all Deepgram API keys associated with the project provided
         /// </summary>

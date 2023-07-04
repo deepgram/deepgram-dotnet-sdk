@@ -1,19 +1,14 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
+using Deepgram.Common;
 using Deepgram.Request;
-using Deepgram.Utilities;
 
 namespace Deepgram.Transcription
 {
-    internal class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
+    public sealed class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
     {
-        private CleanCredentials _credentials;
-        public ApiRequest _apiRequest;
-        internal PrerecordedTranscriptionClient(CleanCredentials credentials)
-        {
-            _credentials = credentials;
-            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient);
-        }
+
+        public PrerecordedTranscriptionClient(CleanCredentials credentials) : base(credentials) { }
 
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio
@@ -23,10 +18,10 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            return await _apiRequest.DoRequestAsync<PrerecordedTranscription>(
+            return await ApiRequest.DoRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                _credentials,
+                Credentials,
                 source,
                 options
                 );
@@ -40,10 +35,10 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            return await _apiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
+            return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                _credentials,
+                Credentials,
                 source,
                 options);
         }
