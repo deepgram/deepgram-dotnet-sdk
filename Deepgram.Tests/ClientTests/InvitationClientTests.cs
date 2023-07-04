@@ -40,13 +40,6 @@ public class InvitationClientTests
     [Fact]
     public async void DeleteInvitation_Should_Return_MessageResponse()
     {
-        var deepgramclient = new DeepgramClient(new Credentials() { ApiKey = "9a5355612e23754e2ff55cb2b5226c7026e517b8" });
-        var projects = deepgramclient.Projects.ListProjectsAsync().Result;
-        var project = projects.Projects[0];
-        var response = await deepgramclient.Invitation.ListInvitationsAsync(project.Id);
-        var options = response.Invites[0];
-        var delete = deepgramclient.Invitation.DeleteInvitationAsync(project.Id, options.Email);
-        var response2 = await deepgramclient.Invitation.ListInvitationsAsync(project.Id);
 
         //Arrange
         var returnObject = new AutoFaker<MessageResponse>().Generate();
@@ -59,7 +52,7 @@ public class InvitationClientTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.IsAssignableFrom<InvitationResponse>(result);
+        Assert.IsAssignableFrom<MessageResponse>(result);
         Assert.Equal(returnObject, result);
     }
 
