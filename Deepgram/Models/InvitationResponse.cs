@@ -3,7 +3,7 @@
 
     public class InvitationResponse
     {
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public string Message { get; set; }
     }
 }

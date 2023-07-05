@@ -5,6 +5,6 @@ public class BillingList
     /// <summary>
     /// List of balances
     /// </summary>
-    [JsonProperty("balances")]
+    [JsonPropertyName("balances")]
     public Billing[] Billings { get; set; }
 }

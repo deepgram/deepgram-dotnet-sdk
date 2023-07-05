@@ -5,30 +5,30 @@ public class UsageFields
     /// <summary>
     /// Array of included tags.
     /// </summary>
-    [JsonProperty("tags")]
+    [JsonPropertyName("tags")]
     public string[] Tags { get; set; }
 
     /// <summary>
     /// Array of included models.
     /// </summary>
-    [JsonProperty("models")]
+    [JsonPropertyName("models")]
     public string[] Models { get; set; }
 
     /// <summary>
     /// Array of included processing methods.
     /// </summary>
-    [JsonProperty("processing_methods")]
+    [JsonPropertyName("processing_methods")]
     public RequestMethod[] ProcessingMethods { get; set; }
 
     /// <summary>
     /// Array of included languages.
     /// </summary>
-    [JsonProperty("languages")]
+    [JsonPropertyName("languages")]
     public string[] Languages { get; set; }
 
     /// <summary>
     /// Array of included features.
     /// </summary>
-    [JsonProperty("features")]
+    [JsonPropertyName("features")]
     public string[] Features { get; set; }
 }

@@ -5,12 +5,12 @@ public class Topic
     /// <summary>
     /// Topic detected.
     /// </summary>
-    [JsonProperty("topic")]
+    [JsonPropertyName("topic")]
     public string TopicText { get; set; }
 
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this topic.
     /// </summary>
-    [JsonProperty("confidence")]
+    [JsonPropertyName("confidence")]
     public decimal Confidence { get; set; }
 }

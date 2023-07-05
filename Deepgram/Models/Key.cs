@@ -5,12 +5,12 @@ public class Key
     /// <summary>
     /// member object
     /// </summary>
-    [JsonProperty("member")]
+    [JsonPropertyName("member")]
     public KeyMember Member { get; set; }
 
     /// <summary>
     /// api key object
     /// </summary>
-    [JsonProperty("api_key")]
+    [JsonPropertyName("api_key")]
     public ApiKey ApiKey { get; set; }
 }

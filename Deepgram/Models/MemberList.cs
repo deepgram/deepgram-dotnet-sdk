@@ -5,6 +5,6 @@ public class MemberList
     /// <summary>
     /// List of members
     /// </summary>
-    [JsonProperty("members")]
+    [JsonPropertyName("members")]
     public Member[] Members { get; set; }
 }

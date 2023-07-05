@@ -9,12 +9,12 @@ public class UsageRequestCallback
     /// <summary>
     /// Status Code of the callback
     /// </summary>
-    [JsonProperty("code")]
+    [JsonPropertyName("code")]
     public int? Code { get; set; }
 
     /// <summary>
     /// DateTime the callback completed
     /// </summary>
-    [JsonProperty("completed")]
+    [JsonPropertyName("completed")]
     public DateTime? Completed { get; set; }
 }

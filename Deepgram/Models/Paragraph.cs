@@ -5,24 +5,24 @@ public class Paragraph
     /// <summary>
     /// Array of Sentence objects.
     /// </summary>
-    [JsonProperty("sentences")]
+    [JsonPropertyName("sentences")]
     public Sentence[] Sentences { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph starts.
     /// </summary>
-    [JsonProperty("start")]
+    [JsonPropertyName("start")]
     public decimal Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph ends.
     /// </summary>
-    [JsonProperty("end")]
+    [JsonPropertyName("end")]
     public decimal End { get; set; }
 
     /// <summary>
     /// Number of words in the paragraph
     /// </summary>
-    [JsonProperty("num_words")]
+    [JsonPropertyName("num_words")]
     public int NumberOfWords { get; set; }
 }

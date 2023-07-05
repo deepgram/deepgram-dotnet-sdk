@@ -5,6 +5,6 @@ public class UpdateScopeOptions
     /// <summary>
     /// New scope
     /// </summary>
-    [JsonProperty("scope")]
+    [JsonPropertyName("scope")]
     public string Scope { get; set; }
 }

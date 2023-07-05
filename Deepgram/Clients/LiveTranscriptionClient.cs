@@ -242,7 +242,7 @@ internal class LiveTranscriptionClient : ILiveTranscriptionClient, IDisposable
                         var text = Encoding.UTF8.GetString(ms.ToArray());
                         if (text != null)
                         {
-                            var transcript = JsonConvert.DeserializeObject<LiveTranscriptionResult>(text);
+                            var transcript = JsonSerializer.Deserialize<LiveTranscriptionResult>(text);
                             if (transcript != null)
                             {
                                 TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));

@@ -1,48 +1,50 @@
-﻿using System.Web;
-using Newtonsoft.Json.Linq;
-
+﻿using System.Data;
+using System.Text.Json.Nodes;
+using System.Web;
 namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
-
 {
     public static string GetParameters(object? parameters = null)
     {
-        List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
-
-        if (parameters is not null)
+        List<(string key, string value)> paramList = new List<(string, string)>();
+        if (parameters != null)
         {
-
-            var json = JsonConvert.SerializeObject(parameters);
-
-            if (json is not null)
+            var json = JsonSerializer.Serialize(parameters, new JsonSerializerOptions());
+            if (json != null)
             {
-                var jObj = JsonConvert.DeserializeObject(json) as JObject;
+                var obj = JsonSerializer.Deserialize<JsonObject>(json);
 
-                foreach (var prop in jObj.Properties())
+                foreach (var item in obj)
                 {
-                    if (prop.HasValues && !string.IsNullOrEmpty(prop.Value.ToString()))
+                    if (item.Value is null) continue;
+
+                    if (item.Value is JsonArray)
                     {
-                        if (prop.Value.Type == JTokenType.Array)
+                        foreach (var value in item.Value as JsonArray)
                         {
-                            foreach (var value in prop.Values())
-                            {
-                                paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
-                            }
+                            paramList.Add((item.Key.ToLower(), HttpUtility.UrlEncode(value.ToString())));
                         }
-                        else if (prop.Value.Type == JTokenType.Date)
-                        {
-                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(((DateTime)prop.Value).ToString("yyyy-MM-dd"))));
-                        }
-                        else
-                        {
-                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));
-                        }
+                    }
+                    else if (ParseDateTime(item.Value.ToString()) is not null)
+                    {
+                        paramList.Add((item.Key.ToLower(), HttpUtility.UrlEncode(((DateTime)item.Value).ToString("yyyy-MM-dd"))));
+                    }
+                    else
+                    {
+                        paramList.Add((item.Key.ToLower(), HttpUtility.UrlEncode(item.Value.ToString())));
                     }
                 }
             }
         }
+        return string.Join("&", paramList.Select(s => $"{s.key}={s.value}")).ToLowerInvariant();
 
-        return string.Join("&", paramList.Select(s => $"{s.Key}={s.Value}")).ToLower();
     }
+
+    public static DateTime? ParseDateTime(object value)
+    {
+        DateTime.TryParse(value.ToString(), out var dateTime);
+        return dateTime != DateTime.MinValue ? dateTime : null;
+    }
+
 }

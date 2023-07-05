@@ -17,9 +17,9 @@ public class RequestMessageBuilder : IRequestMessageBuilder
 
         if (body != null)
         {
-            var payload = JsonConvert.SerializeObject(body, new JsonSerializerSettings()
+            var payload = JsonSerializer.Serialize(body, new JsonSerializerOptions()
             {
-                NullValueHandling = NullValueHandling.Ignore
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
             req.Content = new StringContent(payload, Encoding.UTF8, "application/json");
         }

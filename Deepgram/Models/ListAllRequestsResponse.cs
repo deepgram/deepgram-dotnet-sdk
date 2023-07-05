@@ -5,18 +5,18 @@ public class ListAllRequestsResponse
     /// <summary>
     /// Number of results to return per page. 
     /// </summary>
-    [JsonProperty("limit")]
+    [JsonPropertyName("limit")]
     public int Limit { get; set; }
 
     /// <summary>
     /// Page number that should be returned.
     /// </summary>
-    [JsonProperty("page")]
+    [JsonPropertyName("page")]
     public int Page { get; set; }
 
     /// <summary>
     /// Array of requests
     /// </summary>
-    [JsonProperty("requests")]
+    [JsonPropertyName("requests")]
     public UsageRequest[] Requests { get; set; }
 }

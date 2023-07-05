@@ -13,7 +13,7 @@ public class QueryParameterUtilTests
     [Fact]
     public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
     {
-        //Act
+        //Act  
         var result = QueryParameterUtil.GetParameters(_prerecordedTranscriptionOptions)!;
 
         //Assert
@@ -84,7 +84,9 @@ public class QueryParameterUtilTests
     {
         //Arrange 
         var listAllRequestsOptions = new AutoFaker<ListAllRequestsOptions>().Generate();
+#pragma warning disable CS8629 // Nullable value type may be null.
         var date = listAllRequestsOptions.StartDateTime.Value.ToString("yyyy-MM-dd");
+#pragma warning restore CS8629 // Nullable value type may be null.
 
 
         //Act

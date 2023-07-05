@@ -5,24 +5,24 @@ public class Billing
     /// <summary>
     /// Unique identifier of the balance
     /// </summary>
-    [JsonProperty("balance_id")]
+    [JsonPropertyName("balance_id")]
     public string BalanceId { get; set; } = string.Empty;
 
     /// <summary>
     /// Amount of the balance
     /// </summary>
-    [JsonProperty("amount")]
+    [JsonPropertyName("amount")]
     public decimal Amount { get; set; }
 
     /// <summary>
     /// Units of the balance. May use usd or hour, depending on the project billing settings
     /// </summary>
-    [JsonProperty("units")]
+    [JsonPropertyName("units")]
     public string Units { get; set; }
 
     /// <summary>
     /// Unique identifier of the purchase order associated with the balance
     /// </summary>
-    [JsonProperty("purchase")]
+    [JsonPropertyName("purchase")]
     public string Purchase { get; set; }
 }

@@ -5,12 +5,12 @@ public class Search
     /// <summary>
     /// Term for which Deepgram is searching.
     /// </summary>
-    [JsonProperty("query")]
+    [JsonPropertyName("query")]
     public string Query { get; set; }
 
     /// <summary>
     /// Array of Hit objects
     /// </summary>
-    [JsonProperty("hits")]
+    [JsonPropertyName("hits")]
     public Hit[] Hits { get; set; }
 }

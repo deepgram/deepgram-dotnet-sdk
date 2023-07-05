@@ -2,8 +2,8 @@
 
 public class InvitationOptions
 {
-    [JsonProperty("email")]
+    [JsonPropertyName("email")]
     public string Email { get; set; }
-    [JsonProperty("scope")]
+    [JsonPropertyName("scope")]
     public string Scope { get; set; }
 }

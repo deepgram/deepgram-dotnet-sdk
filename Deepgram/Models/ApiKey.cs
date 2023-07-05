@@ -5,24 +5,24 @@ public class ApiKey
     /// <summary>
     /// Unique identifier of the Deepgram API key
     /// </summary>
-    [JsonProperty("api_key_id")]
+    [JsonPropertyName("api_key_id")]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
     /// Comment for the Deepgram API key
     /// </summary>
-    [JsonProperty("comment")]
+    [JsonPropertyName("comment")]
     public string Comment { get; set; } = string.Empty;
 
-    [JsonProperty("created")]
+    [JsonPropertyName("created")]
     public DateTime Created { get; set; }
 
-    [JsonProperty("scopes")]
+    [JsonPropertyName("scopes")]
     public string[] Scopes { get; set; }
 
-    [JsonProperty("tags")]
+    [JsonPropertyName("tags")]
     public string[] Tags { get; set; } = Array.Empty<string>();
 
-    [JsonProperty("expiration_date")]
+    [JsonPropertyName("expiration_date")]
     public DateTime? ExpirationDate { get; set; }
 }

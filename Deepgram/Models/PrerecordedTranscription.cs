@@ -5,20 +5,20 @@ public class PrerecordedTranscription
     /// <summary>
     /// Id Return When Callback option used in Request
     /// </summary>
-    [JsonProperty("request_id")]
+    [JsonPropertyName("request_id")]
     public string? RequestID { get; set; }
 
 
     /// <summary>
     /// Metadata for the request
     /// </summary>
-    [JsonProperty("metadata")]
+    [JsonPropertyName("metadata")]
     public PrerecordedTranscriptionMetaData? MetaData { get; set; }
 
     /// <summary>
     /// Results of the transcription
     /// </summary>
-    [JsonProperty("results")]
+    [JsonPropertyName("results")]
     public PrerecordedTranscriptionResult? Results { get; set; }
 
     public string ToWebVTT()

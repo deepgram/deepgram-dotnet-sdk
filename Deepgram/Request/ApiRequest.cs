@@ -24,7 +24,7 @@ public class ApiRequest : IApiRequest
 
         var deepgramResponse = ProcessResponse(response, json);
 
-        return JsonConvert.DeserializeObject<T>(deepgramResponse.JsonResponse);
+        return JsonSerializer.Deserialize<T>(deepgramResponse.JsonResponse);
     }
 
     private static DeepgramResponse ProcessResponse(HttpResponseMessage response, string json)

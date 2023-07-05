@@ -5,6 +5,6 @@ public class MessageResponse
     /// <summary>
     /// A message denoting the success of the operation
     /// </summary>
-    [JsonProperty("message")]
+    [JsonPropertyName("message")]
     public string Message { get; set; } = string.Empty;
 }

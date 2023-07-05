@@ -2,6 +2,7 @@
 
 public class BillingClientTests
 {
+
     [Fact]
     public async void GetAllBalancesAsync_Should_Return_BillingList()
     {

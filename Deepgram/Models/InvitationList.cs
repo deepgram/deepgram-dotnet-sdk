@@ -5,12 +5,12 @@ public class InvitationList
     /// <summary>
     /// Options for Invitation
     /// </summary>
-    [JsonProperty("invites")]
+    [JsonPropertyName("invites")]
     public InvitationOptions[] Invites { get; set; }
 
-    [JsonProperty("err_code")]
+    [JsonPropertyName("err_code")]
     public string ErrorCode { get; set; }
 
-    [JsonProperty("err_msg")]
+    [JsonPropertyName("err_msg")]
     public string ErrorMessage { get; set; }
 }

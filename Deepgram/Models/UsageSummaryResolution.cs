@@ -5,12 +5,12 @@ public class UsageSummaryResolution
     /// <summary>
     /// Units of resolution amount.
     /// </summary>
-    [JsonProperty("units")]
+    [JsonPropertyName("units")]
     public string Units { get; set; } = string.Empty;
 
     /// <summary>
     /// Number of days
     /// </summary>
-    [JsonProperty("amount")]
+    [JsonPropertyName("amount")]
     public int Amount { get; set; }
 }

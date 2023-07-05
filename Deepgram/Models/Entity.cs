@@ -6,30 +6,30 @@ public class Entity
     /// This is the type of the entity
     /// </summary>
     /// <remarks>e.g. DATE, PER, ORG, etc.</remarks>
-    [JsonProperty("label")]
+    [JsonPropertyName("label")]
     public string Label { get; set; }
 
     /// <summary>
     /// This is the value of the detected entity.
     /// </summary>
-    [JsonProperty("value")]
+    [JsonPropertyName("value")]
     public string Value { get; set; }
 
     /// <summary>
     /// Starting index of the entities words within the transcript.
     /// </summary>
-    [JsonProperty("start_word")]
+    [JsonPropertyName("start_word")]
     public int StartWord { get; set; }
 
     /// <summary>
     /// Ending index of the entities words within the transcript.
     /// </summary>
-    [JsonProperty("end_word")]
+    [JsonPropertyName("end_word")]
     public int EndWord { get; set; }
 
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this detected entity.
     /// </summary>
-    [JsonProperty("confidence")]
+    [JsonPropertyName("confidence")]
     public decimal Confidence { get; set; }
 }

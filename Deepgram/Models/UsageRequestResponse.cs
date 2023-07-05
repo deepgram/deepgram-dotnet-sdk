@@ -5,12 +5,12 @@ public class UsageRequestResponse
     /// <summary>
     /// Details of the request
     /// </summary>
-    [JsonProperty("details")]
+    [JsonPropertyName("details")]
     public UsageRequestResponseDetail Details { get; set; }
 
     /// <summary>
     /// If the request failed, this will contain the error message.
     /// </summary>
-    [JsonProperty("message")]
+    [JsonPropertyName("message")]
     public string Message { get; set; }
 }

@@ -5,18 +5,18 @@ public class Project
     /// <summary>
     /// Unique identifier of the Deepgram project
     /// </summary>
-    [JsonProperty("project_id")]
+    [JsonPropertyName("project_id")]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
     /// Name of the Deepgram project
     /// </summary>
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Name of the company associated with the Deepgram project
     /// </summary>
-    [JsonProperty("company")]
+    [JsonPropertyName("company")]
     public string Company { get; set; }
 }

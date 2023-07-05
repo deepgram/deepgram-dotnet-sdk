@@ -52,7 +52,9 @@ public class PrerecordedTranscriptionTests
         PrerecordedTranscription responseObject = new AutoFaker<PrerecordedTranscription>().Generate();
         DeepgramClient SUT = GetDeepgramClient(responseObject);
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         responseObject.Results.Summary.Short = "This is a test summary"!;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
 
         var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
@@ -82,7 +84,9 @@ public class PrerecordedTranscriptionTests
         //Arrange
         var responseObject = new AutoFaker<PrerecordedTranscription>().Generate();
         var SUT = GetDeepgramClient(responseObject);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         responseObject.Results.Summary.Short = null!;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
         var fakeOptions = new PrerecordedTranscriptionOptions()
         {

@@ -39,3 +39,4 @@ Added:
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.DeepgramClient.SetHttpClientTimeout(System.TimeSpan)")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.DeepgramClient")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PrerecordedTranscriptionMetaData")]
+[assembly: SuppressMessage("Performance", "CA1806:Do not ignore method results", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.QueryParameterUtil.ParseDateTime(System.Object)~System.Nullable{System.DateTime}")]

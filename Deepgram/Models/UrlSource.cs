@@ -10,6 +10,6 @@ public class UrlSource
     /// <summary>
     /// Url of the file to transcribe
     /// </summary>
-    [JsonProperty("url")]
+    [JsonPropertyName("url")]
     public string Url { get; set; } = string.Empty;
 }

@@ -1,10 +1,12 @@
-﻿namespace Deepgram.Models;
+﻿
+
+namespace Deepgram.Models;
 
 public class KeyList
 {
     /// <summary>
     /// List of Deepgram api keys
     /// </summary>
-    [JsonProperty("api_keys")]
+    [JsonPropertyName("api_keys")]
     public Key[] ApiKeys { get; set; }
 }
