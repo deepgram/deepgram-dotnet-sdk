@@ -2,7 +2,7 @@
 
 public class BillingClient : BaseClient, IBillingClient
 {
-    public BillingClient(CleanCredentials credentials) : base(credentials) { }
+    internal BillingClient(CleanCredentials credentials) : base(credentials) { }
 
     /// <summary>
     /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator

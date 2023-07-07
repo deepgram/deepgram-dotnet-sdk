@@ -2,7 +2,7 @@
 
 public interface IBaseClient
 {
-    IApiRequest ApiRequest { get; set; }
-    CleanCredentials Credentials { get; set; }
-    IRequestMessageBuilder RequestMessageBuilder { get; set; }
+    internal IApiRequest ApiRequest { get; set; }
+    internal CleanCredentials Credentials { get; set; }
+    internal IRequestMessageBuilder RequestMessageBuilder { get; set; }
 }

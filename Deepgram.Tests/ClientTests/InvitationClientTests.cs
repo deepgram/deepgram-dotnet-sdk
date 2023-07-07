@@ -59,13 +59,11 @@ public class InvitationClientTests
 
     private static DeepgramClient GetDeepgramClient<T>(T returnObject)
     {
-        var mockIRequestMessageBuilder = MockIRequestMessageBuilder.Create();
         var mockIApiRequest = MockIApiRequest.Create(returnObject);
         var credentials = new CredentialsFaker().Generate();
         var SUT = new DeepgramClient(credentials);
-
         SUT.Invitation.ApiRequest = mockIApiRequest.Object;
-        SUT.Invitation.RequestMessageBuilder = mockIRequestMessageBuilder.Object;
+
         return SUT;
     }
 }
