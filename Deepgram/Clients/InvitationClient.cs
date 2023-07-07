@@ -2,41 +2,27 @@
 
 public class InvitationClient : BaseClient, IInvitationClient
 {
-    public InvitationClient(CleanCredentials credentials) : base(credentials)
-    {
-    }
+    public InvitationClient(CleanCredentials credentials) : base(credentials) { }
 
-    public async Task<MessageResponse> DeleteInvitationAsync(string projectId, string email)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-      HttpMethod.Delete,
-      $"projects/{projectId}/invites/{email}",
-      Credentials);
+    public async Task<MessageResponse> DeleteInvitationAsync(string projectId, string email) =>
+        await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Delete,
+                $"projects/{projectId}/invites/{email}",
+                Credentials));
 
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-    }
-
-    public async Task<InvitationList> ListInvitationsAsync(string projectId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-      HttpMethod.Get,
-      $"projects/{projectId}/invites",
-      Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<InvitationList>(req);
-
-    }
+    public async Task<InvitationList> ListInvitationsAsync(string projectId) =>
+        await ApiRequest.SendHttpRequestAsync<InvitationList>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                $"projects/{projectId}/invites",
+                Credentials));
 
     public async Task<InvitationResponse> SendInvitationAsync(string projectId, InvitationOptions invitationOptions)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-      HttpMethod.Post,
-      $"projects/{projectId}/invites",
-      Credentials,
-      invitationOptions);
-
-        return await ApiRequest.SendHttpRequestAsync<InvitationResponse>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<InvitationResponse>
+        (RequestMessageBuilder.CreateHttpRequestMessage(
+            HttpMethod.Post,
+            $"projects/{projectId}/invites",
+            Credentials,
+            invitationOptions));
 }

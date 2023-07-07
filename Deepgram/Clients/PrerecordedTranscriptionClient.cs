@@ -11,16 +11,13 @@ public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscript
     /// <param name="options">Feature options for the transcription</param>
     /// <returns>Transcription of the provided audio</returns>
     public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-           HttpMethod.Post,
-            "listen",
-            Credentials,
-            source,
-            options);
-
-        return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
-    }
+        => await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Post,
+                "listen",
+                Credentials,
+                source,
+                options));
 
     /// <summary>
     /// Submits a request to the Deepgram API to transcribe prerecorded audio
@@ -29,14 +26,11 @@ public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscript
     /// <param name="options">Feature options for the transcription</param>
     /// <returns>Transcription of the provided audio</returns>
     public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
-    {
-        var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
-         HttpMethod.Post,
-          "listen",
-          Credentials,
-          source,
-          options);
-
-        return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
-    }
+        => await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
+            RequestMessageBuilder.CreateStreamHttpRequestMessage(
+                HttpMethod.Post,
+                "listen",
+                Credentials,
+                source,
+                options));
 }

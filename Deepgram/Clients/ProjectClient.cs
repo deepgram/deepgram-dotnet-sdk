@@ -8,14 +8,11 @@ public class ProjectClient : BaseClient, IProjectClient
     /// </summary>
     /// <returns>List of Deepgram projects</returns>
     public async Task<ProjectList> ListProjectsAsync()
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Get,
-        "projects",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<ProjectList>(req);
-    }
+        => await ApiRequest.SendHttpRequestAsync<ProjectList>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                "projects",
+                Credentials));
 
     /// <summary>
     /// Retrieves the Deepgram project associated with the provided projectId
@@ -23,15 +20,11 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="projectId">Unique identifier of the project to retrieve</param>
     /// <returns>A Deepgram project</returns>
     public async Task<Project> GetProjectAsync(string projectId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Get,
-        $"projects/{projectId}",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<Project>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<Project>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                $"projects/{projectId}",
+                Credentials));
 
     /// <summary>
     /// Updates the name and company name of a Deepgram project
@@ -39,36 +32,23 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="project">Project to update</param>
     /// <returns>A message denoting the success of the operation</returns>
     public async Task<MessageResponse> UpdateProjectAsync(Project project)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-#if NETSTANDARD2_0
-            new HttpMethod("PATCH"),
-#else
-            HttpMethod.Patch,
-#endif
-            $"projects/{project.Id}",
-            Credentials,
-           project);
-
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Patch,
+                $"projects/{project.Id}",
+                Credentials,
+                project));
 
     /// <summary>
     /// Deletes a project with the provided projectId
     /// </summary>
     /// <param name="projectId">Unique identifier of the project to delete</param>
     public async Task<MessageResponse> DeleteProjectAsync(string projectId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Delete,
-        $"projects/{projectId}",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Delete,
+                $"projects/{projectId}",
+                Credentials));
 
     /// <summary>
     /// Returns all members of a project
@@ -76,15 +56,11 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="projectId">Unique identifier of the project for which you want to get members.</param>
     /// <returns>List of members</returns>
     public async Task<MemberList> GetMembersAsync(string projectId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Get,
-         $"projects/{projectId}/members",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<MemberList>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MemberList>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                $"projects/{projectId}/members",
+                Credentials));
 
     /// <summary>
     /// Returns member scopes for the specific project
@@ -93,28 +69,21 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="memberId">Unique identifier of the member</param>
     /// <returns>List of member scopes</returns>
     public async Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Get,
-         $"projects/{projectId}/members/{memberId}/scopes",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<ScopesList>(req);
-    }
+        => await ApiRequest.SendHttpRequestAsync<ScopesList>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Get,
+                $"projects/{projectId}/members/{memberId}/scopes",
+                Credentials));
 
     /// Removes the authenticated account from the specified project
     /// </summary>
     /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
     public async Task<MessageResponse> LeaveProjectAsync(string projectId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-         HttpMethod.Delete,
-            $"projects/{projectId}/leave",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Delete,
+                $"projects/{projectId}/leave",
+                Credentials));
 
     /// <summary>
     /// Removes a member from a project
@@ -122,15 +91,11 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="projectId">Unique identifier of the project</param>
     /// <param name="memberId">Unique identifier of the member</param>
     public async Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Delete,
-            $"projects/{projectId}/members/{memberId}",
-        Credentials);
-
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Delete,
+                $"projects/{projectId}/members/{memberId}",
+                Credentials));
 
     /// <summary>
     /// Updates member scopes on a project
@@ -139,14 +104,10 @@ public class ProjectClient : BaseClient, IProjectClient
     /// <param name="memberId">Unique identifier of the member</param>
     /// <param name="options">Scope options to update</param>
     public async Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options)
-    {
-        var req = RequestMessageBuilder.CreateHttpRequestMessage(
-        HttpMethod.Put,
-        $"projects/{projectId}/members/{memberId}/scopes",
-        Credentials,
-        options);
-
-        return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
-
-    }
+        => await ApiRequest.SendHttpRequestAsync<MessageResponse>(
+            RequestMessageBuilder.CreateHttpRequestMessage(
+                HttpMethod.Put,
+                $"projects/{projectId}/members/{memberId}/scopes",
+                Credentials,
+                options));
 }
