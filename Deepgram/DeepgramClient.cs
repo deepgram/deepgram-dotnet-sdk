@@ -5,6 +5,7 @@ namespace Deepgram;
 public class DeepgramClient
 {
     private CleanCredentials _credentials;
+    internal IApiRequest _apiRequest;
     public IKeyClient Keys { get; internal set; }
     public IProjectClient Projects { get; internal set; }
     public ITranscriptionClient Transcription { get; internal set; }
@@ -28,13 +29,14 @@ public class DeepgramClient
         InitializeClients();
     }
 
-    protected void InitializeClients()
+    internal void InitializeClients()
     {
-        Keys = new KeyClient(_credentials);
-        Projects = new ProjectClient(_credentials);
-        Transcription = new TranscriptionClient(_credentials);
-        Usage = new UsageClient(_credentials);
-        Billing = new BillingClient(_credentials);
-        Invitation = new InvitationClient(_credentials);
+        _apiRequest = new ApiRequest(HttpClientUtil.HttpClient, _credentials, new RequestMessageBuilder());
+        Keys = new KeyClient(_apiRequest);
+        Projects = new ProjectClient(_apiRequest);
+        Transcription = new TranscriptionClient(_apiRequest);
+        Usage = new UsageClient(_apiRequest);
+        Billing = new BillingClient(_apiRequest);
+        Invitation = new InvitationClient(_apiRequest);
     }
 }

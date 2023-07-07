@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Interfaces;
 
-public interface IKeyClient : IBaseClient
+public interface IKeyClient
 {
     /// <summary>
     /// Returns all Deepgram API keys associated with the project provided

@@ -2,5 +2,5 @@
 
 public interface IApiRequest
 {
-    Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request);
+    Task<T> SendHttpRequestAsync<T>(HttpMethod method, string uri, object? body = null, object? queryParameters = null);
 }

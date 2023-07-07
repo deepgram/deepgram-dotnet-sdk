@@ -1,8 +1,12 @@
 ﻿namespace Deepgram.Clients;
 
-public class BillingClient : BaseClient, IBillingClient
+public class BillingClient : IBillingClient
 {
-    internal BillingClient(CleanCredentials credentials) : base(credentials) { }
+    internal IApiRequest _apiRequest;
+    internal BillingClient(IApiRequest apiRequest)
+    {
+        _apiRequest = apiRequest;
+    }
 
     /// <summary>
     /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator
@@ -10,11 +14,9 @@ public class BillingClient : BaseClient, IBillingClient
     /// <param name="projectId">Unique identifier of the project for which you want to retrieve outstanding balances</param>
     /// <returns>List of Deepgram balances</returns>
     public async Task<BillingList> GetAllBalancesAsync(string projectId)
-        => await ApiRequest.SendHttpRequestAsync<BillingList>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        => await _apiRequest.SendHttpRequestAsync<BillingList>(
                 HttpMethod.Get,
-                $"projects/{projectId}/balances",
-                Credentials));
+                $"projects/{projectId}/balances");
 
 
     /// <summary>
@@ -24,9 +26,7 @@ public class BillingClient : BaseClient, IBillingClient
     /// <param name="balanceId">Unique identifier of the balance that you want to retrieve</param>
     /// <returns>A Deepgram balance</returns>
     public async Task<Billing> GetBalanceAsync(string projectId, string balanceId) =>
-        await ApiRequest.SendHttpRequestAsync<Billing>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        await _apiRequest.SendHttpRequestAsync<Billing>(
                 HttpMethod.Get,
-                $"projects/{projectId}/balances/{balanceId}",
-                Credentials));
+                $"projects/{projectId}/balances/{balanceId}");
 }

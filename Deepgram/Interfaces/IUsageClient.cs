@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
-using Deepgram.Models;
+﻿namespace Deepgram.Interfaces;
 
-namespace Deepgram.Interfaces;
-
-public interface IUsageClient : IBaseClient
+public interface IUsageClient
 {
     /// <summary>
     /// Generates a list of requests sent to the Deepgram API for the specified project over a given time range. 

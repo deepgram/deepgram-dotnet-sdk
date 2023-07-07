@@ -1,9 +1,13 @@
 ﻿namespace Deepgram.Clients;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>")]
-public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
+public class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
 {
-    public PrerecordedTranscriptionClient(CleanCredentials credentials) : base(credentials) { }
+    internal IApiRequest _apiRequest;
+    internal PrerecordedTranscriptionClient(IApiRequest apiRequest)
+    {
+        _apiRequest = apiRequest;
+    }
     /// <summary>
     /// Submits a request to the Deepgram API to transcribe prerecorded audio
     /// </summary>
@@ -11,13 +15,11 @@ public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscript
     /// <param name="options">Feature options for the transcription</param>
     /// <returns>Transcription of the provided audio</returns>
     public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
-        => await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        => await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                Credentials,
                 source,
-                options));
+                options);
 
     /// <summary>
     /// Submits a request to the Deepgram API to transcribe prerecorded audio
@@ -26,11 +28,9 @@ public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscript
     /// <param name="options">Feature options for the transcription</param>
     /// <returns>Transcription of the provided audio</returns>
     public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
-        => await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
-            RequestMessageBuilder.CreateStreamHttpRequestMessage(
+        => await _apiRequest.SendHttpRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                Credentials,
                 source,
-                options));
+                options);
 }

@@ -1,7 +1,12 @@
 ﻿namespace Deepgram.Clients;
-public class KeyClient : BaseClient, IKeyClient
+public class KeyClient : IKeyClient
 {
-    public KeyClient(CleanCredentials credentials) : base(credentials) { }
+    internal IApiRequest _apiRequest;
+    internal KeyClient(IApiRequest apiRequest)
+    {
+        _apiRequest = apiRequest;
+
+    }
 
     /// <summary>
     /// Returns all Deepgram API keys associated with the project provided
@@ -9,11 +14,9 @@ public class KeyClient : BaseClient, IKeyClient
     /// <param name="projectId">Unique identifier of the project to retrieve keys from</param>
     /// <returns>List of Deepgram API keys</returns>
     public async Task<KeyList> ListKeysAsync(string projectId) =>
-        await ApiRequest.SendHttpRequestAsync<KeyList>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        await _apiRequest.SendHttpRequestAsync<KeyList>(
                 HttpMethod.Get,
-                $"projects/{projectId}/keys",
-                Credentials));
+                $"projects/{projectId}/keys");
 
     /// <summary>
     /// Retrieves the Deepgram key associated with the provided keyId
@@ -22,11 +25,9 @@ public class KeyClient : BaseClient, IKeyClient
     /// <param name="keyId">Unique identifier of the API key to retrieve</param>
     /// <returns>A Deepgram API key</returns>
     public async Task<Key> GetKeyAsync(string projectId, string keyId) =>
-        await ApiRequest.SendHttpRequestAsync<Key>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        await _apiRequest.SendHttpRequestAsync<Key>(
                 HttpMethod.Get,
-                $"projects/{projectId}/keys{keyId}",
-                Credentials));
+                $"projects/{projectId}/keys{keyId}");
 
     /// <summary>
     /// Creates a new Deepgram API key
@@ -57,13 +58,10 @@ public class KeyClient : BaseClient, IKeyClient
             time_to_live_in_seconds = createKeyOptions.TimeToLive;
         }
 
-
-        return await ApiRequest.SendHttpRequestAsync<ApiKey>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        return await _apiRequest.SendHttpRequestAsync<ApiKey>(
                 HttpMethod.Post,
                 $"projects/{projectId}/keys",
-                Credentials,
-                new { comment, scopes, expiration_date, time_to_live_in_seconds, tags }));
+                new { comment, scopes, expiration_date, time_to_live_in_seconds, tags });
     }
 
     /// <summary>
@@ -72,9 +70,7 @@ public class KeyClient : BaseClient, IKeyClient
     /// <param name="projectId">Unique identifier of the project to delete</param>
     /// <param name="keyId">Unique identifier of the API key to delete</param>
     public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId) =>
-        await ApiRequest.SendHttpRequestAsync<MessageResponse>(
-            RequestMessageBuilder.CreateHttpRequestMessage(
+        await _apiRequest.SendHttpRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"projects/{projectId}/keys/{keyId}",
-                Credentials));
+                $"projects/{projectId}/keys/{keyId}");
 }

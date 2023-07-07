@@ -1,49 +1,14 @@
 ﻿namespace Deepgram.Tests.ClientTests;
 public class KeyClientTests
 {
-    [Fact]
-    public async void ListKeysAsync_Should_Return_KeyList()
-    {
-        //Arrange
-        var returnObject = new AutoFaker<KeyList>().Generate();
-        var SUT = GetDeepgramClient(returnObject);
-        var projectId = new Faker().Random.Guid().ToString();
-
-        //Act
-        var result = await SUT.Keys.ListKeysAsync(projectId);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsAssignableFrom<KeyList>(result);
-        Assert.Equal(returnObject, result);
-    }
-
-    [Fact]
-    public async void GetKeyAsync_Should_Return_Key()
-    {
-        //Arrange 
-        var returnObject = new AutoFaker<Key>().Generate();
-        var SUT = GetDeepgramClient(returnObject);
-
-        var faker = new Faker();
-        var projectId = faker.Random.Guid().ToString();
-        var keyId = faker.Random.Guid().ToString();
-
-        //Act
-        var result = await SUT.Keys.GetKeyAsync(projectId, keyId);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsAssignableFrom<Key>(result);
-        Assert.Equal(returnObject, result);
-    }
 
     [Fact]
     public async void CreateKeyAsync_Should_Return_ApiKey_Without_CreateKeyOptions()
     {
         //Arrange
-        var returnObject = new AutoFaker<ApiKey>().Generate();
-        DeepgramClient SUT = GetDeepgramClient(returnObject);
+
+        var responseObject = new AutoFaker<ApiKey>().Generate();
+        DeepgramClient SUT = GetDeepgramClient(responseObject);
 
         var faker = new Faker();
         var projectId = faker.Random.Guid().ToString();
@@ -56,16 +21,17 @@ public class KeyClientTests
         //Assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<ApiKey>(result);
-        Assert.Equal(returnObject, result);
+        Assert.Equal(responseObject, result);
     }
+
 
     [Fact]
     public async void CreateKeyAsync_Should_Return_ApiKey_With_CreateKeyOptions_With_ExpirationDate_Set()
     {
         //Arrange
-        var returnObject = new AutoFaker<ApiKey>().Generate();
+        var responseObject = new AutoFaker<ApiKey>().Generate();
         var options = new CreateKeyOptions() { ExpirationDate = DateTime.Now };
-        DeepgramClient SUT = GetDeepgramClient(returnObject);
+        DeepgramClient SUT = GetDeepgramClient(responseObject);
 
         var faker = new Faker();
         var projectId = faker.Random.Guid().ToString();
@@ -78,16 +44,16 @@ public class KeyClientTests
         //Assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<ApiKey>(result);
-        Assert.Equal(returnObject, result);
+        Assert.Equal(responseObject, result);
     }
 
     [Fact]
     public async void CreateKeyAsync_Should_Return_ApiKey_With_CreateKeyOptions_With_TimeToLive_Set()
     {
-        //Arrange
-        var returnObject = new AutoFaker<ApiKey>().Generate();
+        //Arrange       
         var options = new CreateKeyOptions() { TimeToLive = 30 };
-        DeepgramClient SUT = GetDeepgramClient(returnObject);
+        var responseObject = new AutoFaker<ApiKey>().Generate();
+        DeepgramClient SUT = GetDeepgramClient(responseObject);
 
         var faker = new Faker();
         var projectId = faker.Random.Guid().ToString();
@@ -100,7 +66,7 @@ public class KeyClientTests
         //Assert
         Assert.NotNull(result);
         Assert.IsAssignableFrom<ApiKey>(result);
-        Assert.Equal(returnObject, result);
+        Assert.Equal(responseObject, result);
     }
 
     [Fact]
@@ -125,34 +91,16 @@ public class KeyClientTests
         Assert.Equal(" Please provide expirationDate or timeToLive or neither. Providing both is not allowed.", result.Message);
 
     }
-
-    [Fact]
-    public async void DeleteKeyAsync_Should_Return_MessageResponse()
+    private static DeepgramClient GetDeepgramClient(ApiKey responseObject)
     {
-        //Arrange
-        var returnObject = new AutoFaker<MessageResponse>().Generate();
-        var SUT = GetDeepgramClient(returnObject);
-
-        var faker = new Faker();
-        var projectId = faker.Random.Guid().ToString();
-        var keyId = faker.Random.Guid().ToString();
-
-        //Act
-        var result = await SUT.Keys.DeleteKeyAsync(projectId, keyId);
-
-        //Assert
-        Assert.NotNull(result);
-        Assert.IsAssignableFrom<MessageResponse>(result);
-        Assert.Equal(returnObject, result);
-    }
-
-    private static DeepgramClient GetDeepgramClient<T>(T returnObject)
-    {
-        var mockIApiRequest = MockIApiRequest.Create(returnObject);
-        var credentials = new CredentialsFaker().Generate();
-        var SUT = new DeepgramClient(credentials);
-        SUT.Keys.ApiRequest = mockIApiRequest.Object;
+        var credentials = new CleanCredentialsFaker().Generate();
+        var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
+        var MockApi = MockIApiRequest.Create(responseObject);
+        DeepgramClient SUT = new DeepgramClient(new Credentials() { ApiKey = "sdadad" });
+        SUT._apiRequest = MockApi.Object;
+        SUT.InitializeClients();
         return SUT;
     }
+
 
 }

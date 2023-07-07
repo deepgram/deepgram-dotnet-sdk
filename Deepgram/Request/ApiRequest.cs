@@ -3,15 +3,28 @@
 public class ApiRequest : IApiRequest
 {
     readonly HttpClient _httpClient;
-    public ApiRequest(HttpClient httpClient)
+    readonly CleanCredentials _cleanCredentials;
+    readonly RequestMessageBuilder _messageBuilder;
+    public ApiRequest(HttpClient httpClient, CleanCredentials credentials, RequestMessageBuilder requestMessageBuilder)
     {
         _httpClient = httpClient;
+        _cleanCredentials = credentials;
+        _messageBuilder = requestMessageBuilder;
     }
 
-
-    public async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+    public HttpRequestMessage GetHttpMessage(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
     {
+        var source = body as StreamSource;
+        if (source is StreamSource)
+        {
+            return _messageBuilder.CreateStreamHttpRequestMessage(method, uri, _cleanCredentials, source, queryParameters = null);
+        }
+        return _messageBuilder.CreateHttpRequestMessage(method, uri, _cleanCredentials, body, queryParameters = null);
+    }
 
+    public async Task<T> SendHttpRequestAsync<T>(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
+    {
+        var request = GetHttpMessage(method, uri, body, queryParameters);
         var response = await _httpClient.SendAsync(request);
 
         var stream = await response.Content.ReadAsStreamAsync();
