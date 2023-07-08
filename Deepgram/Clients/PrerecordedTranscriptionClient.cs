@@ -3,8 +3,8 @@
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>")]
 public class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
 {
-    internal IApiRequest _apiRequest;
-    internal PrerecordedTranscriptionClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    internal PrerecordedTranscriptionClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
     }

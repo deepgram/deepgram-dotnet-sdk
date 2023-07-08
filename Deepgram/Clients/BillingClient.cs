@@ -2,8 +2,8 @@
 
 public class BillingClient : IBillingClient
 {
-    internal IApiRequest _apiRequest;
-    internal BillingClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    internal BillingClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
     }

@@ -1,11 +1,10 @@
 ﻿namespace Deepgram.Clients;
 public class KeyClient : IKeyClient
 {
-    internal IApiRequest _apiRequest;
-    internal KeyClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    internal KeyClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
-
     }
 
     /// <summary>

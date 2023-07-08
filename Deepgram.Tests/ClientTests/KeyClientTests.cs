@@ -94,11 +94,11 @@ public class KeyClientTests
     private static DeepgramClient GetDeepgramClient(ApiKey responseObject)
     {
         var credentials = new CleanCredentialsFaker().Generate();
-        var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
-        var MockApi = MockIApiRequest.Create(responseObject);
+        var request = new TestableApiRequest(HttpClientUtil.HttpClient, credentials);
         DeepgramClient SUT = new DeepgramClient(new Credentials() { ApiKey = "sdadad" });
-        SUT._apiRequest = MockApi.Object;
-        SUT.InitializeClients();
+        request.response = responseObject;
+        SUT._apiRequest = request;
+        SUT.Keys = new KeyClient(SUT._apiRequest);
         return SUT;
     }
 

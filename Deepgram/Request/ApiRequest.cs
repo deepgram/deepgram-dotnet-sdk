@@ -1,18 +1,18 @@
 ﻿namespace Deepgram.Request;
 
-public class ApiRequest : IApiRequest
+public class ApiRequest
 {
     readonly HttpClient _httpClient;
     readonly CleanCredentials _cleanCredentials;
     readonly RequestMessageBuilder _messageBuilder;
-    public ApiRequest(HttpClient httpClient, CleanCredentials credentials, RequestMessageBuilder requestMessageBuilder)
+    internal ApiRequest(HttpClient httpClient, CleanCredentials credentials)
     {
         _httpClient = httpClient;
         _cleanCredentials = credentials;
-        _messageBuilder = requestMessageBuilder;
+        _messageBuilder = new RequestMessageBuilder();
     }
 
-    public HttpRequestMessage GetHttpMessage(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
+    internal HttpRequestMessage GetHttpMessage(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
     {
         var source = body as StreamSource;
         if (source is StreamSource)
@@ -22,7 +22,7 @@ public class ApiRequest : IApiRequest
         return _messageBuilder.CreateHttpRequestMessage(method, uri, _cleanCredentials, body, queryParameters = null);
     }
 
-    public async Task<T> SendHttpRequestAsync<T>(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
+    internal virtual async Task<T> SendHttpRequestAsync<T>(HttpMethod method, string uri, object? body = null, object? queryParameters = null)
     {
         var request = GetHttpMessage(method, uri, body, queryParameters);
         var response = await _httpClient.SendAsync(request);
@@ -33,7 +33,6 @@ public class ApiRequest : IApiRequest
         {
             json = await sr.ReadToEndAsync();
         }
-
 
         var deepgramResponse = ProcessResponse(response, json);
 

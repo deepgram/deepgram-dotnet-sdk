@@ -2,8 +2,8 @@
 
 public class UsageClient : IUsageClient
 {
-    internal IApiRequest _apiRequest;
-    public UsageClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    public UsageClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
 

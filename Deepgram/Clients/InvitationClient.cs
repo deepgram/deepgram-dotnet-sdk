@@ -2,8 +2,8 @@
 
 public class InvitationClient : IInvitationClient
 {
-    internal IApiRequest _apiRequest;
-    public InvitationClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    public InvitationClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
     }

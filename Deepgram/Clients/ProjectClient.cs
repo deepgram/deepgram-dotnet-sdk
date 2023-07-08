@@ -2,8 +2,8 @@
 
 public class ProjectClient : IProjectClient
 {
-    internal IApiRequest _apiRequest;
-    public ProjectClient(IApiRequest apiRequest)
+    private ApiRequest _apiRequest;
+    public ProjectClient(ApiRequest apiRequest)
     {
         _apiRequest = apiRequest;
     }
