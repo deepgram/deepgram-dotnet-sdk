@@ -5,6 +5,7 @@ using Deepgram.Common;
 using Deepgram.Keys;
 using Deepgram.Tests.Fakers;
 using Deepgram.Tests.Fakes;
+using Deepgram.Utilities;
 using Xunit;
 
 namespace Deepgram.Tests.ClientTests
@@ -160,14 +161,14 @@ namespace Deepgram.Tests.ClientTests
 
 
 
-        private static DeepgramClient GetDeepgramClient<T>(T returnObject)
+        private static DeepgramClient GetDeepgramClient<T>(T responseObject)
         {
-            var mockIRequestMessageBuilder = MockIRequestMessageBuilder.Create();
-            var mockIApiRequest = MockIApiRequest.Create(returnObject);
-            mockIApiRequest.SetupGet(x => x._requestMessageBuilder).Returns(mockIRequestMessageBuilder.Object);
-            var credentials = new CredentialsFaker().Generate();
-            var SUT = new DeepgramClient(credentials);
-            SUT.Keys.ApiRequest = mockIApiRequest.Object;
+            var credentials = new CleanCredentialsFaker().Generate();
+            var request = new TestableApiRequest(HttpClientUtil.HttpClient, credentials);
+            DeepgramClient SUT = new DeepgramClient(new Credentials() { ApiKey = "sdadad" });
+            request.response = responseObject;
+            SUT._apiRequest = request;
+            SUT.Keys = new KeyClient(SUT._apiRequest);
             return SUT;
         }
 

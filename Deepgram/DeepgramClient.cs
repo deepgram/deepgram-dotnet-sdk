@@ -13,7 +13,7 @@ namespace Deepgram
     public class DeepgramClient
     {
         private CleanCredentials _credentials;
-
+        internal ApiRequest _apiRequest;
         public Credentials Credentials
         {
             get => _credentials.ToCredentials();
@@ -42,12 +42,12 @@ namespace Deepgram
             HttpClientUtil.SetTimeOut(timeout);
 
 
-        public IKeyClient Keys { get; private set; }
-        public IProjectClient Projects { get; private set; }
-        public ITranscriptionClient Transcription { get; private set; }
-        public IUsageClient Usage { get; private set; }
-        public IBillingClient Billing { get; private set; }
-        public IInvitationClient Invitation { get; private set; }
+        public IKeyClient Keys { get; internal set; }
+        public IProjectClient Projects { get; internal set; }
+        public ITranscriptionClient Transcription { get; internal set; }
+        public IUsageClient Usage { get; internal set; }
+        public IBillingClient Billing { get; internal set; }
+        public IInvitationClient Invitation { get; internal set; }
         public ILiveTranscriptionClient CreateLiveTranscriptionClient()
         {
             return new LiveTranscriptionClient(_credentials);
@@ -60,12 +60,13 @@ namespace Deepgram
 
         private void InitializeClients()
         {
-            Keys = new KeyClient(_credentials);
-            Projects = new ProjectClient(_credentials);
-            Transcription = new TranscriptionClient(_credentials);
-            Usage = new UsageClient(_credentials);
-            Billing = new BillingClient(_credentials);
-            Invitation = new InvitationClient(_credentials);
+            _apiRequest = new ApiRequest(HttpClientUtil.HttpClient, _credentials);
+            Keys = new KeyClient(_apiRequest);
+            Projects = new ProjectClient(_apiRequest);
+            Transcription = new TranscriptionClient(_apiRequest);
+            Usage = new UsageClient(_apiRequest);
+            Billing = new BillingClient(_apiRequest);
+            Invitation = new InvitationClient(_apiRequest);
         }
     }
 }

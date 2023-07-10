@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Deepgram.Common;
 
 namespace Deepgram.Transcription
 {
-    public interface IPrerecordedTranscriptionClient : IBaseClient
+    public interface IPrerecordedTranscriptionClient
     {
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio

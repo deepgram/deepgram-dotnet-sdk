@@ -1,26 +1,14 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
-using Deepgram.Request;
+﻿using Deepgram.Request;
 
 namespace Deepgram.Transcription
 {
-    internal class TranscriptionClient: ITranscriptionClient
+    public class TranscriptionClient : ITranscriptionClient
     {
-        private CleanCredentials _credentials;
-
-        public TranscriptionClient(CleanCredentials credentials)
+        public IPrerecordedTranscriptionClient Prerecorded { get; internal set; }
+        public TranscriptionClient(ApiRequest apiRequest)
         {
-            _credentials = credentials;
-            InitializeClients();
+            Prerecorded = new PrerecordedTranscriptionClient(apiRequest);
         }
 
-        public IPrerecordedTranscriptionClient Prerecorded { get; private set; }
-
-        private void InitializeClients()
-        {
-            Prerecorded = new PrerecordedTranscriptionClient(_credentials);
-        }
     }
 }

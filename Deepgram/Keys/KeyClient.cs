@@ -6,9 +6,13 @@ using Deepgram.Request;
 
 namespace Deepgram.Keys
 {
-    public sealed class KeyClient : BaseClient, IKeyClient
+    public sealed class KeyClient : IKeyClient
     {
-        public KeyClient(CleanCredentials credentials) : base(credentials) { }
+        private ApiRequest _apiRequest;
+        public KeyClient(ApiRequest apiRequest)
+        {
+            _apiRequest = apiRequest;
+        }
 
         /// <summary>
         /// Returns all Deepgram API keys associated with the project provided
@@ -17,11 +21,9 @@ namespace Deepgram.Keys
         /// <returns>List of Deepgram API keys</returns>
         public async Task<KeyList> ListKeysAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<KeyList>(
+            return await _apiRequest.DoRequestAsync<KeyList>(
                 HttpMethod.Get,
-                $"projects/{projectId}/keys",
-                Credentials
-            );
+                $"projects/{projectId}/keys");
         }
 
         /// <summary>
@@ -32,11 +34,9 @@ namespace Deepgram.Keys
         /// <returns>A Deepgram API key</returns>
         public async Task<Key> GetKeyAsync(string projectId, string keyId)
         {
-            return await ApiRequest.DoRequestAsync<Key>(
+            return await _apiRequest.DoRequestAsync<Key>(
                 HttpMethod.Get,
-                $"projects/{projectId}/keys/{keyId}",
-                Credentials
-            );
+                $"projects/{projectId}/keys/{keyId}");
         }
 
         /// <summary>
@@ -66,12 +66,10 @@ namespace Deepgram.Keys
                 expiration_date = createKeyOptions.ExpirationDate;
                 time_to_live_in_seconds = createKeyOptions.TimeToLive;
             }
-            return await ApiRequest.DoRequestAsync<ApiKey>(
+            return await _apiRequest.DoRequestAsync<ApiKey>(
                 HttpMethod.Post,
                 $"projects/{projectId}/keys",
-                Credentials,
-                new { comment, scopes, expiration_date, time_to_live_in_seconds, tags }
-            );
+                new { comment, scopes, expiration_date, time_to_live_in_seconds, tags });
         }
 
         /// <summary>
@@ -81,10 +79,9 @@ namespace Deepgram.Keys
         /// <param name="keyId">Unique identifier of the API key to delete</param>
         public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId)
         {
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"projects/{projectId}/keys/{keyId}",
-                Credentials);
+                $"projects/{projectId}/keys/{keyId}");
         }
     }
 }

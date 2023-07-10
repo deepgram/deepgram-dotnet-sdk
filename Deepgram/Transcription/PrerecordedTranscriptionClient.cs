@@ -1,14 +1,17 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Deepgram.Common;
 using Deepgram.Request;
 
 namespace Deepgram.Transcription
 {
-    public sealed class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
+    public sealed class PrerecordedTranscriptionClient : IPrerecordedTranscriptionClient
     {
 
-        public PrerecordedTranscriptionClient(CleanCredentials credentials) : base(credentials) { }
+        private ApiRequest _apiRequest;
+        public PrerecordedTranscriptionClient(ApiRequest apiRequest)
+        {
+            _apiRequest = apiRequest;
+        }
 
         /// <summary>
         /// Submits a request to the Deepgram API to transcribe prerecorded audio
@@ -18,13 +21,11 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
-            return await ApiRequest.DoRequestAsync<PrerecordedTranscription>(
+            return await _apiRequest.DoRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                Credentials,
                 source,
-                options
-                );
+                options);
         }
 
         /// <summary>
@@ -35,10 +36,9 @@ namespace Deepgram.Transcription
         /// <returns>Transcription of the provided audio</returns>
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
-            return await ApiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
+            return await _apiRequest.DoStreamRequestAsync<PrerecordedTranscription>(
                 HttpMethod.Post,
                 "listen",
-                Credentials,
                 source,
                 options);
         }

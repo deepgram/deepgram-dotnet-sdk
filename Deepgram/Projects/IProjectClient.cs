@@ -3,7 +3,7 @@ using Deepgram.Common;
 
 namespace Deepgram.Projects
 {
-    public interface IProjectClient : IBaseClient
+    public interface IProjectClient
     {
 
         /// <summary>

@@ -7,37 +7,37 @@ using Newtonsoft.Json;
 
 namespace Deepgram.Request
 {
-    public class ApiRequest : IApiRequest
+    public class ApiRequest
     {
         readonly HttpClient _httpClient;
-        public IRequestMessageBuilder _requestMessageBuilder { get; set; }
-
-
-        public ApiRequest(HttpClient httpClient)
+        readonly CleanCredentials _cleanCredentials;
+        readonly RequestMessageBuilder _messageBuilder;
+        internal ApiRequest(HttpClient httpClient, CleanCredentials credentials)
         {
             _httpClient = httpClient;
-            _requestMessageBuilder = new RequestMessageBuilder();
+            _cleanCredentials = credentials;
+            _messageBuilder = new RequestMessageBuilder();
         }
 
         const string LOGGER_CATEGORY = "Deepgram.Request.ApiRequest";
 
 
 
-        public async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, object body = null, object queryParameters = null)
+        public async Task<T> DoRequestAsync<T>(HttpMethod method, string uri, object body = null, object queryParameters = null)
         {
-            var req = _requestMessageBuilder.CreateHttpRequestMessage(method, uri, credentials, body, queryParameters);
+            var req = _messageBuilder.CreateHttpRequestMessage(method, uri, _cleanCredentials, body, queryParameters);
 
             return await SendHttpRequestAsync<T>(req);
         }
 
-        public async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, CleanCredentials credentials, StreamSource streamSource, object queryParameters = null)
+        public async Task<T> DoStreamRequestAsync<T>(HttpMethod method, string uri, StreamSource streamSource, object queryParameters = null)
         {
-            var req = _requestMessageBuilder.CreateStreamHttpRequestMessage(method, uri, credentials, streamSource, queryParameters);
+            var req = _messageBuilder.CreateStreamHttpRequestMessage(method, uri, _cleanCredentials, streamSource, queryParameters);
 
             return await SendHttpRequestAsync<T>(req);
         }
 
-        private async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+        internal virtual async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
         {
             var json = (await SendHttpRequestAsync(request)).JsonResponse;
             return JsonConvert.DeserializeObject<T>(json);

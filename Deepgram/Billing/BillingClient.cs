@@ -1,13 +1,16 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Deepgram.Common;
 using Deepgram.Request;
 
 namespace Deepgram.Billing
 {
-    public sealed class BillingClient : BaseClient, IBillingClient
+    public sealed class BillingClient : IBillingClient
     {
-        public BillingClient(CleanCredentials credentials) : base(credentials) { }
+        private ApiRequest _apiRequest;
+        public BillingClient(ApiRequest apiRequest)
+        {
+            _apiRequest = apiRequest;
+        }
 
 
         /// <summary>
@@ -17,11 +20,9 @@ namespace Deepgram.Billing
         /// <returns>List of Deepgram balances</returns>
         public async Task<BillingList> GetAllBalancesAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<BillingList>(
+            return await _apiRequest.DoRequestAsync<BillingList>(
                    HttpMethod.Get,
-                   $"projects/{projectId}/balances",
-                   Credentials
-               );
+                   $"projects/{projectId}/balances");
         }
 
         /// <summary>
@@ -32,11 +33,9 @@ namespace Deepgram.Billing
         /// <returns>A Deepgram balance</returns>
         public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
         {
-            return await ApiRequest.DoRequestAsync<Billing>(
+            return await _apiRequest.DoRequestAsync<Billing>(
                   HttpMethod.Get,
-                  $"projects/{projectId}/balances/{balanceId}",
-                  Credentials
-              );
+                  $"projects/{projectId}/balances/{balanceId}");
         }
     }
 }

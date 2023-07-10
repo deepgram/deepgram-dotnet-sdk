@@ -5,35 +5,34 @@ using Deepgram.Request;
 
 namespace Deepgram.Invitation
 {
-    public sealed class InvitationClient : BaseClient, IInvitationClient
+    public sealed class InvitationClient : IInvitationClient
     {
-        public InvitationClient(CleanCredentials credentials) : base(credentials) { }
+        private ApiRequest _apiRequest;
+        public InvitationClient(ApiRequest apiRequest)
+        {
+            _apiRequest = apiRequest;
+        }
 
 
         public async Task<MessageResponse> DeleteInvitationAsync(string projectId, string email)
         {
-
-            return await ApiRequest.DoRequestAsync<MessageResponse>(
+            return await _apiRequest.DoRequestAsync<MessageResponse>(
                 HttpMethod.Delete,
-                $"projects/{projectId}/invites/{email}",
-                Credentials);
+                $"projects/{projectId}/invites/{email}");
         }
 
         public async Task<InvitationList> ListInvitationsAsync(string projectId)
         {
-            return await ApiRequest.DoRequestAsync<InvitationList>(
+            return await _apiRequest.DoRequestAsync<InvitationList>(
                   HttpMethod.Get,
-                  $"projects/{projectId}/invites",
-                  Credentials
-              );
+                  $"projects/{projectId}/invites");
         }
 
         public async Task<InvitationResponse> SendInvitationAsync(string projectId, InvitationOptions invitationOptions)
         {
-            return await ApiRequest.DoRequestAsync<InvitationResponse>(
+            return await _apiRequest.DoRequestAsync<InvitationResponse>(
           HttpMethod.Post,
           $"projects/{projectId}/invites",
-          Credentials,
           invitationOptions);
 
         }

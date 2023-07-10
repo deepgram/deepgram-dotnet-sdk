@@ -3,7 +3,7 @@ using Deepgram.Common;
 
 namespace Deepgram.Keys
 {
-    public interface IKeyClient : IBaseClient
+    public interface IKeyClient
     {
 
         /// <summary>
