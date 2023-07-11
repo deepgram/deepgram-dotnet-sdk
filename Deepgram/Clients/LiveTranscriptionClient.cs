@@ -67,7 +67,7 @@ internal class LiveTranscriptionClient : ILiveTranscriptionClient, IDisposable
 
         _clientWebSocket = new ClientWebSocket();
         _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_credentials.ApiKey}");
-
+        _clientWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(3);
         _tokenSource = new CancellationTokenSource();
         try
         {
