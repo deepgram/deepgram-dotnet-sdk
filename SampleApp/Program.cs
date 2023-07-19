@@ -5,7 +5,7 @@ namespace SampleApp
 {
     class Program
     {
-        const string API_KEY = "24c13ac94b54bd2345dc5d5a93488de63d7d6531";
+        const string API_KEY = "";
 
         static async Task Main(string[] args)
         {
