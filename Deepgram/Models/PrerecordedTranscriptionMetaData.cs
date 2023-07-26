@@ -40,5 +40,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("channels")]
         public int Channels { get; set; }
+
+        /// <summary>
+        /// Warnings to provide feedback about unsupported and deprecated queries.
+        /// </summary>
+        [JsonProperty("warnings")]
+        public Warning[] Warnings  { get; set; }  
     }
 }
