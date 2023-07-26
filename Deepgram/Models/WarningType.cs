@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Deepgram.Transcription
+namespace Deepgram.Models
 {
     public enum WarningType
 
