@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Deepgram.Transcription
+namespace Deepgram.Models
 {
   public class Warning
   {
