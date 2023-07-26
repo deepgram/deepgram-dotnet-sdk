@@ -235,5 +235,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("sample_rate")]
         public int? SampleRate { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram will include filler words in the transcript.
+        /// </summary>
+        [JsonProperty("filler_words")]
+        public bool? FillerWords { get; set; } = null;
     }
 }

@@ -251,5 +251,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("sentiment_threshold")]
         public decimal? SentimentThreshold { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram will include filler words in the transcript.
+        /// </summary>
+        [JsonProperty("filler_words")]
+        public bool? FillerWords { get; set; } = null;
     }
 }
