@@ -226,5 +226,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("sample_rate")]
         public Nullable<int> SampleRate { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram should detect topics within the provided audio.
+        /// </summary>
+        [JsonProperty("filler_words")]
+        public Nullable<bool> FillerWords { get; set; } = null;
     }
 }

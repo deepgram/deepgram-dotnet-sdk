@@ -242,5 +242,11 @@ namespace Deepgram.Transcription
         /// </summary>
         [JsonProperty("sentiment_threshold")]
         public Nullable<decimal> SentimentThreshold { get; set; } = null;
+
+        /// <summary>
+        /// Indicates whether Deepgram should detect topics within the provided audio.
+        /// </summary>
+        [JsonProperty("filler_words")]
+        public Nullable<bool> FillerWords { get; set; } = null;
     }
 }
