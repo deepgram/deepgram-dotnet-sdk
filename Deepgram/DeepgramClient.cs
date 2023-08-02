@@ -1,106 +1,48 @@
 ﻿using System;
-using Deepgram.Keys;
-using Deepgram.Projects;
-using Deepgram.Request;
-using Deepgram.Transcription;
-using Deepgram.Usage;
+using Deepgram.Clients;
+using Deepgram.Interfaces;
+using Deepgram.Models;
+using Deepgram.Utilities;
 
 namespace Deepgram
 {
     public class DeepgramClient
     {
-        private CleanCredentials _credentials;
+        private Credentials Credentials;
 
-        public Credentials Credentials
-        {
-            get => _credentials.ToCredentials();
-            set
-            {
-                InitializeCredentials(value);
-                InitializeClients();
-            }
-        }
-
-        public DeepgramClient() : this(null)
-        {
-        }
+        public IKeyClient Keys { get; protected set; }
+        public IProjectClient Projects { get; protected set; }
+        public ITranscriptionClient Transcription { get; protected set; }
+        public IUsageClient Usage { get; protected set; }
+        public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
+        public DeepgramClient() : this(null) { }
 
         public DeepgramClient(Credentials credentials)
         {
-            InitializeCredentials(credentials);
-            InitializeClients();
+
+            Initialize(credentials);
         }
 
         /// <summary>
         /// Sets the Timeout of the HTTPClient used to send HTTP requests
         /// </summary>
         /// <param name="timeout">Timespan to wait before the request times out.</param>
-        public void SetHttpClientTimeout(TimeSpan timeout)
+        public void SetHttpClientTimeout(TimeSpan timeout) =>
+            HttpClientUtil.SetTimeOut(timeout);
+
+        private void Initialize(Credentials credentials)
         {
-            Configuration.Instance.Client.Timeout = timeout;
+            Credentials = CredentialsUtil.Clean(credentials);
+            InitializeClients();
         }
 
-        public IKeyClient Keys { get; private set; }
-        public IProjectClient Projects { get; private set; }
-        public ITranscriptionClient Transcription { get; private set; }
-        public IUsageClient Usage { get; private set; }
-
-        public ILiveTranscriptionClient CreateLiveTranscriptionClient()
+        protected void InitializeClients()
         {
-            return new LiveTranscriptionClient(_credentials);
-        }
 
-        private void InitializeCredentials(Credentials credentials = null)
-        {
-            string apiUrl = string.IsNullOrWhiteSpace(credentials?.ApiUrl) ? "" : credentials.ApiUrl;
-            string apiKey = string.IsNullOrWhiteSpace(credentials?.ApiKey) ? "" : credentials.ApiKey;
-            Nullable<bool> requireSSL = credentials?.RequireSSL;
-
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                string possibleApiKey = Configuration.Instance.Settings["appSettings:Deepgram.Api.Key"];
-                if (!string.IsNullOrEmpty(possibleApiKey))
-                {
-                    apiKey = possibleApiKey;
-                }
-                else
-                {
-                    throw new ArgumentException("Deepgram API Key must be provided in constructor or via settings");
-                }
-            }
-            if (string.IsNullOrEmpty(apiUrl))
-            {
-                string possibleUri = Configuration.Instance.Settings["appSettings:Deepgram.Api.Uri"];
-                if (string.IsNullOrEmpty(possibleUri))
-                {
-                    apiUrl = "api.deepgram.com";
-                }
-                else
-                {
-                    apiUrl = possibleUri;
-                }
-            }
-            if (!requireSSL.HasValue)
-            {
-                string possibleRequireSSL = Configuration.Instance.Settings["appSettings:Deepgram.Api.RequireSSL"];
-                if (string.IsNullOrEmpty(possibleRequireSSL))
-                {
-                    requireSSL = true;
-                }
-                else
-                {
-                    requireSSL = Convert.ToBoolean(possibleRequireSSL);
-                }
-            }
-            _credentials = new CleanCredentials(apiKey, apiUrl, requireSSL.Value);
-        }
-
-        private void InitializeClients()
-        {
-            Keys = new KeyClient(_credentials);
-            Projects = new ProjectClient(_credentials);
-            Transcription = new TranscriptionClient(_credentials);
-            Usage = new UsageClient(_credentials);
+            Keys = new KeyClient(Credentials);
+            Projects = new ProjectClient(Credentials);
+            Transcription = new TranscriptionClient(Credentials);
+            Usage = new UsageClient(Credentials);
         }
     }
 }
