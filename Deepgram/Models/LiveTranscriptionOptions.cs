@@ -241,5 +241,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("filler_words")]
         public bool? FillerWords { get; set; } = null;
+
+        /// <summary>
+        /// Allows labeling your requests for the purpose of identification during usage reporting.
+        /// </summary>
+        [JsonProperty("tag")]
+        public string[] Tag { get; set; }
     }
 }
