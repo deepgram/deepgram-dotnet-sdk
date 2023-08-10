@@ -13,11 +13,12 @@ namespace SampleApp
             var deepgramClient = new DeepgramClient(credentials);
             var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
                     new UrlSource("https://static.deepgram.com/examples/nasa-spacewalk-interview.wav"),
-                    new PrerecordedTranscriptionOptions()
-                    {
+                    new PrerecordedTranscriptionOptions(){
                         Tier = "nova",
-                        FillerWords = true
-                    });
+                        FillerWords = true,
+                        Tag = new string[1]{"123"} // add new feature to the sample app
+                    }
+            );
 
             Console.WriteLine(JsonConvert.SerializeObject(response));
         }
