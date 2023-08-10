@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -37,9 +38,15 @@ namespace Deepgram.Clients
         /// <inheritdoc />
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
-            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
+            if (!String.IsNullOrEmpty(options.Callback) && !String.IsNullOrEmpty(callbackUrl))
+            {
+                throw new System.ArgumentException("CallbackUrl is already set in the options object. Please use one or the other.");
+            }
 
-            options.Callback = callbackUrl;
+            if (!String.IsNullOrEmpty(callbackUrl))
+            {
+                options.Callback = callbackUrl;
+            }
 
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
              HttpMethod.Post,
@@ -53,9 +60,14 @@ namespace Deepgram.Clients
         /// <inheritdoc />
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
-            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
+            if (!String.IsNullOrEmpty(options.Callback) && !String.IsNullOrEmpty(callbackUrl))
+            {
+                throw new System.ArgumentException("CallbackUrl is already set in the options object. Please use one or the other.");
+            }
 
-            options.Callback = callbackUrl;
+            if( !String.IsNullOrEmpty(callbackUrl)) {
+                options.Callback = callbackUrl;
+            }
 
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
