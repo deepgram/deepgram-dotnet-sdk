@@ -183,7 +183,7 @@ namespace Deepgram.Clients
         /// Sends a binary message over the websocket connection.
         /// </summary>
         /// <param name="data">The data to be sent over the websocket.</param>
-        public void SendData(byte[] data)
+        public virtual void SendData(byte[] data)
         {
             EnqueueForSending(new MessageToSend(data));
         }
