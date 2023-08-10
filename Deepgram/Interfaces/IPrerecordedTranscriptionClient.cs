@@ -20,5 +20,9 @@ namespace Deepgram.Interfaces
         /// <param name="options">Feature options for the transcription</param>
         /// <returns>Transcription of the provided audio</returns>
         Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options);
+
+        Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options);
+
+        Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options);
     }
 }

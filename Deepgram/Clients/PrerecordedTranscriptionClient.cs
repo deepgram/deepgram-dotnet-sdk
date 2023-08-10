@@ -18,10 +18,10 @@ namespace Deepgram.Clients
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
-                "listen",
-                Credentials,
-                source,
-                options);
+               "listen",
+               Credentials,
+               source,
+               options);
 
             return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
@@ -36,12 +36,38 @@ namespace Deepgram.Clients
         {
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
-              "listen",
-              Credentials,
-              source,
-              options);
+             "listen",
+             Credentials,
+             source,
+             options);
 
             return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+        }
+
+        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
+        {
+            options.Callback = callbackUrl;
+
+            var req = RequestMessageBuilder.CreateHttpRequestMessage(
+             HttpMethod.Post,
+             "listen",
+             Credentials,
+             source,
+             options);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req);
+        }
+
+        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
+        {
+            options.Callback = callbackUrl;
+
+            var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
+             HttpMethod.Post,
+             "listen",
+             Credentials,
+             source,
+             options);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req);
         }
     }
 }
