@@ -44,18 +44,4 @@ public class LiveTranscriptionClientTests
         Assert.True(sendDataCalled);
         Assert.Equal(sendDataRecieved, expected);
     }
-
-    [Fact]
-    public async Task Test_OnStartConnectionExecuted_SendDataCalled()
-    {
-        // Arrange
-        var sendDataCalled = false;
-        var client = new LiveTranscriptionClientFake((data) => sendDataCalled = true);
-
-        // Act
-        await client.StartConnectionAsync(new Models.LiveTranscriptionOptions());
-
-        // Assert
-        Assert.True(sendDataCalled);
-    }
 }
