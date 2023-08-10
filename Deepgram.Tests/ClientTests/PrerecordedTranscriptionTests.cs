@@ -170,7 +170,7 @@ namespace Deepgram.Tests.ClientTests
 
             // Act
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await SUT.Transcription.Prerecorded.GetTranscriptionAsync(new UrlSource(_faker.Internet.Url()),
+                await SUT.Transcription.Prerecorded.GetTranscriptionAsync(_urlSource,
                     null, _prerecordedTranscriptionOptions));
 
             // Assert
