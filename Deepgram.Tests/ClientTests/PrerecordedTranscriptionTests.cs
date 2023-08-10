@@ -8,7 +8,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System;
 using Xunit;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
 namespace Deepgram.Tests.ClientTests
 {
@@ -25,7 +24,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async void GetTransaction_Should_Return_PrerecordedTranscription_When_UrlSource_Present()
+        public async Task GetTransaction_Should_Return_PrerecordedTranscription_When_UrlSource_Present()
         {
             //Arrange 
             var fakePrecordedTranscription = new AutoFaker<PrerecordedTranscription>().Generate();
@@ -42,7 +41,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async void GetTransaction_Should_Return_PrerecordedTranscription_When_StreamSource_Present()
+        public async Task GetTransaction_Should_Return_PrerecordedTranscription_When_StreamSource_Present()
         {
             //Arrange 
             var fakePrecordedTranscription = new AutoFaker<PrerecordedTranscription>().Generate();
@@ -60,7 +59,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async void Should_Return_A_Summary_Short_When_Summarize_Set_To_v2()
+        public async Task Should_Return_A_Summary_Short_When_Summarize_Set_To_v2()
         {
             //Arrange
             var responseObject = new AutoFaker<PrerecordedTranscription>().Generate();
@@ -83,12 +82,10 @@ namespace Deepgram.Tests.ClientTests
 
         }
 
-
-
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async void Should_Return_A_Summary_Short_When_Summarize_Set_To_bool(bool value)
+        public async Task Should_Return_A_Summary_Short_When_Summarize_Set_To_bool(bool value)
         {
             //Arrange
             var responseObject = new AutoFaker<PrerecordedTranscription>().Generate();

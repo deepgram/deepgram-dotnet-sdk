@@ -8,12 +8,7 @@ namespace Deepgram.Clients
     public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
     {
         public PrerecordedTranscriptionClient(Credentials credentials) : base(credentials) { }
-        /// <summary>
-        /// Submits a request to the Deepgram API to transcribe prerecorded audio
-        /// </summary>
-        /// <param name="source">Url source to send for transcription</param>
-        /// <param name="options">Feature options for the transcription</param>
-        /// <returns>Transcription of the provided audio</returns>
+        /// <inheritdoc />
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
@@ -26,12 +21,7 @@ namespace Deepgram.Clients
             return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
 
-        /// <summary>
-        /// Submits a request to the Deepgram API to transcribe prerecorded audio
-        /// </summary>
-        /// <param name="source">Audio source to send for transcription</param>
-        /// <param name="options">Feature options for the transcription</param>
-        /// <returns>Transcription of the provided audio</returns>
+        /// <inheritdoc />
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
@@ -44,6 +34,7 @@ namespace Deepgram.Clients
             return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
         }
 
+        /// <inheritdoc />
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
             _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
@@ -59,6 +50,7 @@ namespace Deepgram.Clients
             return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req);
         }
 
+        /// <inheritdoc />
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
             _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
