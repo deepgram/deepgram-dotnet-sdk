@@ -29,6 +29,7 @@ namespace Deepgram.Tests.ClientTests
             //Arrange 
             var fakePrecordedTranscription = new AutoFaker<PrerecordedTranscription>().Generate();
             var SUT = GetDeepgramClient(fakePrecordedTranscription);
+            _prerecordedTranscriptionOptions.Callback = null;
 
             //Act
             var result = await SUT.Transcription.Prerecorded.GetTranscriptionAsync(_urlSource, _prerecordedTranscriptionOptions);
@@ -47,6 +48,7 @@ namespace Deepgram.Tests.ClientTests
             var fakePrecordedTranscription = new AutoFaker<PrerecordedTranscription>().Generate();
             var SUT = GetDeepgramClient(fakePrecordedTranscription);
             var fakeStreamSource = new StreamSourceFaker().Generate();
+            _prerecordedTranscriptionOptions.Callback = null;
 
             //Act
             var result = await SUT.Transcription.Prerecorded.GetTranscriptionAsync(fakeStreamSource, _prerecordedTranscriptionOptions);
@@ -112,6 +114,8 @@ namespace Deepgram.Tests.ClientTests
             //Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
             responseObject.RequestId = Guid.NewGuid();
+            _prerecordedTranscriptionOptions.Callback = null;
+
             var SUT = GetDeepgramClient(responseObject);
 
             // Act
@@ -127,13 +131,15 @@ namespace Deepgram.Tests.ClientTests
         {
             // Arrange
             var responseObject = new AutoFaker<string>().Generate();
+            _prerecordedTranscriptionOptions.Callback = null;
+
             var SUT = GetDeepgramClient(responseObject);
 
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await SUT.Transcription.Prerecorded.GetTranscriptionAsync(_urlSource,
                     null, _prerecordedTranscriptionOptions));
 
-            Assert.Matches("Callback is required", exception.Message);
+            Assert.Matches("CallbackUrl is required for this call. Please set the callbackUrl parameter or the callbackUrl property in the options object.", exception.Message);
         }
 
         [Fact]
@@ -142,6 +148,7 @@ namespace Deepgram.Tests.ClientTests
             // Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
             responseObject.RequestId = Guid.NewGuid();
+            _prerecordedTranscriptionOptions.Callback = null;
 
             var SUT = GetDeepgramClient(responseObject);
 
@@ -161,6 +168,8 @@ namespace Deepgram.Tests.ClientTests
             // Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
             responseObject.RequestId = Guid.NewGuid();
+            _prerecordedTranscriptionOptions.Callback = null;
+
             var httpClient = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
 
             var SUT = GetDeepgramClient(responseObject);
@@ -169,12 +178,12 @@ namespace Deepgram.Tests.ClientTests
             using var stream = new MemoryStream(_faker.Random.Bytes(100));
 
             // Act
-            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await SUT.Transcription.Prerecorded.GetTranscriptionAsync(_urlSource,
                     null, _prerecordedTranscriptionOptions));
 
             // Assert
-            Assert.Matches("Callback is required", exception.Message);
+            Assert.Matches("CallbackUrl is required for this call. Please set the callbackUrl parameter or the callbackUrl property in the options object.", exception.Message);
         }
 
         private static DeepgramClient GetDeepgramClient<T>(T returnObject)

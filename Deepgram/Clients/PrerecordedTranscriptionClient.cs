@@ -12,6 +12,11 @@ namespace Deepgram.Clients
         /// <inheritdoc />
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {
+            if (!String.IsNullOrEmpty(options.Callback))
+            {
+                throw new InvalidOperationException("CallbackUrl is not allowed to be set in this call. Please use method overload with callback parameter.");
+            }
+
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
                "listen",
@@ -25,6 +30,11 @@ namespace Deepgram.Clients
         /// <inheritdoc />
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
         {
+            if(!String.IsNullOrEmpty(options.Callback))
+            {
+                throw new InvalidOperationException("CallbackUrl is not allowed to be set in this call. Please use method overload with callback parameter.");
+            }
+
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
              "listen",
@@ -48,6 +58,8 @@ namespace Deepgram.Clients
                 options.Callback = callbackUrl;
             }
 
+            _ = options.Callback ?? throw new System.ArgumentException("CallbackUrl is required for this call. Please set the callbackUrl parameter or the callbackUrl property in the options object.");
+
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
              HttpMethod.Post,
              "listen",
@@ -68,6 +80,9 @@ namespace Deepgram.Clients
             if( !String.IsNullOrEmpty(callbackUrl)) {
                 options.Callback = callbackUrl;
             }
+
+            _ = options.Callback ?? throw new System.ArgumentException("CallbackUrl is required for this call. Please set the callbackUrl parameter or the callbackUrl property in the options object.");
+
 
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
