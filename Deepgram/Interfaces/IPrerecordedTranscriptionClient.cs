@@ -22,7 +22,7 @@ namespace Deepgram.Interfaces
         Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options);
 
         /// <summary>
-        /// asynchronously submits a request to the Deepgram API to transcribe prerecorded audio
+        /// Asynchronously submits a request to the Deepgram API to transcribe prerecorded audio
         /// </summary>
         /// <param name="source">Url source to send for transcription</param>
         /// <param name="callbackUrl">Url to send the transcription results to</param>
@@ -31,7 +31,7 @@ namespace Deepgram.Interfaces
         Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options);
 
         /// <summary>
-        /// asynchronously submits a request to the Deepgram API to transcribe prerecorded audio
+        /// Asynchronously submits a request to the Deepgram API to transcribe prerecorded audio
         /// </summary>
         /// <param name="source">Audio source to send for transcription</param>
         /// <param name="callbackUrl">Url to send the transcription results to</param>
