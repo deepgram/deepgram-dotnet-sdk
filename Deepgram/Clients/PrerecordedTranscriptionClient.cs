@@ -46,7 +46,7 @@ namespace Deepgram.Clients
 
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
-            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl));
+            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
 
             options.Callback = callbackUrl;
 
@@ -61,7 +61,7 @@ namespace Deepgram.Clients
 
         public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
         {
-            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl));
+            _ = callbackUrl ?? throw new System.ArgumentNullException(nameof(callbackUrl), "Callback is required");
 
             options.Callback = callbackUrl;
 

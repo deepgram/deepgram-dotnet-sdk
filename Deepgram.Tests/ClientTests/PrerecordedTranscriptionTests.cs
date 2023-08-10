@@ -132,7 +132,7 @@ namespace Deepgram.Tests.ClientTests
             var responseObject = new AutoFaker<string>().Generate();
             var SUT = GetDeepgramClient(responseObject);
 
-            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await SUT.Transcription.Prerecorded.GetTranscriptionAsync(new UrlSource(_faker.Internet.Url()),
                     null, _prerecordedTranscriptionOptions));
 
@@ -172,7 +172,7 @@ namespace Deepgram.Tests.ClientTests
             using var stream = new MemoryStream(_faker.Random.Bytes(100));
 
             // Act
-            var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            var exception = await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await SUT.Transcription.Prerecorded.GetTranscriptionAsync(new UrlSource(_faker.Internet.Url()),
                     null, _prerecordedTranscriptionOptions));
 
