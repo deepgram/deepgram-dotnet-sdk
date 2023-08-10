@@ -107,7 +107,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async Task GetTranscriptionFromUrlWithCallbackAsyncShouldMakeRequestWithCallbackReturnRequestId()
+        public async Task Should_Return_RequestId_When_Async_Transcription_From_Url_Requested()
         {
             //Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
@@ -123,7 +123,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async Task GetTranscriptionFromUrlWithCallbackAsyncShouldThrowWhenNoCallbackProvided()
+        public async Task Should_Throw_When_Async_Transcription_From_Url_Has_No_Callback()
         {
             // Arrange
             var responseObject = new AutoFaker<string>().Generate();
@@ -137,7 +137,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async Task GetTranscriptionFromStreamWithCallbackAsyncShouldMakeRequestWithCallbackReturnRequestId()
+        public async Task Should_Return_RequestId_When_Async_Transcription_From_Stream_Requested()
         {
             // Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
@@ -156,7 +156,7 @@ namespace Deepgram.Tests.ClientTests
         }
 
         [Fact]
-        public async Task GetTranscriptionFromStreamWithCallbackAsyncShouldThrowWhenNoCallbackProvided()
+        public async Task Should_Throw_When_Async_Transcription_From_Stream_Has_No_Callback()
         {
             // Arrange
             var responseObject = new AutoFaker<PrerecordedTranscriptionCallbackResult>().Generate();
