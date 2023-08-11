@@ -1,10 +1,4 @@
-﻿using System;
-using Deepgram.Clients;
-using Deepgram.Interfaces;
-using Deepgram.Tests.Fakers;
-using Deepgram.Utilities;
-using Xunit;
-
+﻿
 namespace Deepgram.Tests.ClientTests
 {
     public class DeepClientTests

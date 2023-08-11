@@ -1,21 +1,19 @@
-﻿using System.Net.Http;
-using Deepgram.Interfaces;
-using Deepgram.Models;
-using Moq;
+﻿using Deepgram.Models;
+
 
 namespace Deepgram.Tests.Fakes
 {
     public class MockIRequestMessageBuilder
     {
-        public static Mock<IRequestMessageBuilder> Create()
+        public static IRequestMessageBuilder Create()
         {
-            var mockRequestMessageBuilder = new Mock<IRequestMessageBuilder>();
-            mockRequestMessageBuilder.Setup(x => x.CreateHttpRequestMessage(
-                It.IsAny<HttpMethod>(),
-                It.IsAny<string>(),
-                It.IsAny<Credentials>(),
-                It.IsAny<object>(),
-                It.IsAny<object>())).Returns(new HttpRequestMessage());
+            var mockRequestMessageBuilder = Substitute.For<IRequestMessageBuilder>();
+            mockRequestMessageBuilder.CreateHttpRequestMessage(
+                Arg.Any<HttpMethod>(),
+                Arg.Any<string>(),
+                Arg.Any<Credentials>(),
+                Arg.Any<object>(),
+                Arg.Any<object>()).Returns(new HttpRequestMessage());
             return mockRequestMessageBuilder;
         }
     }
