@@ -1,10 +1,6 @@
-﻿using System;
-using AutoBogus;
-using Bogus;
+﻿using AutoBogus;
 using Deepgram.Models;
-using Deepgram.Tests.Fakers;
 using Deepgram.Tests.Fakes;
-using Xunit;
 
 namespace Deepgram.Tests.ClientTests
 {
@@ -94,8 +90,8 @@ namespace Deepgram.Tests.ClientTests
             var mockIApiRequest = MockIApiRequest.Create(returnObject);
             var credentials = new CredentialsFaker().Generate();
             var SUT = new DeepgramClient(credentials);
-            SUT.Keys.ApiRequest = mockIApiRequest.Object;
-            SUT.Keys.RequestMessageBuilder = mockIRequestMessageBuilder.Object;
+            SUT.Keys.ApiRequest = mockIApiRequest;
+            SUT.Keys.RequestMessageBuilder = mockIRequestMessageBuilder;
             return SUT;
         }
 

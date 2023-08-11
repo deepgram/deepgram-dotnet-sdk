@@ -15,7 +15,7 @@ namespace Deepgram.Tests.RequestTests
         {
             //Arrange
             var responseObject = new AutoFaker<Project>().Generate();
-            var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
+            var client = MockHttpClient.CreateHttpClientWithResult(responseObject);
             var SUT = new ApiRequest(client);
 
             //Act
