@@ -91,7 +91,6 @@ namespace Deepgram.Tests.ClientTests
             var responseObject = new AutoFaker<PrerecordedTranscription>().Generate();
             var SUT = GetDeepgramClient(responseObject);
             responseObject.Results.Summary.Short = null;
-            var client = MockHttpClient.CreateHttpClientWithResult(responseObject);
             var fakeOptions = new PrerecordedTranscriptionOptions()
             {
                 Summarize = value
@@ -169,7 +168,7 @@ namespace Deepgram.Tests.ClientTests
             responseObject.RequestId = Guid.NewGuid();
             _prerecordedTranscriptionOptions.Callback = null;
 
-            var httpClient = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
+            var httpClient = MockHttpClient.CreateHttpClientWithResult(responseObject);
 
             var SUT = GetDeepgramClient(responseObject);
             SUT.Transcription.Prerecorded.ApiRequest = new ApiRequest(httpClient);
