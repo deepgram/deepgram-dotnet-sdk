@@ -66,7 +66,7 @@ namespace Deepgram.Tests.UtilitiesTests
 
             //Assert
             Assert.NotNull(result);
-            Assert.Contains($"utt_split={prerecordedTranscriptionOptions.UtteranceSplit}", result);
+            Assert.Contains($"utt_split={System.Web.HttpUtility.UrlEncode(prerecordedTranscriptionOptions.UtteranceSplit.ToString())}", result);
         }
 
         [Fact]

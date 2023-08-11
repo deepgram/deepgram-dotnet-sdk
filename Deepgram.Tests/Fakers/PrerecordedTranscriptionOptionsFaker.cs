@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using AutoBogus;
-using Bogus.Extensions;
 using Deepgram.Models;
+using Bogus.Extensions;
+
 namespace Deepgram.Tests.Fakers
 {
     public class PrerecordedTranscriptionOptionsFaker : AutoFaker<PrerecordedTranscriptionOptions>

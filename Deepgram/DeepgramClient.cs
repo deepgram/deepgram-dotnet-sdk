@@ -19,7 +19,6 @@ namespace Deepgram
 
         public DeepgramClient(Credentials credentials)
         {
-
             Initialize(credentials);
         }
 
