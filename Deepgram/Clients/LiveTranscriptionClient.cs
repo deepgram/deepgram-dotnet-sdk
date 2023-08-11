@@ -170,11 +170,20 @@ namespace Deepgram.Clients
             await _clientWebSocket.SendAsync(new ArraySegment<byte>(Array.Empty<byte>()), WebSocketMessageType.Binary, true, CancellationToken.None).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
+        public void KeepAlive()
+        {
+            var keepAliveMessage = JsonConvert.SerializeObject(new { type = "KeepAlive" });
+            var keepAliveBytes = Encoding.Default.GetBytes(keepAliveMessage);
+
+            SendData(keepAliveBytes);
+        }
+
         /// <summary>
         /// Sends a binary message over the websocket connection.
         /// </summary>
         /// <param name="data">The data to be sent over the websocket.</param>
-        public void SendData(byte[] data)
+        public virtual void SendData(byte[] data)
         {
             EnqueueForSending(new MessageToSend(data));
         }

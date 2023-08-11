@@ -55,6 +55,12 @@ namespace Deepgram.Interfaces
         Task StopConnectionAsync();
 
         /// <summary>
+        /// Keeps the connection alive even if no audio has been sent before the timeout
+        /// </summary>
+        /// <returns>The task object representing the asynchronous operation.</returns>
+        void KeepAlive();
+
+        /// <summary>
         /// Sends audio data to the Deepgram API for transcription
         /// </summary>
         /// <param name="data">Byte array of the audio to be sent.</param>
