@@ -1,8 +1,6 @@
 ﻿using AutoBogus;
-using Bogus;
 using Deepgram.Models;
 using Deepgram.Request;
-using Deepgram.Tests.Fakers;
 using Deepgram.Tests.Fakes;
 using System.IO;
 using System.Threading.Tasks;
@@ -68,7 +66,7 @@ namespace Deepgram.Tests.ClientTests
             var SUT = GetDeepgramClient(responseObject);
 
             responseObject.Results.Summary.Short = "This is a test summary";
-            var client = FakeHttpMessageHandler.CreateHttpClientWithResult(responseObject);
+            var client = MockHttpClient.CreateHttpClientWithResult(responseObject);
             var fakeOptions = new PrerecordedTranscriptionOptions()
             {
                 Summarize = "v2"
@@ -93,6 +91,7 @@ namespace Deepgram.Tests.ClientTests
             var responseObject = new AutoFaker<PrerecordedTranscription>().Generate();
             var SUT = GetDeepgramClient(responseObject);
             responseObject.Results.Summary.Short = null;
+            var client = MockHttpClient.CreateHttpClientWithResult(responseObject);
             var fakeOptions = new PrerecordedTranscriptionOptions()
             {
                 Summarize = value
@@ -192,8 +191,8 @@ namespace Deepgram.Tests.ClientTests
             var mockIApiRequest = MockIApiRequest.Create(returnObject);
             var credentials = new CredentialsFaker().Generate();
             var SUT = new DeepgramClient(credentials);
-            SUT.Transcription.Prerecorded.ApiRequest = mockIApiRequest.Object;
-            SUT.Transcription.Prerecorded.RequestMessageBuilder = mockIRequestMessageBuilder.Object;
+            SUT.Transcription.Prerecorded.ApiRequest = mockIApiRequest;
+            SUT.Transcription.Prerecorded.RequestMessageBuilder = mockIRequestMessageBuilder;
             return SUT;
         }
     }
