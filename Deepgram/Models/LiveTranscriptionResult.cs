@@ -44,5 +44,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("channel")]
         public Channel Channel { get; set; }
+
+        /// <summary>
+        /// Allows labeling your requests for the purpose of identification during usage reporting.
+        /// </summary>
+        [JsonProperty("tags")]
+        public string[] Tags { get; set; }
     }
 }
