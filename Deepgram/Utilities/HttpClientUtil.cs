@@ -27,8 +27,17 @@ namespace Deepgram.Utilities
         /// sets timeout on the httpclient
         /// </summary>
         /// <param name="timeSpan"></param>
-        public static void SetTimeOut(TimeSpan timeSpan) =>
-          HttpClient.Timeout = timeSpan;
+        public static void SetTimeOut(TimeSpan timeSpan)
+        {
+            // If the timeout has a new value, create a new HttpClient
+            if (HttpClient.Timeout != timeSpan)
+            {
+                HttpClient = Create();
+            }
+
+            // Set the timeout
+            HttpClient.Timeout = timeSpan;
+        }
 
 
     }
