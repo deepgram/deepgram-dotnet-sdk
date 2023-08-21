@@ -3,12 +3,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
     public class PrerecordedTranscriptionClient : BaseClient, IPrerecordedTranscriptionClient
     {
-        public PrerecordedTranscriptionClient(Credentials credentials) : base(credentials) { }
+        public PrerecordedTranscriptionClient(Credentials credentials, HttpClientUtil httpClientUtil)
+            : base(credentials, httpClientUtil) { }
+
         /// <inheritdoc />
         public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
         {

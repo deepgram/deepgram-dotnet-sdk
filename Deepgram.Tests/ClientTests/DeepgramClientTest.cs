@@ -54,13 +54,13 @@ namespace Deepgram.Tests.ClientTests
         [InlineData(30)]
         public void Should_Set_TimeOut_On_HttpClient(double timeSpan)
         {
-
             //Arrange
-            var SUT = new DeepgramClient(new CredentialsFaker().Generate());
+            var httpClientUtil = new HttpClientUtil();
+            var SUT = new DeepgramClient(new CredentialsFaker().Generate(), httpClientUtil);
 
             //Act
             SUT.SetHttpClientTimeout(TimeSpan.FromSeconds(timeSpan));
-            var httpClient = HttpClientUtil.HttpClient;
+            var httpClient = httpClientUtil.HttpClient;
 
             //Assert
             Assert.NotNull(httpClient);

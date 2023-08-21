@@ -2,14 +2,14 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Utilities;
+
 namespace Deepgram.Clients
 {
     public class KeyClient : BaseClient, IKeyClient
     {
-        public KeyClient(Credentials credentials) : base(credentials)
-        {
-        }
-
+        public KeyClient(Credentials credentials, HttpClientUtil httpClientUtil)
+            : base(credentials, httpClientUtil) { }
 
         /// <summary>
         /// Returns all Deepgram API keys associated with the project provided

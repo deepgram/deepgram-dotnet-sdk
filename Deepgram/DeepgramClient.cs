@@ -6,7 +6,7 @@ using Deepgram.Utilities;
 
 namespace Deepgram
 {
-    public class DeepgramClient
+    public class DeepgramClient : BaseClient
     {
         private Credentials Credentials;
 
@@ -17,7 +17,16 @@ namespace Deepgram
         public ILiveTranscriptionClient CreateLiveTranscriptionClient() => new LiveTranscriptionClient(Credentials);
         public DeepgramClient() : this(null) { }
 
-        public DeepgramClient(Credentials credentials)
+        public DeepgramClient(Credentials credentials) : this(credentials, new HttpClientUtil()) { }
+
+        /// <summary>
+        /// Only directly called by unit tests,
+        /// but indirectly called by the other constructors.
+        /// </summary>
+        /// <param name="credentials">Credentials to pass for access to the deepgram services</param>
+        /// <param name="httpClientUtil">The instance to get the HttpClient from</param>
+        internal DeepgramClient(Credentials credentials, HttpClientUtil httpClientUtil)
+            : base(credentials, httpClientUtil)
         {
             Initialize(credentials);
         }
@@ -37,11 +46,10 @@ namespace Deepgram
 
         protected void InitializeClients()
         {
-
-            Keys = new KeyClient(Credentials);
-            Projects = new ProjectClient(Credentials);
-            Transcription = new TranscriptionClient(Credentials);
-            Usage = new UsageClient(Credentials);
+            Keys = new KeyClient(Credentials, HttpClientUtil);
+            Projects = new ProjectClient(Credentials, HttpClientUtil);
+            Transcription = new TranscriptionClient(Credentials, HttpClientUtil);
+            Usage = new UsageClient(Credentials, HttpClientUtil);
         }
     }
 }
