@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ["3.1.x", "5.0.x", "6.0.x", "7.0.x"]
+        dotnet-version: ["6.0.x", "7.0.x"]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,8 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Build
+        run: dotnet build Deepgram.sln --configuration Release --no-restore
+      - name: Pack
         run: |
           dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
       - name: Archive build artifacts
