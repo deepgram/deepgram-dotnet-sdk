@@ -9,12 +9,12 @@ namespace Deepgram.Tests.UtilitiesTests
         [Fact]
         public void GetUserAgent_Should_Return_HttpClient_With_Accept_And_UserAgent_Headers_Set()
         {
-            //Arrange 
+            //Arrange
+            var httpClientUtil = new HttpClientUtil();
             var agent = UserAgentUtil.GetUserAgent();
 
             //Act
-            var result = HttpClientUtil.HttpClient;
-
+            var result = httpClientUtil.HttpClient;
 
             //Assert
             Assert.NotNull(result);

@@ -1,5 +1,6 @@
 ﻿using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
@@ -7,9 +8,9 @@ namespace Deepgram.Clients
     {
         public IPrerecordedTranscriptionClient Prerecorded { get; protected set; }
 
-        public TranscriptionClient(Credentials credentials)
+        public TranscriptionClient(Credentials credentials, HttpClientUtil httpClientUtil)
         {
-            Prerecorded = new PrerecordedTranscriptionClient(credentials);
+            Prerecorded = new PrerecordedTranscriptionClient(credentials, httpClientUtil);
         }
 
 

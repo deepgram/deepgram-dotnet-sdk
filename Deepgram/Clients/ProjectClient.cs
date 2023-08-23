@@ -2,12 +2,15 @@
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
     public class ProjectClient : BaseClient, IProjectClient
     {
-        public ProjectClient(Credentials credentials) : base(credentials) { }
+        public ProjectClient(Credentials credentials, HttpClientUtil httpClientUtil)
+            : base(credentials, httpClientUtil) { }
+
         /// <summary>
         /// Returns all Deepgram projects
         /// </summary>

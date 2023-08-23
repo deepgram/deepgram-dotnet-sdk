@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using Deepgram.Models;
 using Deepgram.Request;
+using Deepgram.Utilities;
 
 namespace Deepgram.Clients
 {
     public class BillingClient : BaseClient
     {
-        public BillingClient(Credentials credentials) : base(credentials) { }
+        public BillingClient(Credentials credentials, HttpClientUtil httpClientUtil)
+            : base(credentials, httpClientUtil) { }
 
         /// <summary>
         /// Generates a list of outstanding balances for the specified project. To see balances, the authenticated account must be a project owner or administrator
