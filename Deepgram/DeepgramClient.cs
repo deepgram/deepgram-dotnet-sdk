@@ -8,8 +8,6 @@ namespace Deepgram
 {
     public class DeepgramClient : BaseClient
     {
-        private Credentials Credentials;
-
         public IKeyClient Keys { get; protected set; }
         public IProjectClient Projects { get; protected set; }
         public ITranscriptionClient Transcription { get; protected set; }
