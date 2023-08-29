@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -15,7 +14,6 @@
     <PackageId>Deepgram</PackageId>
     <Title>Deepgram.NET</Title>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\extras\dg_logo.png">
       <Pack>True</Pack>
@@ -27,13 +25,11 @@
     </None>
     <None Include="D:\Sources\deepgram\deepgram-dotnet-sdk\Deepgram\.editorconfig" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Threading.Channels" Version="7.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <EditorConfigFiles Remove="D:\Sources\deepgram\deepgram-dotnet-sdk\Deepgram\.editorconfig" />
   </ItemGroup>
@@ -42,4 +38,8 @@
       <_Parameter1>Deepgram.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+  <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 and '$(IsCrossTargetingBuild)' == 'true'">
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
+    <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory=".." />
+  </Target>
 </Project>
