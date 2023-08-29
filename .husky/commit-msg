@@ -1,3 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 dotnet husky run --name "commit-message-linter" --args "$1"
+
+echo

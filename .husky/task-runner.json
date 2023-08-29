@@ -6,7 +6,7 @@
             "args": [
                 "husky",
                 "exec",
-                ".husky/csx/commit-lint.csx",
+                ".husky/commit-lint.csx",
                 "--args",
                 "${args}"
             ]
