@@ -52,6 +52,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
       * [GetUsageFieldsOptions](#getusagefieldsoptions)
   * [Logging](#logging)
   * [Development and Contributing](#development-and-contributing)
+  * [Testing](#testing)
   * [Getting Help](#getting-help)
 
 # Getting an API Key
