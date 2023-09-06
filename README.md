@@ -50,9 +50,10 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
       * [GetUsageSummaryOptions](#getusagesummaryoptions)
   * [Get Fields](#get-fields)
       * [GetUsageFieldsOptions](#getusagefieldsoptions)
-  * [Logging](#logging)
-  * [Development and Contributing](#development-and-contributing)
-  * [Getting Help](#getting-help)
+* [Logging](#logging)
+* [Development and Contributing](#development-and-contributing)
+* [Testing](#testing)
+* [Getting Help](#getting-help)
 
 # Getting an API Key
 
@@ -83,8 +84,6 @@ Right click on project and select manage nuget packages
 
 - 7.0.x
 - 6.0.x
-- 5.0.x
-- .NET Core 3.1
 
 # Configuration
 
@@ -102,13 +101,15 @@ var deepgramClient = new DeepgramClient(credentials);
 ## Remote Files
 
 ```csharp
+using Deepgram.Models;
+
 var credentials = new Credentials(DEEPGRAM_API_KEY);
 
 var deepgramClient = new DeepgramClient(credentials);
 
 var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-    new Deepgram.Transcription.UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-    new Deepgram.Transcription.PrerecordedTranscriptionOptions()
+    new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
+    new PrerecordedTranscriptionOptions()
     {
         Punctuate = true
     });
@@ -123,6 +124,8 @@ var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAs
 ## Local files
 
 ```csharp
+using Deepgram.Models;
+
 var credentials = new Credentials(DEEPGRAM_API_KEY);
 
 var deepgramClient = new DeepgramClient(credentials);
@@ -130,10 +133,10 @@ var deepgramClient = new DeepgramClient(credentials);
 using (FileStream fs = File.OpenRead("path\\to\\file"))
 {
     var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-        new Deepgram.Transcription.StreamSource(
+        new StreamSource(
             fs,
             "audio/wav"),
-        new Deepgram.Transcription.PrerecordedTranscriptionOptions()
+        new PrerecordedTranscriptionOptions()
         {
             Punctuate = true
         });
@@ -204,6 +207,10 @@ var SRT =  preRecordedTranscription.ToSRT();
 > pre-recorded transcription.
 
 ```csharp
+using Deepgram.CustomEventArgs;
+using Deepgram.Models;
+using System.Net.WebSockets;
+
 var credentials = new Credentials(DEEPGRAM_API_KEY);
 
 var deepgramClient = new DeepgramClient(credentials);
@@ -304,7 +311,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 
 # Projects
 
-> projectId and memberId are of type`string`
+> projectId and memberId are of type `string`
 
 ## Get Projects
 
@@ -575,7 +582,7 @@ var result = await deepgramClient.Usage.GetUsageFieldsAsync(projectId,getUsageFi
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-fields).
 
-## Logging
+# Logging
 
 The Library uses Microsoft.Extensions.Logging to preform all of its logging tasks. To configure
 logging for your app simply create a new `ILoggerFactory` and call the `LogProvider.SetLogFactory()`
@@ -596,7 +603,7 @@ factory.AddSerilog(log);
 LogProvider.SetLogFactory(factory);
 ```
 
-## Development and Contributing
+# Development and Contributing
 
 Interested in contributing? We ❤️ pull requests!
 
@@ -604,7 +611,20 @@ To make sure our community is safe for all, be sure to review and agree to our
 [Code of Conduct](./.github/CODE_OF_CONDUCT.md). Then see the
 [Contribution](./.github/CONTRIBUTING.md) guidelines for more information.
 
-## Getting Help
+# Testing
+
+The test suite is located within `Deepgram.Tests/`. Run all tests with the following command from the top-level repository:
+
+```bash
+dotnet test
+```
+
+Upon completion, a summary is printed:
+```bash
+Passed!  - Failed:     0, Passed:    69, Skipped:     0, Total:    69, Duration: 906 ms - Deepgram.Tests.dll (net7.0)
+```
+
+# Getting Help
 
 We love to hear from you so if you have questions, comments or find a bug in the
 project, let us know! You can either:
