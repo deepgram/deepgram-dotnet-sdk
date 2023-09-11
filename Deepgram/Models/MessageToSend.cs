@@ -11,8 +11,8 @@ namespace Deepgram.Models
             MessageType = type;
         }
 
-        public readonly ArraySegment<byte> Message { get; }
+        public ArraySegment<byte> Message { get; }
 
-        public readonly WebSocketMessageType MessageType { get; }
+        public WebSocketMessageType MessageType { get; }
     }
 }
