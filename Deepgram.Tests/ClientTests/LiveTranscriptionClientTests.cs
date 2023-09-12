@@ -24,11 +24,10 @@ public class LiveTranscriptionClientTests
     }
 
     [Fact]
-    public void Test_OnKeepAliveExecuted_SendDataCalledWithData()
+    public void Test_SendDataCalledWithData()
     {
         // Arrange
-        var keepAliveMessage = JsonConvert.SerializeObject(new { type = "KeepAlive" });
-        var expected = Encoding.Default.GetBytes(keepAliveMessage);
+        var expected = Encoding.Default.GetBytes("0000");
 
         var sendDataCalled = false;
         byte[] sendDataRecieved = null;
@@ -38,7 +37,7 @@ public class LiveTranscriptionClientTests
         });
 
         // Act
-        client.KeepAlive();
+        client.SendData(expected);
 
         // Assert
         Assert.True(sendDataCalled);

@@ -176,7 +176,7 @@ namespace Deepgram.Clients
             var keepAliveMessage = JsonConvert.SerializeObject(new { type = "KeepAlive" });
             var keepAliveBytes = Encoding.Default.GetBytes(keepAliveMessage);
 
-            SendData(keepAliveBytes);
+            EnqueueForSending(new MessageToSend(keepAliveBytes, WebSocketMessageType.Text));
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Deepgram.Clients
         /// <param name="data">The data to be sent over the websocket.</param>
         public virtual void SendData(byte[] data)
         {
-            EnqueueForSending(new MessageToSend(data));
+            EnqueueForSending(new MessageToSend(data, WebSocketMessageType.Binary));
         }
 
         private Uri GetWSSUriWithQuerystring(string uriSegment, LiveTranscriptionOptions queryParameters) =>
@@ -212,7 +212,7 @@ namespace Deepgram.Clients
                 {
                     while (_sendChannel.Reader.TryRead(out var message))
                     {
-                        await Send(message.Message, _tokenSource.Token).ConfigureAwait(false);
+                        await Send(message, _tokenSource.Token).ConfigureAwait(false);
                     }
                 }
             }
@@ -311,7 +311,7 @@ namespace Deepgram.Clients
             }
         }
 
-        private async Task Send(ArraySegment<byte> data, CancellationToken token)
+        private async Task Send(MessageToSend message, CancellationToken token)
         {
             if (_clientWebSocket.State != WebSocketState.Open)
             {
@@ -320,7 +320,7 @@ namespace Deepgram.Clients
                 return;
             }
 
-            await _clientWebSocket.SendAsync(data, WebSocketMessageType.Binary, true, token).ConfigureAwait(false);
+            await _clientWebSocket.SendAsync(message.Message, message.MessageType, true, token).ConfigureAwait(false);
         }
 
         /// <summary>
