@@ -28,5 +28,11 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("num_words")]
         public int NumberOfWords { get; set; }
+
+        /// <summary>
+        /// Speaker of the paragraph
+        /// </summary>
+        [JsonProperty("speaker")]
+        public string Speaker { get; set; }
     }
 }
