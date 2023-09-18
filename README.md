@@ -6,54 +6,55 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 
 > This SDK only supports hosted usage of api.deepgram.com.
 
-* [Deepgram .NET SDK](#deepgram-net-sdk)
-* [Getting an API Key](#getting-an-api-key)
-* [Documentation](#documentation)
-* [Installation](#installation)
-* [Targeted Frameworks](#targeted-frameworks)
-* [Configuration](#configuration)
-* [Transcription](#transcription)
-  * [Remote Files](#remote-files)
-      * [UrlSource](#urlsource)
-  * [Local files](#local-files)
-      * [StreamSource](#streamsource)
-      * [PrerecordedTranscriptionOptions](#prerecordedtranscriptionoptions)
-* [Generating Captions](#generating-captions)
-  * [Live Audio](#live-audio)
-      * [LiveTranscriptionOptions](#livetranscriptionoptions)
-* [Projects](#projects)
-  * [Get Projects](#get-projects)
-  * [Get Project](#get-project)
-  * [Update Project](#update-project)
-  * [Delete Project](#delete-project)
-* [Keys](#keys)
-  * [List Keys](#list-keys)
-  * [Get Key](#get-key)
-  * [Create Key](#create-key)
-  * [Delete Key](#delete-key)
-* [Members](#members)
-  * [Get Members](#get-members)
-  * [Remove Member](#remove-member)
-* [Scopes](#scopes)
-  * [Get Member Scopes](#get-member-scopes)
-  * [Update Scope](#update-scope)
-* [Invitations](#invitations)
-  * [List Invites](#list-invites)
-  * [Send Invite](#send-invite)
-  * [Delete Invite](#delete-invite)
-  * [Leave Project](#leave-project)
-* [Usage](#usage)
-  * [Get All Requests](#get-all-requests)
-      * [ListAllRequestOptions](#listallrequestoptions)
-  * [Get Request](#get-request)
-  * [Summarize Usage](#summarize-usage)
-      * [GetUsageSummaryOptions](#getusagesummaryoptions)
-  * [Get Fields](#get-fields)
-      * [GetUsageFieldsOptions](#getusagefieldsoptions)
-* [Logging](#logging)
-* [Development and Contributing](#development-and-contributing)
-* [Testing](#testing)
-* [Getting Help](#getting-help)
+- [Deepgram .NET SDK](#deepgram-net-sdk)
+- [Getting an API Key](#getting-an-api-key)
+- [Documentation](#documentation)
+- [Installation](#installation)
+- [Targeted Frameworks](#targeted-frameworks)
+- [Configuration](#configuration)
+- [Examples](#examples)
+- [Transcription](#transcription)
+  - [Remote Files](#remote-files)
+    - [UrlSource](#urlsource)
+  - [Local files](#local-files)
+    - [StreamSource](#streamsource)
+    - [PrerecordedTranscriptionOptions](#prerecordedtranscriptionoptions)
+- [Generating Captions](#generating-captions)
+  - [Live Audio](#live-audio)
+    - [LiveTranscriptionOptions](#livetranscriptionoptions)
+- [Projects](#projects)
+  - [Get Projects](#get-projects)
+  - [Get Project](#get-project)
+  - [Update Project](#update-project)
+  - [Delete Project](#delete-project)
+- [Keys](#keys)
+  - [List Keys](#list-keys)
+  - [Get Key](#get-key)
+  - [Create Key](#create-key)
+  - [Delete Key](#delete-key)
+- [Members](#members)
+  - [Get Members](#get-members)
+  - [Remove Member](#remove-member)
+- [Scopes](#scopes)
+  - [Get Member Scopes](#get-member-scopes)
+  - [Update Scope](#update-scope)
+- [Invitations](#invitations)
+  - [List Invites](#list-invites)
+  - [Send Invite](#send-invite)
+  - [Delete Invite](#delete-invite)
+  - [Leave Project](#leave-project)
+- [Usage](#usage)
+  - [Get All Requests](#get-all-requests)
+    - [ListAllRequestOptions](#listallrequestoptions)
+  - [Get Request](#get-request)
+  - [Summarize Usage](#summarize-usage)
+    - [GetUsageSummaryOptions](#getusagesummaryoptions)
+  - [Get Fields](#get-fields)
+    - [GetUsageFieldsOptions](#getusagefieldsoptions)
+- [Logging](#logging)
+- [Development and Contributing](#development-and-contributing)
+- [Testing](#testing)
+- [Getting Help](#getting-help)
 
 # Getting an API Key
 
@@ -95,6 +96,10 @@ To setup the configuration of the Deepgram Client you can do one of the followin
 var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
 var deepgramClient = new DeepgramClient(credentials);
 ```
+
+# Examples
+
+To quickly get started with examples for prerecorded and streaming, run the files in the example folder. See the README in that folder for more information on getting started.
 
 # Transcription
 
@@ -620,6 +625,7 @@ dotnet test
 ```
 
 Upon completion, a summary is printed:
+
 ```bash
 Passed!  - Failed:     0, Passed:    69, Skipped:     0, Total:    69, Duration: 906 ms - Deepgram.Tests.dll (net7.0)
 ```
