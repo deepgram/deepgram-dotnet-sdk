@@ -33,6 +33,6 @@ namespace Deepgram.Models
         /// Speaker of the paragraph
         /// </summary>
         [JsonProperty("speaker")]
-        public string Speaker { get; set; }
+        public int Speaker { get; set; }
     }
 }
