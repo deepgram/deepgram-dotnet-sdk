@@ -12,6 +12,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Installation](#installation)
 - [Targeted Frameworks](#targeted-frameworks)
 - [Configuration](#configuration)
+  - [Custom API Endpoint](#custom-api-endpoint)   
 - [Examples](#examples)
 - [Transcription](#transcription)
   - [Remote Files](#remote-files)
@@ -95,6 +96,16 @@ To setup the configuration of the Deepgram Client you can do one of the followin
 ```csharp
 var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
 var deepgramClient = new DeepgramClient(credentials);
+```
+## Custom API Endpoint
+
+In order to point the SDK at a different API endpoint (e.g., for on-prem deployments), you can pass in an object setting the `API_URL` when initializing the Deepgram client.
+
+```csharp
+bool REQUIRE_SSL = false; // defaults to true - set depending on server configuration
+var API_URL = "localhost:8080"; // defaults to api.deepgram.com
+var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY, API_URL, REQUIRE_SSL);
+var deepgram = new DeepgramClient(credentials);
 ```
 
 # Examples
