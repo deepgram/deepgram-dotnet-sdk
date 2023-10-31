@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Deepgram.Utilities
 {
@@ -10,15 +11,9 @@ namespace Deepgram.Utilities
         /// <returns></returns>
         public static string GetUserAgent()
         {
-
-            var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
-                .Replace(" ", string.Empty)
-                .Replace("/", string.Empty)
-                .Replace(":", string.Empty)
-                .Replace(";", string.Empty)
-                .Replace("_", string.Empty)
-                .Replace("(", string.Empty)
-                .Replace(")", string.Empty);
+            var languageVersion = new Regex("[ ,/,:,;,_,(,)]")
+                       .Replace(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+                       string.Empty);
 
             var libraryVersion = typeof(UserAgentUtil)
                 .GetTypeInfo()
