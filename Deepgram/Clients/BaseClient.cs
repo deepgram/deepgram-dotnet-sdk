@@ -11,7 +11,7 @@ namespace Deepgram.Clients
         public IApiRequest ApiRequest { get; set; }
         public IRequestMessageBuilder RequestMessageBuilder { get; set; }
 
-        protected HttpClientUtil HttpClientUtil { get; }
+        internal HttpClientUtil HttpClientUtil { get; }
 
         public BaseClient(Credentials credentials, HttpClientUtil httpClientUtil)
         {
