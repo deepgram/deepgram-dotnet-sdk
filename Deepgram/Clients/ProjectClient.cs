@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -15,14 +16,14 @@ namespace Deepgram.Clients
         /// Returns all Deepgram projects
         /// </summary>
         /// <returns>List of Deepgram projects</returns>
-        public async Task<ProjectList> ListProjectsAsync()
+        public async Task<ProjectList> ListProjectsAsync(CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
             "projects",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<ProjectList>(req);
+            return await ApiRequest.SendHttpRequestAsync<ProjectList>(req, token);
         }
 
         /// <summary>
@@ -30,14 +31,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to retrieve</param>
         /// <returns>A Deepgram project</returns>
-        public async Task<Project> GetProjectAsync(string projectId)
+        public async Task<Project> GetProjectAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
             $"projects/{projectId}",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<Project>(req);
+            return await ApiRequest.SendHttpRequestAsync<Project>(req, token);
 
         }
 
@@ -46,7 +47,7 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="project">Project to update</param>
         /// <returns>A message denoting the success of the operation</returns>
-        public async Task<MessageResponse> UpdateProjectAsync(Project project)
+        public async Task<MessageResponse> UpdateProjectAsync(Project project, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
 #if NETSTANDARD2_0
@@ -58,7 +59,7 @@ namespace Deepgram.Clients
                 Credentials,
                project);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
 
 
         }
@@ -67,14 +68,14 @@ namespace Deepgram.Clients
         /// Deletes a project with the provided projectId
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to delete</param>
-        public async Task<MessageResponse> DeleteProjectAsync(string projectId)
+        public async Task<MessageResponse> DeleteProjectAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Delete,
             $"projects/{projectId}",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
 
         }
 
@@ -83,14 +84,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project for which you want to get members.</param>
         /// <returns>List of members</returns>
-        public async Task<MemberList> GetMembersAsync(string projectId)
+        public async Task<MemberList> GetMembersAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/members",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<MemberList>(req);
+            return await ApiRequest.SendHttpRequestAsync<MemberList>(req, token);
 
         }
 
@@ -100,27 +101,27 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project</param>
         /// <param name="memberId">Unique identifier of the member</param>
         /// <returns>List of member scopes</returns>
-        public async Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId)
+        public async Task<ScopesList> GetMemberScopesAsync(string projectId, string memberId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/members/{memberId}/scopes",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<ScopesList>(req);
+            return await ApiRequest.SendHttpRequestAsync<ScopesList>(req, token);
         }
 
         /// Removes the authenticated account from the specified project
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to remove the authenticated account</param>
-        public async Task<MessageResponse> LeaveProjectAsync(string projectId)
+        public async Task<MessageResponse> LeaveProjectAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
              HttpMethod.Delete,
                 $"projects/{projectId}/leave",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
 
         }
 
@@ -129,14 +130,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project</param>
         /// <param name="memberId">Unique identifier of the member</param>
-        public async Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId)
+        public async Task<MessageResponse> RemoveMemberAsync(string projectId, string memberId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Delete,
                 $"projects/{projectId}/members/{memberId}",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
 
         }
 
@@ -146,7 +147,7 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project</param>
         /// <param name="memberId">Unique identifier of the member</param>
         /// <param name="options">Scope options to update</param>
-        public async Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options)
+        public async Task<MessageResponse> UpdateScopeAsync(string projectId, string memberId, UpdateScopeOptions options, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Put,
@@ -154,7 +155,7 @@ namespace Deepgram.Clients
             Credentials,
             options);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
 
         }
     }

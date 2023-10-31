@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -13,7 +14,7 @@ namespace Deepgram.Clients
             : base(credentials, httpClientUtil) { }
 
         /// <inheritdoc />
-        public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options)
+        public async Task<PrerecordedTranscription> GetTranscriptionAsync(UrlSource source, PrerecordedTranscriptionOptions options, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Post,
@@ -22,11 +23,11 @@ namespace Deepgram.Clients
                source,
                options);
 
-            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req, token);
         }
 
         /// <inheritdoc />
-        public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options)
+        public async Task<PrerecordedTranscription> GetTranscriptionAsync(StreamSource source, PrerecordedTranscriptionOptions options, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateStreamHttpRequestMessage(
              HttpMethod.Post,
@@ -35,11 +36,11 @@ namespace Deepgram.Clients
              source,
              options);
 
-            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscription>(req, token);
         }
 
         /// <inheritdoc />
-        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
+        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(UrlSource source, string callbackUrl, PrerecordedTranscriptionOptions options, CancellationToken token = new CancellationToken())
         {
             if (!String.IsNullOrEmpty(options.Callback) && !String.IsNullOrEmpty(callbackUrl))
             {
@@ -59,18 +60,19 @@ namespace Deepgram.Clients
              Credentials,
              source,
              options);
-            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req, token);
         }
 
         /// <inheritdoc />
-        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options)
+        public async Task<PrerecordedTranscriptionCallbackResult> GetTranscriptionAsync(StreamSource source, string callbackUrl, PrerecordedTranscriptionOptions options, CancellationToken token = new CancellationToken())
         {
             if (!String.IsNullOrEmpty(options.Callback) && !String.IsNullOrEmpty(callbackUrl))
             {
                 throw new System.ArgumentException("CallbackUrl is already set in the options object. Please use one or the other.");
             }
 
-            if( !String.IsNullOrEmpty(callbackUrl)) {
+            if (!String.IsNullOrEmpty(callbackUrl))
+            {
                 options.Callback = callbackUrl;
             }
 
@@ -83,7 +85,7 @@ namespace Deepgram.Clients
              Credentials,
              source,
              options);
-            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req);
+            return await ApiRequest.SendHttpRequestAsync<PrerecordedTranscriptionCallbackResult>(req, token);
         }
     }
 }

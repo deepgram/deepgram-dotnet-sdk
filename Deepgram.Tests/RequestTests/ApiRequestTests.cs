@@ -1,9 +1,7 @@
-﻿using System.Net.Http;
-using AutoBogus;
+﻿using AutoBogus;
 using Deepgram.Models;
 using Deepgram.Request;
 using Deepgram.Tests.Fakes;
-using Xunit;
 
 namespace Deepgram.Tests.RequestTests
 {
@@ -19,7 +17,7 @@ namespace Deepgram.Tests.RequestTests
             var SUT = new ApiRequest(client);
 
             //Act
-            var result = await SUT.SendHttpRequestAsync<Project>(new HttpRequestMessage());
+            var result = await SUT.SendHttpRequestAsync<Project>(new HttpRequestMessage(), new CancellationToken());
 
             //Assert
             Assert.NotNull(result);

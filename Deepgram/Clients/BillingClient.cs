@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Deepgram.Models;
-using Deepgram.Request;
 using Deepgram.Utilities;
 
 namespace Deepgram.Clients
@@ -16,14 +16,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project for which you want to retrieve outstanding balances</param>
         /// <returns>List of Deepgram balances</returns>
-        public async Task<BillingList> GetAllBalancesAsync(string projectId)
+        public async Task<BillingList> GetAllBalancesAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                 HttpMethod.Get,
                 $"projects/{projectId}/balances",
                 Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<BillingList>(req);
+            return await ApiRequest.SendHttpRequestAsync<BillingList>(req, token);
         }
 
         /// <summary>
@@ -32,14 +32,14 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project for which you want to retrieve the specified balance</param>
         /// <param name="balanceId">Unique identifier of the balance that you want to retrieve</param>
         /// <returns>A Deepgram balance</returns>
-        public async Task<Billing> GetBalanceAsync(string projectId, string balanceId)
+        public async Task<Billing> GetBalanceAsync(string projectId, string balanceId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Get,
                $"projects/{projectId}/balances/{balanceId}",
                Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<Billing>(req);
+            return await ApiRequest.SendHttpRequestAsync<Billing>(req, token);
         }
     }
 }

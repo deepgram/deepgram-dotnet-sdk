@@ -33,9 +33,12 @@ namespace Deepgram
         /// Sets the Timeout of the HTTPClient used to send HTTP requests
         /// </summary>
         /// <param name="timeout">Timespan to wait before the request times out.</param>
-        public void SetHttpClientTimeout(TimeSpan timeout) =>
+        public void SetHttpClientTimeout(TimeSpan timeout)
+        {
             HttpClientUtil.SetTimeOut(timeout);
-
+            //reinitialize the clients to respect the timeout
+            InitializeClients();
+        }
         private void Initialize(Credentials credentials)
         {
             Credentials = CredentialsUtil.Clean(credentials);
