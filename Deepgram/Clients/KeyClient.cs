@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -16,14 +17,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to retrieve keys from</param>
         /// <returns>List of Deepgram API keys</returns>
-        public async Task<KeyList> ListKeysAsync(string projectId)
+        public async Task<KeyList> ListKeysAsync(string projectId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<KeyList>(req);
+            return await ApiRequest.SendHttpRequestAsync<KeyList>(req, token);
 
 
         }
@@ -34,14 +35,14 @@ namespace Deepgram.Clients
         /// <param name="projectId">Unique identifier of the project to retrieve key from</param>
         /// <param name="keyId">Unique identifier of the API key to retrieve</param>
         /// <returns>A Deepgram API key</returns>
-        public async Task<Key> GetKeyAsync(string projectId, string keyId)
+        public async Task<Key> GetKeyAsync(string projectId, string keyId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
             HttpMethod.Get,
              $"projects/{projectId}/keys{keyId}",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<Key>(req);
+            return await ApiRequest.SendHttpRequestAsync<Key>(req, token);
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace Deepgram.Clients
         /// <param name="comment">Comment to help identify the API key</param>
         /// <param name="scopes">Scopes associated with the key. Cannot be empty</param>
         /// <returns>A new Deepgram API key</returns>
-        public async Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes)
+        public async Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
               HttpMethod.Post,
@@ -59,7 +60,7 @@ namespace Deepgram.Clients
               Credentials,
               new { comment, scopes });
 
-            return await ApiRequest.SendHttpRequestAsync<ApiKey>(req);
+            return await ApiRequest.SendHttpRequestAsync<ApiKey>(req, token);
         }
 
         /// <summary>
@@ -67,14 +68,14 @@ namespace Deepgram.Clients
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to delete</param>
         /// <param name="keyId">Unique identifier of the API key to delete</param>
-        public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId)
+        public async Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId, CancellationToken token = new CancellationToken())
         {
             var req = RequestMessageBuilder.CreateHttpRequestMessage(
                HttpMethod.Delete,
                 $"projects/{projectId}/keys/{keyId}",
             Credentials);
 
-            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req);
+            return await ApiRequest.SendHttpRequestAsync<MessageResponse>(req, token);
         }
     }
 }

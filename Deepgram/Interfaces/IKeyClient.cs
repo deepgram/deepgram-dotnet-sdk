@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Deepgram.Models;
 
 namespace Deepgram.Interfaces
@@ -10,7 +11,7 @@ namespace Deepgram.Interfaces
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to retrieve keys from</param>
         /// <returns>List of Deepgram API keys</returns>
-        Task<KeyList> ListKeysAsync(string projectId);
+        Task<KeyList> ListKeysAsync(string projectId, CancellationToken token = new CancellationToken());
 
         /// <summary>
         /// Retrieves the Deepgram key associated with the provided keyId
@@ -18,7 +19,7 @@ namespace Deepgram.Interfaces
         /// <param name="projectId">Unique identifier of the project to retrieve key from</param>
         /// <param name="keyId">Unique identifier of the API key to retrieve</param>
         /// <returns>A Deepgram API key</returns>
-        Task<Key> GetKeyAsync(string projectId, string keyId);
+        Task<Key> GetKeyAsync(string projectId, string keyId, CancellationToken token = new CancellationToken());
 
         /// <summary>
         /// Creates a new Deepgram API key
@@ -27,13 +28,13 @@ namespace Deepgram.Interfaces
         /// <param name="comment">Comment to help identify the API key</param>
         /// <param name="scopes">Scopes associated with the key. Cannot be empty</param>
         /// <returns>A new Deepgram API key</returns>
-        Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes);
+        Task<ApiKey> CreateKeyAsync(string projectId, string comment, string[] scopes, CancellationToken token = new CancellationToken());
 
         /// <summary>
         /// Deletes an API key
         /// </summary>
         /// <param name="projectId">Unique identifier of the project to delete</param>
         /// <param name="keyId">Unique identifier of the API key to delete</param>
-        Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId);
+        Task<MessageResponse> DeleteKeyAsync(string projectId, string keyId, CancellationToken token = new CancellationToken());
     }
 }

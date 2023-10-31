@@ -1,11 +1,8 @@
-﻿using AutoBogus;
+﻿using System.IO;
+using AutoBogus;
 using Deepgram.Models;
 using Deepgram.Request;
 using Deepgram.Tests.Fakes;
-using System.IO;
-using System.Threading.Tasks;
-using System;
-using Xunit;
 
 namespace Deepgram.Tests.ClientTests
 {
@@ -120,7 +117,7 @@ namespace Deepgram.Tests.ClientTests
             var result = await SUT.Transcription.Prerecorded.GetTranscriptionAsync(_urlSource, _faker.Internet.Url(), _prerecordedTranscriptionOptions);
 
             // Assert
-            
+
             Assert.Equal(responseObject.RequestId, result.RequestId);
         }
 

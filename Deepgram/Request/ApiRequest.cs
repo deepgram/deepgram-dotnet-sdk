@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Deepgram.Interfaces;
 using Deepgram.Models;
@@ -17,10 +18,9 @@ namespace Deepgram.Request
         }
 
 
-        public async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request)
+        public async Task<T> SendHttpRequestAsync<T>(HttpRequestMessage request, CancellationToken token)
         {
-
-            var response = await _httpClient.SendAsync(request);
+            var response = await _httpClient.SendAsync(request, token);
 
             var stream = await response.Content.ReadAsStreamAsync();
             string json;
