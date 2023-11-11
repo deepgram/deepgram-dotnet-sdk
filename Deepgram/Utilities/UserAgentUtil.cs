@@ -1,32 +1,26 @@
-﻿using System.Reflection;
+﻿using System.Text.RegularExpressions;
 
-namespace Deepgram.Utilities
+namespace Deepgram.Utilities;
+
+internal static class UserAgentUtil
 {
-    internal static class UserAgentUtil
+    /// <summary>
+    /// determines the useragent Library version
+    /// </summary>
+    /// <returns></returns>
+    public static string GetInfo()
     {
-        /// <summary>
-        /// determines the useragent for the httpclient
-        /// </summary>
-        /// <returns></returns>
-        public static string GetUserAgent()
-        {
 
-            var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
-                .Replace(" ", string.Empty)
-                .Replace("/", string.Empty)
-                .Replace(":", string.Empty)
-                .Replace(";", string.Empty)
-                .Replace("_", string.Empty)
-                .Replace("(", string.Empty)
-                .Replace(")", string.Empty);
+        var libraryVersion = typeof(UserAgentUtil)
+            .GetTypeInfo()
+            .Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+            .InformationalVersion;
 
-            var libraryVersion = typeof(UserAgentUtil)
-                .GetTypeInfo()
-                .Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                .InformationalVersion;
+        var languageVersion = new Regex("[ ,/,:,;,_,(,)]")
+            .Replace(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+            string.Empty);
 
-            return $"deepgram/{libraryVersion} dotnet/{languageVersion}";
-        }
+        return $"deepgram/{libraryVersion} dotnet/{languageVersion} ";
     }
 }

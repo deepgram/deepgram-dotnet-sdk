@@ -1,20 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class ParagraphGroup
 {
-    public class ParagraphGroup
-    {
-        /// <summary>
-        /// Full transcript
-        /// </summary>
-        [JsonProperty("transcript")]
-        public string Transcript { get; set; } = string.Empty;
+    [JsonPropertyName("transcript")]
+    public string? Transcript { get; set; }
 
-        /// <summary>
-        /// Array of Paragraph objects.
-        /// </summary>
-        [JsonProperty("paragraphs")]
-        public Paragraph[] Paragraphs { get; set; }
-    }
+    [JsonPropertyName("paragraphs")]
+    public Paragraph[]? Paragraphs { get; set; }
 }
+

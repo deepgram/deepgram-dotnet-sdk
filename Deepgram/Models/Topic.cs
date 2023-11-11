@@ -1,20 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class Topic
 {
-    public class Topic
-    {
-        /// <summary>
-        /// Topic detected.
-        /// </summary>
-        [JsonProperty("topic")]
-        public string TopicText { get; set; }
+    [JsonPropertyName("topic")]
+    public string? Name { get; set; }
 
-        /// <summary>
-        /// Value between 0 and 1 indicating the model's relative confidence in this topic.
-        /// </summary>
-        [JsonProperty("confidence")]
-        public decimal Confidence { get; set; }
-    }
+    [JsonPropertyName("confidence")]
+    public double? Confidence { get; set; }
 }
+

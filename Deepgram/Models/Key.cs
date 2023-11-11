@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class Key
 {
-    public class Key
-    {
-        /// <summary>
-        /// member object
-        /// </summary>
-        [JsonProperty("member")]
-        public KeyMember Member { get; set; }
+    [JsonPropertyName("api_key_id")]
+    public string? ApiKeyId { get; set; }
 
-        /// <summary>
-        /// api key object
-        /// </summary>
-        [JsonProperty("api_key")]
-        public ApiKey ApiKey { get; set; }
-    }
+    [JsonPropertyName("comment")]
+    public string? Comment { get; set; }
+
+    [JsonPropertyName("scopes")]
+    public string[]? Scopes { get; set; }
+
+    [JsonPropertyName("tags")]
+    public string[]? Tags { get; set; }
+
+    [JsonPropertyName("created")]
+    public string? Created { get; set; }
 }

@@ -1,50 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Text;
 using System.Web;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-namespace Deepgram.Utilities
+namespace Deepgram.Utilities;
+
+internal static class QueryParameterUtil
 {
-    internal static class QueryParameterUtil
-
+    public static string GetParameters<T>(T parameters)
     {
-        public static string GetParameters(object parameters = null)
+        var sb = new StringBuilder();
+
+        if (parameters is not null)
         {
-            List<KeyValuePair<string, string>> paramList = new List<KeyValuePair<string, string>>();
-
-            if (parameters != null)
+            foreach (var pInfo in parameters.GetType().GetProperties())
             {
-
-                var json = JsonConvert.SerializeObject(parameters);
-                var jObj = (JObject)JsonConvert.DeserializeObject(json);
-
-                foreach (var prop in jObj.Properties())
+                var pValue = pInfo.GetValue(parameters);
+                if (pValue is not null)
                 {
-                    if (prop.HasValues && !String.IsNullOrEmpty(prop.Value.ToString()))
+                    var name = pInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name;
+                    if (pInfo.PropertyType.IsArray)
                     {
-                        if (prop.Value.Type == JTokenType.Array)
-                        {
-                            foreach (var value in prop.Values())
-                            {
-                                paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(value.ToString())));
-                            }
-                        }
-                        else if (prop.Value.Type == JTokenType.Date)
-                        {
-                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(((DateTime)prop.Value).ToString("yyyy-MM-dd"))));
-                        }
-                        else
-                        {
-                            paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(prop.Value.ToString())));
-                        }
+                        foreach (var value in (Array)pValue)
+                            sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");
+                    }
+                    else
+                    {
+                        sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                     }
                 }
-
             }
-
-            return String.Join("&", paramList.Select(s => $"{s.Key}={s.Value.ToString()}")).ToLower();
         }
+
+        return sb.ToString().ToLower().Trim('&');
     }
 }

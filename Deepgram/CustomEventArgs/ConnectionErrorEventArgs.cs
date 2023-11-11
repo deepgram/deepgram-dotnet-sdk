@@ -1,14 +1,6 @@
-﻿using System;
-
-namespace Deepgram.CustomEventArgs
+﻿namespace Deepgram.CustomEventArgs
 {
-    public class ConnectionErrorEventArgs : EventArgs
+    public class ConnectionErrorEventArgs(Exception Exception) : EventArgs
     {
-        public Exception Exception;
-
-        public ConnectionErrorEventArgs(Exception e)
-        {
-            Exception = e;
-        }
     }
 }

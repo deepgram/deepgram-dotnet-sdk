@@ -1,13 +1,11 @@
-﻿#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-
-using Newtonsoft.Json;
+﻿
 
 namespace Deepgram.Tests.Fakes;
-public class MockHttpMessageHandler : HttpMessageHandler
+public class MockHttpMessageHandler<T> : HttpMessageHandler
 {
-    private readonly object _response;
+    private readonly T _response;
     private readonly HttpStatusCode _statusCode;
-    public MockHttpMessageHandler(object response, HttpStatusCode statusCode)
+    public MockHttpMessageHandler(T response, HttpStatusCode statusCode)
     {
         _response = response;
         _statusCode = statusCode;
@@ -18,7 +16,7 @@ public class MockHttpMessageHandler : HttpMessageHandler
         return new HttpResponseMessage()
         {
             StatusCode = _statusCode,
-            Content = new StringContent(JsonConvert.SerializeObject(_response))
+            Content = new StringContent(JsonSerializer.Serialize(_response))
         };
     }
 }

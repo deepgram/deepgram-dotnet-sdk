@@ -1,31 +1,14 @@
-using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class Warning
 {
-  public class Warning
-  {
-      /// <summary>
-      /// Parameter sent in the request that resulted in the warning
-      /// </summary>
-      [JsonProperty("parameter")]
-      public string Parameter { get; set; }
+    [JsonPropertyName("parameter")]
+    public string? Parameter { get; set; }
 
-      /// <summary>
-      /// The type of warning
-      /// </summary>
-      [JsonProperty("type")]
-      [JsonConverter(typeof(StringEnumConverter))]
-      public WarningType Type { get; set; }
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
 
-      /// <summary>
-      /// The warning message
-      /// </summary>
-      [JsonProperty("message")]
-      public string Message { get; set; }
-
-  }
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
 }
-
 

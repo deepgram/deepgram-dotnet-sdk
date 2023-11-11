@@ -1,26 +1,14 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class Sentence
 {
-    public class Sentence
-    {
-        /// <summary>
-        /// Text transcript of the sentence.
-        /// </summary>
-        [JsonProperty("text")]
-        public string Text { get; set; } = string.Empty;
+    [JsonPropertyName("text")]
+    public string? Text { get; set; }
 
-        /// <summary>
-        /// Offset in seconds from the start of the audio to where the sentence starts.
-        /// </summary>
-        [JsonProperty("start")]
-        public decimal Start { get; set; }
+    [JsonPropertyName("start")]
+    public int? Start { get; set; }
 
-        /// <summary>
-        /// Offset in seconds from the start of the audio to where the sentence ends.
-        /// </summary>
-        [JsonProperty("end")]
-        public decimal End { get; set; }
-    }
+    [JsonPropertyName("end")]
+    public int? End { get; set; }
 }
+

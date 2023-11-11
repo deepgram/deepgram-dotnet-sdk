@@ -1,38 +1,18 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-
-namespace Deepgram.Models
+﻿namespace Deepgram.Models;
+public class Member
 {
-    public class Member
-    {
-        /// <summary>
-        /// Unique identifier of member
-        /// </summary>
-        [JsonProperty("member_id")]
-        public string Id { get; set; } = string.Empty;
+    [JsonPropertyName("member_id")]
+    public string? MemberId { get; set; }
 
-        /// <summary>
-        /// First name of member
-        /// </summary>
-        [JsonProperty("first_name")]
-        public string FirstName { get; set; } = string.Empty;
+    [JsonPropertyName("email")]
+    public string? Email { get; set; }
 
-        /// <summary>
-        /// Last name of member
-        /// </summary>
-        [JsonProperty("last_name")]
-        public string LastName { get; set; } = string.Empty;
+    [JsonPropertyName("first_name")]
+    public string? FirstName { get; set; }
 
-        /// <summary>
-        /// Project scopes associated with member
-        /// </summary>
-        [JsonProperty("scopes")]
-        public IEnumerable<string> Scopes { get; set; } = new List<string>();
+    [JsonPropertyName("last_name")]
+    public string? LastName { get; set; }
 
-        /// <summary>
-        /// Email address of member
-        /// </summary>
-        [JsonProperty("email")]
-        public string Email { get; set; } = string.Empty;
-    }
+    [JsonPropertyName("scopes")]
+    public string[]? Scopes { get; set; }
 }

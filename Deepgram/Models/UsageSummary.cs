@@ -1,32 +1,20 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿namespace Deepgram.Models;
 
-namespace Deepgram.Models
+public class UsageSummary
 {
-    public class UsageSummary
-    {
-        /// <summary>
-        /// Start date for included requests.
-        /// </summary>
-        [JsonProperty("start")]
-        public DateTime StartDateTime { get; set; }
+    [JsonPropertyName("start")]
+    public string? Start { get; set; }
 
-        /// <summary>
-        /// End date for included requests.
-        /// </summary>
-        [JsonProperty("end")]
-        public DateTime EndDateTime { get; set; }
+    [JsonPropertyName("end")]
+    public string? End { get; set; }
 
-        /// <summary>
-        /// Resolution of the usage
-        /// </summary>
-        [JsonProperty("resolution")]
-        public UsageSummaryResolution Resolution { get; set; }
+    [JsonPropertyName("hours")]
+    public double? Hours { get; set; }
 
-        /// <summary>
-        /// Result summaries
-        /// </summary>
-        [JsonProperty("results")]
-        public UsageSummaryResult[] Results { get; set; }
-    }
+    [JsonPropertyName("total_hours")]
+    public double? TotalHours { get; set; }
+
+    [JsonPropertyName("requests")]
+    public int? Requests { get; set; }
 }
+
