@@ -1,13 +1,13 @@
 ﻿global using System.Net;
 global using System.Text.Json;
+global using System.Web;
 global using AutoBogus;
 global using Bogus;
 global using Deepgram.Abstractions;
 global using Deepgram.Common;
 global using Deepgram.Logger;
-global using Deepgram.Models;
+global using Deepgram.Models.Schemas;
 global using Deepgram.Tests.Fakes;
-global using Deepgram.Tests.TestExtensions;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.Logging;
 global using NSubstitute;

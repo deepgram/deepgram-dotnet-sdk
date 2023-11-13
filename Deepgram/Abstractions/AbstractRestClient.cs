@@ -6,18 +6,10 @@ namespace Deepgram.Abstractions
     {
         internal ILogger Logger { get; set; }
         internal HttpClient HttpClient { get; set; }
-        internal DeepgramClientOptions? Options { get; }
-        internal string? ApiKey { get; }
-
         internal AbstractRestClient(string? apiKey, DeepgramClientOptions clientOptions, HttpClient httpClient, ILogger logger)
         {
-
-            //  HttpClient = HttpConfigureUtil.SetBaseUrl(clientOptions.Url, httpClient);
-            Options = clientOptions;
+            HttpClient = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
             Logger = logger;
-            ApiKey = apiKey;
-            //HttpClient = HttpConfigureUtil.SetHeaders(ApiKey, null, httpClient);
-            HttpClient = httpClient;
         }
     }
 }

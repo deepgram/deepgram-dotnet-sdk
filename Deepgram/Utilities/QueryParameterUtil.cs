@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Web;
+using Deepgram.Models.Schemas;
 
 namespace Deepgram.Utilities;
 
@@ -20,16 +21,20 @@ internal static class QueryParameterUtil
                     if (pInfo.PropertyType.IsArray)
                     {
                         foreach (var value in (Array)pValue)
-                            sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");
+                            sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
+                    }
+                    else if (typeof(T) == typeof(PrerecordedSchema) && name == "callback")
+                    {
+                        sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                     }
                     else
                     {
-                        sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
+                        sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
                     }
                 }
             }
         }
 
-        return sb.ToString().ToLower().Trim('&');
+        return sb.ToString().Trim('&');
     }
 }

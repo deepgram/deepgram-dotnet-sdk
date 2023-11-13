@@ -1,5 +1,4 @@
-﻿using Bogus;
-using Deepgram.Models.Options;
+﻿using Deepgram.Models.Options;
 
 namespace Deepgram.Tests.Fakes;
 public class ClientOptionsFaker : AutoFaker<DeepgramClientOptions>
@@ -7,10 +6,22 @@ public class ClientOptionsFaker : AutoFaker<DeepgramClientOptions>
     public ClientOptionsFaker()
     {
 
-        RuleSet("All", rules =>
+        //RuleSet("All_Custom", rules =>
+        //{
+        //    RuleFor(o => o.Url, f => f.Internet.DomainName());
+        //    RuleFor(o => o.Headers, f => FakeHeaders());
+        //});
+
+        RuleSet("Custom_Url_Only", rules =>
         {
-            RuleFor(o => o.Url, f => f.Internet.DomainName());
-            RuleFor(o => o.Headers, f => FakeHeaders());
+            RuleFor(o => o.Url, f => "custom");
+            RuleFor(o => o.Headers, f => null);
+        });
+
+        RuleSet("Custom_Headers_Only", rules =>
+        {
+            RuleFor(o => o.Url, f => null);
+            RuleFor(o => o.Headers, f => null);
         });
 
         RuleSet("defaults", rules =>
@@ -20,16 +31,5 @@ public class ClientOptionsFaker : AutoFaker<DeepgramClientOptions>
         });
     }
 
-    private static Dictionary<string, string> FakeHeaders()
-    {
-        var faker = new Faker();
-        var headers = new Dictionary<string, string>();
-        var headersCount = new Random().Next(1, 3);
-        for (var i = 0; i < headersCount; i++)
-        {
-            headers.Add(faker.Random.Word(), faker.Random.Word());
-        }
 
-        return headers;
-    }
 }

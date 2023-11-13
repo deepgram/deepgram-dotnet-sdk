@@ -1,7 +1,4 @@
-﻿using System.Web;
-using Deepgram.Models.Schemas;
-
-namespace Deepgram.Tests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UtilitiesTests;
 
 public class QueryParameterUtilTests
 {
@@ -9,7 +6,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
     {
         //Arrange
-        var prerecordedOptions = new AutoFaker<Models.Schemas.PrerecordedSchema>().Generate();
+        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
         var expected = HttpUtility.UrlEncode(prerecordedOptions.Model)!.ToLower();
         //Act
         var SUT = QueryParameterUtil.GetParameters(prerecordedOptions);
@@ -19,11 +16,29 @@ public class QueryParameterUtilTests
         StringAssert.Contains($"{nameof(prerecordedOptions.Model).ToLower()}={expected}", SUT);
     }
 
+
+    [Test]
+    public void GetParameters_Should_Return_String_Respecting_Callback_Casing()
+    {
+        //Arrange
+        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
+        var CallBack = "https://Signed23.com";
+        prerecordedOptions.Callback = CallBack;
+        var expectedCallBack = HttpUtility.UrlEncode(CallBack);
+
+        //Act
+        var SUT = QueryParameterUtil.GetParameters(prerecordedOptions);
+
+        //Assert
+        Assert.That(SUT, Is.Not.Null);
+        StringAssert.Contains($"{nameof(prerecordedOptions.Callback).ToLower()}={expectedCallBack}", SUT);
+    }
+
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
     {
         //Arrange 
-        var obj = new AutoFaker<Models.Schemas.PrerecordedSchema>().Generate();
+        var obj = new AutoFaker<PrerecordedSchema>().Generate();
 
         //Act
         var SUT = QueryParameterUtil.GetParameters(obj);
@@ -38,7 +53,7 @@ public class QueryParameterUtilTests
     {
         //Arrange
 
-        var prerecordedOptions = new AutoFaker<Models.Schemas.PrerecordedSchema>().Generate();
+        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedOptions.Keywords = new string[] { "test" };
 
         //Act
@@ -55,7 +70,7 @@ public class QueryParameterUtilTests
     {
 
         //Arrange
-        var prerecordedOptions = new AutoFaker<Models.Schemas.PrerecordedSchema>().Generate();
+        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedOptions.UtteranceSplit = 2.3;
 
         //Act
@@ -65,14 +80,14 @@ public class QueryParameterUtilTests
 
         //Assert
         Assert.That(SUT, Is.Not.Null);
-        StringAssert.Contains($"utt_split={System.Web.HttpUtility.UrlEncode(prerecordedOptions.UtteranceSplit.ToString())}", SUT);
+        StringAssert.Contains($"utt_split={HttpUtility.UrlEncode(prerecordedOptions.UtteranceSplit.ToString())}", SUT);
     }
 
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
     {
         //Arrange 
-        var obj = new AutoFaker<Models.Schemas.PrerecordedSchema>().Generate();
+        var obj = new AutoFaker<PrerecordedSchema>().Generate();
 
         //Act
         var SUT = QueryParameterUtil.GetParameters(obj);
