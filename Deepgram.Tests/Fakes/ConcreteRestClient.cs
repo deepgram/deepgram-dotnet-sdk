@@ -1,12 +1,16 @@
-﻿using Deepgram.Abstractions;
-using Deepgram.Models.Options;
-
-namespace Deepgram.Tests.Fakes;
+﻿namespace Deepgram.Tests.Fakes;
 
 public class ConcreteRestClient : AbstractRestClient
 {
+
     public ConcreteRestClient(string? apiKey, DeepgramClientOptions clientOptions, HttpClient httpClient)
-        : base(apiKey, clientOptions, httpClient, LogProvider.GetLogger(nameof(ConcreteRestClient)))
+        : base(apiKey, clientOptions, nameof(ConcreteRestClient), httpClient)
+    {
+    }
+
+
+    public ConcreteRestClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
+        : base(apiKey, clientOptions, nameof(ConcreteRestClient), httpClientFactory)
     {
     }
 }
