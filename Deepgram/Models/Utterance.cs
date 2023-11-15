@@ -3,10 +3,10 @@
 public class Utterance
 {
     [JsonPropertyName("start")]
-    public int? Start { get; set; }
+    public double? Start { get; set; }
 
     [JsonPropertyName("end")]
-    public int? End { get; set; }
+    public double? End { get; set; }
 
     [JsonPropertyName("confidence")]
     public double? Confidence { get; set; }

@@ -6,10 +6,10 @@ public class WordBase
     public string? Word { get; set; }
 
     [JsonPropertyName("start")]
-    public int? Start { get; set; }
+    public double? Start { get; set; }
 
     [JsonPropertyName("end")]
-    public int? End { get; set; }
+    public double? End { get; set; }
 
     [JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
@@ -18,7 +18,7 @@ public class WordBase
     public string? PunctuatedWord { get; set; }
 
     [JsonPropertyName("speaker")]
-    public int? Speaker { get; set; }
+    public double? Speaker { get; set; }
 
     [JsonPropertyName("speaker_confidence")]
     public double? SpeakerConfidence { get; set; }

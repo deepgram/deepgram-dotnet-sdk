@@ -6,7 +6,7 @@ public class Alternative
     public string? Transcript { get; set; }
 
     [JsonPropertyName("confidence")]
-    public bool? Confidence { get; set; }
+    public double? Confidence { get; set; }
 
     [JsonPropertyName("words")]
     public Word[]? Words { get; set; }

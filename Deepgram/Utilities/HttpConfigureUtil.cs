@@ -5,7 +5,7 @@ namespace Deepgram.Utilities;
 
 internal static class HttpConfigureUtil
 {
-    internal static HttpClient Configure(string? apiKey, DeepgramClientOptions options, HttpClient client)
+    internal static HttpClient Configure(string apiKey, DeepgramClientOptions options, HttpClient client)
     {
         client = SetBaseUrl(options, client);
         client = SetHeaders(apiKey, options, client);
@@ -22,11 +22,11 @@ internal static class HttpConfigureUtil
         {
             string pattern = @"^.*//(http://|https://)?";
             var url = Regex.Replace(options.Url, pattern, "").TrimEnd('/');
-            httpClient.BaseAddress = new Uri($"https://{url}/v1");
+            httpClient.BaseAddress = new Uri($"https://{url}");
         }
         else
         {
-            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}/v1");
+            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}");
         }
 
         return httpClient;

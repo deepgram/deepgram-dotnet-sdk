@@ -66,6 +66,82 @@ namespace Deepgram.Abstractions
             Logger = LogProvider.GetLogger(loggerName);
         }
 
+        public virtual async Task<TResponse> GetAsync<TResponse>(string uriSegment)
+        {
+            try
+            {
+                var client = ConfigureClient();
+                var requestUri = $"{Constants.API_VERSION}/{uriSegment}";
+                var response = await client.GetAsync(requestUri);
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<TResponse>(response);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during GET request");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Post method
+        /// </summary>
+        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
+        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>    
+        /// <param name="obj">instance of T that is to be sent</param>
+        /// <param name="logger">logger to log any messages</param>   
+        /// <returns>instance of TResponse</returns>
+        public virtual async Task<TResponse> PostAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        {
+            try
+            {
+                var client = ConfigureClient();
+                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
+                var payload = CreatePayload(obj);
+                var response = await client.PostAsync(requestUrl, payload);
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<TResponse>(response);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during POST request");
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// method that deserializes DeepgramResponse and performs null checks on values
+        /// </summary>
+        /// <typeparam name="TResponse">Class Type of expected response</typeparam>
+        /// <param name="httpResponseMessage">Http Response to be deserialized</param>
+        /// <param name="logger">logger to log messages</param>
+        /// <returns>instance of TResponse or a Exception</returns>
+        internal async Task<TResponse> Deserialize<TResponse>(HttpResponseMessage httpResponseMessage)
+        {
+            var content = await httpResponseMessage.Content.ReadAsStringAsync();
+            try
+            {
+                var options = new JsonSerializerOptions
+                {
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString
+                };
+                var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, options);
+                return deepgramResponse;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred whilst processing REST response : {0}", ex.Message);
+                throw;
+            }
+        }
+
 
 
         /// <summary>
@@ -74,13 +150,11 @@ namespace Deepgram.Abstractions
         /// <returns>A HttpClient, with timeout,headers a</returns>
         internal HttpClient ConfigureClient()
         {
-            HttpClient client;
+            HttpClient? client = null;
             if (HttpClientFactory != null)
                 client = HttpClientFactory.CreateClient();
             else if (ExternalHttpClient != null)
                 client = ExternalHttpClient;
-            else
-                client = new HttpClient();
 
             if (Timeout != null)
                 client.Timeout = (TimeSpan)Timeout;
@@ -92,10 +166,7 @@ namespace Deepgram.Abstractions
         /// Set the time out on the httpclient
         /// </summary>
         /// <param name="timeSpan"></param>
-        public void SetTimeout(TimeSpan timeSpan)
-        {
-            Timeout = timeSpan;
-        }
+        public void SetTimeout(TimeSpan timeSpan) => Timeout = timeSpan;
 
         /// <summary>
         /// Create the body payload of a httpRequest
@@ -105,11 +176,9 @@ namespace Deepgram.Abstractions
         /// <param name="contentType">What type of content is being sent default is : application/json</param>
         /// <returns></returns>
         internal static StringContent CreatePayload<T>(T body, string contentType = Constants.DEFAULT_CONTENT_TYPE)
-        {
-            return new StringContent(
+            => new StringContent(
                 JsonSerializer.Serialize(body),
                 Encoding.UTF8,
                 contentType);
-        }
     }
 }
