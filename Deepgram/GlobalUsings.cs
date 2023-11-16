@@ -2,11 +2,14 @@
 global using System.Net.Http.Headers;
 global using System.Net.WebSockets;
 global using System.Reflection;
+global using System.Text;
+global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using Deepgram.Abstractions;
 global using Deepgram.Clients;
 global using Deepgram.Common;
 global using Deepgram.Logger;
+global using Deepgram.Models.Options;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;

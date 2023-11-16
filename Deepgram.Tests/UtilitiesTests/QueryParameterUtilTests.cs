@@ -97,6 +97,24 @@ public class QueryParameterUtilTests
         StringAssert.Contains($"{nameof(obj.Paragraphs).ToLower()}={obj.Paragraphs.ToString()?.ToLower()}", SUT);
     }
 
+    [Test]
+    public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
+    {
+        //Arrange 
+        var option = new AutoFaker<ExpirationOptions>().Generate();
+        var obj = DateTime.Now;
+        option.ExpirationDate = obj;
+        var expected = ($"expiration_date={HttpUtility.UrlEncode(((DateTime)obj).ToString("yyyy-MM-dd"))}");
+
+
+        //Act
+        var SUT = QueryParameterUtil.GetParameters(option);
+
+        //Assert
+        Assert.That(SUT, Is.Not.Null);
+        StringAssert.Contains(expected, SUT);
+    }
+
 
     [Test]
     public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()

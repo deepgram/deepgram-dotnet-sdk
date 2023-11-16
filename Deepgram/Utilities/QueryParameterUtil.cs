@@ -23,6 +23,10 @@ internal static class QueryParameterUtil
                         foreach (var value in (Array)pValue)
                             sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
                     }
+                    else if (pValue is DateTime)
+                    {
+                        sb.Append($"{name}={HttpUtility.UrlEncode(((DateTime)pValue).ToString("yyyy-MM-dd"))}&");
+                    }
                     else if (typeof(T) == typeof(PrerecordedSchema) && name == "callback")
                     {
                         sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");

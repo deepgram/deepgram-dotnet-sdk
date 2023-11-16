@@ -5,9 +5,9 @@ public abstract class CreateProjectKeySchema
     public string Comment { get; set; }
 
     [JsonPropertyName("scopes")]
-    public string Scopes { get; set; }
+    public string[] Scopes { get; set; }
 
     [JsonPropertyName("tags")]
-    public string Tags { get; set; }
+    public string[]? Tags { get; set; }
 
 }

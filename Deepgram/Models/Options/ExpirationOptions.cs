@@ -3,6 +3,8 @@
 public class ExpirationOptions : CreateProjectKeySchema
 {
     [JsonPropertyName("expiration_date")]
-    public string? ExpirationDate { get; set; }
+    public DateTime? ExpirationDate { get; set; }
+
+
 }
 

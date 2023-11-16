@@ -1,8 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-using Deepgram.Models.Options;
-
-namespace Deepgram.Abstractions
+﻿namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {
@@ -113,6 +109,58 @@ namespace Deepgram.Abstractions
             }
         }
 
+        /// <summary>
+        /// Delete Method for use with calls that do not expect a response
+        /// </summary>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>
+        /// <param name="logger">logger to log any messages</param>
+        /// <returns>nothing</returns>
+        public async Task DeleteAsync(string uriSegment)
+        {
+            try
+            {
+                var client = ConfigureClient();
+                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
+
+                var response = await client.DeleteAsync(requestUrl);
+                response.EnsureSuccessStatusCode();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during DELETE request");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Delete method that returns the type of response specified
+        /// </summary>
+        /// <typeparam name="TResponse">Class Type of expected response</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>
+        /// <param name="logger">logger to log any messages</param>
+        /// <returns>instance  of TResponse or throws Exception</returns>
+        public async Task<TResponse> DeleteAsync<TResponse>(string uriSegment)
+        {
+            try
+            {
+                var client = ConfigureClient();
+                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
+                var response = await client.DeleteAsync(requestUrl);
+
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<TResponse>(response);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during DELETE request");
+                throw;
+            }
+        }
+
+
 
         /// <summary>
         /// method that deserializes DeepgramResponse and performs null checks on values
@@ -126,14 +174,15 @@ namespace Deepgram.Abstractions
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             try
             {
+
                 var options = new JsonSerializerOptions
                 {
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     NumberHandling = JsonNumberHandling.AllowReadingFromString
                 };
+
                 var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, options);
                 return deepgramResponse;
-
             }
             catch (Exception ex)
             {
@@ -176,9 +225,18 @@ namespace Deepgram.Abstractions
         /// <param name="contentType">What type of content is being sent default is : application/json</param>
         /// <returns></returns>
         internal static StringContent CreatePayload<T>(T body, string contentType = Constants.DEFAULT_CONTENT_TYPE)
-            => new StringContent(
-                JsonSerializer.Serialize(body),
-                Encoding.UTF8,
-                contentType);
+        {
+            var serializeOptions = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            };
+
+            var serializedBody = JsonSerializer.Serialize(body, serializeOptions);
+            return new StringContent(
+                        serializedBody,
+                        Encoding.UTF8,
+                        contentType);
+        }
     }
 }
