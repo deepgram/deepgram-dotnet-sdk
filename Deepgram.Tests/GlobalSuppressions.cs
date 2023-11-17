@@ -11,3 +11,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Tests.Fakes.PrerecordedTranscriptionOptionsFaker.#ctor")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Tests.ClientTests.DeepgramClientTest")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Tests.Fakes.PrerecordedTranscriptionOptionsFaker")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Tests.UtilitiesTests.HttpConfigureUtilTests.Should_Return_HttpClient_With_Custom_BaseAddress_With_Https_Protocol")]

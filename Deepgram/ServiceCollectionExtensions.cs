@@ -6,12 +6,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDeepgram(this IServiceCollection services)
     {
-        //    services.AddHttpClient("DeepgramHttpClient", client =>
-        //    {
-        //        client.BaseAddress = new($"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}");
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //        client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
-        //    });
+        //services.AddHttpClient(Constants.HTTPCLIENT_NAME, client =>
+        //{
+        //    client.BaseAddress = new($"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}");
+        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //    client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
+        //});
 
         services.AddHttpClient();
 

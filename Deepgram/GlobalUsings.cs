@@ -9,7 +9,11 @@ global using Deepgram.Abstractions;
 global using Deepgram.Clients;
 global using Deepgram.Common;
 global using Deepgram.Logger;
+global using Deepgram.Models;
 global using Deepgram.Models.Options;
+global using Deepgram.Models.Responses;
+global using Deepgram.Models.Schemas;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
+

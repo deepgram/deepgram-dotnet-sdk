@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Deepgram.Models.Options;
 
 namespace Deepgram.Utilities;
 public static class ClientOptionsUtil

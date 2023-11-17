@@ -5,8 +5,9 @@
 //  c#  Equivalent of node readable - Stream
 public class FileSource
 {
+
     public byte[]? Buffer { get; set; }
 
-    public Stream Stream { get; set; }
+    public Stream? Stream { get; set; }
 }
 

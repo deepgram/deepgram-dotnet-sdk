@@ -1,4 +1,8 @@
-﻿namespace Deepgram.Clients;
+﻿
+namespace Deepgram.Clients;
+
+
+//working of node sdk - https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/packages/PrerecordedClient.ts
 public class PrerecordedClient : AbstractRestClient
 {
 
@@ -12,4 +16,46 @@ public class PrerecordedClient : AbstractRestClient
         : base(apiKey, clientOptions, nameof(PrerecordedClient), httpClientFactory)
     {
     }
+
+    //can take a UrlSource
+    //byte[] (c# equivalent to node buffer)
+    //Stream (c# equivalent to node readable)
+    public async Task<SyncPrerecordedResponse> TranscribeUrl(UrlSource source, PrerecordedSchema? prerecordedSchema)
+    {
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
+        string url = $"listen?{stringedOptions}";
+        throw new NotImplementedException();
+    }
+
+
+    //byte[] (c# equivalent to node buffer)
+    //Stream (c# equivalent to node readable)
+    public async Task<SyncPrerecordedResponse> TranscribeFile(FileSource fileSource, PrerecordedSchema? prerecordedSchema)
+    {
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
+        string url = $"listen?{stringedOptions}";
+        throw new NotImplementedException();
+    }
+
+    //can take a UrlSource
+    //byte[] (c# equivalent to node buffer)
+    //Stream (c# equivalent to node readable)
+    public async Task<AsyncPrerecordedResponse> TranscribeUrlCallback(UrlSource source, string callBack, PrerecordedSchema? prerecordedSchema)
+    {
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
+        string url = $"listen?{stringedOptions}";
+        throw new NotImplementedException();
+    }
+
+
+    //byte[] (c# equivalent to node buffer)
+    //Stream (c# equivalent to node readable)
+    public async Task<AsyncPrerecordedResponse> TranscribeFileCallback(FileSource fileSource, string callBack, PrerecordedSchema? prerecordedSchema)
+    {
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
+        string url = $"listen?{stringedOptions}";
+        throw new NotImplementedException();
+    }
+
+
 }

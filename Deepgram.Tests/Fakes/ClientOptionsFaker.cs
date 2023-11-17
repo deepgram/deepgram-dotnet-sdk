@@ -1,5 +1,4 @@
-﻿using Deepgram.Models.Options;
-
+﻿
 namespace Deepgram.Tests.Fakes;
 public class ClientOptionsFaker : AutoFaker<DeepgramClientOptions>
 {
