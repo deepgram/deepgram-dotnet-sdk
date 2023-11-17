@@ -17,6 +17,8 @@ public class PrerecordedClient : AbstractRestClient
     {
     }
 
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/helpers.ts
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/types/PrerecordedSource.ts
     //can take a UrlSource
     //byte[] (c# equivalent to node buffer)
     //Stream (c# equivalent to node readable)
@@ -27,7 +29,8 @@ public class PrerecordedClient : AbstractRestClient
         throw new NotImplementedException();
     }
 
-
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/helpers.ts
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/types/PrerecordedSource.ts
     //byte[] (c# equivalent to node buffer)
     //Stream (c# equivalent to node readable)
     public async Task<SyncPrerecordedResponse> TranscribeFile(FileSource fileSource, PrerecordedSchema? prerecordedSchema)
@@ -37,6 +40,8 @@ public class PrerecordedClient : AbstractRestClient
         throw new NotImplementedException();
     }
 
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/helpers.ts
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/types/PrerecordedSource.ts
     //can take a UrlSource
     //byte[] (c# equivalent to node buffer)
     //Stream (c# equivalent to node readable)
@@ -47,7 +52,8 @@ public class PrerecordedClient : AbstractRestClient
         throw new NotImplementedException();
     }
 
-
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/helpers.ts
+    //https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/lib/types/PrerecordedSource.ts
     //byte[] (c# equivalent to node buffer)
     //Stream (c# equivalent to node readable)
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallback(FileSource fileSource, string callBack, PrerecordedSchema? prerecordedSchema)
