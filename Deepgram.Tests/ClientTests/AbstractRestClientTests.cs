@@ -7,22 +7,26 @@ public class AbstractRestfulClientTests
 {
     ILogger<ConcreteRestClient> logger;
     string ApiKey;
+    IHttpClientFactory httpClientFactory;
 
     [SetUp]
     public void Setup()
     {
         logger = Substitute.For<ILogger<ConcreteRestClient>>();
         ApiKey = new Faker().Random.Guid().ToString();
+        httpClientFactory = Substitute.For<IHttpClientFactory>();
+        httpClientFactory.CreateClient(Arg.Any<string>()).Returns(new HttpClient());
+
     }
 
     [Test]
     public async Task GetAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
     {
         // Arrange        
-        var expectedResult = new AutoFaker<GetProjectsResponse>().Generate();
+        var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResult, HttpStatusCode.OK);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
         // Act
@@ -31,7 +35,7 @@ public class AbstractRestfulClientTests
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.IsAssignableFrom<GetProjectsResponse>(result);
-        Assert.That(result.Projects.Length, Is.EqualTo(expectedResult.Projects.Length));
+        Assert.That(result.Projects.Length, Is.EqualTo(expectedResponse.Projects.Length));
     }
 
     [Test]
@@ -40,8 +44,8 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
@@ -61,8 +65,9 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
 
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.GetAsync<GetProjectResponse>(uriSegment);
@@ -80,8 +85,8 @@ public class AbstractRestfulClientTests
         var expectedResponse = new GetProjectsResponse();
         var id = new Faker().Random.Guid().ToString();
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}/{id}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act & Assert       
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
@@ -98,8 +103,8 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
 
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.PostAsync<CreateProjectKeyResponse, object>(uriSegment, null);
@@ -122,8 +127,8 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}?{stringedSchema}";
 
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.PostAsync<SyncPrerecordedResponse, UrlSource>(uriSegment, source);
@@ -145,8 +150,8 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}?{stringedSchema}";
 
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act
         // Act & Assert       
@@ -160,10 +165,10 @@ public class AbstractRestfulClientTests
     public void DeleteAsync_Should_Return_Nothing_On_SuccessfulResponse()
     {
         // Arrange        
-        var expectedResult = new VoidResponse();
+        var expectedResponse = new VoidResponse();
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResult, HttpStatusCode.OK);
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         AsyncTestDelegate act = async () => await client.DeleteAsync(uriSegment);
@@ -177,14 +182,14 @@ public class AbstractRestfulClientTests
     public void DeleteAsync_Should_ThrowsException_On_Response_containing_Error()
     {
         // Arrange       
-        var expectedResult = new VoidResponse()
+        var expectedResponse = new VoidResponse()
         {
             Error = new Exception()
         };
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResult, HttpStatusCode.BadRequest);
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync(uriSegment));
@@ -201,8 +206,8 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.DeleteAsync<MessageResponse>(uriSegment);
@@ -219,10 +224,8 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}";
-
-
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClient);
+        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync(uriSegment));
@@ -232,4 +235,92 @@ public class AbstractRestfulClientTests
         logger.ReceivedWithAnyArgs();
     }
 
+
+    [Test]
+    public async Task PatchAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
+    {
+        // Arrange
+        var id = new Faker().Random.Guid().ToString();
+        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
+        var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}/{id}";
+
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        client.Logger = logger;
+
+        var content = new AutoFaker<Project>().Generate();
+
+        // Act
+        var result = await client.PatchAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.IsAssignableFrom<MessageResponse>(result);
+        Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+    }
+
+    [Test]
+    public void PatchAsync_TResponse_Should_ThrowsException_On_UnsuccessfulResponse()
+    {
+        // Arrange
+        var id = new Faker().Random.Guid().ToString();
+        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
+        var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}/{id}";
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+        client.Logger = logger;
+        //Act
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PatchAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions));
+
+        // Act & Assert
+
+        logger.ReceivedWithAnyArgs();
+    }
+
+    [Test]
+    public async Task PutAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
+    {
+        // Arrange
+        var id = new Faker().Random.Guid().ToString();
+        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
+        var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}/{id}";
+
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        client.Logger = logger;
+
+        var content = new AutoFaker<Project>().Generate();
+
+        // Act
+        var result = await client.PutAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions);
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+        Assert.IsAssignableFrom<MessageResponse>(result);
+        Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+    }
+
+    [Test]
+    public void PutAsync_TResponse_Should_ThrowsException_On_UnsuccessfulResponse()
+    {
+        // Arrange
+        var id = new Faker().Random.Guid().ToString();
+        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
+        var uriSegment = $"{Constants.PROJECTS_URI_SEGMENT}/{id}";
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+
+        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+        client.Logger = logger;
+        //Act
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PutAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions));
+
+        // Act & Assert
+
+        logger.ReceivedWithAnyArgs();
+    }
 }

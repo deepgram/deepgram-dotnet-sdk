@@ -8,7 +8,7 @@ public class HttpConfigureUtilTests
         var apiKey = Guid.NewGuid().ToString();
         var clientOptions = new ClientOptionsFaker().Generate("defaults");
         var httpClient = new HttpClient();
-        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/";
+        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}";
 
         //Act
         var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
@@ -99,7 +99,7 @@ public class HttpConfigureUtilTests
         var expectedHeaders = FakeHeaders();
         clientOptions.Headers = expectedHeaders;
         var httpClient = new HttpClient();
-        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/";
+        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}";
 
         //Act
         var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);

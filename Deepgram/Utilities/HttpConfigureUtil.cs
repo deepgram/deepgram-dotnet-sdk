@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using Deepgram.Models.Options;
 
 namespace Deepgram.Utilities;
 
@@ -26,7 +25,7 @@ internal static class HttpConfigureUtil
         }
         else
         {
-            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}");
+            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}");
         }
 
         return httpClient;

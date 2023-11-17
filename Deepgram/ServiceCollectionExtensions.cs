@@ -6,14 +6,14 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDeepgram(this IServiceCollection services)
     {
-        services.AddHttpClient<PrerecordedClient>();
+        //    services.AddHttpClient("DeepgramHttpClient", client =>
+        //    {
+        //        client.BaseAddress = new($"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}");
+        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //        client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
+        //    });
 
-
-        services.Configure<System.Text.Json.JsonSerializerOptions>(options =>
-        {
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.NumberHandling = JsonNumberHandling.AllowReadingFromString;
-        });
+        services.AddHttpClient();
 
         services.AddTransient<LiveClient, LiveClient>();
         services.AddTransient<ClientWebSocket, ClientWebSocket>();

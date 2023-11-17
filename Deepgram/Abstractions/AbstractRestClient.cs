@@ -13,9 +13,8 @@
         internal IHttpClientFactory? HttpClientFactory { get; set; }
 
         /// <summary>
-        /// Optional HttpClient passed in by consuming project
-        /// </summary>
-        internal HttpClient? ExternalHttpClient { get; set; }
+        ///  HttpClient created by the factory
+        internal HttpClient? HttpClient { get; set; }
 
         /// <summary>
         /// ApiKey used for Authentication Header and is required
@@ -32,20 +31,6 @@
         /// </summary>
         internal DeepgramClientOptions Options { get; set; }
 
-        /// <summary>
-        /// Constructor that take a HttpClient
-        /// </summary>
-        /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-        /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
-        /// <param name="loggerName">nameof the descendent class</param>
-        /// <param name="httpClient">HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, DeepgramClientOptions clientOptions, string loggerName, HttpClient httpClient)
-        {
-            ApiKey = ApiKeyUtil.Configure(apiKey);
-            ExternalHttpClient = httpClient;
-            Options = clientOptions;
-            Logger = LogProvider.GetLogger(loggerName);
-        }
 
         /// <summary>
         /// Constructor that take a IHttpClientFactory
@@ -59,16 +44,24 @@
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;
             Options = clientOptions;
+            HttpClient = httpClientFactory.CreateClient();
+            HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
+
             Logger = LogProvider.GetLogger(loggerName);
         }
 
+        /// <summary>
+        /// GET Rest Request
+        /// </summary>
+        /// <typeparam name="TResponse">Type of class of response expected</typeparam>
+        /// <param name="uriSegment">request uri Endpoint</param>
+        /// <returns></returns>
         public virtual async Task<TResponse> GetAsync<TResponse>(string uriSegment)
         {
             try
             {
-                var client = ConfigureClient();
-                var requestUri = $"{Constants.API_VERSION}/{uriSegment}";
-                var response = await client.GetAsync(requestUri);
+                CheckForTimeout();
+                var response = await HttpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<TResponse>(response);
                 return result;
@@ -93,10 +86,9 @@
         {
             try
             {
-                var client = ConfigureClient();
-                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
+                CheckForTimeout();
                 var payload = CreatePayload(obj);
-                var response = await client.PostAsync(requestUrl, payload);
+                var response = await HttpClient.PostAsync(uriSegment, payload);
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<TResponse>(response);
 
@@ -119,10 +111,8 @@
         {
             try
             {
-                var client = ConfigureClient();
-                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
-
-                var response = await client.DeleteAsync(requestUrl);
+                CheckForTimeout();
+                var response = await HttpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
 
             }
@@ -144,9 +134,8 @@
         {
             try
             {
-                var client = ConfigureClient();
-                var requestUrl = $"{Constants.API_VERSION}/{uriSegment}";
-                var response = await client.DeleteAsync(requestUrl);
+                CheckForTimeout();
+                var response = await HttpClient.DeleteAsync(uriSegment);
 
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<TResponse>(response);
@@ -160,6 +149,61 @@
             }
         }
 
+        /// <summary>
+        /// Patch method call that takes a body object
+        /// </summary>
+        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
+        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>   
+        /// <param name="obj">instance of T that is to be sent</param>      
+        /// <returns>instance of TResponse</returns>
+        public virtual async Task<TResponse> PatchAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        {
+            try
+            {
+
+                CheckForTimeout();
+                var payload = CreatePayload(obj);
+                var response = await HttpClient.PatchAsync(uriSegment, payload);
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<TResponse>(response);
+                return result;
+
+            }
+
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during PATCH request");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Put method call that takes a body object
+        /// </summary>
+        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
+        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
+        /// <param name="uriSegment">Uri for the api</param>   
+        /// <param name="obj">instance of TContent that is to be sent</param>       
+        /// <returns>instance of TResponse</returns>
+        public virtual async Task<TResponse> PutAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        {
+            try
+            {
+                CheckForTimeout();
+                var payload = CreatePayload(obj);
+                var response = await HttpClient.PatchAsync(uriSegment, payload);
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<TResponse>(response);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during PATCH request");
+                throw;
+            }
+        }
 
 
         /// <summary>
@@ -174,7 +218,6 @@
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             try
             {
-
                 var options = new JsonSerializerOptions
                 {
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -191,24 +234,10 @@
             }
         }
 
-
-
-        /// <summary>
-        /// Set up the HttpClient onb method call using in priority order: IHttpClientFactory,ExternalHttpClient, Fallback - create a new HttpClient
-        /// </summary>
-        /// <returns>A HttpClient, with timeout,headers a</returns>
-        internal HttpClient ConfigureClient()
+        internal void CheckForTimeout()
         {
-            HttpClient? client = null;
-            if (HttpClientFactory != null)
-                client = HttpClientFactory.CreateClient();
-            else if (ExternalHttpClient != null)
-                client = ExternalHttpClient;
-
             if (Timeout != null)
-                client.Timeout = (TimeSpan)Timeout;
-
-            return HttpConfigureUtil.Configure(ApiKey, Options, client);
+                HttpClient.Timeout = (TimeSpan)Timeout;
         }
 
         /// <summary>
