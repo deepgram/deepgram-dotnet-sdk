@@ -58,7 +58,8 @@ public class OnPremClient : AbstractRestClient
     public async Task<OnPremCredentialResponse> CreateCredentials(string projectId, CreateOnPremCredentialsSchema createOnPremCredentialsSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}";
-        return await PostAsync<OnPremCredentialResponse, CreateOnPremCredentialsSchema>(url, createOnPremCredentialsSchema);
+        var payload = CreatePayload(createOnPremCredentialsSchema);
+        return await PostAsync<OnPremCredentialResponse>(url, payload);
     }
 
 }

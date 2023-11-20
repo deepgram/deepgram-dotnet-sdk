@@ -50,8 +50,9 @@ public class ManageClient : AbstractRestClient
     public async Task<MessageResponse> UpdateProject(string projectId, UpdateProjectSchema updateProjectSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}";
+        var payload = CreatePayload(updateProjectSchema);
         // USES PATCH
-        return await PatchAsync<MessageResponse, UpdateProjectSchema>(url, updateProjectSchema);
+        return await PatchAsync<MessageResponse>(url, payload);
     }
 
     /// <summary>
@@ -113,7 +114,8 @@ public class ManageClient : AbstractRestClient
     public async Task<CreateProjectKeyResponse> CreateProjectKey(string projectId, CreateProjectKeySchema createProjectKeySchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/keys";
-        return await PostAsync<CreateProjectKeyResponse, CreateProjectKeySchema>(url, createProjectKeySchema);
+        var payload = CreatePayload(createProjectKeySchema);
+        return await PostAsync<CreateProjectKeyResponse>(url, payload);
     }
 
     /// <summary>
@@ -160,7 +162,8 @@ public class ManageClient : AbstractRestClient
     public async Task<MessageResponse> SendProjectInvite(string projectId, SendProjectInviteSchema sendProjectInviteSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/invites";
-        return await PostAsync<MessageResponse, SendProjectInviteSchema>(url, sendProjectInviteSchema);
+        var payload = CreatePayload(sendProjectInviteSchema);
+        return await PostAsync<MessageResponse>(url, payload);
     }
 
 
@@ -201,7 +204,8 @@ public class ManageClient : AbstractRestClient
     public async Task<MessageResponse> UpdateProjectMemberScope(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}";
-        return await PutAsync<MessageResponse, UpdateProjectMemberScopeSchema>(url, updateProjectMemberScopeSchema);
+        var payload = CreatePayload(updateProjectMemberScopeSchema);
+        return await PutAsync<MessageResponse>(url, payload);
     }
 
     /// <summary>

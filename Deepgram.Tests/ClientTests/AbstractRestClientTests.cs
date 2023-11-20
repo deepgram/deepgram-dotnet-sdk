@@ -107,7 +107,7 @@ public class AbstractRestfulClientTests
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
-        var result = await client.PostAsync<CreateProjectKeyResponse, object>(uriSegment, null);
+        var result = await client.PostAsync<CreateProjectKeyResponse>(uriSegment, null);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -121,7 +121,6 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var source = new UrlSource { Url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav" };
-
         var schema = new PrerecordedSchema { Punctuate = true, Utterances = true };
         var stringedSchema = QueryParameterUtil.GetParameters(schema);
 
@@ -130,8 +129,10 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
+        var content = AbstractRestClient.CreatePayload(source);
+
         // Act
-        var result = await client.PostAsync<SyncPrerecordedResponse, UrlSource>(uriSegment, source);
+        var result = await client.PostAsync<SyncPrerecordedResponse>(uriSegment, content);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -144,7 +145,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var source = new UrlSource { Url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav" };
-
+        var content = AbstractRestClient.CreatePayload(source);
         var schema = new PrerecordedSchema { Punctuate = true, Utterances = true };
         var stringedSchema = QueryParameterUtil.GetParameters(schema);
 
@@ -155,7 +156,7 @@ public class AbstractRestfulClientTests
         client.Logger = logger;
         // Act
         // Act & Assert       
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PostAsync<SyncPrerecordedResponse, UrlSource>(uriSegment, source));
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PostAsync<SyncPrerecordedResponse>(uriSegment, content));
         logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during POST request");
         return Task.CompletedTask;
     }
@@ -248,11 +249,11 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
+        var content = AbstractRestClient.CreatePayload(updateOptions);
 
-        var content = new AutoFaker<Project>().Generate();
 
         // Act
-        var result = await client.PatchAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions);
+        var result = await client.PatchAsync<MessageResponse>(uriSegment, content);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -272,8 +273,11 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
+
+        var content = AbstractRestClient.CreatePayload(updateOptions);
+
         //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PatchAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions));
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PatchAsync<MessageResponse>(uriSegment, content));
 
         // Act & Assert
 
@@ -293,10 +297,10 @@ public class AbstractRestfulClientTests
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
-        var content = new AutoFaker<Project>().Generate();
+        var content = AbstractRestClient.CreatePayload(updateOptions);
 
         // Act
-        var result = await client.PutAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions);
+        var result = await client.PutAsync<MessageResponse>(uriSegment, content);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -316,8 +320,10 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
+        var content = AbstractRestClient.CreatePayload(updateOptions);
+
         //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PutAsync<MessageResponse, UpdateProjectSchema>(uriSegment, updateOptions));
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PutAsync<MessageResponse>(uriSegment, content));
 
         // Act & Assert
 

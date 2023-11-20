@@ -53,17 +53,17 @@
         /// <summary>
         /// GET Rest Request
         /// </summary>
-        /// <typeparam name="TResponse">Type of class of response expected</typeparam>
+        /// <typeparam name="T">Type of class of response expected</typeparam>
         /// <param name="uriSegment">request uri Endpoint</param>
         /// <returns></returns>
-        public virtual async Task<TResponse> GetAsync<TResponse>(string uriSegment)
+        public virtual async Task<T> GetAsync<T>(string uriSegment)
         {
             try
             {
                 CheckForTimeout();
                 var response = await HttpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<TResponse>(response);
+                var result = await Deserialize<T>(response);
                 return result;
             }
             catch (Exception ex)
@@ -76,21 +76,18 @@
         /// <summary>
         /// Post method
         /// </summary>
-        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
-        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
-        /// <param name="uriSegment">Uri for the api including the query parameters</param>    
-        /// <param name="obj">instance of T that is to be sent</param>
+        /// <typeparam name="T">Class type of what return type is expected</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param> 
         /// <param name="logger">logger to log any messages</param>   
         /// <returns>instance of TResponse</returns>
-        public virtual async Task<TResponse> PostAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        public virtual async Task<T> PostAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
                 CheckForTimeout();
-                var payload = CreatePayload(obj);
-                var response = await HttpClient.PostAsync(uriSegment, payload);
+                var response = await HttpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<TResponse>(response);
+                var result = await Deserialize<T>(response);
 
                 return result;
             }
@@ -126,11 +123,11 @@
         /// <summary>
         /// Delete method that returns the type of response specified
         /// </summary>
-        /// <typeparam name="TResponse">Class Type of expected response</typeparam>
+        /// <typeparam name="T">Class Type of expected response</typeparam>
         /// <param name="uriSegment">Uri for the api including the query parameters</param>
         /// <param name="logger">logger to log any messages</param>
         /// <returns>instance  of TResponse or throws Exception</returns>
-        public async Task<TResponse> DeleteAsync<TResponse>(string uriSegment)
+        public async Task<T> DeleteAsync<T>(string uriSegment)
         {
             try
             {
@@ -138,7 +135,7 @@
                 var response = await HttpClient.DeleteAsync(uriSegment);
 
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<TResponse>(response);
+                var result = await Deserialize<T>(response);
 
                 return result;
             }
@@ -152,21 +149,17 @@
         /// <summary>
         /// Patch method call that takes a body object
         /// </summary>
-        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
-        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
-        /// <param name="uriSegment">Uri for the api including the query parameters</param>   
-        /// <param name="obj">instance of T that is to be sent</param>      
+        /// <typeparam name="T">Class type of what return type is expected</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>  
         /// <returns>instance of TResponse</returns>
-        public virtual async Task<TResponse> PatchAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
-
                 CheckForTimeout();
-                var payload = CreatePayload(obj);
-                var response = await HttpClient.PatchAsync(uriSegment, payload);
+                var response = await HttpClient.PatchAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<TResponse>(response);
+                var result = await Deserialize<T>(response);
                 return result;
 
             }
@@ -181,20 +174,17 @@
         /// <summary>
         /// Put method call that takes a body object
         /// </summary>
-        /// <typeparam name="TResponse">Class type of what return type is expected</typeparam>
-        /// <typeparam name="TContent">type of object being sent as part of the body</typeparam>
+        /// <typeparam name="T">Class type of what return type is expected</typeparam>
         /// <param name="uriSegment">Uri for the api</param>   
-        /// <param name="obj">instance of TContent that is to be sent</param>       
         /// <returns>instance of TResponse</returns>
-        public virtual async Task<TResponse> PutAsync<TResponse, TContent>(string uriSegment, TContent obj)
+        public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
                 CheckForTimeout();
-                var payload = CreatePayload(obj);
-                var response = await HttpClient.PatchAsync(uriSegment, payload);
+                var response = await HttpClient.PatchAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<TResponse>(response);
+                var result = await Deserialize<T>(response);
 
                 return result;
             }
