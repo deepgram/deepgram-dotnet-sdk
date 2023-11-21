@@ -1,32 +1,29 @@
-﻿using Deepgram.Clients;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Deepgram.Tests.IntegrationTests;
+﻿namespace Deepgram.Tests.IntegrationTests;
 public class EndpointTests
 {
-    public string ApiKey = "a5c3539348f3a038111b5a6c77ed26c1f938cf72";
+    public string ApiKey = "";
 
 
-    [Test]
-    public async Task GetAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
-    {
-        // Arrange        
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddHttpClient();
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+    //[Test]
+    //public async Task GetAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
+    //{
+    //    // Arrange        
+    //    var serviceCollection = new ServiceCollection();
+    //    serviceCollection.AddHttpClient();
+    //    var serviceProvider = serviceCollection.BuildServiceProvider();
+    //    var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-        var client = new ManageClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+    //    var client = new ManageClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
 
 
-        // Act
-        var result = await client.GetProjects();
+    //    // Act
+    //    var result = await client.GetProjects();
 
-        // Assert
-        Assert.That(result, Is.Not.Null);
+    //    // Assert
+    //    Assert.That(result, Is.Not.Null);
 
-        // Assert.That(result.Projects.Length, Is.EqualTo(excpectedResult.Projects.Length));
-    }
+    //    // Assert.That(result.Projects.Length, Is.EqualTo(excpectedResult.Projects.Length));
+    //}
 
     //[Test]
     //public async Task PostTest()
