@@ -1,34 +1,32 @@
-﻿namespace Deepgram.Tests.ClientTests;
+﻿using Deepgram.Clients;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Deepgram.Tests.IntegrationTests;
 public class EndpointTests
 {
-    public string ApiKey = "";
+    public string ApiKey = "a5c3539348f3a038111b5a6c77ed26c1f938cf72";
 
 
-    //[Test]
-    //public async Task GetAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
-    //{
-    //    // Arrange        
-    //    var excpectedResult = new AutoFaker<GetProjectsResponse>().Generate();
-    //    var deepgramResponse = new DeepgramResponse<GetProjectsResponse>()
-    //    {
-    //        Error = null,
-    //        Result = excpectedResult
-    //    };
-    //    var uriSegment = Constants.PROJECTS_URI_SEGMENT;
-    //    // var httpClient = MockHttpClient.CreateHttpClientWithResult(deepgramResponse, HttpStatusCode.OK);
-    //    var httpClient = new HttpClient();
+    [Test]
+    public async Task GetAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
+    {
+        // Arrange        
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddHttpClient();
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-    //    var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClient);
-    //    client.Logger = Substitute.For<ILogger<ConcreteRestClient>>();
+        var client = new ManageClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
 
-    //    // Act
-    //    var result = await client.GetAsync<GetProjectsResponse>(uriSegment);
 
-    //    // Assert
-    //    Assert.That(result, Is.Not.Null);
-    //    Assert.IsAssignableFrom<GetProjectsResponse>(result);
-    //    // Assert.That(result.Projects.Length, Is.EqualTo(excpectedResult.Projects.Length));
-    //}
+        // Act
+        var result = await client.GetProjects();
+
+        // Assert
+        Assert.That(result, Is.Not.Null);
+
+        // Assert.That(result.Projects.Length, Is.EqualTo(excpectedResult.Projects.Length));
+    }
 
     //[Test]
     //public async Task PostTest()

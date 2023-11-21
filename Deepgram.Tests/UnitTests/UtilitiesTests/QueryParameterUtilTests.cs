@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Tests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
 public class QueryParameterUtilTests
 {
@@ -104,7 +104,7 @@ public class QueryParameterUtilTests
         var option = new AutoFaker<ExpirationOptions>().Generate();
         var obj = DateTime.Now;
         option.ExpirationDate = obj;
-        var expected = ($"expiration_date={HttpUtility.UrlEncode(((DateTime)obj).ToString("yyyy-MM-dd"))}");
+        var expected = $"expiration_date={HttpUtility.UrlEncode(obj.ToString("yyyy-MM-dd"))}";
 
 
         //Act

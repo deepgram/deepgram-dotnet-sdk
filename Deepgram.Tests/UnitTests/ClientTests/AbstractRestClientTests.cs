@@ -1,6 +1,6 @@
 ﻿using Deepgram.Models;
 
-namespace Deepgram.Tests.ClientTests;
+namespace Deepgram.Tests.UnitTests.ClientTests;
 
 [TestFixture]
 public class AbstractRestfulClientTests

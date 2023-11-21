@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Tests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 internal class UserAgentTest
 {
     [Test]

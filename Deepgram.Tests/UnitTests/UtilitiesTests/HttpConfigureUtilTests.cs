@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Tests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class HttpConfigureUtilTests
 {
     [Test]

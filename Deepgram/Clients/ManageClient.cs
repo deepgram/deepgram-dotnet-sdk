@@ -26,7 +26,7 @@ public class ManageClient : AbstractRestClient
     /// <returns>GetProjectsResponse</returns>
     public async Task<GetProjectsResponse> GetProjects()
     {
-        string url = $"{Constants.PROJECTS}";
+        string url = $"/{Constants.PROJECTS}";
         return await GetAsync<GetProjectsResponse>(url);
     }
 
