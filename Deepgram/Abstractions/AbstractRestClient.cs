@@ -39,11 +39,11 @@
         /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
         /// <param name="loggerName">nameof the descendent class</param>
         /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, DeepgramClientOptions clientOptions, string loggerName, IHttpClientFactory httpClientFactory)
+        internal AbstractRestClient(string? apiKey, DeepgramClientOptions? clientOptions, string loggerName, IHttpClientFactory httpClientFactory)
         {
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;
-            Options = clientOptions;
+            Options = clientOptions == null ? new DeepgramClientOptions() : clientOptions;
             HttpClient = httpClientFactory.CreateClient();
             HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
 
@@ -97,6 +97,32 @@
                 throw;
             }
         }
+
+        /// <summary>
+        /// Post method
+        /// </summary>
+        /// <typeparam name="T">Class type of what return type is expected</typeparam>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param> 
+        /// <param name="logger">logger to log any messages</param>   
+        /// <returns>instance of TResponse</returns>
+        public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
+        {
+            try
+            {
+                CheckForTimeout();
+                var response = await HttpClient.PostAsync(uriSegment, content);
+                response.EnsureSuccessStatusCode();
+                var result = await Deserialize<T>(response);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error occurred during POST request");
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Delete Method for use with calls that do not expect a response
@@ -243,19 +269,34 @@
         /// <param name="body">instance valye for the body</param>
         /// <param name="contentType">What type of content is being sent default is : application/json</param>
         /// <returns></returns>
-        internal static StringContent CreatePayload<T>(T body, string contentType = Constants.DEFAULT_CONTENT_TYPE)
+        internal static StringContent CreatePayload<T>(T body)
         {
             var serializeOptions = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
-
             var serializedBody = JsonSerializer.Serialize(body, serializeOptions);
             return new StringContent(
                         serializedBody,
                         Encoding.UTF8,
-                        contentType);
+                        Constants.DEFAULT_CONTENT_TYPE);
         }
+
+
+        /// <summary>
+        /// Create the stream payload of a httpRequest
+        /// </summary>
+        /// <param name="body">of type stream</param>
+        /// <returns>HttpContent</returns>
+        internal static HttpContent CreateStreamPayload(Stream body)
+        {
+            body.Seek(0, SeekOrigin.Begin);
+            HttpContent httpContent = new StreamContent(body);
+            httpContent.Headers.Add("Content-Type", Constants.DEEPGRAM_CONTENT_TYPE);
+            httpContent.Headers.Add("Content-Length", body.Length.ToString());
+            return httpContent;
+        }
+
     }
 }

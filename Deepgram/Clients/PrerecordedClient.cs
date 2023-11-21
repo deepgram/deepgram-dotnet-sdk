@@ -43,7 +43,9 @@ public class PrerecordedClient : AbstractRestClient
         VerifyNoCallBack(prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
-        var payload = CreatePayload(source, Constants.DEEPGRAM_CONTENT_TYPE);
+        var stream = new MemoryStream();
+        stream.Write(source, 0, source.Length);
+        var payload = CreateStreamPayload(stream);
         return await PostAsync<SyncPrerecordedResponse>(url, payload);
     }
 
@@ -58,7 +60,7 @@ public class PrerecordedClient : AbstractRestClient
         VerifyNoCallBack(prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
-        var payload = CreatePayload(source, Constants.DEEPGRAM_CONTENT_TYPE);
+        var payload = CreateStreamPayload(source);
         return await PostAsync<SyncPrerecordedResponse>(url, payload);
     }
 
@@ -91,7 +93,9 @@ public class PrerecordedClient : AbstractRestClient
     {
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
-        var payload = CreatePayload(source, Constants.DEEPGRAM_CONTENT_TYPE);
+        var stream = new MemoryStream();
+        stream.Write(source, 0, source.Length);
+        var payload = CreateStreamPayload(stream);
         return await PostAsync<AsyncPrerecordedResponse>(url, payload);
     }
 
@@ -106,7 +110,7 @@ public class PrerecordedClient : AbstractRestClient
     {
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
-        var payload = CreatePayload(source, Constants.DEEPGRAM_CONTENT_TYPE);
+        var payload = CreateStreamPayload(source);
         return await PostAsync<AsyncPrerecordedResponse>(url, payload);
     }
 

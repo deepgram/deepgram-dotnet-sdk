@@ -15,7 +15,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    internal ManageClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
+    public ManageClient(string? apiKey, DeepgramClientOptions? clientOptions, IHttpClientFactory httpClientFactory)
         : base(apiKey, clientOptions, nameof(ManageClient), httpClientFactory) { }
 
     #region Projects
@@ -26,7 +26,7 @@ public class ManageClient : AbstractRestClient
     /// <returns>GetProjectsResponse</returns>
     public async Task<GetProjectsResponse> GetProjects()
     {
-        string url = $"/{Constants.PROJECTS}";
+        string url = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
         return await GetAsync<GetProjectsResponse>(url);
     }
 

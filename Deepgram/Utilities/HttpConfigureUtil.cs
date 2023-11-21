@@ -14,9 +14,6 @@ internal static class HttpConfigureUtil
 
     private static HttpClient SetBaseUrl(DeepgramClientOptions options, HttpClient httpClient)
     {
-        //if the HttpClient BaseAddress is pre-set then return it 
-        if (httpClient.BaseAddress != null) return httpClient;
-
         if (options.Url != null)
         {
             string pattern = @"^.*//(http://|https://)?";
@@ -25,7 +22,7 @@ internal static class HttpConfigureUtil
         }
         else
         {
-            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}");
+            httpClient.BaseAddress = new($"https://{Constants.DEFAULT_URI}");
         }
 
         return httpClient;
