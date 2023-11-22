@@ -183,7 +183,13 @@
             try
             {
                 CheckForTimeout();
+#if NETSTANDARD2_0
+    var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment);
+                request.Content = content;
+    var response = await HttpClient.SendAsync(request);
+#else
                 var response = await HttpClient.PatchAsync(uriSegment, content);
+#endif
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<T>(response);
                 return result;
@@ -208,7 +214,7 @@
             try
             {
                 CheckForTimeout();
-                var response = await HttpClient.PatchAsync(uriSegment, content);
+                var response = await HttpClient.PutAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<T>(response);
 
@@ -216,7 +222,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during PATCH request");
+                Logger.LogError(ex, "Error occurred during PUT request");
                 throw;
             }
         }
