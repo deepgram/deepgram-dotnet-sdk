@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Clients;
+﻿namespace Deepgram;
 
 
 //working of node sdk - https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/packages/PrerecordedClient.ts
@@ -6,15 +6,22 @@ public class PrerecordedClient : AbstractRestClient
 {
 
     /// <summary>
-    /// Constructor that take a IHttpClientFactory
+    /// Constructor for when specific configuration of the httpclient is needed that take a IHttpClientFactory
     /// </summary>
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>   
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     public PrerecordedClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
-        : base(apiKey, clientOptions, nameof(PrerecordedClient), httpClientFactory)
-    {
-    }
+        : base(apiKey, clientOptions, nameof(PrerecordedClient), httpClientFactory) { }
+
+    /// <summary>
+    /// Constructor that take a IHttpClientFactory
+    /// </summary>
+    /// <param name="apiKey">ApiKey used for Authentication Header and is required</param> 
+    /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
+    public PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory)
+        : base(apiKey, nameof(PrerecordedClient), httpClientFactory) { }
+
 
     /// <summary>
     ///  Transcribe a file by providing a url 
@@ -22,7 +29,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">Url to the file that is to be transcribed</param>
     /// <param name="prerecordedSchema">Option for the transcription</param>
     /// <returns>SyncPrerecordedResponse</returns>
-    public async Task<SyncPrerecordedResponse> TranscribeUrl(UrlSource source, PrerecordedSchema? prerecordedSchema)
+    public async Task<SyncPrerecordedResponse> TranscribeUrlAsync(UrlSource source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(prerecordedSchema);
 
@@ -38,7 +45,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">file is the form of a byte[]</param>
     /// <param name="prerecordedSchema">Option for the transcription</param>
     /// <returns>SyncPrerecordedResponse</returns>
-    public async Task<SyncPrerecordedResponse> TranscribeFile(byte[] source, PrerecordedSchema? prerecordedSchema)
+    public async Task<SyncPrerecordedResponse> TranscribeFileAsync(byte[] source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
@@ -55,7 +62,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">file is the form of a stream</param>
     /// <param name="prerecordedSchema">Options for the transcription</param>
     /// <returns>SyncPrerecordedResponse</returns>
-    public async Task<SyncPrerecordedResponse> TranscribeFile(Stream source, PrerecordedSchema? prerecordedSchema)
+    public async Task<SyncPrerecordedResponse> TranscribeFileAsync(Stream source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
@@ -72,7 +79,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
     /// <returns>AsyncPrerecordedResponse</returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBack(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema)
+    public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBackAsync(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         VerifyOneCallBackSet(callBack, prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
@@ -89,7 +96,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
     /// <returns>AsyncPrerecordedResponse</returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeFileCallBack(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema)
+    public async Task<AsyncPrerecordedResponse> TranscribeFileCallBackAsync(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
@@ -106,7 +113,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
     /// <returns>AsyncPrerecordedResponse</returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeFileCallback(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema)
+    public async Task<AsyncPrerecordedResponse> TranscribeFileCallbackAsync(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
@@ -118,7 +125,7 @@ public class PrerecordedClient : AbstractRestClient
     {
         if (prerecordedSchema != null && prerecordedSchema.Callback != null)
         {
-            throw new DeepgramError($"CallBack cannot be provided as schema option to a synchronous transcription. Use {nameof(TranscribeFileCallback)} or {nameof(TranscribeUrlCallBack)}");
+            throw new DeepgramError($"CallBack cannot be provided as schema option to a synchronous transcription. Use {nameof(TranscribeFileCallbackAsync)} or {nameof(TranscribeUrlCallBackAsync)}");
         }
     }
 
@@ -127,7 +134,7 @@ public class PrerecordedClient : AbstractRestClient
         //check if no CallBack set in either callBack parameter or PrerecordedSchema
         if (prerecordedSchema.Callback == null && callBack == null)
         {
-            throw new DeepgramError($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  Use {nameof(TranscribeFile)} or {nameof(TranscribeUrl)}");
+            throw new DeepgramError($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  Use {nameof(TranscribeFileCallbackAsync)}  or  {nameof(TranscribeUrlCallBackAsync)}");
         }
 
         //check that only one CallBack is set in either callBack parameter or PrerecordedSchema

@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Clients;
+﻿namespace Deepgram;
 
 
 // working of node sdk - https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/packages/ManageClient.ts
@@ -9,7 +9,7 @@
 public class ManageClient : AbstractRestClient
 {
     /// <summary>
-    /// Constructor that take a IHttpClientFactory
+    /// Constructor for when specific configuration of the HttpClient is needed
     /// </summary>
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
@@ -17,6 +17,15 @@ public class ManageClient : AbstractRestClient
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     public ManageClient(string? apiKey, DeepgramClientOptions? clientOptions, IHttpClientFactory httpClientFactory)
         : base(apiKey, clientOptions, nameof(ManageClient), httpClientFactory) { }
+
+    /// <summary>
+    /// Constructor 
+    /// </summary>
+    /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
+    /// <param name="loggerName">nameof the descendent class</param>
+    /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
+    public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory)
+        : base(apiKey, nameof(ManageClient), httpClientFactory) { }
 
     #region Projects
 

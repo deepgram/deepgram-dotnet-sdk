@@ -11,7 +11,11 @@ public class DeepgramClientOptions
     /// The URL used to interact with production, On-prem and other Deepgram environments. Defaults to `api.deepgram.com`.
     /// </summary>    
     public string? Url { get; set; }
-    FetchOptions? FetchOptions { get; set; }
 
-    RestProxy? RestProxy { get; set; }
+    /// <summary>
+    /// If using named clients you can assign the Client Name here
+    /// </summary>
+    public string NamedClientName { get; set; }
+
+    FetchOptions? FetchOptions { get; set; }
 }

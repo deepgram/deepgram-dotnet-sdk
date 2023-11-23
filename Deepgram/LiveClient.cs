@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Clients;
+﻿namespace Deepgram;
 public class LiveClient
 {
     //const string LOGGER_CATEGORY = "Deepgram.Transcription.LiveTranscriptionClient";

@@ -49,6 +49,4 @@ public class TranscriptionSchema
     [JsonPropertyName("tag")]
     public string[]? Tag { get; set; }
 
-    [JsonPropertyName("additional_properties")]
-    public Dictionary<string, string>? AdditionalProperties { get; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Clients;
+﻿namespace Deepgram;
 
 /// <summary>
 /// Client for OnPrem user to manage credentials
@@ -13,6 +13,7 @@ public class OnPremClient : AbstractRestClient
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     internal OnPremClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
         : base(apiKey, clientOptions, nameof(OnPremClient), httpClientFactory) { }
+
 
     /// <summary>
     /// get a list of credentials associated with project

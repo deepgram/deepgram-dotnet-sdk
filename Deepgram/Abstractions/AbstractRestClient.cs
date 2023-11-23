@@ -29,7 +29,7 @@
         /// <summary>
         /// Options for configuring the HttpClient
         /// </summary>
-        internal DeepgramClientOptions Options { get; set; }
+        internal DeepgramClientOptions? Options { get; set; }
 
 
         /// <summary>
@@ -43,7 +43,30 @@
         {
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;
-            Options = clientOptions == null ? new DeepgramClientOptions() : clientOptions;
+            Options = clientOptions;
+            if (!string.IsNullOrEmpty(Options.NamedClientName))
+            {
+                HttpClient = httpClientFactory.CreateClient();
+            }
+            else
+            {
+                HttpClient = httpClientFactory.CreateClient(Options.NamedClientName);
+            }
+            HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
+
+            Logger = LogProvider.GetLogger(loggerName);
+        }
+
+        /// <summary>
+        /// Constructor that take a IHttpClientFactory
+        /// </summary>
+        /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
+        /// <param name="loggerName">nameof the descendent class</param>
+        /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
+        internal AbstractRestClient(string? apiKey, string loggerName, IHttpClientFactory httpClientFactory)
+        {
+            ApiKey = ApiKeyUtil.Configure(apiKey);
+            HttpClientFactory = httpClientFactory;
             HttpClient = httpClientFactory.CreateClient();
             HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
 

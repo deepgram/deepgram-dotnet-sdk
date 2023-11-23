@@ -11,18 +11,19 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Documentation](#documentation)
 - [Installation](#installation)
 - [Targeted Frameworks](#targeted-frameworks)
-- [Configuration](#configuration)
-  - [Custom API Endpoint](#custom-api-endpoint)   
+- [Creating A Rest Client](#creating-a-rest-client)
+  - [Default Client Creation](#default-client-creation)   
+  - [DeepgramClientOptions Creation](#deepgramclientoptions-creation)   
+  - [Setting Proxy for CORS](#setting-proxy-for-cors)   
 - [Examples](#examples)
 - [Transcription](#transcription)
-  - [Remote Files](#remote-files)
+  - [Remote File](#remote-file) 
     - [UrlSource](#urlsource)
-  - [Local files](#local-files)
-    - [StreamSource](#streamsource)
-    - [PrerecordedTranscriptionOptions](#prerecordedtranscriptionoptions)
-- [Generating Captions](#generating-captions)
+  - [Local files](#local-files)    
+    - [PrerecordedSchema](#prerecordedschema)
+  - [CallBackAsync Methods](#callbackasync-methods) 
   - [Live Audio](#live-audio)
-    - [LiveTranscriptionOptions](#livetranscriptionoptions)
+    - [LiveSchema](#liveSchema)
 - [Projects](#projects)
   - [Get Projects](#get-projects)
   - [Get Project](#get-project)
@@ -87,26 +88,44 @@ Right click on project and select manage nuget packages
 - 7.0.x
 - 6.0.x
 
-# Configuration
+# Creating a Client
 
-To setup the configuration of the Deepgram Client you can do one of the following:
+To create rest clients to communitcate with the deepgram apis, instantiate them directly.
+When creating a restclient you need to pass in the apikey and a HttpClientFactory
 
-- Create a Deepgram Client instance and pass in credentials in the constructor.
-
+## Default Client Creation
+>If you dont need to customize the url or set optional headers then you can create a client -
 ```csharp
-var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
-var deepgramClient = new DeepgramClient(credentials);
+var manageClient = new ManageClient(apiKey,httpClientFactory);
 ```
-## Custom API Endpoint
 
-In order to point the SDK at a different API endpoint (e.g., for on-prem deployments), you can pass in an object setting the `API_URL` when initializing the Deepgram client.
-
+## DeepgramClientOptions Creation
+>In order to point the SDK at a different API endpoint (e.g., for on-prem deployments), you can pass in an object setting the `API_URL` when initializing the Deepgram client.
 ```csharp
-bool REQUIRE_SSL = false; // defaults to true - set depending on server configuration
-var API_URL = "localhost:8080"; // defaults to api.deepgram.com
-var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY, API_URL, REQUIRE_SSL);
-var deepgram = new DeepgramClient(credentials);
+var deepgramClientOptions = new DeepgramClientOptions(){
+ Url = "urlstring", // any protocol will be stripped out and replaced with https://
+ Headers = new Dictonary<string,string>(){}       
+};
+var client = new ManageClient(apiKey,oppions,HttpClientFactory)
 ```
+
+## Setting Proxy for CORS
+>The Deepgram api will not accept CORS requests. Some apps, Such as Blazor Wasm, may throw Cross Origin Resource Sharing Errors,if your
+>app throw this exception as you do not have access to the api endpoints you will need to create a proxy server and assign it to the IHttpClientFactory. To do this when
+>adding AddHttpClient to you services you need to add the following- 
+```csharp
+  services.AddHttpClient("ProxyClient").ConfigurePrimaryHttpMessageHandler(() =>
+    {
+        return new HttpClientHandler
+        {
+            Proxy = new WebProxy("http://proxyserver:port", true),
+            UseProxy = true
+        };
+    });
+``` 
+> If you set this up as a NamedClient as shown above you need to let the SDK know the name of the NamedClient
+> you cna do this by setting the NamedClientName property of the DeepgramClientOptions.
+
 
 # Examples
 
@@ -114,18 +133,13 @@ To quickly get started with examples for prerecorded and streaming, run the file
 
 # Transcription
 
-## Remote Files
-
+## Remote File
+> for available options see PrerecordedSchema
 ```csharp
-using Deepgram.Models;
-
-var credentials = new Credentials(DEEPGRAM_API_KEY);
-
-var deepgramClient = new DeepgramClient(credentials);
-
-var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
+var client = new PrerecordedClient(apiKey,HttpClientFactory);
+var response = await client.TranscribeUrlAsync(
     new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-    new PrerecordedTranscriptionOptions()
+    new PrerecordedSchema()
     {
         Punctuate = true
     });
@@ -138,35 +152,24 @@ var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAs
 | Url      | string | Url of the file to transcribe |
 
 ## Local files
+>There are 2 overloads for local files you can pass either a byte[] or a stream 
 
 ```csharp
-using Deepgram.Models;
-
-var credentials = new Credentials(DEEPGRAM_API_KEY);
-
-var deepgramClient = new DeepgramClient(credentials);
-
-using (FileStream fs = File.OpenRead("path\\to\\file"))
-{
-    var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-        new StreamSource(
-            fs,
-            "audio/wav"),
-        new PrerecordedTranscriptionOptions()
-        {
-            Punctuate = true
-        });
-}
+var client = new PrerecordedClient(apiKey,HttpClientFactory);
+var response = await client.TranscribeFileAsync(
+    stream,
+     new PrerecordedSchema()
+    {
+        Punctuate = true
+    });
 ```
 
-#### StreamSource
+### CallBackAsync Methods
+>TranscibeFileCallBackAsync and TranscibeUrlCallBackAsync are the methods to use if you want to use a CallBack url
+>you can either pass the the CallBack in the method or by setting  the CallBack proeprty in the PrerecordedSchema, but NOT in both
 
-| Property | Value Type |      reason for      |
-| -------- | :--------- | :------------------: |
-| Stream   | Stream     | stream to transcribe |
-| MimeType | string     |  MIMETYPE of stream  |
 
-#### PrerecordedTranscriptionOptions
+#### PrerecordedSchema
 
 | Property               | Value Type |                                                      reason for                                                      |       Possible values       |
 | ---------------------- | :--------- | :------------------------------------------------------------------------------------------------------------------: | :-------------------------: |
@@ -176,45 +179,25 @@ using (FileStream fs = File.OpenRead("path\\to\\file"))
 | Tier                   | string     |                                 Level of model you would like to use in your request                                 |
 | Punctuate              | bool       |                      Indicates whether to add punctuation and capitalization to the transcript                       |
 | ProfanityFilter        | bool       |                              Indicates whether to remove profanity from the transcript                               |
-| Redaction              | string[]   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
+| Redact                 | string[]   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
 | Diarize                | bool       |                                    Indicates whether to recognize speaker changes                                    |
-| DiarizationVersion     | string     |                                    Indicates which version of the diarizer to use                                    |
-| NamedEntityRecognition | bool       |                                 Indicates whether to recognize alphanumeric strings.                                 | **obselete** **deprecated** |
 | MultiChannel           | bool       |                           Indicates whether to transcribe each audio channel independently                           |
 | Alternatives           | int        |                                 Maximum number of transcript alternatives to return                                  |
 | Numerals               | bool       |                               Indicates whether to convert numbers from written format                               |
-| Numbers                | bool       |                               Indicates whether to convert numbers from written format                               |
-| NumbersSpaces          | bool       |                                Indicates whether to add spaces between spoken numbers                                |
-| Dates                  | bool       |                                Indicates whether to convert dates from written format                                |
-| DateFormat             | string     |                                        Indicates the format to use for dates                                         |
-| Times                  | bool       |                                Indicates whether to convert times from written format                                |
-| Dictation              | bool       |                                         Option to format punctuated commands                                         |
-| Measurements           | bool       |                                  Option to convert measurments to numerical format                                   |
 | SmartFormat            | bool       |                               Indicates whether to use Smart Format on the transcript                                |
-| SearchTerms            | string[]   |                                Terms or phrases to search for in the submitted audio                                 |
+| Search                 | string[]   |                                Terms or phrases to search for in the submitted audio                                 |
 | Replace                | string[]   |                          Terms or phrases to search for in the submitted audio and replace                           |
 | Callback               | string     |            Callback URL to provide if you would like your submitted audio to be processed asynchronously             |
 | Keywords               | string[]   | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context |
-| KeywordBoost           | string     |                                            Support for out-of-vocabulary                                             |
 | Utterances             | bool       |                    Indicates whether Deepgram will segment speech into meaningful semantic units                     |
 | DetectLanguage         | bool       |                            Indicates whether to detect the language of the provided audio                            |
 | Paragraphs             | bool       |                             Indicates whether Deepgram will split audio into paragraphs                              |
 | UtteranceSplit         | decimal    |              Length of time in seconds of silence between words that Deepgram will use when determining              |
 | Summarize              | object     |              Indicates whether Deepgram should provide summarizations of sections of the provided audio              |
 | DetectEntities         | bool       |                     Indicates whether Deepgram should detect entities within the provided audio                      |
-| Translate              | string[]   |                              anguage codes to which transcripts should be translated to                              |
 | DetectTopics           | bool       |                      Indicates whether Deepgram should detect topics within the provided audio                       |
-| AnalyzeSentiment       | bool       |                         Indicates whether Deepgram will identify sentiment in the transcript                         |
-| Sentiment              | bool       |                           Indicates whether Deepgram will identify sentiment in the audio                            |
-| SentimentThreshold     | decimal    |                            Indicates the confidence requirement for non-neutral sentiment                            |
+| Tag                    | string[]   |                                                                                                                      |
 
-# Generating Captions
-
-```
-var preRecordedTranscription =  await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(streamSource,prerecordedtranscriptionOptions);
-var WebVTT = preRecordedTranscription.ToWebVTT();
-var SRT =  preRecordedTranscription.ToSRT();
-```
 
 ## Live Audio
 
@@ -227,9 +210,9 @@ using Deepgram.CustomEventArgs;
 using Deepgram.Models;
 using System.Net.WebSockets;
 
-var credentials = new Credentials(DEEPGRAM_API_KEY);
 
-var deepgramClient = new DeepgramClient(credentials);
+
+var deepgramClient = new LiveClient(apiKey);
 
 using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {
@@ -285,7 +268,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 }
 ```
 
-#### LiveTranscriptionOptions
+#### LiveSchema
 
 | Property               | Type     |                                                               Description                                                               |             Possible values |
 | ---------------------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------------: | --------------------------: |
@@ -295,36 +278,22 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 | Tier                   | string   |                                          Level of model you would like to use in your request                                           |
 | Punctuate              | bool     |                                Indicates whether to add punctuation and capitalization to the transcript                                |
 | ProfanityFilter        | bool     |                                        Indicates whether to remove profanity from the transcript                                        |
-| Redaction              | string[] |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
+| Redact                 | string[] |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
 | Diarize                | bool     |                                             Indicates whether to recognize speaker changes                                              |
-| DiarizationVersion     | string   |                                             Indicates which version of the diarizer to use                                              |
-| NamedEntityRecognition | bool     |                                          Indicates whether to recognize alphanumeric strings.                                           | **obselete** **deprecated** |
 | MultiChannel           | bool     |                                    Indicates whether to transcribe each audio channel independently                                     |
-| Alternatives           | int      |                                           Maximum number of transcript alternatives to return                                           |
 | Numerals               | bool     |                                        Indicates whether to convert numbers from written format                                         |
-| Numbers                | bool     |                                        Indicates whether to convert numbers from written format                                         |
-| NumbersSpaces          | bool     |                                         Indicates whether to add spaces between spoken numbers                                          |
-| Dates                  | bool     |                                         Indicates whether to convert dates from written format                                          |
-| DateFormat             | string   |                                                  Indicates the format to use for dates                                                  |
-| Times                  | bool     |                                         Indicates whether to convert times from written format                                          |
-| Dictation              | bool     |                                                  Option to format punctuated commands                                                   |
-| Measurements           | bool     |                                            Option to convert measurments to numerical format                                            |
 | SmartFormat            | bool     |                                         Indicates whether to use Smart Format on the transcript                                         |
-| SearchTerms            | string[] |                                          Terms or phrases to search for in the submitted audio                                          |
+| Search                 | string[] |                                          Terms or phrases to search for in the submitted audio                                          |
 | Replace                | string[] |                                    Terms or phrases to search for in the submitted audio and replace                                    |
 | Callback               | string   |                      Callback URL to provide if you would like your submitted audio to be processed asynchronously                      |
 | Keywords               | string[] |          Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context           |
-| KeywordBoost           | string   |                                                      Support for out-of-vocabulary                                                      |
-| Utterances             | bool     |                              Indicates whether Deepgram will segment speech into meaningful semantic units                              |
-| DetectLanguage         | bool     |                                     Indicates whether to detect the language of the provided audio                                      |
-| Paragraphs             | bool     |                                       Indicates whether Deepgram will split audio into paragraphs                                       |
 | InterimResults         | bool     |          Indicates whether the streaming endpoint should send you updates to its transcription as more audio becomes available          |
 | EndPointing            | string   |                             Indicates whether Deepgram will detect whether a speaker has finished speaking                              |
-| VADTurnOff             | int      | Length of time in milliseconds of silence that voice activation detection (VAD) will use to detect that a speaker has finished speaking |
-| Encoding               | string   |                                           Expected encoding of the submitted streaming audio                                            |
 | Channels               | int      |                               Number of independent audio channels contained in submitted streaming audio                               |
 | SampleRate             | int      |                Sample rate of submitted streaming audio. Required (and only read) when a value is provided for encoding                 |
+| Tag                    | string[]   |                                                                                                                      |
 
+#NEEDS TO BE REVIESED FROM HERE DOWN
 # Projects
 
 > projectId and memberId are of type `string`
