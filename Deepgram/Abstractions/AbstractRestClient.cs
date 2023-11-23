@@ -39,7 +39,7 @@
         /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
         /// <param name="loggerName">nameof the descendent class</param>
         /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, DeepgramClientOptions? clientOptions, string loggerName, IHttpClientFactory httpClientFactory)
+        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions, string loggerName)
         {
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;
@@ -63,7 +63,7 @@
         /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
         /// <param name="loggerName">nameof the descendent class</param>
         /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, string loggerName, IHttpClientFactory httpClientFactory)
+        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName)
         {
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;

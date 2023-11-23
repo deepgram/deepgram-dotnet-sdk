@@ -15,8 +15,8 @@ public class ManageClient : AbstractRestClient
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    public ManageClient(string? apiKey, DeepgramClientOptions? clientOptions, IHttpClientFactory httpClientFactory)
-        : base(apiKey, clientOptions, nameof(ManageClient), httpClientFactory) { }
+    public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
+        : base(apiKey, httpClientFactory, clientOptions, nameof(ManageClient)) { }
 
     /// <summary>
     /// Constructor 
@@ -25,7 +25,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory)
-        : base(apiKey, nameof(ManageClient), httpClientFactory) { }
+        : base(apiKey, httpClientFactory, nameof(ManageClient)) { }
 
     #region Projects
 

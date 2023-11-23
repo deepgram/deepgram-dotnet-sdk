@@ -8,8 +8,8 @@ public class ReadClient : AbstractRestClient
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    internal ReadClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
-        : base(apiKey, clientOptions, nameof(ReadClient), httpClientFactory) { }
+    internal ReadClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
+        : base(apiKey, httpClientFactory, clientOptions, nameof(ReadClient)) { }
 
     /// <summary>
     /// Constructor that take a IHttpClientFactory
@@ -18,5 +18,5 @@ public class ReadClient : AbstractRestClient
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     internal ReadClient(string? apiKey, IHttpClientFactory httpClientFactory)
-        : base(apiKey, nameof(ReadClient), httpClientFactory) { }
+        : base(apiKey, httpClientFactory, nameof(ReadClient)) { }
 }

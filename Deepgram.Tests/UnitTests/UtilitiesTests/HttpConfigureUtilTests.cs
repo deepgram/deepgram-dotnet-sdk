@@ -8,7 +8,7 @@ public class HttpConfigureUtilTests
         var apiKey = Guid.NewGuid().ToString();
         var clientOptions = new ClientOptionsFaker().Generate("defaults");
         var httpClient = new HttpClient();
-        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}";
+        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/";
 
         //Act
         var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
@@ -99,7 +99,7 @@ public class HttpConfigureUtilTests
         var expectedHeaders = FakeHeaders();
         clientOptions.Headers = expectedHeaders;
         var httpClient = new HttpClient();
-        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/{Constants.API_VERSION}";
+        var expectedBaseAddress = $"https://{Constants.DEFAULT_URI}/";
 
         //Act
         var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
@@ -141,60 +141,9 @@ public class HttpConfigureUtilTests
         });
     }
 
-    [Test]
-    public void Should_Return_HttpClient_With_PreConfigured_BaseAddress()
-    {
-        //Arrange
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new ClientOptionsFaker().Generate("defaults");
-        var expectedBaseAddress = new Uri("https://preconfig.com");
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = expectedBaseAddress;
-
-
-        //Act
-        var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
-
-        //Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress.ToString()));
-        });
-    }
-
-    [Test]
-    public void Should_Return_HttpClient_With_PreConfigured_BaseAddress_And_Custom_Headers()
-    {
-        //Arrange
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new ClientOptionsFaker().Generate("defaults");
-        var expectedHeaders = FakeHeaders();
-        clientOptions.Headers = expectedHeaders;
-        var expectedBaseAddress = new Uri("https://preconfig.com");
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = expectedBaseAddress;
-
-        //Act
-        var SUT = HttpConfigureUtil.Configure(apiKey, clientOptions, httpClient);
-
-        //Assert
-        Assert.Multiple(() =>
-        {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress.ToString()));
-            Assert.IsTrue(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key));
-        });
-    }
-
 
     private static Dictionary<string, string> FakeHeaders()
     {
-        var faker = new Faker();
         var headers = new Dictionary<string, string>();
         var headersCount = new Random().Next(1, 3);
         for (var i = 0; i < headersCount; i++)

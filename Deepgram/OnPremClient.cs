@@ -11,8 +11,8 @@ public class OnPremClient : AbstractRestClient
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>   
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    internal OnPremClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
-        : base(apiKey, clientOptions, nameof(OnPremClient), httpClientFactory) { }
+    internal OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
+        : base(apiKey, httpClientFactory, clientOptions, nameof(OnPremClient)) { }
 
 
     /// <summary>

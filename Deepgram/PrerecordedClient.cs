@@ -11,8 +11,8 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
     /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>   
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    public PrerecordedClient(string? apiKey, DeepgramClientOptions clientOptions, IHttpClientFactory httpClientFactory)
-        : base(apiKey, clientOptions, nameof(PrerecordedClient), httpClientFactory) { }
+    public PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
+        : base(apiKey, httpClientFactory, clientOptions, nameof(PrerecordedClient)) { }
 
     /// <summary>
     /// Constructor that take a IHttpClientFactory
@@ -20,7 +20,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param> 
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     public PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory)
-        : base(apiKey, nameof(PrerecordedClient), httpClientFactory) { }
+        : base(apiKey, httpClientFactory, nameof(PrerecordedClient)) { }
 
 
     /// <summary>
@@ -82,6 +82,8 @@ public class PrerecordedClient : AbstractRestClient
     public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBackAsync(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         VerifyOneCallBackSet(callBack, prerecordedSchema);
+        if (callBack != null)
+            prerecordedSchema.Callback = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
         var payload = CreatePayload(source);
@@ -98,6 +100,9 @@ public class PrerecordedClient : AbstractRestClient
     /// <returns>AsyncPrerecordedResponse</returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallBackAsync(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
+        VerifyOneCallBackSet(callBack, prerecordedSchema);
+        if (callBack != null)
+            prerecordedSchema.Callback = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
         var stream = new MemoryStream();
@@ -115,6 +120,9 @@ public class PrerecordedClient : AbstractRestClient
     /// <returns>AsyncPrerecordedResponse</returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallbackAsync(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
+        VerifyOneCallBackSet(callBack, prerecordedSchema);
+        if (callBack != null)
+            prerecordedSchema.Callback = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         string url = $"listen?{stringedOptions}";
         var payload = CreateStreamPayload(source);

@@ -25,7 +25,7 @@ public class AbstractRestfulClientTests
         // Arrange        
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
@@ -38,13 +38,14 @@ public class AbstractRestfulClientTests
         Assert.That(result.Projects.Length, Is.EqualTo(expectedResponse.Projects.Length));
     }
 
+
     [Test]
     public void GetAsync_Should_ThrowsException_On_UnsuccessfulResponse()
     {
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
@@ -66,7 +67,7 @@ public class AbstractRestfulClientTests
         var uriSegment = $"{Constants.PROJECTS}";
 
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
@@ -85,7 +86,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new GetProjectsResponse();
         var id = new Faker().Random.Guid().ToString();
         var uriSegment = $"{Constants.PROJECTS}/{id}";
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act & Assert       
@@ -103,7 +104,7 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS}";
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
@@ -126,7 +127,7 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(source);
@@ -151,7 +152,7 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act
@@ -168,7 +169,7 @@ public class AbstractRestfulClientTests
         // Arrange        
         var expectedResponse = new VoidResponse();
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient("apiKey", httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
@@ -189,7 +190,7 @@ public class AbstractRestfulClientTests
         };
 
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient("apiKey", httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
@@ -207,7 +208,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient("apiKey", httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
@@ -225,7 +226,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient("apiKey", httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
@@ -246,7 +247,7 @@ public class AbstractRestfulClientTests
         var uriSegment = $"{Constants.PROJECTS}/{id}";
 
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(updateOptions);
@@ -270,7 +271,7 @@ public class AbstractRestfulClientTests
         var uriSegment = $"{Constants.PROJECTS}/{id}";
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
 
@@ -293,7 +294,7 @@ public class AbstractRestfulClientTests
         var uriSegment = $"{Constants.PROJECTS}/{id}";
 
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
@@ -317,7 +318,7 @@ public class AbstractRestfulClientTests
         var uriSegment = $"{Constants.PROJECTS}/{id}";
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
-        var client = new ConcreteRestClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(updateOptions);
