@@ -58,7 +58,7 @@
         {
             try
             {
-                //CheckForTimeout();
+                CheckForTimeout();
                 var response = await HttpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<T>(response);
