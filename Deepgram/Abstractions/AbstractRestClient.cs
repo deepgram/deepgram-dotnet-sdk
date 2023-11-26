@@ -26,36 +26,8 @@
         /// </summary>
         internal TimeSpan? Timeout { get; set; }
 
-        /// <summary>
-        /// Options for configuring the HttpClient
-        /// </summary>
-        internal DeepgramClientOptions? Options { get; set; }
 
 
-        /// <summary>
-        /// Constructor that take a IHttpClientFactory
-        /// </summary>
-        /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-        /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
-        /// <param name="loggerName">nameof the descendent class</param>
-        /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions, string loggerName)
-        {
-            ApiKey = ApiKeyUtil.Configure(apiKey);
-            HttpClientFactory = httpClientFactory;
-            Options = clientOptions;
-            if (!string.IsNullOrEmpty(Options.NamedClientName))
-            {
-                HttpClient = httpClientFactory.CreateClient();
-            }
-            else
-            {
-                HttpClient = httpClientFactory.CreateClient(Options.NamedClientName);
-            }
-            HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
-
-            Logger = LogProvider.GetLogger(loggerName);
-        }
 
         /// <summary>
         /// Constructor that take a IHttpClientFactory
@@ -67,11 +39,14 @@
         {
             ApiKey = ApiKeyUtil.Configure(apiKey);
             HttpClientFactory = httpClientFactory;
-            HttpClient = httpClientFactory.CreateClient();
-            HttpClient = HttpConfigureUtil.Configure(ApiKey, Options, HttpClient);
+            HttpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
+            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", apiKey);
+
+
 
             Logger = LogProvider.GetLogger(loggerName);
         }
+
 
         /// <summary>
         /// GET Rest Request
@@ -83,7 +58,7 @@
         {
             try
             {
-                CheckForTimeout();
+                //CheckForTimeout();
                 var response = await HttpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<T>(response);
@@ -207,9 +182,9 @@
             {
                 CheckForTimeout();
 #if NETSTANDARD2_0
-    var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment);
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment);
                 request.Content = content;
-    var response = await HttpClient.SendAsync(request);
+                var response = await HttpClient.SendAsync(request);
 #else
                 var response = await HttpClient.PatchAsync(uriSegment, content);
 #endif

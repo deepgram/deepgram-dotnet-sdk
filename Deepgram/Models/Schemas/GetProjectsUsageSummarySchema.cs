@@ -1,26 +1,41 @@
 ﻿namespace Deepgram.Models.Schemas;
-public class GetProjectUsageSummarySchema
+public class GetProjectsUsageSummarySchema
 {
+    /// <summary>
+    /// Start date to limit range of requests to summarize
+    /// </summary>
     [JsonPropertyName("start")]
-    public string? Start { get; set; }
+    public DateTime? Start { get; set; }
 
+    /// <summary>
+    /// End date to limit range of requests to summarize
+    /// </summary>
     [JsonPropertyName("end")]
-    public string? End { get; set; }
+    public DateTime? End { get; set; }
 
+    /// <summary>
+    /// Name of who made request
+    /// </summary>
     [JsonPropertyName("accessor")]
     public string? Accessor { get; set; }
 
+    /// <summary>
+    /// tags associated with request
+    /// </summary>
     [JsonPropertyName("tag")]
     public string? Tag { get; set; }
 
+
     [JsonPropertyName("method")]
     public string? Method { get; set; }
+
 
     [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
+
 
     [JsonPropertyName("interim_results")]
     public bool? InterimResults { get; set; }

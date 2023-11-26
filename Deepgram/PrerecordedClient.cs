@@ -4,16 +4,6 @@
 //working of node sdk - https://github.com/deepgram/deepgram-node-sdk/blob/lo/beta-test-improvements/src/packages/PrerecordedClient.ts
 public class PrerecordedClient : AbstractRestClient
 {
-
-    /// <summary>
-    /// Constructor for when specific configuration of the httpclient is needed that take a IHttpClientFactory
-    /// </summary>
-    /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-    /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>   
-    /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    public PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
-        : base(apiKey, httpClientFactory, clientOptions, nameof(PrerecordedClient)) { }
-
     /// <summary>
     /// Constructor that take a IHttpClientFactory
     /// </summary>

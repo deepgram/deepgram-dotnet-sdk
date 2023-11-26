@@ -1,21 +1,26 @@
 ﻿namespace Deepgram.Models.Options;
-
 public class DeepgramClientOptions
 {
-    ///<summary>
-    ///Optional headers for initializing the client.
-    ///</summary>
-    public Dictionary<string, string>? Headers { get; set; }
-
     /// <summary>
-    /// The URL used to interact with production, On-prem and other Deepgram environments. Defaults to `api.deepgram.com`.
-    /// </summary>    
-    public string? Url { get; set; }
-
-    /// <summary>
-    /// If using named clients you can assign the Client Name here
+    /// BaseAddress of the server :defaults to https://api.deepgram.com
     /// </summary>
-    public string NamedClientName { get; set; }
+    public string? BaseAddress { get; set; } = Constants.HTTPCLIENT_NAME;
 
-    FetchOptions? FetchOptions { get; set; }
+    /// <summary>
+    /// proxy address include port if used
+    /// </summary>
+    public RestProxy? Proxy { get; set; }
+
+    public string? Cache { get; set; }
+    /// <summary>
+    /// Timeout of client
+    /// </summary>
+    public int? TimeoutInSeconds { get; set; }
+
+    /// <summary>
+    /// Additional headers 
+    /// </summary>
+    public Dictionary<string, string>? Headers { get; set; }
 }
+
+

@@ -12,16 +12,6 @@ public class ManageClient : AbstractRestClient
     /// Constructor for when specific configuration of the HttpClient is needed
     /// </summary>
     /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-    /// <param name="clientOptions">Optional HttpClient for configuring the HttpClient</param>
-    /// <param name="loggerName">nameof the descendent class</param>
-    /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions clientOptions)
-        : base(apiKey, httpClientFactory, clientOptions, nameof(ManageClient)) { }
-
-    /// <summary>
-    /// Constructor 
-    /// </summary>
-    /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
     /// <param name="loggerName">nameof the descendent class</param>
     /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
     public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory)
@@ -33,7 +23,7 @@ public class ManageClient : AbstractRestClient
     /// Gets projects associated to ApiKey 
     /// </summary>
     /// <returns>GetProjectsResponse</returns>
-    public async Task<GetProjectsResponse> GetProjects()
+    public async Task<GetProjectsResponse> GetProjectsAsync()
     {
         string url = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
         return await GetAsync<GetProjectsResponse>(url);
@@ -44,7 +34,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of Project</param>
     /// <returns>GetProjectResponse</returns>
-    public async Task<GetProjectResponse> GetProject(string projectId)
+    public async Task<GetProjectResponse> GetProjectAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}";
         return await GetAsync<GetProjectResponse>(url);
@@ -56,7 +46,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">ID of project</param>
     /// <param name="updateProjectSchema">Update options for project</param>
     /// <returns>Message Response</returns>
-    public async Task<MessageResponse> UpdateProject(string projectId, UpdateProjectSchema updateProjectSchema)
+    public async Task<MessageResponse> UpdateProjectAsync(string projectId, UpdateProjectSchema updateProjectSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}";
         var payload = CreatePayload(updateProjectSchema);
@@ -81,7 +71,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>MessageResponse</returns>
-    public async Task<MessageResponse> LeaveProject(string projectId)
+    public async Task<MessageResponse> LeaveProjectAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/leave";
         return await DeleteAsync<MessageResponse>(url);
@@ -96,7 +86,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>GetProjectKeysResponse</returns>
-    public async Task<GetProjectKeysResponse> GetProjectKeys(string projectId)
+    public async Task<GetProjectKeysResponse> GetProjectKeysAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.KEYS}";
         return await GetAsync<GetProjectKeysResponse>(url);
@@ -108,7 +98,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     /// <returns>GetProjectKeyResponse</returns>
-    public async Task<GetProjectKeyResponse> GetProjectKey(string projectId, string keyId)
+    public async Task<GetProjectKeyResponse> GetProjectKeyAsync(string projectId, string keyId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.KEYS}/{keyId}";
         return await GetAsync<GetProjectKeyResponse>(url);
@@ -120,7 +110,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="createProjectKeySchema">options for the key to be created</param>
     /// <returns>CreateProjectKeyResponse</returns>
-    public async Task<CreateProjectKeyResponse> CreateProjectKey(string projectId, CreateProjectKeySchema createProjectKeySchema)
+    public async Task<CreateProjectKeyResponse> CreateProjectKeyAsync(string projectId, CreateProjectKeySchema createProjectKeySchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/keys";
         var payload = CreatePayload(createProjectKeySchema);
@@ -145,7 +135,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>GetProjectInvitesResponse</returns>
-    public async Task<GetProjectInvitesResponse> GetProjectInvites(string projectId)
+    public async Task<GetProjectInvitesResponse> GetProjectInvitesAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.INVITES}";
         return await GetAsync<GetProjectInvitesResponse>(url);
@@ -168,7 +158,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="sendProjectInviteSchema">Details for a invite to project</param>
     /// <returns>MessageResponse</returns>
-    public async Task<MessageResponse> SendProjectInvite(string projectId, SendProjectInviteSchema sendProjectInviteSchema)
+    public async Task<MessageResponse> SendProjectInviteAsync(string projectId, SendProjectInviteSchema sendProjectInviteSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/invites";
         var payload = CreatePayload(sendProjectInviteSchema);
@@ -185,7 +175,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>GetProjectMembersResponse</returns>
-    public async Task<GetProjectMembersResponse> GetProjectMembers(string projectId)
+    public async Task<GetProjectMembersResponse> GetProjectMembersAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}";
         return await GetAsync<GetProjectMembersResponse>(url);
@@ -197,7 +187,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>
     /// <returns>GetProjectMembersScopesResponse</returns>
-    public async Task<GetProjectMemberScopesResponse> GetProjectMemberScopes(string projectId, string memberId)
+    public async Task<GetProjectMemberScopesResponse> GetProjectMemberScopesAsync(string projectId, string memberId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}";
         return await GetAsync<GetProjectMemberScopesResponse>(url);
@@ -210,7 +200,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="memberId">Id of member</param>
     /// <param name="updateProjectMemberScopeSchema">scope update options</param>
     /// <returns>MessageResponse</returns>  
-    public async Task<MessageResponse> UpdateProjectMemberScope(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema)
+    public async Task<MessageResponse> UpdateProjectMemberScopeAsync(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}";
         var payload = CreatePayload(updateProjectMemberScopeSchema);
@@ -237,7 +227,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="getProjectUsageRequestsSchema">constraints to limit the usage requests needed </param>
     /// <returns></returns>
-    public async Task<GetProjectUsageRequestsResponse> GetProjectUsageRequests(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
+    public async Task<GetProjectUsageRequestsResponse> GetProjectsUsageRequestsAsync(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageRequestsSchema);
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.REQUESTS}?{stringedOptions}";
@@ -250,7 +240,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="requestId">Id of request</param>
     /// <returns>GetProjectUsageResponse</returns>
-    public async Task<GetProjectUsageRequestResponse> GetProjectUsageRequest(string projectId, string requestId)
+    public async Task<GetProjectUsageRequestResponse> GetProjectUsageRequestAsync(string projectId, string requestId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.REQUESTS}/{requestId}";
         return await GetAsync<GetProjectUsageRequestResponse>(url);
@@ -262,7 +252,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="getProjectUsageSummarySchema">constraints to limit the usage requests for summarizing</param>
     /// <returns></returns>
-    public async Task<GetProjectUsageSummaryResponse> GetProjectUsageSummary(string projectId, GetProjectUsageSummarySchema getProjectUsageSummarySchema)
+    public async Task<GetProjectUsageSummaryResponse> GetProjectUsageSummaryAsync(string projectId, GetProjectsUsageSummarySchema getProjectUsageSummarySchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}?{stringedOptions}";
@@ -275,7 +265,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="getProjectUsageFieldsSchema">constraints on Usage request range</param>
     /// <returns>GetProjectUsageFieldsResponse</returns>
-    public async Task<GetProjectUsageFieldsResponse> GetProjectUsageFields(string projectId, GetProjectUsageFieldsSchema getProjectUsageFieldsSchema)
+    public async Task<GetProjectUsageFieldsResponse> GetProjectUsageFieldsAsync(string projectId, GetProjectUsageFieldsSchema getProjectUsageFieldsSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}/fields?{stringedOptions}";
@@ -290,7 +280,7 @@ public class ManageClient : AbstractRestClient
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>GetProjectBalancesResponse</returns>
-    public async Task<GetProjectBalancesResponse> GetProjectBalances(string projectId)
+    public async Task<GetProjectBalancesResponse> GetProjectBalancesAsync(string projectId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.BALANCES}";
         return await GetAsync<GetProjectBalancesResponse>(url);
@@ -302,7 +292,7 @@ public class ManageClient : AbstractRestClient
     /// <param name="projectId">Id of project</param>
     /// <param name="balanceId">Id of balance</param>
     /// <returns>GetProjectBalanceResponse</returns>
-    public async Task<GetProjectBalanceResponse> GetProjectBalance(string projectId, string balanceId)
+    public async Task<GetProjectBalanceResponse> GetProjectBalanceAsync(string projectId, string balanceId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/{Constants.BALANCES}/{balanceId}";
         return await GetAsync<GetProjectBalanceResponse>(url);

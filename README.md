@@ -11,10 +11,13 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Documentation](#documentation)
 - [Installation](#installation)
 - [Targeted Frameworks](#targeted-frameworks)
+- [Configuration](#configuration)
+  - [Default](#default) 
+  - [With Options](#with-Options)
+    - [Notes regarding Cors](#notes-regarding-cors)
+  - [Examples](#examples)  
 - [Creating A Rest Client](#creating-a-rest-client)
-  - [Default Client Creation](#default-client-creation)   
-  - [DeepgramClientOptions Creation](#deepgramclientoptions-creation)   
-  - [Setting Proxy for CORS](#setting-proxy-for-cors)   
+  - [Default Client Creation](#default-client-creation)    
 - [Examples](#examples)
 - [Transcription](#transcription)
   - [Remote File](#remote-file) 
@@ -29,6 +32,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
   - [Get Project](#get-project)
   - [Update Project](#update-project)
   - [Delete Project](#delete-project)
+  - [Leave Project](#leave-project)
 - [Keys](#keys)
   - [List Keys](#list-keys)
   - [Get Key](#get-key)
@@ -53,6 +57,14 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
     - [GetUsageSummaryOptions](#getusagesummaryoptions)
   - [Get Fields](#get-fields)
     - [GetUsageFieldsOptions](#getusagefieldsoptions)
+- [Balances](#balances)
+  - [Get Balances](#get-balances) 
+  - [Get Balance](#get-balance) 
+- [OnPrem](#onprem)
+  - [List Credentials](#list-credentials)
+  - [Get Credentials](#get-credentials)
+  - [Remove Credentials](#remove-credentials)
+  - [Create Credentials](#create-credentials)
 - [Logging](#logging)
 - [Development and Contributing](#development-and-contributing)
 - [Testing](#testing)
@@ -88,8 +100,82 @@ Right click on project and select manage nuget packages
 - 7.0.x
 - 6.0.x
 
-# Creating a Client
+# Configuration
+Add to you ServiceCollection class
 
+### Default  
+for default implementation add
+```csharp
+    services.AddDeepgram():
+```
+
+### With Options
+if you need to set different options the you need to pass in a instance of DeepgramClientOptions
+```csharp
+   services.AddDeepgram(deepgramClientsOptions);
+```
+
+#### Notes Regarding CORS
+    if you run it to problems with cors, the deepgram api reject CORS you will need to 
+use a proxy and pass it in as part of the options.
+
+### Examples
+in a console app this might look like -
+```csharp
+    var services = new ServiceCollection()
+    var clientSettings = new ClientSettings()
+    {
+     BaseAddress = "https://some.com",
+     Proxy = new RestProxy()
+            {
+               ProxyAddress= "http://prox.com:8080",
+               Username = "carl",
+               Password = "saturn" 
+            },
+     TimeoutInSeconds = 60,
+     Headers = new Dictionary<string, string>()
+     {
+        {"oneKey","oneValue" },
+     }
+    };
+    serviceCollection.AddDeepgram(clientSettings);
+```
+
+if you are using the options pattern and storing them in a json file
+```csharp
+    var configuration = new ConfigurationBuilder()
+           .SetBasePath(@"D:\Projects\ConsoleApp2\ConsoleApp2")
+           .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+           .Build();
+
+    var options = new DeepgramOptions
+    configuration.GetSettings(nameof(DeepgramClientOptions)).Bind(options);
+    //you can assign the values manually if you keep them else were
+    // options.Proxy.Username = "bill"
+
+    serviceCollection.AddDeepgram(clientSettings);
+```    
+#### DeepgramClientOptions
+| Property         | Value                       |          Description             |
+| --------         | :-----                      | :---------------------------:    |
+| BaseAddress      | string?                     | url of server, include protocol  |
+| Proxy            | RestProxy?                  | proxy details                    |
+| TimeoutInSeconds | int?                        | timeout in seconds required      |
+| Headers          | Dictionary<string, string>? | any headers that you want to add |
+
+#### RestProxy
+| Property         | Value   |          Description                     |
+| --------         | :-----  | :---------------------------:            |
+| ProxyAddress     | string? | Url of proxy including protocol and port |
+| Username         | string? | Username for proxy                       |
+| Password         | string? | Password for proxy                       |
+
+
+> Timeout can also be set on the various rest clients through  SetTimeout 
+
+>UserAgent & Authorization headers are added internally
+
+# Creating a Client
 To create rest clients to communitcate with the deepgram apis, instantiate them directly.
 When creating a restclient you need to pass in the apikey and a HttpClientFactory
 
@@ -98,33 +184,6 @@ When creating a restclient you need to pass in the apikey and a HttpClientFactor
 ```csharp
 var manageClient = new ManageClient(apiKey,httpClientFactory);
 ```
-
-## DeepgramClientOptions Creation
->In order to point the SDK at a different API endpoint (e.g., for on-prem deployments), you can pass in an object setting the `API_URL` when initializing the Deepgram client.
-```csharp
-var deepgramClientOptions = new DeepgramClientOptions(){
- Url = "urlstring", // any protocol will be stripped out and replaced with https://
- Headers = new Dictonary<string,string>(){}       
-};
-var client = new ManageClient(apiKey,oppions,HttpClientFactory)
-```
-
-## Setting Proxy for CORS
->The Deepgram api will not accept CORS requests. Some apps, Such as Blazor Wasm, may throw Cross Origin Resource Sharing Errors,if your
->app throw this exception as you do not have access to the api endpoints you will need to create a proxy server and assign it to the IHttpClientFactory. To do this when
->adding AddHttpClient to you services you need to add the following- 
-```csharp
-  services.AddHttpClient("ProxyClient").ConfigurePrimaryHttpMessageHandler(() =>
-    {
-        return new HttpClientHandler
-        {
-            Proxy = new WebProxy("http://proxyserver:port", true),
-            UseProxy = true
-        };
-    });
-``` 
-> If you set this up as a NamedClient as shown above you need to let the SDK know the name of the NamedClient
-> you cna do this by setting the NamedClientName property of the DeepgramClientOptions.
 
 
 # Examples
@@ -293,7 +352,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 | SampleRate             | int      |                Sample rate of submitted streaming audio. Required (and only read) when a value is provided for encoding                 |
 | Tag                    | string[]   |                                                                                                                      |
 
-#NEEDS TO BE REVIESED FROM HERE DOWN
+
 # Projects
 
 > projectId and memberId are of type `string`
@@ -303,7 +362,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 Returns all projects accessible by the API key.
 
 ```csharp
-var result = await deepgramClient.Projects.ListProjectsAsync();
+    var result = await manageClient.GetProjectsAsync();
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-projects).
@@ -313,7 +372,7 @@ var result = await deepgramClient.Projects.ListProjectsAsync();
 Retrieves a specific project based on the provided projectId.
 
 ```csharp
-var result = await deepgramClient.Projects.GetProjectAsync(projectId);
+var result = await manageClient.GetProject(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-project).
@@ -323,20 +382,19 @@ var result = await deepgramClient.Projects.GetProjectAsync(projectId);
 Update a project.
 
 ```csharp
-var project = new Project()
+var updateProjectSchema = new UpdateProjectSchema()
 {
-    Project = "projectId string",
-    Name = "New name for Project"
+    Company = "Acme",
+    Name = "Mega Speech inc"
 }
-var result = await deepgramClient.Projects.UpdateProjectAsync(project);
+var result = await manageClient.UpdateProjectAsync(projectid,updateProjectSchema);
 
 ```
 
-**Project Type**
+**UpdateProjectSchema Type**
 
 | Property Name | Type   |                       Description                        |
 | ------------- | :----- | :------------------------------------------------------: |
-| Id            | string |        Unique identifier of the Deepgram project         |
 | Name          | string |                   Name of the project                    |
 | Company       | string | Name of the company associated with the Deepgram project |
 
@@ -347,10 +405,18 @@ var result = await deepgramClient.Projects.UpdateProjectAsync(project);
 Delete a project.
 
 ```csharp
-var result = await deepgramClient.Projects.DeleteProjectAsync(projectId);
+manageClient.DeleteProject(projectId);
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/delete-project).
+## Leave Project
+
+Leave a project.
+
+```csharp
+var result = await manageClient.LeaveProjectAsync(projectId);
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/leave-project).
 
 # Keys
 
@@ -361,7 +427,7 @@ var result = await deepgramClient.Projects.DeleteProjectAsync(projectId);
 Retrieves all keys associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.ListKeysAsync(projectId);
+var result = await manageClient.GetProjectAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/list-keys).
@@ -371,7 +437,7 @@ var result = await deepgramClient.Keys.ListKeysAsync(projectId);
 Retrieves a specific key associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.GetKeyAsync(projectId,keyId);
+var result = await manageClient.GetProjectKeyAsync(projectId,keyId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-key).
@@ -381,9 +447,16 @@ var result = await deepgramClient.Keys.GetKeyAsync(projectId,keyId);
 Creates an API key with the provided scopes.
 
 ```csharp
-var scopes = new string[]{"admin","member"};
-var result = await deepgramClient.Keys.CreateKeyAsync(projectId,comment,scopes);
+var createProjectKeyWithExpirationSchema = new createProjectKeyWithExpirationSchema
+    {
+        Scopes= new string[]{"admin","member"},
+        Comment = "Yay a new key",
+        Tags = new string []{"boss"}
+        Expiration = DateTime.Now.AddDays(7);
+};
+var result = await manageClient.CreateProjectKey(projectId,createProjectKeyWithExpirationSchema);
 ```
+> you can create a key with using either a CreateProjectKeySchema CreateProjectKeyWithExpirationSchema or CreateProjectKeyWithTimeToLiveSchema
 
 [See our API reference for more info](https://developers.deepgram.com/reference/create-key).
 
@@ -392,7 +465,7 @@ var result = await deepgramClient.Keys.CreateKeyAsync(projectId,comment,scopes);
 Deletes a specific key associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.DeleteKeyAsync(projectId, keyId);
+manageClient.DeleteKey(projectId, keyId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/delete-key).
@@ -406,7 +479,7 @@ var result = await deepgramClient.Keys.DeleteKeyAsync(projectId, keyId);
 Retrieves account objects for all of the accounts in the specified project_id.
 
 ```csharp
-var result = await deepgramClient.Projects.GetMembersScopesAsync(projectId,memberId);
+var result = await manageClient.GetMembersAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-members).
@@ -416,7 +489,7 @@ var result = await deepgramClient.Projects.GetMembersScopesAsync(projectId,membe
 Removes member account for specified member_id.
 
 ```csharp
-var result = await deepgramClient.Projects.RemoveMemberAsync(projectId,memberId);
+var result = manageClient.RemoveProjectMember(projectId,memberId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/remove-member).
@@ -425,12 +498,13 @@ var result = await deepgramClient.Projects.RemoveMemberAsync(projectId,memberId)
 
 > projectId and memberId are of type`string`
 
+
 ## Get Member Scopes
 
 Retrieves scopes of the specified member in the specified project.
 
 ```csharp
-var result = await deepgramClient.Keys. GetMemberScopesAsync(projectId,memberId);
+var result = await manageClient.GetProjectMemberScopesAsync(projectId,memberId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-member-scopes).
@@ -440,8 +514,8 @@ var result = await deepgramClient.Keys. GetMemberScopesAsync(projectId,memberId)
 Updates the scope for the specified member in the specified project.
 
 ```csharp
-var scopeOptions = new UpdateScopeOption(){Scope = "admin"};
-var result = await deepgramClient.Keys.UpdateScopeAsync(projectId,memberId,scopeOptions);
+var scopeOptions = new UpdateProjectMemeberScopeSchema(){Scope = "admin"};
+var result = await manageClient.UpdateProjectMemberScopeAsync(projectId,memberId,scopeOptions);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/update-scope).
@@ -453,7 +527,7 @@ var result = await deepgramClient.Keys.UpdateScopeAsync(projectId,memberId,scope
 Retrieves all invitations associated with the provided project_id.
 
 ```csharp
-to be implmented
+var result = await manageClient.GetProjectInvitesAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/list-invites).
@@ -463,7 +537,12 @@ to be implmented
 Sends an invitation to the provided email address.
 
 ```csharp
-to be implmentented
+var sendProjectInviteSchema = new SendProjectInviteSchema()
+{
+    Email = "awesome@person.com",
+    Scope = "fab"
+}
+var result = manageClient.SendProjectInviteAsync(projectId,sendProjectInviteSchema)
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/send-invites).
@@ -473,20 +552,11 @@ to be implmentented
 Removes the specified invitation from the project.
 
 ```csharp
-to be implemented
+ manageClient.DeleteProjectInvite(projectId,emailOfInvite)
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/delete-invite).
 
-## Leave Project
-
-Removes the authenticated user from the project.
-
-```csharp
-var result = await deepgramClient.Projects.LeaveProjectAsync(projectId);
-```
-
-[See our API reference for more info](https://developers.deepgram.com/reference/leave-project).
 
 # Usage
 
@@ -497,20 +567,21 @@ var result = await deepgramClient.Projects.LeaveProjectAsync(projectId);
 Retrieves all requests associated with the provided projectId based on the provided options.
 
 ```csharp
-var listAllRequestOptions = new listAllRequestOptions()
+var getProjectUsageRequestsSchema = new GetProjectUsageRequestsSchema ()
 {
-     StartDateTime = DateTime.Now
+     Start = DateTime.Now.AddDays(-7);
 };
-var result = await deepgramClient.Usage.ListAllRequestsAsync(projectId,listAllRequestOptions);
+var result = await manageClient.ListAllRequestsAsync(projectId,getProjectUsageRequestsSchema);
 ```
 
-#### ListAllRequestOptions
+#### GetProjectUsageRequestsSchema
 
 | Property      | Type     |              Description               |
 | ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
+| Start         | DateTime | Start date of the requested date range |
+| End           | DateTime |  End date of the requested date range  |
 | Limit         | int      |       number of results per page       |
+| Status        | string   |     status of requests to search for   |
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-all-requests).
 
@@ -519,7 +590,7 @@ var result = await deepgramClient.Usage.ListAllRequestsAsync(projectId,listAllRe
 Retrieves a specific request associated with the provided projectId.
 
 ```csharp
-var result = await deepgramClient.Usage.GetUsageRequestAsync(projectId,requestId);
+var result = await manageClient.GetProjectUsageRequestAsync(projectId,requestId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-request).
@@ -529,20 +600,37 @@ var result = await deepgramClient.Usage.GetUsageRequestAsync(projectId,requestId
 Retrieves usage associated with the provided project_id based on the provided options.
 
 ```csharp
-var getUsageSummmaryOptions = new GetUsageSummmaryOptions()
+var getProjectUsageSummarySchema = new GetProjectUsageSummarySchema ()
 {
     StartDateTime = DateTime.Now
 }
-var result = await deepgramClient.Usage.GetUsageSummaryAsync(projectId,getUsageSummmaryOptions);
+var result = await manageClient.GetProjectUsageSummaryAsync(projectId,getProjectUsageSummarySchema);
 ```
 
-#### GetUsageSummaryOptions
+#### GetProjectUsageSummarySchema
 
-| Property      | Value    |              Description               |
-| ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
-| Limit         | int      |       number of results per page       |
+| Property        | Value    |              Description               |
+| -------------   | :------- | :------------------------------------: |
+| Start           | DateTime | Start date of the requested date range |
+| End             | DateTime |  End date of the requested date range  |
+| Accessor        | string   ||
+| Model           | string   ||
+| MultiChannel    | bool     ||
+| InterimResults  | bool     ||
+| Punctuate       | bool     ||
+| Ner             | bool     ||
+| Utterances      | bool     ||
+| Replace         | bool     ||
+| ProfanityFilter | bool     ||
+| Keywords        | bool     ||
+| DetectTopics    | bool     ||
+| Diarize         | bool     ||
+| Search          | bool     ||
+| Redact          | bool     ||
+| Alternatives    | bool     ||
+| Numerals        | bool     ||
+| SmartFormat     | bool     ||
+
 
 [See our API reference for more info](https://developers.deepgram.com/reference/summarize-usage).
 
@@ -551,21 +639,76 @@ var result = await deepgramClient.Usage.GetUsageSummaryAsync(projectId,getUsageS
 Lists the features, models, tags, languages, and processing method used for requests in the specified project.
 
 ```csharp
-var getUsageFieldsOptions = new getUsageFieldsOptions()
+var getProjectUsageFieldsSchema = new GetProjectUsageFieldsSchema()
 {
-    StartDateTime = Datetime.Now
+    Start = Datetime.Now
 }
-var result = await deepgramClient.Usage.GetUsageFieldsAsync(projectId,getUsageFieldsOptions);
+var result = await manageClient.GetProjectUsageFieldsAsync(projectId,getProjectUsageFieldsSchema);
 ```
 
-#### GetUsageFieldsOptions
+#### GetProjectUsageFieldsSchema
 
 | Property      | Value    |              Description               |
 | ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
+| Start         | DateTime | Start date of the requested date range |
+| End           | DateTime |  End date of the requested date range  |
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-fields).
+
+
+# Balances
+
+## Get Balances
+Get balances associated with project
+```csharp
+var result = await manageClient.GetProjectBalancesAsync(projectId)
+```
+## Get Balance
+Get Balance associated with id
+```csharp
+var result = await manageClient.GetProjectBalanceAsync(projectId,balanceId)
+```
+
+# OnPrem
+OnPremClient methods
+
+## List Credentials
+list credenetials 
+```csharp
+var result = onPremClient.ListCredentialsAsync(projectId);
+```
+
+## Get Credentials
+get the credentials associated with the credentials id
+```csharp
+var result = onPremClient.GetCredentialsASync(projectId,credentialsId);
+```
+
+## Remove Credentials
+remove credentials associated with the credentials id
+```csharp
+var result = onPremClient.DeleteCredentialsASync(projectId,credentialsId);
+```
+
+## Create Credentials
+```csharp
+var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema()
+ {
+    Comment = "my new credentials",
+    Scopes = new  string[]{"team fab"},
+    Provider = "Acme credential provider"
+ }
+var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremCredentialsSchema)
+```
+
+#### CreateOnPremCredentialsSchema
+
+| Property      | Value     |              Description               |
+| ------------- | :-------  | :------------------------------------: |
+| Comment       | string?   | comment to associate with credentials  |
+| Scopes        | string[]? | scopes for the credentials             |
+| Provider      | string?   | provider for the credentials             |
+
 
 # Logging
 

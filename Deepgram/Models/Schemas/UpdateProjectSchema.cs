@@ -1,12 +1,16 @@
 ﻿namespace Deepgram.Models.Schemas;
 public class UpdateProjectSchema
 {
+    /// <summary>
+    /// Name of Project
+    /// </summary>
     [JsonPropertyName("name")]
     public string? Name { get; set; }
+
+    /// <summary>
+    /// Company who project belongs to 
+    /// </summary>
     [JsonPropertyName("company")]
     public string? Company { get; set; }
-
-    [JsonPropertyName("additional_properties")]
-    Dictionary<string, string>? AdditionalProperties { get; set; }
 }
 

@@ -101,7 +101,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
         //Arrange 
-        var option = new AutoFaker<ExpirationOptions>().Generate();
+        var option = new AutoFaker<CreateProjectKeyWithExpirationSchema>().Generate();
         var obj = DateTime.Now;
         option.ExpirationDate = obj;
         var expected = $"expiration_date={HttpUtility.UrlEncode(obj.ToString("yyyy-MM-dd"))}";

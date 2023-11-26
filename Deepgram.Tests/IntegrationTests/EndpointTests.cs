@@ -13,7 +13,7 @@ public class EndpointTests
     //    var serviceProvider = serviceCollection.BuildServiceProvider();
     //    var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-    //    var client = new ManageClient(ApiKey, new DeepgramClientOptions(), httpClientFactory);
+    //    var client = new ManageClient(ApiKey,  httpClientFactory);
 
 
     //    // Act

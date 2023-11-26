@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.ClientOptionsUtil.Configure(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "namespace", Target = "~N:Deepgram")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~P:Deepgram.Models.Config.Diarize")]
-[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~P:Deepgram.Models.Schemas.GetProjectUsageSummarySchema.Diarize")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~P:Deepgram.Models.Schemas.GetProjectsUsageSummarySchema.Diarize")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~P:Deepgram.Models.Schemas.LiveSchema.Endpointing")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~P:Deepgram.Models.Schemas.TranscriptionSchema.Diarize")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Exceptions.DeepgramApiError")]
