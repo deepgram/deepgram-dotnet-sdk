@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Exceptions.DeepgramApiError")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Exceptions.DeepgramError")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.DeepgramError")]
-[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.Options.ClientConfigOptions")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PrerecordedSource")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.Responses.AsyncPrerecordedResponse")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.Responses.DeepgramResponse`1")]

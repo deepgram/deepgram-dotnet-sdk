@@ -112,7 +112,7 @@ for default implementation add
 ### With Options
 if you need to set different options the you need to pass in a instance of DeepgramClientOptions
 ```csharp
-   services.AddDeepgram(deepgramClientsOptions);
+   services.AddDeepgram(ClientConfigOptions);
 ```
 
 #### Notes Regarding CORS
@@ -123,20 +123,15 @@ use a proxy and pass it in as part of the options.
 in a console app this might look like -
 ```csharp
     var services = new ServiceCollection()
-    var clientSettings = new ClientSettings()
+    var clientConfigOptions = new ClientConfigOptions()
     {
-     BaseAddress = "https://some.com",
-     Proxy = new RestProxy()
-            {
-               ProxyAddress= "http://prox.com:8080",
-               Username = "carl",
-               Password = "saturn" 
-            },
-     TimeoutInSeconds = 60,
-     Headers = new Dictionary<string, string>()
-     {
-        {"oneKey","oneValue" },
-     }
+     Proxy = new WebProxy()
+      {
+        Address= "http://prox.com:8080",
+        Credentials = new NetworkCredential(String, SecureString)                              
+      }
+    
+    
     };
     serviceCollection.AddDeepgram(clientSettings);
 ```
@@ -155,35 +150,37 @@ if you are using the options pattern and storing them in a json file
 
     serviceCollection.AddDeepgram(clientSettings);
 ```    
-#### DeepgramClientOptions
-| Property         | Value                       |          Description             |
-| --------         | :-----                      | :---------------------------:    |
-| BaseAddress      | string?                     | url of server, include protocol  |
-| Proxy            | RestProxy?                  | proxy details                    |
-| TimeoutInSeconds | int?                        | timeout in seconds required      |
-| Headers          | Dictionary<string, string>? | any headers that you want to add |
 
-#### RestProxy
+#### ClientConfigOptions
 | Property         | Value   |          Description                     |
 | --------         | :-----  | :---------------------------:            |
-| ProxyAddress     | string? | Url of proxy including protocol and port |
-| Username         | string? | Username for proxy                       |
-| Password         | string? | Password for proxy                       |
+| Proxy            | WebProxy| proxy of type System.Net.WebProxy        |
+|        |  |                 |
+
+> Some free proxies may cause SSL verification errors
 
 
-> Timeout can also be set on the various rest clients through  SetTimeout 
-
->UserAgent & Authorization headers are added internally
 
 # Creating a Client
 To create rest clients to communitcate with the deepgram apis, instantiate them directly.
 When creating a restclient you need to pass in the apikey and a HttpClientFactory
 
 ## Default Client Creation
->If you dont need to customize the url or set optional headers then you can create a client -
+>If you dont need to customize the url or set optional headers then you can when creating  a client 
+>passing in a instance of DeepgramClientOptions. 
 ```csharp
-var manageClient = new ManageClient(apiKey,httpClientFactory);
+var manageClient = new ManageClient(apiKey,httpClientFactory,deepgramClientOptions);
 ```
+#### DeepgramClientOptions
+| Property         | Value                       |          Description             |
+| --------         | :-----                      | :---------------------------:    |
+| BaseAddress      | string?                     | url of server, include protocol  |
+| Timeout          | TimeSpan                    | timeout in seconds required      |
+| Headers          | Dictionary<string, string>? | any headers that you want to add |
+
+>UserAgent & Authorization headers are added internally
+
+>Timeout can also be set by callling the RestClients SetTimeout(Timespan)
 
 
 # Examples

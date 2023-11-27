@@ -63,7 +63,7 @@ public class ManageClient : AbstractRestClient
         string url = $"{Constants.PROJECTS}/{projectId}";
 
         // No response expected
-        _ = DeleteAsync(url);
+        _ = Delete(url);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class ManageClient : AbstractRestClient
     public void DeleteProjectKey(string projectId, string keyId)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/keys/{keyId}";
-        _ = DeleteAsync(url);
+        _ = Delete(url);
     }
     #endregion
 
@@ -149,7 +149,7 @@ public class ManageClient : AbstractRestClient
     public void DeleteProjectInvite(string projectId, string email)
     {
         string url = $"{Constants.PROJECTS}/{projectId}/invites/{email}";
-        _ = DeleteAsync(url);
+        _ = Delete(url);
     }
 
     /// <summary>

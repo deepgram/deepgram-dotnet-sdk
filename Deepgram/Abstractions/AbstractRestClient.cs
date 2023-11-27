@@ -8,25 +8,10 @@
         internal ILogger Logger { get; set; }
 
         /// <summary>
-        /// Optional IHttpClientFactory passed in by the consuming project
-        /// </summary>
-        internal IHttpClientFactory? HttpClientFactory { get; set; }
-
-        /// <summary>
         ///  HttpClient created by the factory
         internal HttpClient? HttpClient { get; set; }
 
-        /// <summary>
-        /// ApiKey used for Authentication Header and is required
-        /// </summary>
-        internal string ApiKey { get; set; }
-
-        /// <summary>
-        /// Timeout for the HttpClient
-        /// </summary>
-        internal TimeSpan? Timeout { get; set; }
-
-
+        internal DeepgramClientOptions DeepgramClientOptions { get; set; }
 
 
         /// <summary>
@@ -35,15 +20,14 @@
         /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
         /// <param name="loggerName">nameof the descendent class</param>
         /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName)
+        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName, DeepgramClientOptions? deepgramClientOptions = null)
         {
-            ApiKey = ApiKeyUtil.Configure(apiKey);
-            HttpClientFactory = httpClientFactory;
+            if (apiKey is null)
+                throw new ArgumentException("A Deepgram API Key is required when creating a client");
+
+            DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
             HttpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
-            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", apiKey);
-
-
-
+            HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, HttpClient);
             Logger = LogProvider.GetLogger(loggerName);
         }
 
@@ -128,13 +112,14 @@
         /// <param name="uriSegment">Uri for the api including the query parameters</param>
         /// <param name="logger">logger to log any messages</param>
         /// <returns>nothing</returns>
-        public async Task DeleteAsync(string uriSegment)
+        public async Task Delete(string uriSegment)
         {
             try
             {
                 CheckForTimeout();
-                var response = await HttpClient.DeleteAsync(uriSegment);
-                response.EnsureSuccessStatusCode();
+                var rq = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
+
+                await HttpClient.DeleteAsync(uriSegment);
 
             }
             catch (Exception ex)
@@ -256,15 +241,16 @@
 
         internal void CheckForTimeout()
         {
-            if (Timeout != null)
-                HttpClient.Timeout = (TimeSpan)Timeout;
+            if (DeepgramClientOptions.Timeout != null)
+                HttpClient.Timeout = (TimeSpan)DeepgramClientOptions.Timeout;
         }
 
         /// <summary>
         /// Set the time out on the httpclient
         /// </summary>
         /// <param name="timeSpan"></param>
-        public void SetTimeout(TimeSpan timeSpan) => Timeout = timeSpan;
+        public void SetTimeout(TimeSpan timeSpan)
+            => DeepgramClientOptions.Timeout = timeSpan;
 
         /// <summary>
         /// Create the body payload of a httpRequest

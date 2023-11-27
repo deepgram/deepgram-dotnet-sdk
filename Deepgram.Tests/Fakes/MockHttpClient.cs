@@ -2,16 +2,24 @@
 public static class MockHttpClient
 {
     public static HttpClient CreateHttpClientWithResult<T>(
-       T result, HttpStatusCode code = HttpStatusCode.OK, string? url = null)
+       T result, HttpStatusCode code = HttpStatusCode.OK, string? url = Constants.DEFAULT_URI, bool throwException = false)
     {
-        Uri? baseAddress = null;
-        if (url is null)
+
+        var httpClient = new HttpClient(new MockHttpMessageHandler<T>(result, code, throwException))
         {
-            baseAddress = new Uri(new Faker().Internet.Url());
-        }
-        var httpClient = new HttpClient(new MockHttpMessageHandler<T>(result, code))
+            BaseAddress = new Uri(url)
+        };
+
+        return httpClient;
+    }
+
+    public static HttpClient CreateHttpClientWithException<T>(
+       T result, HttpStatusCode code = HttpStatusCode.OK)
+    {
+
+        var httpClient = new HttpClient(new MockHttpMessageHandler<T>(result, code, true))
         {
-            BaseAddress = baseAddress
+            BaseAddress = new Uri(Constants.DEFAULT_URI)
         };
 
         return httpClient;

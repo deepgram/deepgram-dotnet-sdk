@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Models;
+﻿using System.Net;
+
+namespace Deepgram.Models;
 public class RestProxy
 {
     /// <summary>
@@ -6,6 +8,7 @@ public class RestProxy
     /// </summary>
     public string? ProxyAddress { get; set; }
 
+    public NetworkCredential? Credentials { get; set; }
     /// <summary>
     /// username for credentials 
     /// </summary>

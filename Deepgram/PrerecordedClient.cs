@@ -18,6 +18,7 @@ public class PrerecordedClient : AbstractRestClient
     /// </summary>
     /// <param name="source">Url to the file that is to be transcribed</param>
     /// <param name="prerecordedSchema">Option for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>SyncPrerecordedResponse</returns>
     public async Task<SyncPrerecordedResponse> TranscribeUrlAsync(UrlSource source, PrerecordedSchema? prerecordedSchema)
     {
@@ -34,6 +35,7 @@ public class PrerecordedClient : AbstractRestClient
     /// </summary>
     /// <param name="source">file is the form of a byte[]</param>
     /// <param name="prerecordedSchema">Option for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>SyncPrerecordedResponse</returns>
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(byte[] source, PrerecordedSchema? prerecordedSchema)
     {
@@ -51,6 +53,7 @@ public class PrerecordedClient : AbstractRestClient
     /// </summary>
     /// <param name="source">file is the form of a stream</param>
     /// <param name="prerecordedSchema">Options for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>SyncPrerecordedResponse</returns>
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(Stream source, PrerecordedSchema? prerecordedSchema)
     {
@@ -68,6 +71,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">Url to the file that is to be transcribed</param>
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>AsyncPrerecordedResponse</returns>
     public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBackAsync(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
@@ -87,6 +91,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">file is the form of a byte[]</param>
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>AsyncPrerecordedResponse</returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallBackAsync(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
@@ -107,6 +112,7 @@ public class PrerecordedClient : AbstractRestClient
     /// <param name="source">file is the form of a stream</param>
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription</param>
+    /// <param name="deepgramRequestOptions">options specific to this request call</param>
     /// <returns>AsyncPrerecordedResponse</returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallbackAsync(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {

@@ -7,16 +7,13 @@ public class AbstractRestfulClientTests
 {
     ILogger<ConcreteRestClient> logger;
     string ApiKey;
-    IHttpClientFactory httpClientFactory;
+
 
     [SetUp]
     public void Setup()
     {
         logger = Substitute.For<ILogger<ConcreteRestClient>>();
         ApiKey = new Faker().Random.Guid().ToString();
-        httpClientFactory = Substitute.For<IHttpClientFactory>();
-        httpClientFactory.CreateClient(Arg.Any<string>()).Returns(new HttpClient());
-
     }
 
     [Test]
@@ -25,8 +22,11 @@ public class AbstractRestfulClientTests
         // Arrange        
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
         // Act
@@ -45,8 +45,11 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
@@ -66,9 +69,11 @@ public class AbstractRestfulClientTests
 
         var uriSegment = $"{Constants.PROJECTS}";
 
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.GetAsync<GetProjectResponse>(uriSegment);
@@ -86,8 +91,11 @@ public class AbstractRestfulClientTests
         var expectedResponse = new GetProjectsResponse();
         var id = new Faker().Random.Guid().ToString();
         var uriSegment = $"{Constants.PROJECTS}/{id}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act & Assert       
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
@@ -103,9 +111,11 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<CreateProjectKeyResponse>().Generate();
 
         var uriSegment = $"{Constants.PROJECTS}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.PostAsync<CreateProjectKeyResponse>(uriSegment, null);
@@ -117,7 +127,7 @@ public class AbstractRestfulClientTests
     }
 
     [Test]
-    public async Task PostAsync_Should_Return_Response_Model_With_Schema_And_Body()
+    public async Task PostAsync_Should_Return_Response_Model_With_Schema_And_BodyAsync()
     {
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
@@ -126,9 +136,11 @@ public class AbstractRestfulClientTests
         var stringedSchema = QueryParameterUtil.GetParameters(schema);
 
         var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(source);
 
@@ -141,7 +153,7 @@ public class AbstractRestfulClientTests
     }
 
     [Test]
-    public Task PostAsync_Should_Throw_Exception_On_UnsuccessfulResponse()
+    public void PostAsync_Should_Throw_Exception_On_UnsuccessfulResponse()
     {
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
@@ -151,29 +163,34 @@ public class AbstractRestfulClientTests
         var stringedSchema = QueryParameterUtil.GetParameters(schema);
 
         var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         // Act
         // Act & Assert       
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PostAsync<SyncPrerecordedResponse>(uriSegment, content));
         logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during POST request");
-        return Task.CompletedTask;
+
     }
 
 
     [Test]
-    public void DeleteAsync_Should_Return_Nothing_On_SuccessfulResponse()
+    public void Delete_Should_Return_Nothing_On_SuccessfulResponse()
     {
         // Arrange        
         var expectedResponse = new VoidResponse();
         var uriSegment = $"{Constants.PROJECTS}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
-        AsyncTestDelegate act = async () => await client.DeleteAsync(uriSegment);
+        AsyncTestDelegate act = async () => await client.Delete(uriSegment);
 
         // Assert
         Assert.DoesNotThrowAsync(act);
@@ -181,20 +198,20 @@ public class AbstractRestfulClientTests
 
 
     [Test]
-    public void DeleteAsync_Should_ThrowsException_On_Response_containing_Error()
+    public void Delete_Should_ThrowsException_On_Response_containing_Error()
     {
         // Arrange       
-        var expectedResponse = new VoidResponse()
-        {
-            Error = new Exception()
-        };
+        var response = new MessageResponse();
 
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithException(response, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.Logger = logger;
         //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync(uriSegment));
+        Assert.ThrowsAsync<HttpRequestException>(() => client.Delete(uriSegment));
 
         // Act & Assert
 
@@ -208,8 +225,11 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
         var uriSegment = $"{Constants.PROJECTS}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         // Act
         var result = await client.DeleteAsync<MessageResponse>(uriSegment);
@@ -226,11 +246,15 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var uriSegment = $"{Constants.PROJECTS}";
-        var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
         client.Logger = logger;
         //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync(uriSegment));
+        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync<MessageResponse>(uriSegment));
 
         // Act & Assert
 
@@ -245,10 +269,12 @@ public class AbstractRestfulClientTests
         var id = new Faker().Random.Guid().ToString();
         var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
         var uriSegment = $"{Constants.PROJECTS}/{id}";
-
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
@@ -270,9 +296,11 @@ public class AbstractRestfulClientTests
         var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
         var uriSegment = $"{Constants.PROJECTS}/{id}";
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
 
         var content = AbstractRestClient.CreatePayload(updateOptions);
@@ -291,11 +319,14 @@ public class AbstractRestfulClientTests
         // Arrange
         var id = new Faker().Random.Guid().ToString();
         var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
-
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var uriSegment = $"{Constants.PROJECTS}/{id}";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         client.Logger = logger;
 
         var content = AbstractRestClient.CreatePayload(updateOptions);
@@ -317,9 +348,11 @@ public class AbstractRestfulClientTests
         var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
         var uriSegment = $"{Constants.PROJECTS}/{id}";
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
 
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.HttpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         client.Logger = logger;
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
