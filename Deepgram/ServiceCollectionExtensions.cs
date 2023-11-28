@@ -12,16 +12,17 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    //Proxy throwing a System.PlatformNotSupportedException
     private static HttpClientHandler ConfigureHandler(ClientConfigOptions? clientConfigOptions)
     {
         var handler = new HttpClientHandler();
         if (clientConfigOptions is not null && clientConfigOptions.Proxy is not null)
         {
             var webProxy = clientConfigOptions.Proxy;
-            webProxy.BypassProxyOnLocal = false;
-            webProxy.UseDefaultCredentials = false;
+            //webProxy.BypassProxyOnLocal = false;
+            //webProxy.UseDefaultCredentials = false;
             handler.Proxy = webProxy;
-            handler.UseProxy = true;
+            // handler.UseProxy = true;
         }
 
         return handler;

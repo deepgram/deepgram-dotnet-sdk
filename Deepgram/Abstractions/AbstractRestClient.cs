@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Abstractions
+﻿using System.Diagnostics;
+
+namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {
@@ -26,7 +28,17 @@
                 throw new ArgumentException("A Deepgram API Key is required when creating a client");
 
             DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
-            HttpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
+            //Proxy throwing a System.PlatformNotSupportedException
+            try
+            {
+                HttpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                throw;
+            }
+
             HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, HttpClient);
             Logger = LogProvider.GetLogger(loggerName);
         }
