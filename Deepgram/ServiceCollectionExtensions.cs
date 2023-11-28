@@ -4,27 +4,9 @@ namespace Deepgram;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDeepgram(this IServiceCollection services, ClientConfigOptions? clientConfigOptions = null)
+    public static IServiceCollection AddDeepgram(this IServiceCollection services)
     {
-        services.AddHttpClient(Constants.HTTPCLIENT_NAME)
-            .ConfigurePrimaryHttpMessageHandler(() => ConfigureHandler(clientConfigOptions));
-
+        services.AddHttpClient(Constants.HTTPCLIENT_NAME);
         return services;
-    }
-
-    //Proxy throwing a System.PlatformNotSupportedException
-    private static HttpClientHandler ConfigureHandler(ClientConfigOptions? clientConfigOptions)
-    {
-        var handler = new HttpClientHandler();
-        if (clientConfigOptions is not null && clientConfigOptions.Proxy is not null)
-        {
-            var webProxy = clientConfigOptions.Proxy;
-            //webProxy.BypassProxyOnLocal = false;
-            //webProxy.UseDefaultCredentials = false;
-            handler.Proxy = webProxy;
-            // handler.UseProxy = true;
-        }
-
-        return handler;
     }
 }

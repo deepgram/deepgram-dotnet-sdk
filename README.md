@@ -13,8 +13,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Targeted Frameworks](#targeted-frameworks)
 - [Configuration](#configuration)
   - [Default](#default) 
-  - [With Options](#with-Options)
-    - [Notes regarding Cors](#notes-regarding-cors)
+   - [Notes regarding Cors](#notes-regarding-cors)
   - [Examples](#examples)  
 - [Creating A Rest Client](#creating-a-rest-client)
   - [Default Client Creation](#default-client-creation)    
@@ -108,57 +107,10 @@ for default implementation add
 ```csharp
     services.AddDeepgram():
 ```
-
-### With Options
-if you need to set different options the you need to pass in a instance of DeepgramClientOptions
-```csharp
-   services.AddDeepgram(ClientConfigOptions);
-```
-
 #### Notes Regarding CORS
-    if you run it to problems with cors, the deepgram api reject CORS you will need to 
-use a proxy and pass it in as part of the options.
+    deepgram api does not support COR requests
 
 ### Examples
-in a console app this might look like -
-```csharp
-    var services = new ServiceCollection()
-    var clientConfigOptions = new ClientConfigOptions()
-    {
-     Proxy = new WebProxy()
-      {
-        Address= "http://prox.com:8080",
-        Credentials = new NetworkCredential(String, SecureString)                              
-      }
-    
-    
-    };
-    serviceCollection.AddDeepgram(clientSettings);
-```
-
-if you are using the options pattern and storing them in a json file
-```csharp
-    var configuration = new ConfigurationBuilder()
-           .SetBasePath(@"D:\Projects\ConsoleApp2\ConsoleApp2")
-           .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-           .Build();
-
-    var options = new DeepgramOptions
-    configuration.GetSettings(nameof(DeepgramClientOptions)).Bind(options);
-    //you can assign the values manually if you keep them else were
-    // options.Proxy.Username = "bill"
-
-    serviceCollection.AddDeepgram(clientSettings);
-```    
-
-#### ClientConfigOptions
-| Property         | Value   |          Description                     |
-| --------         | :-----  | :---------------------------:            |
-| Proxy            | WebProxy| proxy of type System.Net.WebProxy        |
-|        |  |                 |
-
-> Some free proxies may cause SSL verification errors
-
 
 
 # Creating a Client
@@ -166,7 +118,7 @@ To create rest clients to communitcate with the deepgram apis, instantiate them 
 When creating a restclient you need to pass in the apikey and a HttpClientFactory
 
 ## Default Client Creation
->If you dont need to customize the url or set optional headers then you can when creating  a client 
+>If you  need to customize the url or set optional headers then you can when creating  a client 
 >passing in a instance of DeepgramClientOptions. 
 ```csharp
 var manageClient = new ManageClient(apiKey,httpClientFactory,deepgramClientOptions);
