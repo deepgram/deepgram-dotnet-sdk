@@ -14,3 +14,4 @@ global using Deepgram.Utilities;
 global using Microsoft.Extensions.Logging;
 global using NSubstitute;
 global using NUnit.Framework;
+

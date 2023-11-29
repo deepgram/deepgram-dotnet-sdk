@@ -34,7 +34,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<GetProjectsResponse>(result);
+        Assert.That(result, Is.InstanceOf<GetProjectsResponse>());
         Assert.That(result.Projects.Length, Is.EqualTo(expectedResponse.Projects.Length));
     }
 
@@ -80,7 +80,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<GetProjectResponse>(result);
+        Assert.That(result, Is.InstanceOf<GetProjectResponse>());
         Assert.That(result.ProjectId, Is.EqualTo(expectedResponse.ProjectId));
     }
 
@@ -122,7 +122,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<CreateProjectKeyResponse>(result);
+        Assert.That(result, Is.InstanceOf<CreateProjectKeyResponse>());
         Assert.That(result.ApiKeyId, Is.EqualTo(expectedResponse.ApiKeyId));
     }
 
@@ -149,7 +149,8 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<SyncPrerecordedResponse>(result);
+        Assert.That(result, Is.InstanceOf<SyncPrerecordedResponse>());
+
     }
 
     [Test]
@@ -236,7 +237,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<MessageResponse>(result);
+        Assert.That(result, Is.InstanceOf<MessageResponse>());
         Assert.That(result.Message, Is.EqualTo(expectedResponse.Message));
     }
 
@@ -284,7 +285,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<MessageResponse>(result);
+        Assert.That(result, Is.InstanceOf<MessageResponse>());
         Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
     }
 
@@ -336,7 +337,7 @@ public class AbstractRestfulClientTests
 
         // Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<MessageResponse>(result);
+        Assert.That(result, Is.InstanceOf<MessageResponse>());
         Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
     }
 

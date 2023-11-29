@@ -67,7 +67,8 @@ public class HttpClientUtilTests
             Assert.That(SUT.BaseAddress, Is.Not.Null);
 
             Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-            Assert.IsTrue(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key));
+
+            Assert.That(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key), Is.True);
         });
     }
 
@@ -94,7 +95,8 @@ public class HttpClientUtilTests
             Assert.That(SUT.BaseAddress, Is.Not.Null);
 
             Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-            Assert.IsTrue(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key));
+            Assert.That(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key), Is.True);
+
         });
     }
 

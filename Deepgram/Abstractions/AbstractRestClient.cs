@@ -13,8 +13,10 @@ namespace Deepgram.Abstractions
         ///  HttpClient created by the factory
         internal HttpClient? HttpClient { get; set; }
 
+        /// <summary>
+        /// Options for setting Httpclient and request
+        /// </summary>
         internal DeepgramClientOptions DeepgramClientOptions { get; set; }
-
 
         /// <summary>
         /// Constructor that take a IHttpClientFactory

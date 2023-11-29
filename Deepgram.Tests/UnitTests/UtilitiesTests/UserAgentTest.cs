@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
+﻿
+
+namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 internal class UserAgentTest
 {
     [Test]
@@ -9,7 +11,7 @@ internal class UserAgentTest
 
         //Assert
         Assert.That(result, Is.Not.Null);
-        Assert.IsAssignableFrom<string>(result);
-        StringAssert.StartsWith("deepgram", result);
+        Assert.That(result, Is.InstanceOf<string>());
+        Assert.That(result, Does.Contain("deepgram"));
     }
 }
