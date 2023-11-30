@@ -11,7 +11,8 @@ global using Deepgram.Models.Schemas;
 global using Deepgram.Tests.Fakes;
 global using Deepgram.Tests.TestExtensions;
 global using Deepgram.Utilities;
+global using FluentAssertions;
+global using FluentAssertions.Execution;
 global using Microsoft.Extensions.Logging;
 global using NSubstitute;
 global using NUnit.Framework;
-

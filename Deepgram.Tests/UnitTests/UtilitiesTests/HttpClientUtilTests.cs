@@ -2,116 +2,97 @@
 public class HttpClientUtilTests
 {
     readonly string _customUrl = "acme.com";
+    IHttpClientFactory _httpClientFactory;
+    string _apiKey;
+    DeepgramClientOptions _clientOptions;
+
+    [SetUp]
+    public void Setup()
+    {
+        _apiKey = Guid.NewGuid().ToString();
+        _httpClientFactory = Substitute.For<IHttpClientFactory>();
+        _clientOptions = new DeepgramClientOptions();
+    }
+
+
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress()
     {
         //Arrange 
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new DeepgramClientOptions();
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var expectedBaseAddress = $"{Constants.DEFAULT_URI}/";
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
+        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
 
         //Assert 
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-        });
+            SUT.Should().NotBeNull();
+            SUT.BaseAddress.Should().Be($"{Constants.DEFAULT_URI}/");
+        };
     }
 
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress()
     {
-        //Arrange 
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new DeepgramClientOptions();
+        //Arrange        
         var expectedBaseAddress = $"https://{_customUrl}/";
-        clientOptions.BaseAddress = expectedBaseAddress;
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        _clientOptions.BaseAddress = expectedBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-
-
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
+        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
 
         //Assert 
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-        });
+            SUT.Should().NotBeNull();
+            SUT.BaseAddress.Should().Be(expectedBaseAddress);
+        };
     }
 
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress_And_Custom_Headers()
     {
         //Arrange 
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new DeepgramClientOptions();
-        var expectedHeaders = FakeHeaders();
-        clientOptions.Headers = expectedHeaders;
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-
-        var expectedBaseAddress = $"{Constants.DEFAULT_URI}/";
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
+        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
 
         //Assert 
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-
-            Assert.That(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key), Is.True);
-        });
+            SUT.Should().NotBeNull();
+            SUT.BaseAddress.Should().Be($"{Constants.DEFAULT_URI}/");
+            SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
+        };
     }
 
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress_And_Custom_Headers()
     {
-        //Arrange 
-        var apiKey = Guid.NewGuid().ToString();
-        var clientOptions = new DeepgramClientOptions();
-        var expectedHeaders = FakeHeaders();
-        clientOptions.Headers = expectedHeaders;
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        //Arrange       
+        _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var expectedBaseAddress = $"https://{_customUrl}/";
-        clientOptions.BaseAddress = expectedBaseAddress;
-
+        _clientOptions.BaseAddress = expectedBaseAddress;
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
+        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
 
         //Assert 
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(SUT, Is.Not.Null);
-            Assert.That(SUT.BaseAddress, Is.Not.Null);
-
-            Assert.That(SUT.BaseAddress!.ToString(), Is.EqualTo(expectedBaseAddress));
-            Assert.That(SUT.DefaultRequestHeaders.Contains(expectedHeaders.First().Key), Is.True);
-
-        });
+            SUT.Should().NotBeNull();
+            SUT.BaseAddress.Should().Be(expectedBaseAddress);
+            SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
+        };
     }
 
 

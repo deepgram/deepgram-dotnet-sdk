@@ -25,8 +25,8 @@
     <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
     <Version>4.0.0-alpha</Version>
   </PropertyGroup>
-  
-  
+
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.*" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.*" />
@@ -37,6 +37,7 @@
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.*" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.*" />
   </ItemGroup>
+
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.*" />
@@ -88,6 +89,9 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Deepgram.Tests" />    
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
   </ItemGroup>
 
   

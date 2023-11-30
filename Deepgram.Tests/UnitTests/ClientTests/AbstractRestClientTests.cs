@@ -6,14 +6,15 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 public class AbstractRestfulClientTests
 {
     ILogger<ConcreteRestClient> _logger;
+    IHttpClientFactory _httpClientFactory;
     string _apiKey;
-
 
     [SetUp]
     public void Setup()
     {
         _logger = Substitute.For<ILogger<ConcreteRestClient>>();
         _apiKey = new Faker().Random.Guid().ToString();
+        _httpClientFactory = Substitute.For<IHttpClientFactory>();
     }
 
     [Test]
@@ -21,108 +22,79 @@ public class AbstractRestfulClientTests
     {
         // Arrange        
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
-        {
-            Logger = _logger
-        };
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act
-        var result = await client.GetAsync<GetProjectsResponse>(uriSegment);
+        var result = await client.GetAsync<GetProjectsResponse>(Constants.PROJECTS);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<GetProjectsResponse>());
-        Assert.That(result.Projects, Is.EquivalentTo(expectedResponse.Projects!));
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<GetProjectsResponse>();
+            result.Should().BeEquivalentTo(expectedResponse);
+        };
     }
-
 
     [Test]
     public void GetAsync_Should_ThrowsException_On_UnsuccessfulResponse()
     {
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
-        {
-            Logger = _logger
-        };
-        //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act & Assert
-
-        _logger.ReceivedWithAnyArgs();
+        client.Invoking(y => y.GetAsync<GetProjectsResponse>(Constants.PROJECTS))
+             .Should().ThrowAsync<HttpRequestException>();
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during GET request");
     }
 
     [Test]
     public async Task GetAsync_With_Id_Should_Return_ExpectedResult_On_SuccessfulResponse()
     {
         // Arrange    
-        var id = new Faker().Random.Guid().ToString();
         var expectedResponse = new AutoFaker<GetProjectResponse>().Generate();
-        expectedResponse.ProjectId = id;
-
-        var uriSegment = $"{Constants.PROJECTS}";
-
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        expectedResponse.ProjectId = "1";
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act
-        var result = await client.GetAsync<GetProjectResponse>(uriSegment);
+        var result = await client.GetAsync<GetProjectResponse>($"{Constants.PROJECTS}/1");
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<GetProjectResponse>());
-        Assert.That(result.ProjectId, Is.EqualTo(expectedResponse.ProjectId));
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<GetProjectResponse>();
+            result.ProjectId.Should().Be(expectedResponse.ProjectId);
+        };
     }
 
-    [Test]
-    public void GetAsync_With_Id_Should_ThrowsException_On_UnsuccessfulResponse()
-    {
-        // Arrange       
-        var expectedResponse = new GetProjectsResponse();
-        var id = new Faker().Random.Guid().ToString();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-        // Act & Assert       
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
-        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during GET request");
-    }
 
     [Test]
     public async Task PostAsync_Should_Return_Response_Model_With_Schema_And_No_Body()
     {
         // Arrange      
         var expectedResponse = new AutoFaker<CreateProjectKeyResponse>().Generate();
-
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act
-        var result = await client.PostAsync<CreateProjectKeyResponse>(uriSegment, new StringContent(""));
+        var result = await client.PostAsync<CreateProjectKeyResponse>(Constants.PROJECTS, new StringContent(string.Empty));
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<CreateProjectKeyResponse>());
-        Assert.That(result.ApiKeyId, Is.EqualTo(expectedResponse.ApiKeyId));
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<CreateProjectKeyResponse>();
+            result.ApiKeyId.Should().Be(expectedResponse.ApiKeyId);
+        };
     }
 
     [Test]
@@ -130,25 +102,19 @@ public class AbstractRestfulClientTests
     {
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var source = new UrlSource { Url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav" };
-        var schema = new PrerecordedSchema { Punctuate = true, Utterances = true };
-        var stringedSchema = QueryParameterUtil.GetParameters(schema);
-
-        var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-        var content = AbstractRestClient.CreatePayload(source);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act
-        var result = await client.PostAsync<SyncPrerecordedResponse>(uriSegment, content);
+        var result = await client.PostAsync<SyncPrerecordedResponse>(Constants.PROJECTS, new StringContent(""));
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<SyncPrerecordedResponse>());
-
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<SyncPrerecordedResponse>();
+        };
     }
 
     [Test]
@@ -156,61 +122,43 @@ public class AbstractRestfulClientTests
     {
         // Arrange       
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var source = new UrlSource { Url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav" };
-        var content = AbstractRestClient.CreatePayload(source);
-        var schema = new PrerecordedSchema { Punctuate = true, Utterances = true };
-        var stringedSchema = QueryParameterUtil.GetParameters(schema);
-
-        var uriSegment = $"{Constants.PROJECTS}?{stringedSchema}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
+        // Act & Assert      
 
-        // Act & Assert       
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PostAsync<SyncPrerecordedResponse>(uriSegment, content));
+        client.Invoking(y => y.PostAsync<GetProjectsResponse>(Constants.PROJECTS, new StringContent("")))
+             .Should().ThrowAsync<HttpRequestException>();
         _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during POST request");
-
     }
-
 
     [Test]
     public void Delete_Should_Return_Nothing_On_SuccessfulResponse()
     {
-        // Arrange        
-        var expectedResponse = new VoidResponse();
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        // Arrange   
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse(), HttpStatusCode.OK);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act & Assert
-        async Task act() => await client.Delete(uriSegment);
-        Assert.DoesNotThrowAsync(act);
+        client.Invoking(y => y.Delete($"{Constants.PROJECTS}/1"))
+            .Should().NotThrowAsync();
     }
 
 
     [Test]
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async Task Delete_Should_ThrowsException_On_Response_containing_Error()
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async Task Delete_Should_ThrowsException_On_Response_Containing_Error()
     {
-        // Arrange       
-        var response = new MessageResponse();
-
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        var httpClient = MockHttpClient.CreateHttpClientWithException(response, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-
+        // Arrange    
+        var httpClient = MockHttpClient.CreateHttpClientWithException(new MessageResponse(), HttpStatusCode.BadRequest);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act & Assert
-        Assert.ThrowsAsync<HttpRequestException>(() => client.Delete(uriSegment));
-        _logger.ReceivedWithAnyArgs();
+        _ = client.Invoking(y => y.Delete(Constants.PROJECTS))
+             .Should().ThrowAsync<HttpRequestException>();
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during DELETE request");
     }
 
     [Test]
@@ -218,20 +166,20 @@ public class AbstractRestfulClientTests
     {
         // Arrange        
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-
-        var uriSegment = $"{Constants.PROJECTS}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient("apiKey", httpClientFactory) { Logger = _logger };
         // Act
-        var result = await client.DeleteAsync<MessageResponse>(uriSegment);
+        var result = await client.DeleteAsync<MessageResponse>($"{Constants.PROJECTS}/1");
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<MessageResponse>());
-        Assert.That(result.Message, Is.EqualTo(expectedResponse.Message));
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<MessageResponse>();
+            result.Message.Should().Be(expectedResponse.Message);
+        };
     }
 
     [Test]
@@ -239,126 +187,121 @@ public class AbstractRestfulClientTests
     {
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}";
-
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-        //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync<MessageResponse>(uriSegment));
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act & Assert
-
-        _logger.ReceivedWithAnyArgs();
+        client.Invoking(y => y.DeleteAsync<MessageResponse>(Constants.PROJECTS))
+             .Should().ThrowAsync<HttpRequestException>();
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during DELETE request");
     }
 
 
     [Test]
     public async Task PatchAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
     {
-        // Arrange
-        var id = new Faker().Random.Guid().ToString();
-        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
+        // Arrange        
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-        var content = AbstractRestClient.CreatePayload(updateOptions);
-
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act
-        var result = await client.PatchAsync<MessageResponse>(uriSegment, content);
+        var result = await client.PatchAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(""));
 
         // Assert
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<MessageResponse>());
-            Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
-        });
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<MessageResponse>();
+            result.Message.Should().Be(expectedResponse.Message);
+        };
     }
 
     [Test]
     public void PatchAsync_TResponse_Should_ThrowsException_On_UnsuccessfulResponse()
     {
-        // Arrange
-        var id = new Faker().Random.Guid().ToString();
-        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
+        // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-
-        var content = AbstractRestClient.CreatePayload(updateOptions);
-
-        //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PatchAsync<MessageResponse>(uriSegment, content));
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act & Assert
-
-        _logger.ReceivedWithAnyArgs();
+        client.Invoking(y => y.PatchAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
+             .Should().ThrowAsync<HttpRequestException>();
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during PATCH request");
     }
 
     [Test]
     public async Task PutAsync_Should_Return_ExpectedResult_On_SuccessfulResponse()
     {
         // Arrange
-        var id = new Faker().Random.Guid().ToString();
-        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
-        {
-            Logger = _logger
-        };
-
-        var content = AbstractRestClient.CreatePayload(updateOptions);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act
-        var result = await client.PutAsync<MessageResponse>(uriSegment, content);
+        var result = await client.PutAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(""));
 
         // Assert
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(result, Is.Not.Null);
+            result.Should().NotBeNull();
             Assert.That(result, Is.InstanceOf<MessageResponse>());
             Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
-        });
+        };
     }
 
     [Test]
     public void PutAsync_TResponse_Should_ThrowsException_On_UnsuccessfulResponse()
     {
-        // Arrange
-        var id = new Faker().Random.Guid().ToString();
-        var updateOptions = new AutoFaker<UpdateProjectSchema>().Generate();
-        var uriSegment = $"{Constants.PROJECTS}/{id}";
-        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
-
-        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
-        var content = AbstractRestClient.CreatePayload(updateOptions);
-
-        //Act
-        var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PutAsync<MessageResponse>(uriSegment, content));
+        // Arrange       
+        var httpClient = MockHttpClient.CreateHttpClientWithException(new MessageResponse(), HttpStatusCode.BadRequest);
+        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { Logger = _logger };
 
         // Act & Assert
+        client.Invoking(y => y.PutAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
+             .Should().ThrowAsync<HttpRequestException>();
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during PUT request");
 
-        _logger.ReceivedWithAnyArgs();
+    }
+
+    [Test]
+    public void CreatePayload_Should_Return_StringContent()
+    {
+        //Arrange       
+        var project = new AutoFaker<Project>().Generate();
+
+        //Act
+        var result = AbstractRestClient.CreatePayload(project);
+
+        //Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<StringContent>();
+        }
+    }
+
+    [Test]
+    public void CreateStreamPayload_Should_Return_HttpContent()
+    {
+        //Arrange 
+        var source = System.Text.Encoding.ASCII.GetBytes("Acme Unit Testing");
+        var stream = new MemoryStream(source);
+
+        //Act
+        var result = AbstractRestClient.CreateStreamPayload(stream);
+
+        //Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<HttpContent>();
+        }
     }
 }
