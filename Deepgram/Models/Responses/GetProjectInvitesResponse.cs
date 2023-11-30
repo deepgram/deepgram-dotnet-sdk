@@ -3,5 +3,5 @@
 public class GetProjectInvitesResponse
 {
     [JsonPropertyName("invites")]
-    Invite[]? Invites { get; set; }
+    public Invite[]? Invites { get; set; }
 }

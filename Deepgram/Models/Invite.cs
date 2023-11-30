@@ -3,8 +3,8 @@
 public class Invite
 {
     [JsonPropertyName("email")]
-    string? Email { get; set; }
+    public string? Email { get; set; }
 
     [JsonPropertyName("scope")]
-    string? Scope { get; set; }
+    public string? Scope { get; set; }
 }

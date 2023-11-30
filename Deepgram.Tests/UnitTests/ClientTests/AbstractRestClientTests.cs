@@ -5,15 +5,15 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 [TestFixture]
 public class AbstractRestfulClientTests
 {
-    ILogger<ConcreteRestClient> logger;
-    string ApiKey;
+    ILogger<ConcreteRestClient> _logger;
+    string _apiKey;
 
 
     [SetUp]
     public void Setup()
     {
-        logger = Substitute.For<ILogger<ConcreteRestClient>>();
-        ApiKey = new Faker().Random.Guid().ToString();
+        _logger = Substitute.For<ILogger<ConcreteRestClient>>();
+        _apiKey = new Faker().Random.Guid().ToString();
     }
 
     [Test]
@@ -26,8 +26,10 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
+        {
+            Logger = _logger
+        };
 
         // Act
         var result = await client.GetAsync<GetProjectsResponse>(uriSegment);
@@ -35,7 +37,7 @@ public class AbstractRestfulClientTests
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result, Is.InstanceOf<GetProjectsResponse>());
-        Assert.That(result.Projects.Length, Is.EqualTo(expectedResponse.Projects.Length));
+        Assert.That(result.Projects, Is.EquivalentTo(expectedResponse.Projects!));
     }
 
 
@@ -49,14 +51,16 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
+        {
+            Logger = _logger
+        };
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
 
         // Act & Assert
 
-        logger.ReceivedWithAnyArgs();
+        _logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -73,8 +77,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act
         var result = await client.GetAsync<GetProjectResponse>(uriSegment);
 
@@ -95,19 +98,16 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act & Assert       
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.GetAsync<GetProjectsResponse>(uriSegment));
-        logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during GET request");
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during GET request");
     }
 
     [Test]
     public async Task PostAsync_Should_Return_Response_Model_With_Schema_And_No_Body()
     {
-        // Arrange
-
-        var id = new Faker().Random.Guid().ToString();
+        // Arrange      
         var expectedResponse = new AutoFaker<CreateProjectKeyResponse>().Generate();
 
         var uriSegment = $"{Constants.PROJECTS}";
@@ -115,10 +115,9 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         // Act
-        var result = await client.PostAsync<CreateProjectKeyResponse>(uriSegment, null);
+        var result = await client.PostAsync<CreateProjectKeyResponse>(uriSegment, new StringContent(""));
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -140,8 +139,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         var content = AbstractRestClient.CreatePayload(source);
 
         // Act
@@ -168,12 +166,11 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
-        // Act
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
+
         // Act & Assert       
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.PostAsync<SyncPrerecordedResponse>(uriSegment, content));
-        logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during POST request");
+        _logger.Received().AnyLogOfType(LogLevel.Error, "Error occurred during POST request");
 
     }
 
@@ -188,35 +185,32 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.Logger = logger;
-        // Act
-        AsyncTestDelegate act = async () => await client.Delete(uriSegment);
-
-        // Assert
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
+        // Act & Assert
+        async Task act() => await client.Delete(uriSegment);
         Assert.DoesNotThrowAsync(act);
     }
 
 
     [Test]
-    public void Delete_Should_ThrowsException_On_Response_containing_Error()
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    public async Task Delete_Should_ThrowsException_On_Response_containing_Error()
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         // Arrange       
         var response = new MessageResponse();
 
         var uriSegment = $"{Constants.PROJECTS}";
         var httpClientFactory = Substitute.For<IHttpClientFactory>();
-        var httpClient = MockHttpClient.CreateHttpClientWithException(response, HttpStatusCode.OK);
+        var httpClient = MockHttpClient.CreateHttpClientWithException(response, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
-        //Act
-        Assert.ThrowsAsync<HttpRequestException>(() => client.Delete(uriSegment));
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
+
 
         // Act & Assert
-
-        logger.ReceivedWithAnyArgs();
+        Assert.ThrowsAsync<HttpRequestException>(() => client.Delete(uriSegment));
+        _logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -230,8 +224,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient("apiKey", httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient("apiKey", httpClientFactory) { Logger = _logger };
         // Act
         var result = await client.DeleteAsync<MessageResponse>(uriSegment);
 
@@ -252,14 +245,13 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         //Act
         var ex = Assert.ThrowsAsync<HttpRequestException>(() => client.DeleteAsync<MessageResponse>(uriSegment));
 
         // Act & Assert
 
-        logger.ReceivedWithAnyArgs();
+        _logger.ReceivedWithAnyArgs();
     }
 
 
@@ -275,8 +267,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
 
@@ -284,9 +275,12 @@ public class AbstractRestfulClientTests
         var result = await client.PatchAsync<MessageResponse>(uriSegment, content);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<MessageResponse>());
-        Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<MessageResponse>());
+            Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+        });
     }
 
     [Test]
@@ -301,8 +295,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
 
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
@@ -311,7 +304,7 @@ public class AbstractRestfulClientTests
 
         // Act & Assert
 
-        logger.ReceivedWithAnyArgs();
+        _logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -327,8 +320,10 @@ public class AbstractRestfulClientTests
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory)
+        {
+            Logger = _logger
+        };
 
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
@@ -336,9 +331,12 @@ public class AbstractRestfulClientTests
         var result = await client.PutAsync<MessageResponse>(uriSegment, content);
 
         // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result, Is.InstanceOf<MessageResponse>());
-        Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<MessageResponse>());
+            Assert.That(expectedResponse.Message, Is.EqualTo(result.Message));
+        });
     }
 
     [Test]
@@ -353,8 +351,7 @@ public class AbstractRestfulClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
 
         httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(ApiKey, httpClientFactory);
-        client.Logger = logger;
+        var client = new ConcreteRestClient(_apiKey, httpClientFactory) { Logger = _logger };
         var content = AbstractRestClient.CreatePayload(updateOptions);
 
         //Act
@@ -362,6 +359,6 @@ public class AbstractRestfulClientTests
 
         // Act & Assert
 
-        logger.ReceivedWithAnyArgs();
+        _logger.ReceivedWithAnyArgs();
     }
 }

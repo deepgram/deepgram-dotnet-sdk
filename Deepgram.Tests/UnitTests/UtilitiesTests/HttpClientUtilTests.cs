@@ -1,18 +1,21 @@
 ﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class HttpClientUtilTests
 {
-    string CustomUrl = "acme.com";
+    readonly string _customUrl = "acme.com";
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress()
     {
         //Arrange 
         var apiKey = Guid.NewGuid().ToString();
         var clientOptions = new DeepgramClientOptions();
-        var httpClient = new HttpClient();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var expectedBaseAddress = $"{Constants.DEFAULT_URI}/";
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClient);
+        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
 
         //Assert 
         Assert.Multiple(() =>
@@ -29,13 +32,17 @@ public class HttpClientUtilTests
         //Arrange 
         var apiKey = Guid.NewGuid().ToString();
         var clientOptions = new DeepgramClientOptions();
-        var expectedBaseAddress = $"https://{CustomUrl}/";
+        var expectedBaseAddress = $"https://{_customUrl}/";
         clientOptions.BaseAddress = expectedBaseAddress;
-        var httpClient = new HttpClient();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+
 
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClient);
+        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
 
         //Assert 
         Assert.Multiple(() =>
@@ -54,11 +61,14 @@ public class HttpClientUtilTests
         var clientOptions = new DeepgramClientOptions();
         var expectedHeaders = FakeHeaders();
         clientOptions.Headers = expectedHeaders;
-        var httpClient = new HttpClient();
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+
         var expectedBaseAddress = $"{Constants.DEFAULT_URI}/";
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClient);
+        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
 
         //Assert 
         Assert.Multiple(() =>
@@ -80,13 +90,17 @@ public class HttpClientUtilTests
         var clientOptions = new DeepgramClientOptions();
         var expectedHeaders = FakeHeaders();
         clientOptions.Headers = expectedHeaders;
-        var httpClient = new HttpClient();
-        var expectedBaseAddress = $"https://{CustomUrl}/";
+        var httpClientFactory = Substitute.For<IHttpClientFactory>();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+
+        httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+
+        var expectedBaseAddress = $"https://{_customUrl}/";
         clientOptions.BaseAddress = expectedBaseAddress;
 
 
         //Act 
-        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClient);
+        var SUT = HttpClientUtil.Configure(apiKey, clientOptions, httpClientFactory);
 
         //Assert 
         Assert.Multiple(() =>

@@ -1,14 +1,8 @@
-﻿using System.Text.Json;
-
-namespace Deepgram.Exceptions;
-public class DeepgramApiError : DeepgramError
+﻿namespace Deepgram.Exceptions;
+public class DeepgramApiError(string message, int status) : DeepgramError(message)
 {
-    public int Status;
+    public int Status = status;
     public const string Name = "DeepgramApiError";
-    public DeepgramApiError(string message, int status) : base(message)
-    {
-        Status = status;
-    }
 
     public string ToJson() => JsonSerializer.Serialize(this);
 }

@@ -13,5 +13,5 @@ public class DeepgramClientOptions
     /// <summary>
     /// BaseAddress of the server :defaults to https://api.deepgram.com
     /// </summary>
-    public string? BaseAddress { get; set; } = Constants.DEFAULT_URI;
+    public string BaseAddress { get; set; } = Constants.DEFAULT_URI;
 }

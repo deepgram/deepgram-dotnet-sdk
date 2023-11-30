@@ -1,22 +1,26 @@
-﻿using System.Diagnostics;
-
-namespace Deepgram.Abstractions
+﻿namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {
         /// <summary>
         /// logger create by the descended class and passed in through the constructor
         /// </summary>
-        internal ILogger Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         /// <summary>
         ///  HttpClient created by the factory
         internal HttpClient? HttpClient { get; set; }
 
         /// <summary>
-        /// Options for setting Httpclient and request
+        /// Options for setting HttpClient and request
         /// </summary>
         internal DeepgramClientOptions DeepgramClientOptions { get; set; }
+
+        static readonly JsonSerializerOptions JsonSerializerOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            NumberHandling = JsonNumberHandling.AllowReadingFromString
+        };
 
         /// <summary>
         /// Constructor that take a IHttpClientFactory
@@ -30,18 +34,7 @@ namespace Deepgram.Abstractions
                 throw new ArgumentException("A Deepgram API Key is required when creating a client");
 
             DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
-            //Proxy throwing a System.PlatformNotSupportedException
-            try
-            {
-                HttpClient = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-                throw;
-            }
-
-            HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, HttpClient);
+            HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, httpClientFactory);
             Logger = LogProvider.GetLogger(loggerName);
         }
 
@@ -132,9 +125,8 @@ namespace Deepgram.Abstractions
             {
                 CheckForTimeout();
                 var rq = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
-
-                await HttpClient.DeleteAsync(uriSegment);
-
+                var response = await HttpClient.DeleteAsync(uriSegment);
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
@@ -156,7 +148,6 @@ namespace Deepgram.Abstractions
             {
                 CheckForTimeout();
                 var response = await HttpClient.DeleteAsync(uriSegment);
-
                 response.EnsureSuccessStatusCode();
                 var result = await Deserialize<T>(response);
 
@@ -180,9 +171,9 @@ namespace Deepgram.Abstractions
             try
             {
                 CheckForTimeout();
+
 #if NETSTANDARD2_0
-                var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment);
-                request.Content = content;
+                var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
                 var response = await HttpClient.SendAsync(request);
 #else
                 var response = await HttpClient.PatchAsync(uriSegment, content);
@@ -237,18 +228,12 @@ namespace Deepgram.Abstractions
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             try
             {
-                var options = new JsonSerializerOptions
-                {
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    NumberHandling = JsonNumberHandling.AllowReadingFromString
-                };
-
-                var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, options);
+                var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, JsonSerializerOptions);
                 return deepgramResponse;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred whilst processing REST response : {0}", ex.Message);
+                Logger.LogError(ex, "Error occurred whilst processing REST response : {ErrorMessage}", ex.Message);
                 throw;
             }
         }
@@ -260,7 +245,7 @@ namespace Deepgram.Abstractions
         }
 
         /// <summary>
-        /// Set the time out on the httpclient
+        /// Set the time out on the HttpClient
         /// </summary>
         /// <param name="timeSpan"></param>
         public void SetTimeout(TimeSpan timeSpan)
@@ -270,22 +255,13 @@ namespace Deepgram.Abstractions
         /// Create the body payload of a httpRequest
         /// </summary>
         /// <typeparam name="T">Type of the body to be sent</typeparam>
-        /// <param name="body">instance valye for the body</param>
+        /// <param name="body">instance value for the body</param>
         /// <param name="contentType">What type of content is being sent default is : application/json</param>
         /// <returns></returns>
-        internal static StringContent CreatePayload<T>(T body)
-        {
-            var serializeOptions = new JsonSerializerOptions
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-            };
-            var serializedBody = JsonSerializer.Serialize(body, serializeOptions);
-            return new StringContent(
-                        serializedBody,
+        internal static StringContent CreatePayload<T>(T body) => new(
+                        JsonSerializer.Serialize(body, JsonSerializerOptions),
                         Encoding.UTF8,
                         Constants.DEFAULT_CONTENT_TYPE);
-        }
 
 
         /// <summary>

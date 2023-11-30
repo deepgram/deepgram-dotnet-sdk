@@ -6,16 +6,12 @@
 /// <summary>
 ///  Client containing methods for interacting with API's to manage project(s)
 /// </summary>
-public class ManageClient : AbstractRestClient
+/// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
+/// <param name="loggerName">nameof the descendent class</param>
+/// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
+public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory)
+    : AbstractRestClient(apiKey, httpClientFactory, nameof(ManageClient))
 {
-    /// <summary>
-    /// Constructor for when specific configuration of the HttpClient is needed
-    /// </summary>
-    /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-    /// <param name="loggerName">nameof the descendent class</param>
-    /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-    public ManageClient(string? apiKey, IHttpClientFactory httpClientFactory)
-        : base(apiKey, httpClientFactory, nameof(ManageClient)) { }
 
     #region Projects
 

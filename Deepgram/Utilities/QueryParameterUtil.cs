@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Web;
-using Deepgram.Models.Schemas;
+﻿using System.Web;
 
 namespace Deepgram.Utilities;
 
@@ -23,9 +21,9 @@ internal static class QueryParameterUtil
                         foreach (var value in (Array)pValue)
                             sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
                     }
-                    else if (pValue is DateTime)
+                    else if (pValue is DateTime time)
                     {
-                        sb.Append($"{name}={HttpUtility.UrlEncode(((DateTime)pValue).ToString("yyyy-MM-dd"))}&");
+                        sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
                     }
                     else if (typeof(T) == typeof(PrerecordedSchema) && name == "callback")
                     {

@@ -2,8 +2,9 @@
 
 internal static class HttpClientUtil
 {
-    internal static HttpClient Configure(string apiKey, DeepgramClientOptions options, HttpClient client)
+    internal static HttpClient Configure(string apiKey, DeepgramClientOptions options, IHttpClientFactory httpClientFactory)
     {
+        var client = httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME);
         client.BaseAddress = new Uri(options.BaseAddress);
         client = SetDefaultHeaders(apiKey, options, client);
         return client;
