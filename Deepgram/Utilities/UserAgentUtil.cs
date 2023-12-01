@@ -10,12 +10,7 @@ internal static class UserAgentUtil
     /// <returns></returns>
     public static string GetInfo()
     {
-
-        var libraryVersion = typeof(UserAgentUtil)
-            .GetTypeInfo()
-            .Assembly
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
-            .InformationalVersion;
+        var libraryVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
         var languageVersion = new Regex("[ ,/,:,;,_,(,)]")
              .Replace(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
