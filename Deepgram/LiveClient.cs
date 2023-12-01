@@ -105,7 +105,7 @@ public class LiveClient
     //        if (ClientWebSocket!.CloseStatus.HasValue)
     //        {
     //            var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
-    //            logger.LogDebug("Closing websocket.");
+    //            logger.LogDebug("Closing WebSocket.");
     //        }
 
     //        if (!_disposed)
@@ -157,9 +157,9 @@ public class LiveClient
     //    EnqueueForSending(new MessageToSend(keepAliveBytes, WebSocketMessageType.Text));
     //}
     ///// <summary>
-    ///// Sends a binary message over the websocket connection.
+    ///// Sends a binary message over the WebSocket connection.
     ///// </summary>
-    ///// <param name="data">The data to be sent over the websocket.</param>
+    ///// <param name="data">The data to be sent over the WebSocket.</param>
     //public virtual void SendData(byte[] data)
     //{
     //    EnqueueForSending(new MessageToSend(data, WebSocketMessageType.Binary));
@@ -201,7 +201,7 @@ public class LiveClient
     //        logger.LogDebug(e, _disposed ? "Connection has been disposed." : "WebSocket send operation cancelled.");
     //        ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(e));
     //    }
-    //    catch (OperationCanceledException e)
+    //    catch (OperationCancelledException e)
     //    {
     //        var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
     //        logger.LogDebug(e, _disposed ? "Connection has been disposed." : "WebSocket send operation cancelled.");
@@ -304,7 +304,7 @@ public class LiveClient
     //}
 
     ///// <summary>
-    ///// Dispose method. Stops the send thread and disposes the websocket.
+    ///// Dispose method. Stops the send thread and disposes the WebSocket.
     ///// </summary>
     //public void Dispose()
     //{

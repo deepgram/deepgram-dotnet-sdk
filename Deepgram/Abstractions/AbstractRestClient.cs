@@ -3,11 +3,6 @@
     public abstract class AbstractRestClient
     {
         /// <summary>
-        /// logger create by the descended class and passed in through the constructor
-        /// </summary>
-        public ILogger Logger { get; set; }
-
-        /// <summary>
         ///  HttpClient created by the factory
         internal HttpClient? HttpClient { get; set; }
 
@@ -26,16 +21,15 @@
         /// Constructor that take a IHttpClientFactory
         /// </summary>
         /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-        /// <param name="loggerName">nameof the descendent class</param>
-        /// <param name="httpClientFactory">IHttpClientFactory for creating instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName, DeepgramClientOptions? deepgramClientOptions = null)
+        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
+        /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
+        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
         {
             if (apiKey is null)
                 throw new ArgumentException("A Deepgram API Key is required when creating a client");
 
             DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
             HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, httpClientFactory);
-            Logger = LogProvider.GetLogger(loggerName);
         }
 
 
@@ -44,8 +38,8 @@
         /// </summary>
         /// <typeparam name="T">Type of class of response expected</typeparam>
         /// <param name="uriSegment">request uri Endpoint</param>
-        /// <returns></returns>
-        public virtual async Task<T> GetAsync<T>(string uriSegment)
+        /// <returns>Instance of T</returns>
+        public async Task<T> GetAsync<T>(string uriSegment)
         {
             try
             {
@@ -58,8 +52,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during GET request");
-                throw;
+                throw new DeepgramError("Error occurred during GET request", ex);
             }
         }
 
@@ -67,10 +60,10 @@
         /// Post method
         /// </summary>
         /// <typeparam name="T">Class type of what return type is expected</typeparam>
-        /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-        /// <param name="logger">logger to log any messages</param>   
-        /// <returns>instance of TResponse</returns>
-        public virtual async Task<T> PostAsync<T>(string uriSegment, StringContent content)
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>   
+        /// <param name="content">StringContent as content for HttpRequestMessage</param>   
+        /// <returns>Instance of T</returns>
+        public async Task<T> PostAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
@@ -83,19 +76,18 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during POST request");
-                throw;
+                throw new DeepgramError("Error occurred during POST request", ex);
             }
         }
 
         /// <summary>
-        /// Post method
+        /// Post method for use with stream requests
         /// </summary>
         /// <typeparam name="T">Class type of what return type is expected</typeparam>
         /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-        /// <param name="logger">logger to log any messages</param>   
-        /// <returns>instance of TResponse</returns>
-        public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
+        /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
+        /// <returns>Instance of T</returns>
+        public async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
         {
             try
             {
@@ -108,8 +100,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during POST request");
-                throw;
+                throw new DeepgramError("Error occurred during Post request", ex);
             }
         }
 
@@ -117,9 +108,7 @@
         /// <summary>
         /// Delete Method for use with calls that do not expect a response
         /// </summary>
-        /// <param name="uriSegment">Uri for the api including the query parameters</param>
-        /// <param name="logger">logger to log any messages</param>
-        /// <returns>nothing</returns>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param> 
         public async Task Delete(string uriSegment)
         {
             try
@@ -131,8 +120,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during DELETE request");
-                throw;
+                throw new DeepgramError("Error occurred during Delete request", ex);
             }
         }
 
@@ -140,9 +128,8 @@
         /// Delete method that returns the type of response specified
         /// </summary>
         /// <typeparam name="T">Class Type of expected response</typeparam>
-        /// <param name="uriSegment">Uri for the api including the query parameters</param>
-        /// <param name="logger">logger to log any messages</param>
-        /// <returns>instance  of TResponse or throws Exception</returns>
+        /// <param name="uriSegment">Uri for the api including the query parameters</param>      
+        /// <returns>Instance  of T or throws Exception</returns>
         public async Task<T> DeleteAsync<T>(string uriSegment)
         {
             try
@@ -156,8 +143,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during DELETE request");
-                throw;
+                throw new DeepgramError("Error occurred during Delete request", ex);
             }
         }
 
@@ -166,8 +152,8 @@
         /// </summary>
         /// <typeparam name="T">Class type of what return type is expected</typeparam>
         /// <param name="uriSegment">Uri for the api including the query parameters</param>  
-        /// <returns>instance of TResponse</returns>
-        public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content)
+        /// <returns>Instance of T</returns>
+        public async Task<T> PatchAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
@@ -187,8 +173,7 @@
 
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during PATCH request");
-                throw;
+                throw new DeepgramError("Error occurred during Patch request", ex);
             }
         }
 
@@ -197,8 +182,8 @@
         /// </summary>
         /// <typeparam name="T">Class type of what return type is expected</typeparam>
         /// <param name="uriSegment">Uri for the api</param>   
-        /// <returns>instance of TResponse</returns>
-        public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content)
+        /// <returns>Instance of T</returns>
+        public async Task<T> PutAsync<T>(string uriSegment, StringContent content)
         {
             try
             {
@@ -211,8 +196,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred during PUT request");
-                throw;
+                throw new DeepgramError("Error occurred during PUT request", ex);
             }
         }
 
@@ -221,10 +205,9 @@
         /// method that deserializes DeepgramResponse and performs null checks on values
         /// </summary>
         /// <typeparam name="TResponse">Class Type of expected response</typeparam>
-        /// <param name="httpResponseMessage">Http Response to be deserialized</param>
-        /// <param name="logger">logger to log messages</param>
+        /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
         /// <returns>instance of TResponse or a Exception</returns>
-        internal async Task<TResponse> Deserialize<TResponse>(HttpResponseMessage httpResponseMessage)
+        internal static async Task<TResponse> Deserialize<TResponse>(HttpResponseMessage httpResponseMessage)
         {
             var content = await httpResponseMessage.Content.ReadAsStringAsync();
             try
@@ -234,8 +217,7 @@
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error occurred whilst processing REST response : {ErrorMessage}", ex.Message);
-                throw;
+                throw new DeepgramError("Error occurred whilst processing REST response : {ErrorMessage}", ex);
             }
         }
 
@@ -253,7 +235,7 @@
             => DeepgramClientOptions.Timeout = timeSpan;
 
         /// <summary>
-        /// Create the body payload of a httpRequest
+        /// Create the body payload of a HttpRequestMessage
         /// </summary>
         /// <typeparam name="T">Type of the body to be sent</typeparam>
         /// <param name="body">instance value for the body</param>
@@ -266,7 +248,7 @@
 
 
         /// <summary>
-        /// Create the stream payload of a httpRequest
+        /// Create the stream payload of a HttpRequestMessage
         /// </summary>
         /// <param name="body">of type stream</param>
         /// <returns>HttpContent</returns>

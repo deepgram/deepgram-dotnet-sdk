@@ -12,7 +12,7 @@ public class LiveSchema : TranscriptionSchema
     public int? SampleRate { get; set; }
 
     [JsonPropertyName("endpointing")]
-    public int? Endpointing { get; set; }
+    public int? EndPointing { get; set; }
 
     [JsonPropertyName("interim_results")]
     public bool? InterimResults { get; set; }

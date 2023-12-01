@@ -8,9 +8,12 @@ internal class UserAgentTest
         var result = UserAgentUtil.GetInfo();
 
         //Assert
-        result.Should().NotBeNull();
-        result.Should().BeAssignableTo<string>();
-        result.Should().Contain("deepgram");
-
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<string>();
+            result.Should().Contain("deepgram/");
+            result.Should().Contain("dotnet/");
+        }
     }
 }
