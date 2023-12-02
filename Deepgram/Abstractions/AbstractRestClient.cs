@@ -1,10 +1,14 @@
-﻿namespace Deepgram.Abstractions
+﻿using Deepgram.Logger;
+
+namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {
         /// <summary>
         ///  HttpClient created by the factory
         internal HttpClient? HttpClient { get; set; }
+
+        public ILogger Logger { get; set; }
 
         /// <summary>
         /// Options for setting HttpClient and request
@@ -23,13 +27,13 @@
         /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
         /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
         /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
+        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName, DeepgramClientOptions? deepgramClientOptions = null)
         {
             if (apiKey is null)
                 throw new ArgumentException("A Deepgram API Key is required when creating a client");
-
             DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
             HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, httpClientFactory);
+            Logger = LogProvider.GetLogger(loggerName);
         }
 
 
@@ -52,7 +56,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during GET request", ex);
+                throw new Exception("Error occurred during GET request", ex);
             }
         }
 
@@ -76,7 +80,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during POST request", ex);
+                throw new Exception("Error occurred during POST request", ex);
             }
         }
 
@@ -100,7 +104,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during Post request", ex);
+                throw new Exception("Error occurred during Post request", ex);
             }
         }
 
@@ -120,7 +124,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during Delete request", ex);
+                throw new Exception("Error occurred during Delete request", ex);
             }
         }
 
@@ -143,7 +147,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during Delete request", ex);
+                throw new Exception("Error occurred during Delete request", ex);
             }
         }
 
@@ -173,7 +177,7 @@
 
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during Patch request", ex);
+                throw new Exception("Error occurred during Patch request", ex);
             }
         }
 
@@ -196,7 +200,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred during PUT request", ex);
+                throw new Exception("Error occurred during PUT request", ex);
             }
         }
 
@@ -217,7 +221,7 @@
             }
             catch (Exception ex)
             {
-                throw new DeepgramError("Error occurred whilst processing REST response : {ErrorMessage}", ex);
+                throw new Exception("Error occurred whilst processing REST response : {ErrorMessage}", ex);
             }
         }
 

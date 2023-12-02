@@ -1,4 +1,5 @@
-﻿global using System.Net.Http.Headers;
+﻿global using System.Collections.Concurrent;
+global using System.Net.Http.Headers;
 global using System.Reflection;
 global using System.Text;
 global using System.Text.Json;
@@ -10,4 +11,5 @@ global using Deepgram.Models.Options;
 global using Deepgram.Models.Responses;
 global using Deepgram.Models.Schemas;
 global using Deepgram.Utilities;
-
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Logging.Abstractions;

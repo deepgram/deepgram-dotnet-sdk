@@ -7,7 +7,7 @@
 /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
+    : AbstractRestClient(apiKey, httpClientFactory, nameof(PrerecordedClient), deepgramClientOptions)
 {
     #region NoneCallBacks
     /// <summary>
@@ -130,18 +130,18 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     private static void VerifyNoCallBack(string method, PrerecordedSchema? prerecordedSchema)
     {
         if (prerecordedSchema != null && prerecordedSchema.Callback != null)
-            throw new DeepgramError($"CallBack cannot be provided as schema option to a synchronous transcription. Use {nameof(TranscribeFileCallBackAsync)} or {nameof(TranscribeUrlCallBackAsync)}");
+            throw new Exception($"CallBack cannot be provided as schema option to a synchronous transcription. Use {nameof(TranscribeFileCallBackAsync)} or {nameof(TranscribeUrlCallBackAsync)}");
     }
 
     private static void VerifyOneCallBackSet(string callingMethod, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         //check if no CallBack set in either callBack parameter or PrerecordedSchema
         if (prerecordedSchema.Callback == null && callBack == null)
-            throw new DeepgramError($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrlAsync)} or {nameof(TranscribeFileAsync)}");
+            throw new Exception($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrlAsync)} or {nameof(TranscribeFileAsync)}");
 
         //check that only one CallBack is set in either callBack parameter or PrerecordedSchema
         if (!string.IsNullOrEmpty(prerecordedSchema.Callback) && !string.IsNullOrEmpty(callBack))
-            throw new DeepgramError("CallBack should be set in either the CallBack parameter or PrerecordedSchema.CallBack not in both.");
+            throw new Exception("CallBack should be set in either the CallBack parameter or PrerecordedSchema.CallBack not in both.");
     }
     #endregion    
 }

@@ -679,6 +679,13 @@ var factory = new LoggerFactory();
 factory.AddSerilog(log);
 LogProvider.SetLogFactory(factory);
 ```
+The sdk will generate loggers with the cateroryName of the client being used for example 
+ to get the logger for the ManageClient you would call
+```csharp
+LogProvider.GetLogger(nameof(ManageClient));
+```
+
+
 
 # Development and Contributing
 

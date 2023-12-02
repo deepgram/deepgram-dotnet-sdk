@@ -7,7 +7,7 @@
 /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
+    : AbstractRestClient(apiKey, httpClientFactory, nameof(OnPremClient), deepgramClientOptions)
 {
 
     /// <summary>

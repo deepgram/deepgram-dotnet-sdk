@@ -270,6 +270,7 @@ public class AbstractRestfulClientTests
     [Test]
     public void CreatePayload_Should_Return_StringContent()
     {
+
         //Arrange       
         var project = new AutoFaker<Project>().Generate();
 

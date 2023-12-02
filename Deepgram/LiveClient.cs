@@ -1,7 +1,7 @@
 ﻿namespace Deepgram;
 public class LiveClient
 {
-    //const string LOGGER_CATEGORY = "Deepgram.Transcription.LiveTranscriptionClient";
+    const string LOGGER_CATEGORY = nameof(LiveClient);
     //internal HttpClientOptions _clientOptions;
     //internal ClientWebSocket? ClientWebSocket { get; set; }
     //private CancellationTokenSource? _tokenSource = new();
