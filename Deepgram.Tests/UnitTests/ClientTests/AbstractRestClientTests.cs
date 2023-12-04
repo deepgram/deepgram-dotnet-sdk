@@ -1,11 +1,14 @@
 ﻿using Deepgram.Models;
+using Microsoft.Extensions.Logging;
+using NSubstitute.ReceivedExtensions;
+using NUnit.Framework.Internal;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
 
 public class AbstractRestfulClientTests
 {
-
+    ILogger<ConcreteRestClient> _Logger;
     IHttpClientFactory _httpClientFactory;
     string _apiKey;
 
@@ -13,6 +16,7 @@ public class AbstractRestfulClientTests
     public void Setup()
     {
         _apiKey = new Faker().Random.Guid().ToString();
+        _Logger = Substitute.For<ILogger<ConcreteRestClient>>();
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
     }
 
@@ -44,11 +48,15 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
         // Act & Assert
         client.Invoking(y => y.GetAsync<GetProjectsResponse>(Constants.PROJECTS))
              .Should().ThrowAsync<HttpRequestException>();
+        _Logger.ReceivedWithAnyArgs();
+
 
     }
 
@@ -60,8 +68,7 @@ public class AbstractRestfulClientTests
         expectedResponse.ProjectId = "1";
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
         // Act
         var result = await client.GetAsync<GetProjectResponse>($"{Constants.PROJECTS}/1");
 
@@ -82,8 +89,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<CreateProjectKeyResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
         // Act
         var result = await client.PostAsync<CreateProjectKeyResponse>(Constants.PROJECTS, new StringContent(string.Empty));
 
@@ -103,8 +109,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
         // Act
         var result = await client.PostAsync<SyncPrerecordedResponse>(Constants.PROJECTS, new StringContent(""));
 
@@ -123,13 +128,16 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse, HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
 
         // Act & Assert      
 
         client.Invoking(y => y.PostAsync<GetProjectsResponse>(Constants.PROJECTS, new StringContent("")))
              .Should().ThrowAsync<HttpRequestException>();
-
+        _Logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -138,11 +146,14 @@ public class AbstractRestfulClientTests
         // Arrange   
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
         // Act & Assert
         client.Invoking(y => y.Delete($"{Constants.PROJECTS}/1"))
             .Should().NotThrowAsync();
+        _Logger.ReceivedWithAnyArgs();
     }
 
 
@@ -152,12 +163,14 @@ public class AbstractRestfulClientTests
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new MessageResponse(), HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
         // Act & Assert
         _ = client.Invoking(y => y.Delete(Constants.PROJECTS))
              .Should().ThrowAsync<HttpRequestException>();
-
+        _Logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -188,12 +201,15 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
 
         // Act & Assert
         client.Invoking(y => y.DeleteAsync<MessageResponse>(Constants.PROJECTS))
              .Should().ThrowAsync<HttpRequestException>();
-
+        _Logger.ReceivedWithAnyArgs();
     }
 
 
@@ -225,12 +241,14 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(expectedResponse, HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
         //Act & Assert
         client.Invoking(y => y.PatchAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
              .Should().ThrowAsync<HttpRequestException>();
-
+        _Logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -260,11 +278,14 @@ public class AbstractRestfulClientTests
         // Arrange       
         var httpClient = MockHttpClient.CreateHttpClientWithException(new MessageResponse(), HttpStatusCode.BadRequest);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
-        var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
-
+        var client = new ConcreteRestClient(_apiKey, _httpClientFactory)
+        {
+            Logger = _Logger
+        };
         // Act & Assert
         client.Invoking(y => y.PutAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
              .Should().ThrowAsync<HttpRequestException>();
+        _Logger.ReceivedWithAnyArgs();
     }
 
     [Test]
@@ -273,9 +294,9 @@ public class AbstractRestfulClientTests
 
         //Arrange       
         var project = new AutoFaker<Project>().Generate();
-
+        var logger = Substitute.For<ILogger<ConcreteRestClient>>();
         //Act
-        var result = AbstractRestClient.CreatePayload(project);
+        var result = AbstractRestClient.CreatePayload(logger, project);
 
         //Assert
         using (new AssertionScope())
@@ -284,6 +305,7 @@ public class AbstractRestfulClientTests
             result.Should().BeAssignableTo<StringContent>();
         }
     }
+
 
     [Test]
     public void CreateStreamPayload_Should_Return_HttpContent()

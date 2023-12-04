@@ -29,11 +29,16 @@ namespace Deepgram.Abstractions
         /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
         internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, string loggerName, DeepgramClientOptions? deepgramClientOptions = null)
         {
-            if (apiKey is null)
+            Logger = LogProvider.GetLogger(loggerName);
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                Log.ApiKeyNotPresent(Logger, this.GetType().Name);
                 throw new ArgumentException("A Deepgram API Key is required when creating a client");
+            }
             DeepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
             HttpClient = HttpClientUtil.Configure(apiKey!, DeepgramClientOptions, httpClientFactory);
-            Logger = LogProvider.GetLogger(loggerName);
+
         }
 
 
@@ -48,15 +53,20 @@ namespace Deepgram.Abstractions
             try
             {
                 CheckForTimeout();
-
                 var response = await HttpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
                 return result;
+            }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "GET", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during GET request", ex);
+                Log.Exception(Logger, "GET", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during GET request to {uriSegment}: Message{ex.Message}", ex);
             }
         }
 
@@ -74,13 +84,19 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await HttpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
 
                 return result;
             }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "POST", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during POST request", ex);
+                Log.Exception(Logger, "POST", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during StringContent POST request to {uriSegment}: Message {ex.Message}", ex);
             }
         }
 
@@ -98,14 +114,21 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await HttpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
 
                 return result;
             }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "POST", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during Post request", ex);
+                Log.Exception(Logger, "POST", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during HTTPContent POST request to {uriSegment}", ex);
             }
+
         }
 
 
@@ -122,9 +145,15 @@ namespace Deepgram.Abstractions
                 var response = await HttpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
             }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "DELETE", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during DELETE request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during Delete request", ex);
+                Log.Exception(Logger, "DELETE", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during DELETE request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
 
@@ -141,13 +170,19 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await HttpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
 
                 return result;
             }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "DELETE ASYNC", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during DELETE ASYNC request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during Delete request", ex);
+                Log.Exception(Logger, "DELETE ASYNC", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during DELETE ASYNC request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
 
@@ -170,15 +205,21 @@ namespace Deepgram.Abstractions
                 var response = await HttpClient.PatchAsync(uriSegment, content);
 #endif
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
                 return result;
 
             }
-
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "PATCH", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during PATCH request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during Patch request", ex);
+                Log.Exception(Logger, "PATCH", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during PATCH request to {uriSegment}: Message {ex.Message} ", ex);
             }
+
         }
 
         /// <summary>
@@ -194,13 +235,19 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await HttpClient.PutAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await Deserialize<T>(response);
+                var result = await Deserialize<T>(Logger, response);
 
                 return result;
             }
+            catch (HttpRequestException hre)
+            {
+                Log.HttpRequestException(Logger, "PUT", uriSegment, hre);
+                throw new HttpRequestException($"Error occurred during PUT request to {uriSegment}: Message{hre.Message}", hre);
+            }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred during PUT request", ex);
+                Log.Exception(Logger, "PUT", ex.GetType().Name, ex);
+                throw new Exception($"Error occurred during PUT request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
 
@@ -211,17 +258,18 @@ namespace Deepgram.Abstractions
         /// <typeparam name="TResponse">Class Type of expected response</typeparam>
         /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
         /// <returns>instance of TResponse or a Exception</returns>
-        internal static async Task<TResponse> Deserialize<TResponse>(HttpResponseMessage httpResponseMessage)
+        internal static async Task<TResponse> Deserialize<TResponse>(ILogger logger, HttpResponseMessage httpResponseMessage)
         {
-            var content = await httpResponseMessage.Content.ReadAsStringAsync();
             try
             {
+                var content = await httpResponseMessage.Content.ReadAsStringAsync();
                 var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, JsonSerializerOptions);
                 return deepgramResponse;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error occurred whilst processing REST response : {ErrorMessage}", ex);
+                Log.SerializerException(logger, "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
+                throw new Exception($"Error occurred whilst processing REST response : {ex.Message}", ex);
             }
         }
 
@@ -245,10 +293,22 @@ namespace Deepgram.Abstractions
         /// <param name="body">instance value for the body</param>
         /// <param name="contentType">What type of content is being sent default is : application/json</param>
         /// <returns></returns>
-        internal static StringContent CreatePayload<T>(T body) => new(
-                        JsonSerializer.Serialize(body, JsonSerializerOptions),
-                        Encoding.UTF8,
-                        Constants.DEFAULT_CONTENT_TYPE);
+        internal static StringContent CreatePayload<T>(ILogger logger, T body)
+        {
+            try
+            {
+                return new StringContent(
+                                    JsonSerializer.Serialize(body, JsonSerializerOptions),
+                                   Encoding.UTF8,
+                                   Constants.DEFAULT_CONTENT_TYPE);
+            }
+            catch (Exception ex)
+            {
+                Log.SerializerException(logger, "Serializing", ex.GetType().Name, typeof(T).Name, ex);
+                throw new Exception($"Error occurred whilst creating http request message body using data of type {typeof(T).Name}: ErrorMessage: {ex.Message}", ex);
+            }
+
+        }
 
 
         /// <summary>
