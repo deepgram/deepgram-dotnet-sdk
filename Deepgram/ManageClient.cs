@@ -7,7 +7,7 @@
 /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, httpClientFactory, nameof(ManageClient), deepgramClientOptions)
+    : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
 
     #region Projects
@@ -36,7 +36,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<MessageResponse> UpdateProjectAsync(string projectId, UpdateProjectSchema updateProjectSchema) =>
         await PatchAsync<MessageResponse>(
             $"{Constants.PROJECTS}/{projectId}",
-            CreatePayload(Logger, updateProjectSchema));
+            RequestContentUtil.CreatePayload(_loggerName, updateProjectSchema));
 
     /// <summary>
     /// Deletes a project, no response will be returned
@@ -84,7 +84,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<CreateProjectKeyResponse> CreateProjectKeyAsync(string projectId, CreateProjectKeySchema createProjectKeySchema) =>
          await PostAsync<CreateProjectKeyResponse>(
              $"{Constants.PROJECTS}/{projectId}/keys",
-             CreatePayload(Logger, createProjectKeySchema));
+             RequestContentUtil.CreatePayload(_loggerName, createProjectKeySchema));
 
 
     /// <summary>
@@ -123,7 +123,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<MessageResponse> SendProjectInviteAsync(string projectId, SendProjectInviteSchema sendProjectInviteSchema) =>
         await PostAsync<MessageResponse>(
             $"{Constants.PROJECTS}/{projectId}/{Constants.INVITES}",
-            CreatePayload(Logger, sendProjectInviteSchema));
+            RequestContentUtil.CreatePayload(_loggerName, sendProjectInviteSchema));
     #endregion
 
     #region Members
@@ -154,7 +154,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<MessageResponse> UpdateProjectMemberScopeAsync(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema) =>
         await PutAsync<MessageResponse>(
             $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}",
-            CreatePayload(Logger, updateProjectMemberScopeSchema));
+            RequestContentUtil.CreatePayload(_loggerName, updateProjectMemberScopeSchema));
 
     /// <summary>
     /// Remove member from project, there is no response
@@ -175,7 +175,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns><see cref="GetProjectUsageRequestsResponse"/></returns>
     public async Task<GetProjectUsageRequestsResponse> GetProjectsUsageRequestsAsync(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(Logger, getProjectUsageRequestsSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, getProjectUsageRequestsSchema);
         return await GetAsync<GetProjectUsageRequestsResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.REQUESTS}?{stringedOptions}");
     }
 
@@ -196,7 +196,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns><see cref="GetProjectUsageSummaryResponse"/></returns>
     public async Task<GetProjectUsageSummaryResponse> GetProjectUsageSummaryAsync(string projectId, GetProjectsUsageSummarySchema getProjectUsageSummarySchema)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(Logger, getProjectUsageSummarySchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, getProjectUsageSummarySchema);
         return await GetAsync<GetProjectUsageSummaryResponse>(
             $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}?{stringedOptions}");
     }
@@ -209,7 +209,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns><see cref="GetProjectUsageFieldsResponse"/></returns>
     public async Task<GetProjectUsageFieldsResponse> GetProjectUsageFieldsAsync(string projectId, GetProjectUsageFieldsSchema getProjectUsageFieldsSchema)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(Logger, getProjectUsageFieldsSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, getProjectUsageFieldsSchema);
         return await GetAsync<GetProjectUsageFieldsResponse>(
             $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}/fields?{stringedOptions}");
     }

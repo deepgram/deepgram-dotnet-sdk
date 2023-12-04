@@ -26,6 +26,5 @@
         public const string ONPREM = "onprem/distribution/credentials";
         public const string TRANSCRIPTION = "listen";
         #endregion
-
     }
 }

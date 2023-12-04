@@ -2,11 +2,11 @@
 {
     public class TranscriptReceivedEventArgs : EventArgs
     {
-        //public LiveTranscriptionResult Transcript { get; set; }
-        //public TranscriptReceivedEventArgs(LiveTranscriptionResult transcript)
-        //{
-        //    Transcript = transcript;
-        //}
+        public LiveTranscriptionResponse Transcript { get; set; }
+        public TranscriptReceivedEventArgs(LiveTranscriptionResponse transcript)
+        {
+            Transcript = transcript;
+        }
 
 
     }

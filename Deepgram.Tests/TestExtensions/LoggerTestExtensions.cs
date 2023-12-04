@@ -4,12 +4,12 @@ namespace Deepgram.Tests.TestExtensions;
 
 public static class LoggerTestExtensions
 {
-    public static void AnyLogOfType<T>(this ILogger<T> logger, LogLevel level, string message) where T : class
+    public static void AnyLogOfType<T>(this ILogger<T> logger, LogLevel level) where T : class
     {
         logger.Log(
             level,
             Arg.Any<EventId>(),
-             Arg.Is<object>(o => o.ToString() == message),
+             Arg.Is<object>(o => o != null),
             Arg.Any<Exception>(),
             Arg.Any<Func<object, Exception?, string>>());
     }
