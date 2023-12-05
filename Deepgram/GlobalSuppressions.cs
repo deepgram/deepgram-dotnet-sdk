@@ -22,8 +22,29 @@
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "company name which is not recognised by spellcheck dictionaries", Scope = "type", Target = "~T:Deepgram.OnPremClient")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "company name which is not recognised by spellcheck dictionaries", Scope = "type", Target = "~T:Deepgram.PrerecordedClient")]
 [assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.UserAgentUtil.GetInfo~System.String")]
-[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.LiveClient._deepgramClientOptions")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.Abstractions.AbstractRestClient._deepgramClientOptions")]
+
+/* Unmerged change from project 'Deepgram (net7.0)'
+Before:
+// This file is used by Code Analysis to maintain SuppressMessage
+After:
+[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.Abstractions.AbstractWebSocketClient._deepgramClientOptions")]
+// This file is used by Code Analysis to maintain SuppressMessage
+*/
+[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetHttps(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetWss(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.Abstractions.AbstractWebSocketClient._deepgramClientOptions")]
+
+/* Unmerged change from project 'Deepgram (net7.0)'
+Before:
+// This file is used by Code Analysis to maintain SuppressMessage
+After:
+[assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetHttps(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("GeneratedRegex", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetWss(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+// This file is used by Code Analysis to maintain SuppressMessage
+*/
+[assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetHttps(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetWss(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given

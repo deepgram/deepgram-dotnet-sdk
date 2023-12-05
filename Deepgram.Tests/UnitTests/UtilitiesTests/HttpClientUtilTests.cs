@@ -29,7 +29,7 @@ public class HttpClientUtilTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"{Constants.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Constants.DEFAULT_URI}/");
         };
     }
 
@@ -39,7 +39,7 @@ public class HttpClientUtilTests
         //Arrange        
         var expectedBaseAddress = $"https://{_customUrl}/";
         _clientOptions.BaseAddress = expectedBaseAddress;
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act 
@@ -68,7 +68,7 @@ public class HttpClientUtilTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"{Constants.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Constants.DEFAULT_URI}/");
             SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
         };
     }

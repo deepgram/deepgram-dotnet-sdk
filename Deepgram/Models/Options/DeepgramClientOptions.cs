@@ -10,8 +10,10 @@ public class DeepgramClientOptions
     /// Additional headers 
     /// </summary>
     public Dictionary<string, string>? Headers { get; set; }
+
     /// <summary>
-    /// BaseAddress of the server :defaults to https://api.deepgram.com
+    /// BaseAddress of the server :defaults to api.deepgram.com
+    /// no need to attach the protocol it will be added internally
     /// </summary>
     public string BaseAddress { get; set; } = Constants.DEFAULT_URI;
 }

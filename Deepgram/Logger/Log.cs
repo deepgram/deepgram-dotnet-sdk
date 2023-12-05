@@ -94,12 +94,18 @@ internal static partial class Log
       EventId = 0015,
       Level = LogLevel.Debug,
       Message = "Staring Connection Async")]
-    internal static partial void StartSocketError(this ILogger logger, Exception ex);
+    internal static partial void WebSocketStartError(this ILogger logger, Exception ex);
 
     [LoggerMessage(
       EventId = 0016,
-      Level = LogLevel.Debug,
+      Level = LogLevel.Information,
       Message = "WebSocket is being closed : `{closeStatusDescription}`")]
     internal static partial void RequestedSocketClose(this ILogger logger, string closeStatusDescription);
+
+    [LoggerMessage(
+     EventId = 0017,
+     Level = LogLevel.Debug,
+     Message = "Error closing WebSocket")]
+    internal static partial void WebSocketCloseError(this ILogger logger, Exception ex);
 
 }

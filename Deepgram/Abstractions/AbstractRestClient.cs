@@ -30,6 +30,7 @@ namespace Deepgram.Abstractions
             _clientName = this.GetType().Name;
             var validatedKey = ApiKeyUtil.Validate(apiKey, _clientName);
             _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
+            _deepgramClientOptions = BaseAddressUtil.GetHttps(_deepgramClientOptions);
             _httpClient = HttpClientUtil.Configure(validatedKey, _deepgramClientOptions, httpClientFactory);
         }
 
