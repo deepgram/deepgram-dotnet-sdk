@@ -1,7 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Threading.Channels;
-using Deepgram.CustomEventArgs;
-using Deepgram.Logger;
+using Deepgram.DeepgramEventArgs;
 
 namespace Deepgram.Abstractions;
 public abstract class AbstractWebSocketClient

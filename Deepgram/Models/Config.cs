@@ -43,6 +43,4 @@ public class Config
     [JsonPropertyName("search")]
     public string? Search { get; set; }
 
-    [JsonPropertyName("additional_properties")]
-    public Dictionary<string, string>? AdditionalProperties { get; set; }
 }

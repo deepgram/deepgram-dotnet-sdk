@@ -1,5 +1,4 @@
 ﻿using System.Web;
-using Deepgram.Logger;
 
 namespace Deepgram.Utilities;
 
@@ -9,39 +8,13 @@ internal static class QueryParameterUtil
     {
         try
         {
+            if (parameters is null) return string.Empty;
 
-            var sb = new StringBuilder();
+            var propertyInfoList = parameters.GetType()
+                .GetProperties()
+                .Where(v => v.GetValue(parameters) is not null);
+            return UrlEncode(parameters, propertyInfoList);
 
-            if (parameters is not null)
-            {
-                foreach (var pInfo in parameters.GetType().GetProperties())
-                {
-                    var pValue = pInfo.GetValue(parameters);
-                    if (pValue is not null)
-                    {
-                        var name = pInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name;
-                        if (pInfo.PropertyType.IsArray)
-                        {
-                            foreach (var value in (Array)pValue)
-                                sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
-                        }
-                        else if (pValue is DateTime time)
-                        {
-                            sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
-                        }
-                        else if (typeof(T) == typeof(PrerecordedSchema) && name == "callback")
-                        {
-                            sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
-                        }
-                        else
-                        {
-                            sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
-                        }
-                    }
-                }
-            }
-
-            return sb.ToString().Trim('&');
         }
         catch (Exception ex)
         {
@@ -49,5 +22,30 @@ internal static class QueryParameterUtil
             Log.ParameterStringError(LogProvider.GetLogger(nameof(QueryParameterUtil)), type, ex);
             throw new Exception($"Error creating a query string from object of type {type} ", ex);
         }
+    }
+
+    private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfos)
+    {
+        var sb = new StringBuilder();
+        foreach (var pInfo in propertyInfos)
+        {
+            var name = pInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name;
+            var pValue = pInfo.GetValue(parameters);
+
+            switch (pValue)
+            {
+                case Array array:
+                    foreach (var value in array)
+                        sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");
+                    break;
+                case DateTime time:
+                    sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
+                    break;
+                default:
+                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
+                    break;
+            }
+        }
+        return sb.ToString();
     }
 }

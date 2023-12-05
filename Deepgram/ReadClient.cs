@@ -1,4 +1,5 @@
 ﻿namespace Deepgram;
+
 /// <summary>
 /// Constructor that take a IHttpClientFactory
 /// </summary>

@@ -1,12 +1,10 @@
-﻿using Deepgram.Logger;
-
-internal static class RequestContentUtil
+﻿internal static class RequestContentUtil
 {
     static ILogger logger => LogProvider.GetLogger(nameof(RequestContentUtil));
     static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
     };
 
     /// <summary>

@@ -3,11 +3,11 @@
 public class Callback
 {
     [JsonPropertyName("attempts")]
-    public int? Attempts { get; set; }
+    public int Attempts { get; set; }
 
     [JsonPropertyName("code")]
-    public int? Code { get; set; }
+    public int Code { get; set; }
 
     [JsonPropertyName("completed")]
-    public string? Completed { get; set; }
+    public string Completed { get; set; }
 }

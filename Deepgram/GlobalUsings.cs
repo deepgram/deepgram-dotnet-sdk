@@ -6,6 +6,7 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using Deepgram.Abstractions;
 global using Deepgram.Common;
+global using Deepgram.Logger;
 global using Deepgram.Models;
 global using Deepgram.Models.Options;
 global using Deepgram.Models.Responses;

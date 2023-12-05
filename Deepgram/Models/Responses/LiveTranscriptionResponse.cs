@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Models;
+﻿namespace Deepgram.Models.Responses;
 public class LiveTranscriptionResponse
 {
     [JsonPropertyName("type")]

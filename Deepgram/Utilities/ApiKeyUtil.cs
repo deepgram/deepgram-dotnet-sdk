@@ -1,6 +1,4 @@
-﻿
-using Deepgram.Logger;
-
+﻿namespace Deepgram.Utilities;
 internal static class ApiKeyUtil
 {
     public static string Validate(string? apiKey, string clientType)

@@ -1,5 +1,6 @@
 ﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
+
 public class QueryParameterUtilTests
 {
 
@@ -8,7 +9,7 @@ public class QueryParameterUtilTests
     {
         //Arrange
         var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
-        var expectedModel = HttpUtility.UrlEncode(prerecordedOptions.Model)!.ToLower();
+        var expectedModel = HttpUtility.UrlEncode(prerecordedOptions.Model)!;
         var expected = $"{nameof(prerecordedOptions.Model).ToLower()}={expectedModel}";
         //Act
         var result = QueryParameterUtil.GetParameters(prerecordedOptions);
@@ -54,7 +55,7 @@ public class QueryParameterUtilTests
         //Arrange
         var prerecordedOptions = new PrerecordedSchema
         {
-            Keywords = new string[] { "test" }
+            Keywords = new string[] { "test", "acme" }
         };
         var expected = $"keywords={prerecordedOptions.Keywords[0].ToLower()}";
 
@@ -88,7 +89,7 @@ public class QueryParameterUtilTests
     {
         //Arrange 
         var obj = new PrerecordedSchema() { Paragraphs = true };
-        var expected = $"{nameof(obj.Paragraphs).ToLower()}=true";
+        var expected = $"{nameof(obj.Paragraphs).ToLower()}=True";
         //Act
         var result = QueryParameterUtil.GetParameters(obj);
 
@@ -116,6 +117,20 @@ public class QueryParameterUtilTests
         result.Should().Contain(expected); ;
     }
 
+    [Test]
+    public void GetParameters_Should_Return_Valid_String_When_CallBack_Set()
+    {
+        //Arrange 
+        var signedCallBackUrl = "As$Ssw.com";
+        var expected = HttpUtility.UrlEncode(signedCallBackUrl);
+
+        //Act
+        var result = QueryParameterUtil.GetParameters(new PrerecordedSchema() { Callback = signedCallBackUrl, Diarize = true });
+
+        //Assert
+        result.Should().NotBeNull();
+        result.Should().Contain(expected);
+    }
 
     [Test]
     public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()
