@@ -127,7 +127,6 @@ var manageClient = new ManageClient(apiKey,httpClientFactory,deepgramClientOptio
 | Property         | Value                       |          Description             |
 | --------         | :-----                      | :---------------------------:    |
 | BaseAddress      | string?                     | url of server, include protocol  |
-| Timeout          | TimeSpan                    | timeout in seconds required      |
 | Headers          | Dictionary<string, string>? | any headers that you want to add |
 
 >UserAgent & Authorization headers are added internally

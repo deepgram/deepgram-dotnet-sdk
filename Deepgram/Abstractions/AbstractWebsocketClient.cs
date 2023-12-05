@@ -52,9 +52,7 @@ public abstract class AbstractWebSocketClient
         _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
         _deepgramClientOptions = BaseAddressUtil.GetWss(_deepgramClientOptions);
         _apiKey = ApiKeyUtil.Validate(apiKey, _clientType);
-
     }
-
 
     internal readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel
         .CreateUnbounded<MessageToSend>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
@@ -68,7 +66,7 @@ public abstract class AbstractWebSocketClient
         catch (Exception ex)
         {
             if (_disposed)
-                Log.SocketDisposing(logger, "Enqueue Message");
+                Log.SocketDisposed(logger, "Enqueue Message", ex);
             else
                 Log.EnqueueFailure(logger);
 
@@ -108,17 +106,17 @@ public abstract class AbstractWebSocketClient
         catch (ObjectDisposedException ex)
         {
             if (_disposed)
-                Log.SocketDisposingWithException(logger, "Processing send queue", ex);
+                Log.SocketDisposed(logger, "Processing send queue", ex);
             else
-                Log.SendOperationCancelledError(logger, ex);
+                Log.SendCancelledError(logger, ex);
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
         }
         catch (OperationCanceledException ex)
         {
             if (_disposed)
-                Log.SocketDisposingWithException(logger, "Processing send queue", ex);
+                Log.SocketDisposed(logger, "Processing send queue", ex);
             else
-                Log.SendOperationCancelledError(logger, ex);
+                Log.SendCancelledError(logger, ex);
 
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
         }
@@ -128,7 +126,6 @@ public abstract class AbstractWebSocketClient
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
         }
     }
-
 
 
     internal async Task Receive()
@@ -157,20 +154,8 @@ public abstract class AbstractWebSocketClient
                             result.Count);
                     } while (!result.EndOfMessage);
 
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    if (result.MessageType == WebSocketMessageType.Text)
-                    {
-                        if (Encoding.UTF8.GetString(ms.ToArray()) != null)
-                        {
-                            var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(Encoding.UTF8.GetString(ms.ToArray()));
-                            if (transcript != null)
-                                TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
-                        }
-                    }
-
+                    RaiseTranscriptionReceived(result, ms);
                 }
-
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
@@ -185,6 +170,21 @@ public abstract class AbstractWebSocketClient
                 break;
             }
 
+        }
+    }
+
+    private void RaiseTranscriptionReceived(WebSocketReceiveResult result, MemoryStream ms)
+    {
+        ms.Seek(0, SeekOrigin.Begin);
+
+        if (result.MessageType == WebSocketMessageType.Text)
+        {
+            if (Encoding.UTF8.GetString(ms.ToArray()) != null)
+            {
+                var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(Encoding.UTF8.GetString(ms.ToArray()));
+                if (transcript != null)
+                    TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+            }
         }
     }
 

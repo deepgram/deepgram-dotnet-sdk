@@ -2,11 +2,6 @@
 public class DeepgramClientOptions
 {
     /// <summary>
-    /// Timeout of client
-    /// </summary>
-    public TimeSpan? Timeout { get; set; }
-
-    /// <summary>
     /// Additional headers 
     /// </summary>
     public Dictionary<string, string>? Headers { get; set; }

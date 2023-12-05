@@ -18,8 +18,8 @@ public class LiveClient(string? apiKey, DeepgramClientOptions? deepgramClientOpt
         _clientWebSocket?.Dispose();
         _clientWebSocket = new ClientWebSocket();
         _clientWebSocket = WssClientUtil.SetHeaders(_apiKey, _deepgramClientOptions, _clientWebSocket);
-
         _tokenSource = new CancellationTokenSource();
+
         _deepgramClientOptions = BaseAddressUtil.GetWss(_deepgramClientOptions);
         try
         {

@@ -48,16 +48,10 @@ internal static partial class Log
     internal static partial void EnqueueFailure(this ILogger logger);
 
     [LoggerMessage(
-        EventId = 0008,
-        Level = LogLevel.Error,
-        Message = "Unable to perform `{action}` Socket disposing")]
-    internal static partial void SocketDisposing(this ILogger logger, string action);
-
-    [LoggerMessage(
        EventId = 0009,
        Level = LogLevel.Debug,
-       Message = "Unable to perform `{action}` Socket disposing")]
-    internal static partial void SocketDisposingWithException(this ILogger logger, string action, Exception ex);
+       Message = "Unable to perform `{action}` Socket disposed")]
+    internal static partial void SocketDisposed(this ILogger logger, string action, Exception ex);
 
 
     [LoggerMessage(
@@ -76,7 +70,7 @@ internal static partial class Log
        EventId = 0012,
        Level = LogLevel.Debug,
        Message = "WebSocket send operation cancelled")]
-    internal static partial void SendOperationCancelledError(this ILogger logger, Exception ex);
+    internal static partial void SendCancelledError(this ILogger logger, Exception ex);
 
     [LoggerMessage(
        EventId = 0013,
