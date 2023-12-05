@@ -20,10 +20,10 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     public async Task<SyncPrerecordedResponse> TranscribeUrlAsync(UrlSource source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeUrlAsync), prerecordedSchema);
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
             $"{Constants.LISTEN}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(_loggerName, source));
+            RequestContentUtil.CreatePayload(source));
     }
 
 
@@ -37,7 +37,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(byte[] source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeFileAsync), prerecordedSchema);
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<SyncPrerecordedResponse>(
@@ -55,7 +55,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(Stream source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeFileAsync), prerecordedSchema);
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
             $"{Constants.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
@@ -78,7 +78,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
 
         if (callBack != null)
             prerecordedSchema.Callback = callBack;
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<AsyncPrerecordedResponse>(
@@ -99,7 +99,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
         VerifyOneCallBackSet(nameof(TranscribeFileCallBackAsync), callBack, prerecordedSchema);
         if (callBack != null)
             prerecordedSchema.Callback = callBack;
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
             $"{Constants.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
@@ -119,10 +119,10 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
 
         if (callBack != null)
             prerecordedSchema.Callback = callBack;
-        var stringedOptions = QueryParameterUtil.GetParameters(_loggerName, prerecordedSchema);
+        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
             $"{Constants.LISTEN}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(_loggerName, source));
+            RequestContentUtil.CreatePayload(source));
     }
     #endregion
 

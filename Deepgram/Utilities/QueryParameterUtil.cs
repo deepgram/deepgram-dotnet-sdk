@@ -5,7 +5,7 @@ namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
 {
-    public static string GetParameters<T>(string loggerName, T parameters)
+    public static string GetParameters<T>(T parameters)
     {
         try
         {
@@ -46,7 +46,7 @@ internal static class QueryParameterUtil
         catch (Exception ex)
         {
             var type = typeof(T).Name;
-            Log.ParameterStringError(LogProvider.GetLogger(loggerName), type, ex);
+            Log.ParameterStringError(LogProvider.GetLogger(nameof(QueryParameterUtil)), type, ex);
             throw new Exception($"Error creating a query string from object of type {type} ", ex);
         }
     }

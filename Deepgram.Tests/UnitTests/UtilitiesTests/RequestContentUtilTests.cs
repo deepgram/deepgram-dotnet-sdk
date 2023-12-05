@@ -11,7 +11,7 @@ public class RequestContentUtilTests
         var project = new AutoFaker<Project>().Generate();
 
         //Act
-        var result = RequestContentUtil.CreatePayload("TestClient", project);
+        var result = RequestContentUtil.CreatePayload(project);
 
         //Assert
         using (new AssertionScope())

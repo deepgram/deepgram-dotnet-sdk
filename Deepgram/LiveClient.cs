@@ -6,7 +6,8 @@ using Deepgram.Logger;
 namespace Deepgram;
 public class LiveClient
 {
-    internal string _loggerName;
+    internal ILogger logger => LogProvider.GetLogger(nameof(LiveClient));
+
     internal DeepgramClientOptions _deepgramClientOptions;
     internal string ApiKey;
     internal ClientWebSocket? ClientWebSocket { get; set; }
@@ -15,12 +16,8 @@ public class LiveClient
 
     public LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     {
-        _loggerName = this.GetType().Name;
         _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
         ApiKey = ApiKeyUtil.Validate(apiKey, this.GetType().Name);
-
-        // add logger to  log collection
-
     }
 
     private readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel.CreateUnbounded<MessageToSend>(
@@ -78,7 +75,7 @@ public class LiveClient
         }
         catch (Exception ex)
         {
-            Log.StartSocketError(LogProvider.GetLogger(_loggerName), ex);
+            Log.StartSocketError(logger, ex);
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
         }
 
@@ -95,7 +92,7 @@ public class LiveClient
 
     private Uri GetUri(LiveSchema queryParameters)
     {
-        var query = QueryParameterUtil.GetParameters(_loggerName, queryParameters);
+        var query = QueryParameterUtil.GetParameters(queryParameters);
         return new Uri($"wss/{_deepgramClientOptions.BaseAddress}/{Constants.API_VERSION}/{Constants.LISTEN}?{query}");
     }
 
@@ -111,7 +108,7 @@ public class LiveClient
         {
             if (ClientWebSocket!.CloseStatus.HasValue)
             {
-                Log.ClosingSocket(LogProvider.GetLogger(_loggerName));
+                Log.ClosingSocket(logger);
             }
 
             if (!_disposed)
@@ -174,7 +171,7 @@ public class LiveClient
         if (_disposed)
         {
             var ex = new Exception("Attempting to start a sender queue when the WebSocket has been disposed is not allowed.");
-            Log.SocketStartError(LogProvider.GetLogger(_loggerName), ex);
+            Log.SocketStartError(logger, ex);
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
             throw ex;
         }
@@ -191,7 +188,6 @@ public class LiveClient
         }
         catch (ObjectDisposedException ex)
         {
-            var logger = LogProvider.GetLogger(_loggerName);
             if (_disposed)
                 Log.SocketDisposingWithException(logger, "Processing send queue", ex);
             else
@@ -200,7 +196,6 @@ public class LiveClient
         }
         catch (OperationCanceledException ex)
         {
-            var logger = LogProvider.GetLogger(_loggerName);
             if (_disposed)
                 Log.SocketDisposingWithException(logger, "Processing send queue", ex);
             else
@@ -210,7 +205,7 @@ public class LiveClient
         }
         catch (Exception ex)
         {
-            Log.SendWebSocketError(LogProvider.GetLogger(_loggerName), ex);
+            Log.SendWebSocketError(logger, ex);
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
         }
     }
@@ -230,7 +225,7 @@ public class LiveClient
                         result = await ClientWebSocket.ReceiveAsync(buffer, _tokenSource!.Token);
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            Log.RequestedSocketClose(LogProvider.GetLogger(_loggerName), result.CloseStatusDescription);
+                            Log.RequestedSocketClose(logger, result.CloseStatusDescription!);
 
                             break;
                         }
@@ -246,7 +241,7 @@ public class LiveClient
                         var text = Encoding.UTF8.GetString(ms.ToArray());
                         if (text != null)
                         {
-                            var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(_loggerName, text);
+                            var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(text);
                             if (transcript != null)
                                 TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
                         }
@@ -261,7 +256,7 @@ public class LiveClient
             }
             catch (Exception ex)
             {
-                Log.ReceiptError(LogProvider.GetLogger(_loggerName), ex);
+                Log.ReceiptError(logger, ex);
                 ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
                 break;
             }
@@ -274,15 +269,15 @@ public class LiveClient
         {
             var writeResult = _sendChannel.Writer.TryWrite(message);
             if (writeResult == false)
-                Log.SocketDisposing(LogProvider.GetLogger(_loggerName), "Enqueue Message");
+                Log.SocketDisposing(logger, "Enqueue Message");
 
         }
         catch (Exception ex)
         {
             if (_disposed)
-                Log.SocketDisposing(LogProvider.GetLogger(_loggerName), "Enqueue Message");
+                Log.SocketDisposing(logger, "Enqueue Message");
             else
-                Log.EnqueueFailure(LogProvider.GetLogger(_loggerName));
+                Log.EnqueueFailure(logger);
 
             ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
             throw;
@@ -293,7 +288,7 @@ public class LiveClient
     {
         if (ClientWebSocket!.State != WebSocketState.Open)
         {
-            Log.LiveSendWarning(LogProvider.GetLogger(_loggerName), ClientWebSocket.State);
+            Log.LiveSendWarning(logger, ClientWebSocket.State);
             return;
         }
 
@@ -318,15 +313,9 @@ public class LiveClient
         _disposed = true;
     }
 }
-internal readonly struct MessageToSend
+internal readonly struct MessageToSend(byte[] message, WebSocketMessageType type)
 {
-    public MessageToSend(byte[] message, WebSocketMessageType type)
-    {
-        Message = new ArraySegment<byte>(message);
-        MessageType = type;
-    }
+    public ArraySegment<byte> Message { get; } = new ArraySegment<byte>(message);
 
-    public ArraySegment<byte> Message { get; }
-
-    public WebSocketMessageType MessageType { get; }
+    public WebSocketMessageType MessageType { get; } = type;
 }

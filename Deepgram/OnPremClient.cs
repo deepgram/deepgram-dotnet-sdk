@@ -45,6 +45,6 @@ public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<OnPremCredentialResponse> CreateCredentialsAsync(string projectId, CreateOnPremCredentialsSchema createOnPremCredentialsSchema) =>
         await PostAsync<OnPremCredentialResponse>(
             $"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}",
-            RequestContentUtil.CreatePayload(_loggerName, createOnPremCredentialsSchema));
+            RequestContentUtil.CreatePayload(createOnPremCredentialsSchema));
 
 }

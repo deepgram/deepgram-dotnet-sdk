@@ -1,13 +1,7 @@
 ﻿namespace Deepgram.CustomEventArgs
 {
-    public class TranscriptReceivedEventArgs : EventArgs
+    public class TranscriptReceivedEventArgs(LiveTranscriptionResponse transcript) : EventArgs
     {
-        public LiveTranscriptionResponse Transcript { get; set; }
-        public TranscriptReceivedEventArgs(LiveTranscriptionResponse transcript)
-        {
-            Transcript = transcript;
-        }
-
-
+        public LiveTranscriptionResponse Transcript { get; set; } = transcript;
     }
 }

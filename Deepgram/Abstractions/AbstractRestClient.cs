@@ -14,7 +14,8 @@ namespace Deepgram.Abstractions
         /// </summary>
         internal DeepgramClientOptions _deepgramClientOptions;
 
-        internal string _loggerName;
+        internal string _clientName;
+        internal ILogger logger => LogProvider.GetLogger(_clientName);
 
 
 
@@ -26,9 +27,8 @@ namespace Deepgram.Abstractions
         /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/> for HttpClient Configuration</param>
         internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
         {
-            var type = this.GetType().Name;
-            _loggerName = type;
-            var validatedKey = ApiKeyUtil.Validate(apiKey, type);
+            _clientName = this.GetType().Name;
+            var validatedKey = ApiKeyUtil.Validate(apiKey, _clientName);
             _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
             _httpClient = HttpClientUtil.Configure(validatedKey, _deepgramClientOptions, httpClientFactory);
         }
@@ -48,17 +48,17 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await _httpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
                 return result;
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "GET", uriSegment, hre);
+                Log.HttpRequestException(logger, "GET", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "GET", ex.GetType().Name, ex);
+                Log.Exception(logger, "GET", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during GET request to {uriSegment}: Message{ex.Message}", ex);
             }
         }
@@ -77,18 +77,18 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await _httpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
                 return result;
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "POST", uriSegment, hre);
+                Log.HttpRequestException(logger, "POST", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "POST", ex.GetType().Name, ex);
+                Log.Exception(logger, "POST", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during StringContent POST request to {uriSegment}: Message {ex.Message}", ex);
             }
         }
@@ -107,18 +107,18 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await _httpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
                 return result;
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "POST", uriSegment, hre);
+                Log.HttpRequestException(logger, "POST", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "POST", ex.GetType().Name, ex);
+                Log.Exception(logger, "POST", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during HTTPContent POST request to {uriSegment}", ex);
             }
 
@@ -140,12 +140,12 @@ namespace Deepgram.Abstractions
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "DELETE", uriSegment, hre);
+                Log.HttpRequestException(logger, "DELETE", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during DELETE request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "DELETE", ex.GetType().Name, ex);
+                Log.Exception(logger, "DELETE", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during DELETE request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
@@ -163,18 +163,18 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await _httpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
                 return result;
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "DELETE ASYNC", uriSegment, hre);
+                Log.HttpRequestException(logger, "DELETE ASYNC", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during DELETE ASYNC request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "DELETE ASYNC", ex.GetType().Name, ex);
+                Log.Exception(logger, "DELETE ASYNC", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during DELETE ASYNC request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
@@ -198,18 +198,18 @@ namespace Deepgram.Abstractions
                 var response = await _httpClient.PatchAsync(uriSegment, content);
 #endif
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
                 return result;
 
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "PATCH", uriSegment, hre);
+                Log.HttpRequestException(logger, "PATCH", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during PATCH request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "PATCH", ex.GetType().Name, ex);
+                Log.Exception(logger, "PATCH", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during PATCH request to {uriSegment}: Message {ex.Message} ", ex);
             }
 
@@ -228,18 +228,18 @@ namespace Deepgram.Abstractions
                 CheckForTimeout();
                 var response = await _httpClient.PutAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
-                var result = await RequestContentUtil.DeserializeAsync<T>(_loggerName, response);
+                var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
                 return result;
             }
             catch (HttpRequestException hre)
             {
-                Log.HttpRequestException(LogProvider.GetLogger(_loggerName), "PUT", uriSegment, hre);
+                Log.HttpRequestException(logger, "PUT", uriSegment, hre);
                 throw new HttpRequestException($"Error occurred during PUT request to {uriSegment}: Message{hre.Message}", hre);
             }
             catch (Exception ex)
             {
-                Log.Exception(LogProvider.GetLogger(_loggerName), "PUT", ex.GetType().Name, ex);
+                Log.Exception(logger, "PUT", ex.GetType().Name, ex);
                 throw new Exception($"Error occurred during PUT request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }

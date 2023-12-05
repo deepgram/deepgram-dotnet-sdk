@@ -2,7 +2,7 @@
 
 internal static class RequestContentUtil
 {
-
+    static ILogger logger => LogProvider.GetLogger(nameof(RequestContentUtil));
     static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -16,7 +16,7 @@ internal static class RequestContentUtil
     /// <param name="body">instance value for the body</param>
     /// <param name="contentType">What type of content is being sent default is : application/json</param>
     /// <returns></returns>
-    internal static StringContent CreatePayload<T>(string loggerName, T body)
+    internal static StringContent CreatePayload<T>(T body)
     {
         try
         {
@@ -27,7 +27,7 @@ internal static class RequestContentUtil
         }
         catch (Exception ex)
         {
-            Log.SerializerException(LogProvider.GetLogger(loggerName), "Serializing", ex.GetType().Name, typeof(T).Name, ex);
+            Log.SerializerException(logger, "Serializing", ex.GetType().Name, typeof(T).Name, ex);
             throw new Exception($"Error occurred whilst creating http request message body using data of type {typeof(T).Name}: ErrorMessage: {ex.Message}", ex);
         }
 
@@ -55,7 +55,7 @@ internal static class RequestContentUtil
     /// <typeparam name="TResponse">Class Type of expected response</typeparam>
     /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
     /// <returns>instance of TResponse or a Exception</returns>
-    internal static async Task<TResponse> DeserializeAsync<TResponse>(string loggerName, HttpResponseMessage httpResponseMessage)
+    internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
     {
         try
         {
@@ -65,7 +65,7 @@ internal static class RequestContentUtil
         }
         catch (Exception ex)
         {
-            Log.SerializerException(LogProvider.GetLogger(loggerName), "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
+            Log.SerializerException(logger, "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
             throw new Exception($"Error occurred whilst processing REST response : {ex.Message}", ex);
         }
     }
@@ -77,7 +77,7 @@ internal static class RequestContentUtil
     /// <typeparam name="TResponse">Class Type of expected response</typeparam>
     /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
     /// <returns>instance of TResponse or a Exception</returns>
-    internal static TResponse Deserialize<TResponse>(string loggerName, string content)
+    internal static TResponse Deserialize<TResponse>(string content)
     {
         try
         {
@@ -86,7 +86,7 @@ internal static class RequestContentUtil
         }
         catch (Exception ex)
         {
-            Log.SerializerException(LogProvider.GetLogger(loggerName), "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
+            Log.SerializerException(logger, "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
             throw new Exception($"Error occurred whilst processing REST response : {ex.Message}", ex);
         }
     }
