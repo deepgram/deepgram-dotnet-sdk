@@ -3,11 +3,11 @@
 public class LiveClient
 {
     #region Fields
-    readonly string _clientType;
+    private readonly string _clientType;
     internal ILogger logger => LogProvider.GetLogger(_clientType);
-    internal DeepgramClientOptions _deepgramClientOptions;
+    internal readonly DeepgramClientOptions _deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
-    internal CancellationTokenSource? _tokenSource = new();
+    internal readonly CancellationTokenSource _tokenSource;
     internal bool _disposed;
 
     #endregion
@@ -36,6 +36,8 @@ public class LiveClient
 
     public LiveClient(DeepgramClientOptions deepgramClientOptions)
     {
+        _tokenSource = new CancellationTokenSource();
+
         _clientType = this.GetType().Name;
         _deepgramClientOptions = BaseAddressUtil.GetWss(deepgramClientOptions);
     }
@@ -46,19 +48,19 @@ public class LiveClient
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task StartConnectionAsync(LiveSchema options)
+    public async Task StartConnectionAsync(LiveSchema options, CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         _clientWebSocket?.Dispose();
         _clientWebSocket = new ClientWebSocket();
         _clientWebSocket = WssClientUtil.SetHeaders(_deepgramClientOptions.ApiKey, _deepgramClientOptions, _clientWebSocket);
-        _tokenSource = new CancellationTokenSource();
 
 
         try
         {
             await _clientWebSocket.ConnectAsync(
                 GetUri(options),
-                CancellationToken.None).ConfigureAwait(false);
+                cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
             ConnectionOpened?.Invoke(null, new ConnectionOpenEventArgs());
@@ -73,12 +75,12 @@ public class LiveClient
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
             _ => ProcessSenderQueue(),
                 TaskCreationOptions.LongRunning,
-                _tokenSource.Token);
+                cancelToken);
 
         void StartReceiverBackgroundThread() => _ = Task.Factory.StartNew(
                 _ => Receive(),
             TaskCreationOptions.LongRunning,
-            _tokenSource.Token);
+            cancelToken);
     }
 
     /// <summary>
@@ -106,8 +108,9 @@ public class LiveClient
         }
     }
 
-    internal async Task ProcessSenderQueue()
+    internal async Task ProcessSenderQueue(CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         if (_disposed)
         {
             var ex = new Exception(
@@ -119,7 +122,7 @@ public class LiveClient
 
         try
         {
-            while (await _sendChannel.Reader.WaitToReadAsync())
+            while (await _sendChannel.Reader.WaitToReadAsync(cancelToken))
             {
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
@@ -130,7 +133,7 @@ public class LiveClient
                         message.Message,
                         WebSocketMessageType.Text,
                         true,
-                        _tokenSource!.Token).ConfigureAwait(false);
+                        cancelToken).ConfigureAwait(false);
                 }
             }
         }
@@ -159,8 +162,9 @@ public class LiveClient
         }
     }
 
-    internal async Task Receive()
+    internal async Task Receive(CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
             try
@@ -172,7 +176,7 @@ public class LiveClient
                 {
                     do
                     {
-                        result = await _clientWebSocket.ReceiveAsync(buffer, _tokenSource!.Token);
+                        result = await _clientWebSocket.ReceiveAsync(buffer, cancelToken);
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
                             Log.RequestedSocketClose(logger, result.CloseStatusDescription!);
@@ -223,8 +227,9 @@ public class LiveClient
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task StopConnectionAsync()
+    public async Task StopConnectionAsync(CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         try
         {
             if (_clientWebSocket!.CloseStatus.HasValue)
@@ -239,10 +244,11 @@ public class LiveClient
                     await _clientWebSocket.CloseOutputAsync(
                         WebSocketCloseStatus.NormalClosure,
                         string.Empty,
-                        CancellationToken.None)
+                        cancelToken)
                         .ConfigureAwait(false);
                 }
 
+                // Always request cancellation to the local token source, if some function has been called without a token
                 _tokenSource?.Cancel();
             }
 
@@ -259,8 +265,9 @@ public class LiveClient
     /// Signals to Deepgram that the audio has completed so it can return the final transcription output
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task FinishAsync()
+    public async Task FinishAsync(CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         if (_clientWebSocket!.State != WebSocketState.Open)
             return;
 
@@ -268,7 +275,7 @@ public class LiveClient
             new ArraySegment<byte>([]),
             WebSocketMessageType.Binary,
             true,
-            CancellationToken.None)
+            cancelToken)
             .ConfigureAwait(false);
     }
 
@@ -304,7 +311,7 @@ public class LiveClient
             return;
         }
 
-        _tokenSource!.Cancel();
+        _tokenSource.Cancel();
         _tokenSource.Dispose();
         _sendChannel?.Writer.Complete();
         _clientWebSocket?.Dispose();
