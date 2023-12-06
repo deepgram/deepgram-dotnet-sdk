@@ -9,6 +9,7 @@
 public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
+    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
     #region NoneCallBacks
     /// <summary>
     ///  Transcribe a file by providing a url 
@@ -21,7 +22,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
         VerifyNoCallBack(nameof(TranscribeUrlAsync), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source));
     }
 
@@ -39,7 +40,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream));
     }
 
@@ -54,7 +55,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
         VerifyNoCallBack(nameof(TranscribeFileAsync), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
     }
 
@@ -78,7 +79,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream));
     }
 
@@ -96,7 +97,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
             prerecordedSchema.Callback = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
     }
 
@@ -115,7 +116,7 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
             prerecordedSchema.Callback = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{Constants.LISTEN}?{stringedOptions}",
+            $"{_urlPrefix}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source));
     }
     #endregion

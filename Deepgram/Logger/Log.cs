@@ -5,25 +5,19 @@ internal static partial class Log
 {
     [LoggerMessage(
         EventId = 0001,
-        Level = LogLevel.Debug,
+        Level = LogLevel.Error,
         Message = "`{requestType}` to `{endpoint}` threw HttpRequestException  ")]
     internal static partial void HttpRequestException(this ILogger logger, string requestType, string endpoint, Exception ex);
 
     [LoggerMessage(
         EventId = 0002,
-        Level = LogLevel.Debug,
+        Level = LogLevel.Error,
         Message = "`{requestType}` threw `{exceptionType}` ")]
     internal static partial void Exception(this ILogger logger, string requestType, string exceptionType, Exception ex);
 
     [LoggerMessage(
-        EventId = 0003,
-        Level = LogLevel.Debug,
-        Message = "Whilst `{operationType}` `{objectType}` threw {exceptionType} ")]
-    internal static partial void SerializerException(this ILogger logger, string operationType, string exceptionType, string objectType, Exception ex);
-
-    [LoggerMessage(
         EventId = 0004,
-        Level = LogLevel.Debug,
+        Level = LogLevel.Error,
         Message = "Error occurred whilst get values for query parameter class type of `{classType}`")]
     internal static partial void ParameterStringError(this ILogger logger, string classType, Exception ex);
 
@@ -49,7 +43,7 @@ internal static partial class Log
 
     [LoggerMessage(
        EventId = 0009,
-       Level = LogLevel.Debug,
+       Level = LogLevel.Error,
        Message = "Unable to perform `{action}` Socket disposed")]
     internal static partial void SocketDisposed(this ILogger logger, string action, Exception ex);
 
@@ -68,7 +62,7 @@ internal static partial class Log
 
     [LoggerMessage(
        EventId = 0012,
-       Level = LogLevel.Debug,
+       Level = LogLevel.Error,
        Message = "WebSocket send operation cancelled")]
     internal static partial void SendCancelledError(this ILogger logger, Exception ex);
 
@@ -80,13 +74,13 @@ internal static partial class Log
 
     [LoggerMessage(
       EventId = 0014,
-      Level = LogLevel.Debug,
+      Level = LogLevel.Error,
       Message = "Closing WebSocket")]
     internal static partial void ClosingSocket(this ILogger logger);
 
     [LoggerMessage(
       EventId = 0015,
-      Level = LogLevel.Debug,
+      Level = LogLevel.Error,
       Message = "Staring Connection Async")]
     internal static partial void WebSocketStartError(this ILogger logger, Exception ex);
 
@@ -98,7 +92,7 @@ internal static partial class Log
 
     [LoggerMessage(
      EventId = 0017,
-     Level = LogLevel.Debug,
+     Level = LogLevel.Error,
      Message = "Error closing WebSocket")]
     internal static partial void WebSocketCloseError(this ILogger logger, Exception ex);
 

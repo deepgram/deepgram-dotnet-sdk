@@ -9,14 +9,14 @@
 public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
-
+    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
     /// <summary>
     /// get a list of credentials associated with project
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns>ListOnPremCredentialsResponse</returns>
     public async Task<ListOnPremCredentialsResponse> ListCredentialsAsync(string projectId) =>
-        await GetAsync<ListOnPremCredentialsResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}");
+        await GetAsync<ListOnPremCredentialsResponse>($"{_urlPrefix}/{projectId}/{Constants.ONPREM}");
 
     /// <summary>
     /// Get credentials for the project that is associated with credential ID
@@ -25,7 +25,7 @@ public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns>OnPremCredentialResponse</returns>
     public async Task<OnPremCredentialResponse> GetCredentialsAsync(string projectId, string credentialsId) =>
-        await GetAsync<OnPremCredentialResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}/{credentialsId}");
+        await GetAsync<OnPremCredentialResponse>($"{_urlPrefix}/{projectId}/{Constants.ONPREM}/{credentialsId}");
 
     /// <summary>
     /// Remove credentials in the project associated with the credentials ID
@@ -34,7 +34,7 @@ public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns>Message Response</returns>
     public async Task<MessageResponse> DeleteCredentialsAsync(string projectId, string credentialsId) =>
-        await DeleteAsync<MessageResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}/{credentialsId}");
+        await DeleteAsync<MessageResponse>($"{_urlPrefix}/{projectId}/{Constants.ONPREM}/{credentialsId}");
 
     /// <summary>
     /// Create credentials for the associated projects
@@ -44,7 +44,7 @@ public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns>OnPremCredentialResponse</returns>
     public async Task<OnPremCredentialResponse> CreateCredentialsAsync(string projectId, CreateOnPremCredentialsSchema createOnPremCredentialsSchema) =>
         await PostAsync<OnPremCredentialResponse>(
-            $"{Constants.PROJECTS}/{projectId}/{Constants.ONPREM}",
+            $"{_urlPrefix}/{projectId}/{Constants.ONPREM}",
             RequestContentUtil.CreatePayload(createOnPremCredentialsSchema));
 
 }

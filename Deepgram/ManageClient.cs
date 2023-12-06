@@ -9,6 +9,7 @@
 public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
+    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
 
     #region Projects
     /// <summary>
@@ -16,7 +17,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// </summary>
     /// <returns><see cref="GetProjectsResponse"/></returns>
     public async Task<GetProjectsResponse> GetProjectsAsync() =>
-        await GetAsync<GetProjectsResponse>($"/{Constants.API_VERSION}/{Constants.PROJECTS}");
+        await GetAsync<GetProjectsResponse>(_urlPrefix);
 
     /// <summary>
     /// Gets project associated with project Id
@@ -24,7 +25,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of Project</param>
     /// <returns><see cref="GetProjectResponse"/></returns>
     public async Task<GetProjectResponse> GetProjectAsync(string projectId) =>
-        await GetAsync<GetProjectResponse>($"{Constants.PROJECTS}/{projectId}");
+        await GetAsync<GetProjectResponse>($"{_urlPrefix}/{projectId}");
 
     /// <summary>
     /// Update a project associated with the projectID
@@ -35,7 +36,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     // USES PATCH
     public async Task<MessageResponse> UpdateProjectAsync(string projectId, UpdateProjectSchema updateProjectSchema) =>
         await PatchAsync<MessageResponse>(
-            $"{Constants.PROJECTS}/{projectId}",
+            $"{_urlPrefix}/{projectId}",
             RequestContentUtil.CreatePayload(updateProjectSchema));
 
     /// <summary>
@@ -44,7 +45,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     // No response expected
     public void DeleteProject(string projectId) =>
-        _ = Delete($"{Constants.PROJECTS}/{projectId}");
+        _ = Delete($"{_urlPrefix}/{projectId}");
 
     /// <summary>
     /// leave project associated with the project Id
@@ -64,7 +65,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectKeysResponse"/></returns>
     public async Task<GetProjectKeysResponse> GetProjectKeysAsync(string projectId) =>
-        await GetAsync<GetProjectKeysResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.KEYS}");
+        await GetAsync<GetProjectKeysResponse>($"{_urlPrefix}/{projectId}/{Constants.KEYS}");
 
     /// <summary>
     /// Get details of key associated with the key ID
@@ -73,7 +74,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="keyId">Id of key</param>
     /// <returns><see cref="GetProjectKeyResponse"/></returns>
     public async Task<GetProjectKeyResponse> GetProjectKeyAsync(string projectId, string keyId) =>
-        await GetAsync<GetProjectKeyResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.KEYS}/{keyId}");
+        await GetAsync<GetProjectKeyResponse>($"{_urlPrefix}/{projectId}/{Constants.KEYS}/{keyId}");
 
     /// <summary>
     /// Create a key in the associated project
@@ -90,7 +91,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
         }
 
         return await PostAsync<CreateProjectKeyResponse>(
-                     $"{Constants.PROJECTS}/{projectId}/keys",
+                     $"{_urlPrefix}/{projectId}/keys",
                      RequestContentUtil.CreatePayload(createProjectKeySchema));
     }
 
@@ -101,7 +102,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     public void DeleteProjectKey(string projectId, string keyId) =>
-        _ = Delete($"{Constants.PROJECTS}/{projectId}/keys/{keyId}");
+        _ = Delete($"{_urlPrefix}/{projectId}/keys/{keyId}");
 
     #endregion
 
@@ -112,7 +113,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectInvitesResponse"/></returns>
     public async Task<GetProjectInvitesResponse> GetProjectInvitesAsync(string projectId) =>
-        await GetAsync<GetProjectInvitesResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.INVITES}");
+        await GetAsync<GetProjectInvitesResponse>($"{_urlPrefix}/{projectId}/{Constants.INVITES}");
 
     /// <summary>
     /// Delete a project invite that has been sent
@@ -120,7 +121,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <param name="email">email of the invite to be removed</param>
     public void DeleteProjectInvite(string projectId, string email) =>
-        _ = Delete($"{Constants.PROJECTS}/{projectId}/{Constants.INVITES}/{email}");
+        _ = Delete($"{_urlPrefix}/{projectId}/{Constants.INVITES}/{email}");
 
     /// <summary>
     /// Send a invite to the associated project
@@ -130,7 +131,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns><see cref="MessageResponse"/></returns>
     public async Task<MessageResponse> SendProjectInviteAsync(string projectId, SendProjectInviteSchema sendProjectInviteSchema) =>
         await PostAsync<MessageResponse>(
-            $"{Constants.PROJECTS}/{projectId}/{Constants.INVITES}",
+            $"{_urlPrefix}/{projectId}/{Constants.INVITES}",
             RequestContentUtil.CreatePayload(sendProjectInviteSchema));
     #endregion
 
@@ -141,7 +142,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectMembersResponse"/></returns>
     public async Task<GetProjectMembersResponse> GetProjectMembersAsync(string projectId) =>
-        await GetAsync<GetProjectMembersResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}");
+        await GetAsync<GetProjectMembersResponse>($"{_urlPrefix}/{projectId}/{Constants.MEMBERS}");
 
     /// <summary>
     /// Get the scopes associated with member
@@ -150,7 +151,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="memberId">Id of member</param>
     /// <returns><see cref="GetProjectMemberScopesResponse"/></returns>
     public async Task<GetProjectMemberScopesResponse> GetProjectMemberScopesAsync(string projectId, string memberId) =>
-        await GetAsync<GetProjectMemberScopesResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}");
+        await GetAsync<GetProjectMemberScopesResponse>($"{_urlPrefix}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}");
 
     /// <summary>
     /// Update the scopes fot the member
@@ -161,7 +162,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <returns><see cref="MessageResponse"/></returns>  
     public async Task<MessageResponse> UpdateProjectMemberScopeAsync(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema) =>
         await PutAsync<MessageResponse>(
-            $"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}",
+            $"{_urlPrefix}/{projectId}/{Constants.MEMBERS}/{memberId}/{Constants.SCOPES}",
             RequestContentUtil.CreatePayload(updateProjectMemberScopeSchema));
 
     /// <summary>
@@ -170,7 +171,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>   
     public void RemoveProjectMember(string projectId, string memberId) =>
-        _ = Delete($"{Constants.PROJECTS}/{projectId}/{Constants.MEMBERS}/{memberId}");
+        _ = Delete($"{_urlPrefix}/{projectId}/{Constants.MEMBERS}/{memberId}");
     #endregion
 
     #region Usage
@@ -184,7 +185,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     public async Task<GetProjectUsageRequestsResponse> GetProjectsUsageRequestsAsync(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageRequestsSchema);
-        return await GetAsync<GetProjectUsageRequestsResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.REQUESTS}?{stringedOptions}");
+        return await GetAsync<GetProjectUsageRequestsResponse>($"{_urlPrefix}/{projectId}/{Constants.REQUESTS}?{stringedOptions}");
     }
 
     /// <summary>
@@ -194,7 +195,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="requestId">Id of request</param>
     /// <returns><see cref="GetProjectUsageRequestResponse"/></returns>
     public async Task<GetProjectUsageRequestResponse> GetProjectUsageRequestAsync(string projectId, string requestId) =>
-        await GetAsync<GetProjectUsageRequestResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.REQUESTS}/{requestId}");
+        await GetAsync<GetProjectUsageRequestResponse>($"{_urlPrefix}/{projectId}/{Constants.REQUESTS}/{requestId}");
 
     /// <summary>
     /// Gets a summary of usage
@@ -206,7 +207,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
         return await GetAsync<GetProjectUsageSummaryResponse>(
-            $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}?{stringedOptions}");
+            $"{_urlPrefix}/{projectId}/{Constants.USAGE}?{stringedOptions}");
     }
 
     /// <summary>
@@ -219,7 +220,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
         return await GetAsync<GetProjectUsageFieldsResponse>(
-            $"{Constants.PROJECTS}/{projectId}/{Constants.USAGE}/fields?{stringedOptions}");
+            $"{_urlPrefix}/{projectId}/{Constants.USAGE}/fields?{stringedOptions}");
     }
     #endregion
 
@@ -231,7 +232,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectBalancesResponse"/></returns>
     public async Task<GetProjectBalancesResponse> GetProjectBalancesAsync(string projectId) =>
-        await GetAsync<GetProjectBalancesResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.BALANCES}");
+        await GetAsync<GetProjectBalancesResponse>($"{_urlPrefix}/{projectId}/{Constants.BALANCES}");
 
     /// <summary>
     /// Get the balance details associated with the balance id
@@ -240,6 +241,6 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="balanceId">Id of balance</param>
     /// <returns><see cref="GetProjectBalanceResponse"/></returns>
     public async Task<GetProjectBalanceResponse> GetProjectBalanceAsync(string projectId, string balanceId) =>
-        await GetAsync<GetProjectBalanceResponse>($"{Constants.PROJECTS}/{projectId}/{Constants.BALANCES}/{balanceId}");
+        await GetAsync<GetProjectBalanceResponse>($"{_urlPrefix}/{projectId}/{Constants.BALANCES}/{balanceId}");
     #endregion
 }

@@ -23,7 +23,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/deepgram-devs/deepgram-dotnet-sdk</RepositoryUrl>
     <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <Version>4.0.0-alpha</Version>
+    <Version>4.0.0-alpha01</Version>
   </PropertyGroup>
 
 

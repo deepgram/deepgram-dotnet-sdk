@@ -14,22 +14,10 @@
     /// <param name="body">instance value for the body</param>
     /// <param name="contentType">What type of content is being sent default is : application/json</param>
     /// <returns></returns>
-    internal static StringContent CreatePayload<T>(T body)
-    {
-        try
-        {
-            return new StringContent(
+    internal static StringContent CreatePayload<T>(T body) => new StringContent(
                                 JsonSerializer.Serialize(body, _jsonSerializerOptions),
                                Encoding.UTF8,
                                Constants.DEFAULT_CONTENT_TYPE);
-        }
-        catch (Exception ex)
-        {
-            Log.SerializerException(logger, "Serializing", ex.GetType().Name, typeof(T).Name, ex);
-            throw new Exception($"Error occurred whilst creating http request message body using data of type {typeof(T).Name}: ErrorMessage: {ex.Message}", ex);
-        }
-
-    }
 
 
     /// <summary>
@@ -55,17 +43,9 @@
     /// <returns>instance of TResponse or a Exception</returns>
     internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
     {
-        try
-        {
-            var content = await httpResponseMessage.Content.ReadAsStringAsync();
-            var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content, _jsonSerializerOptions);
-            return deepgramResponse;
-        }
-        catch (Exception ex)
-        {
-            Log.SerializerException(logger, "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
-            throw new Exception($"Error occurred whilst processing REST response : {ex.Message}", ex);
-        }
+        var content = await httpResponseMessage.Content.ReadAsStringAsync();
+        var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content);
+        return deepgramResponse;
     }
 
 
@@ -75,17 +55,6 @@
     /// <typeparam name="TResponse">Class Type of expected response</typeparam>
     /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
     /// <returns>instance of TResponse or a Exception</returns>
-    internal static TResponse Deserialize<TResponse>(string content)
-    {
-        try
-        {
-            var result = JsonSerializer.Deserialize<TResponse>(content, _jsonSerializerOptions);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            Log.SerializerException(logger, "Deserializing", ex.GetType().Name, typeof(TResponse).Name, ex);
-            throw new Exception($"Error occurred whilst processing REST response : {ex.Message}", ex);
-        }
-    }
+    internal static TResponse Deserialize<TResponse>(string content) =>
+        JsonSerializer.Deserialize<TResponse>(content, _jsonSerializerOptions);
 }
