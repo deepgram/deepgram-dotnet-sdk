@@ -54,7 +54,7 @@ public class QueryParameterUtilTests
         //Arrange
         var prerecordedOptions = new PrerecordedSchema
         {
-            Keywords = new string[] { "test", "acme" }
+            Keywords = ["test", "acme"]
         };
         var expected = $"keywords={prerecordedOptions.Keywords[0].ToLower()}";
 
@@ -88,7 +88,7 @@ public class QueryParameterUtilTests
     {
         //Arrange 
         var obj = new PrerecordedSchema() { Paragraphs = true };
-        var expected = $"{nameof(obj.Paragraphs).ToLower()}=True";
+        var expected = $"{nameof(obj.Paragraphs).ToLower()}=true";
         //Act
         var result = QueryParameterUtil.GetParameters(obj);
 

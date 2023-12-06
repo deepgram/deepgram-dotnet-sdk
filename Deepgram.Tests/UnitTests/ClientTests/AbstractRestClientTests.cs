@@ -100,7 +100,7 @@ public class AbstractRestfulClientTests
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
         // Act
-        var result = await client.PostAsync<SyncPrerecordedResponse>(Constants.PROJECTS, new StringContent(""));
+        var result = await client.PostAsync<SyncPrerecordedResponse>(Constants.PROJECTS, new StringContent(string.Empty));
 
         // Assert
         using (new AssertionScope())
@@ -121,7 +121,7 @@ public class AbstractRestfulClientTests
 
         // Act & Assert      
 
-        client.Invoking(y => y.PostAsync<GetProjectsResponse>(Constants.PROJECTS, new StringContent("")))
+        client.Invoking(y => y.PostAsync<GetProjectsResponse>(Constants.PROJECTS, new StringContent(string.Empty)))
              .Should().ThrowAsync<HttpRequestException>();
     }
 
@@ -198,7 +198,7 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
 
         // Act
-        var result = await client.PatchAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(""));
+        var result = await client.PatchAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(string.Empty));
 
         // Assert
         using (new AssertionScope())
@@ -219,7 +219,7 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
 
         //Act & Assert
-        client.Invoking(y => y.PatchAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
+        client.Invoking(y => y.PatchAsync<MessageResponse>(Constants.PROJECTS, new StringContent(string.Empty)))
              .Should().ThrowAsync<HttpRequestException>();
     }
 
@@ -233,7 +233,7 @@ public class AbstractRestfulClientTests
         var client = new ConcreteRestClient(_apiKey, _httpClientFactory) { };
 
         // Act
-        var result = await client.PutAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(""));
+        var result = await client.PutAsync<MessageResponse>($"{Constants.PROJECTS}/1", new StringContent(string.Empty));
 
         // Assert
         using (new AssertionScope())
@@ -252,7 +252,7 @@ public class AbstractRestfulClientTests
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
         var client = new ConcreteRestClient(_apiKey, _httpClientFactory);
         // Act & Assert
-        client.Invoking(y => y.PutAsync<MessageResponse>(Constants.PROJECTS, new StringContent("")))
+        client.Invoking(y => y.PutAsync<MessageResponse>(Constants.PROJECTS, new StringContent(string.Empty)))
              .Should().ThrowAsync<HttpRequestException>();
     }
 }

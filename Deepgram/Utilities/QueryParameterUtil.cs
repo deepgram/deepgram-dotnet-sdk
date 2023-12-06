@@ -22,16 +22,16 @@ internal static class QueryParameterUtil
         }
     }
 
-    private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfos)
+    private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfoList)
     {
         var sb = new StringBuilder();
-        foreach (var pInfo in propertyInfos)
+        foreach (var pInfo in propertyInfoList)
         {
             var name = pInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name;
             var pValue = pInfo.GetValue(parameters);
 
             //need to check for the CallBack property so the value  is not changed to lowercase 
-            if (typeof(T) == typeof(PrerecordedSchema) && name == nameof(PrerecordedSchema.Callback).ToLower())
+            if (typeof(T) == typeof(PrerecordedSchema) && string.Compare(name, nameof(PrerecordedSchema.Callback).ToLower(), StringComparison.Ordinal) == 0)
             {
                 sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                 continue;

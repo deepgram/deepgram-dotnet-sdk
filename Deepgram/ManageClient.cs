@@ -9,7 +9,7 @@
 public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
-    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
+    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
 
     #region Projects
     /// <summary>
@@ -201,7 +201,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// Gets a summary of usage
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageSummarySchema">Usage summmary options<see cref="GetProjectsUsageSummarySchema"/> </param>
+    /// <param name="getProjectUsageSummarySchema">Usage summary options<see cref="GetProjectsUsageSummarySchema"/> </param>
     /// <returns><see cref="GetProjectUsageSummaryResponse"/></returns>
     public async Task<GetProjectUsageSummaryResponse> GetProjectUsageSummaryAsync(string projectId, GetProjectsUsageSummarySchema getProjectUsageSummarySchema)
     {

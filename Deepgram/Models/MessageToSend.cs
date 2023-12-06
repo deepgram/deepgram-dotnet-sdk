@@ -1,6 +1,4 @@
-﻿using System.Net.WebSockets;
-
-namespace Deepgram.Models;
+﻿namespace Deepgram.Models;
 
 internal readonly struct MessageToSend(byte[] message, WebSocketMessageType type)
 {

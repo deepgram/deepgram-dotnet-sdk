@@ -9,7 +9,7 @@
 public class OnPremClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
-    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
+    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
     /// <summary>
     /// get a list of credentials associated with project
     /// </summary>

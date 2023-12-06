@@ -1,7 +1,7 @@
 ﻿namespace Deepgram.Tests.IntegrationTests;
 public class EndpointTests
 {
-    public string ApiKey = "";
+    public string ApiKey = string.Empty;
 
 
     //[Test]

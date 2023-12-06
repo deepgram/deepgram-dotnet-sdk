@@ -38,6 +38,9 @@ After:
 */
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetHttps(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.BaseAddressUtil.GetWss(Deepgram.Models.Options.DeepgramClientOptions)~Deepgram.Models.Options.DeepgramClientOptions")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.Common.AudioEncoding.OggSpeex")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP09:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:Deepgram.LiveClient._deepgramClientOptions")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "namespace", Target = "~N:Deepgram.DeepgramEventArgs")]
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given

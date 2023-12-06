@@ -14,7 +14,7 @@
     /// <param name="body">instance value for the body</param>
     /// <param name="contentType">What type of content is being sent default is : application/json</param>
     /// <returns></returns>
-    internal static StringContent CreatePayload<T>(T body) => new StringContent(
+    internal static StringContent CreatePayload<T>(T body) => new (
                                 JsonSerializer.Serialize(body, _jsonSerializerOptions),
                                Encoding.UTF8,
                                Constants.DEFAULT_CONTENT_TYPE);

@@ -9,7 +9,7 @@
 public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
 {
-    string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
+    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
     #region NoneCallBacks
     /// <summary>
     ///  Transcribe a file by providing a url 
