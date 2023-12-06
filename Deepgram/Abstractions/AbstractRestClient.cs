@@ -31,13 +31,12 @@
         /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
         /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
         /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/> for HttpClient Configuration</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
+        internal AbstractRestClient(IHttpClientFactory httpClientFactory, DeepgramClientOptions deepgramClientOptions)
         {
             _clientName = this.GetType().Name;
-            var validatedKey = ApiKeyUtil.Validate(apiKey, _clientName);
-            _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
+            _deepgramClientOptions = deepgramClientOptions;
             _deepgramClientOptions = BaseAddressUtil.GetHttps(_deepgramClientOptions);
-            _httpClient = HttpClientUtil.Configure(validatedKey, _deepgramClientOptions, httpClientFactory);
+            _httpClient = HttpClientUtil.Configure(_deepgramClientOptions.ApiKey, _deepgramClientOptions, httpClientFactory);
         }
 
         /// <summary>

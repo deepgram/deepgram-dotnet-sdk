@@ -6,7 +6,6 @@ public class LiveClient
     readonly string _clientType;
     internal ILogger logger => LogProvider.GetLogger(_clientType);
     internal DeepgramClientOptions _deepgramClientOptions;
-    internal string _apiKey;
     internal ClientWebSocket? _clientWebSocket;
     internal CancellationTokenSource? _tokenSource = new();
     internal bool _disposed;
@@ -35,12 +34,10 @@ public class LiveClient
     public event EventHandler<TranscriptReceivedEventArgs>? TranscriptReceived;
     #endregion
 
-    public LiveClient(string? apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+    public LiveClient(DeepgramClientOptions deepgramClientOptions)
     {
         _clientType = this.GetType().Name;
-        _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
-        _deepgramClientOptions = BaseAddressUtil.GetWss(_deepgramClientOptions);
-        _apiKey = ApiKeyUtil.Validate(apiKey, _clientType);
+        _deepgramClientOptions = BaseAddressUtil.GetWss(deepgramClientOptions);
     }
 
 
@@ -53,7 +50,7 @@ public class LiveClient
     {
         _clientWebSocket?.Dispose();
         _clientWebSocket = new ClientWebSocket();
-        _clientWebSocket = WssClientUtil.SetHeaders(_apiKey, _deepgramClientOptions, _clientWebSocket);
+        _clientWebSocket = WssClientUtil.SetHeaders(_deepgramClientOptions.ApiKey, _deepgramClientOptions, _clientWebSocket);
         _tokenSource = new CancellationTokenSource();
 
 

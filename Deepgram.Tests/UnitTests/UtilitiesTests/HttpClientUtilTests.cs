@@ -11,7 +11,7 @@ public class HttpClientUtilTests
     {
         _apiKey = Guid.NewGuid().ToString();
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
-        _clientOptions = new DeepgramClientOptions();
+        _clientOptions = new DeepgramClientOptions("fakeKey");
     }
 
 

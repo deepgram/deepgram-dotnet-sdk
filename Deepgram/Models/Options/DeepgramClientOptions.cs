@@ -20,6 +20,12 @@ public class DeepgramClientOptions
     /// <param name="apiKey">The key to authenticate with deepgram</param>
     public DeepgramClientOptions(string apiKey)
     {
+        if( string.IsNullOrWhiteSpace(apiKey))
+        {
+            Log.ApiKeyNotPresent(LogProvider.GetLogger(nameof(DeepgramClientOptions)), nameof(DeepgramClientOptions));
+            throw new ArgumentNullException(nameof(apiKey));
+        }
+
         ApiKey = apiKey;
     }
 }
