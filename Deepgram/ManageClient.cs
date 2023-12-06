@@ -81,10 +81,19 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// <param name="projectId">Id of project</param>
     /// <param name="createProjectKeySchema"><see cref="CreateProjectKeySchema"/> for the key to be created</param>
     /// <returns><see cref="CreateProjectKeyResponse"/></returns>
-    public async Task<CreateProjectKeyResponse> CreateProjectKeyAsync(string projectId, CreateProjectKeySchema createProjectKeySchema) =>
-         await PostAsync<CreateProjectKeyResponse>(
-             $"{Constants.PROJECTS}/{projectId}/keys",
-             RequestContentUtil.CreatePayload(createProjectKeySchema));
+    public async Task<CreateProjectKeyResponse> CreateProjectKeyAsync(string projectId, CreateProjectKeySchema createProjectKeySchema)
+    {
+        if (createProjectKeySchema.ExpirationDate is not null && createProjectKeySchema.TimeToLiveInSeconds is not null)
+        {
+            Log.CreateProjectKeyError(_logger, createProjectKeySchema);
+            throw new ArgumentException("Both ExpirationDate and TimeToLiveInSeconds is set. set either one but not both");
+        }
+
+
+        return await PostAsync<CreateProjectKeyResponse>(
+                     $"{Constants.PROJECTS}/{projectId}/keys",
+                     RequestContentUtil.CreatePayload(createProjectKeySchema));
+    }
 
 
     /// <summary>

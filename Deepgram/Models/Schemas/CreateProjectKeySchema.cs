@@ -19,4 +19,16 @@ public class CreateProjectKeySchema
     [JsonPropertyName("tags")]
     public string[]? Tags { get; set; }
 
+    /// <summary>
+    /// Date on which the key should expire if you set this do not set the TimeToLiveInSeconds
+    /// </summary>
+    [JsonPropertyName("expiration_date")]
+    public DateTime? ExpirationDate { get; set; }
+
+    /// <summary>
+    /// Time for the key to live in seconds 
+    /// if you se this do not set the ExpirationDate
+    /// </summary>
+    [JsonPropertyName("time_to_live_in_seconds")]
+    public int? TimeToLiveInSeconds { get; set; }
 }

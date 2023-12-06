@@ -102,4 +102,10 @@ internal static partial class Log
      Message = "Error closing WebSocket")]
     internal static partial void WebSocketCloseError(this ILogger logger, Exception ex);
 
+
+    [LoggerMessage(
+    EventId = 0018,
+    Level = LogLevel.Error,
+    Message = "Error creating project key both ExpirationDate and TimeToLiveInSeconds are set: `{createProjectKeySchema}`")]
+    internal static partial void CreateProjectKeyError(this ILogger logger, CreateProjectKeySchema createProjectKeySchema);
 }
