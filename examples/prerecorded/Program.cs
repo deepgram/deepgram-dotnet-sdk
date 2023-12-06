@@ -1,35 +1,39 @@
-using Deepgram.Clients;
 using Deepgram.Models;
+using Deepgram.Models.Options;
 using Newtonsoft.Json;
 
-namespace SampleApp
+namespace SampleApp;
+public static class Program
 {
-    class Program
+    private const string API_KEY = "YOUR_DEEPGRAM_API_KEY";
+
+    public static async Task Main()
     {
-        const string API_KEY = "YOUR_DEEPGRAM_API_KEY";
+        var httpClientFactory = new HttpClientFactory(); // Brute force. Don't do this, use dependency injection.
+        var options = new DeepgramClientOptions("apiKey");
+        var deepgramClient = new PrerecordedClient(httpClientFactory, options);
 
-        static async Task Main(string[] args)
-        {   
-            var credentials = new Credentials(API_KEY);
-            var deepgramClient = new DeepgramClient(credentials);
-
-            // UNCOMMENT IF USING LOCAL FILE:
-            // using (FileStream fs = File.OpenRead("YOUR_FILE_LOCATION"))
+        var response = await deepgramClient.TranscribeUrlAsync(
+            new UrlSource()
             {
-                var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-                    // UNCOMMENT IF USING LOCAL FILE:
-                    // new Deepgram.Transcription.StreamSource(
-                    //     fs,
-                    //     "audio/wav"),
-                    new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-                    new PrerecordedTranscriptionOptions()
-                    {
-                        Punctuate = true,
-                        Utterances = true,
-                    });
+                Url = "https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"
+            },
+            new Deepgram.Models.Schemas.PrerecordedSchema()
+            {
+                Punctuate = true,
+                Utterances = true,
+            });
 
-                Console.WriteLine(JsonConvert.SerializeObject(response));
-            }
+        Console.WriteLine(JsonConvert.SerializeObject(response));
+    }
+
+    // Brute force. Don't do this, use dependency injection.
+    private class HttpClientFactory : IHttpClientFactory
+    {
+        public HttpClient CreateClient(string name)
+        {
+            return new HttpClient();
         }
     }
 }
+
