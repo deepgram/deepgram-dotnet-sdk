@@ -28,10 +28,9 @@
         /// <summary>
         /// Constructor that take a IHttpClientFactory
         /// </summary>
-        /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
-        /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/> for HttpClient Configuration</param>
-        internal AbstractRestClient(IHttpClientFactory httpClientFactory, DeepgramClientOptions deepgramClientOptions)
+        /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
+        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/>Factory to use to create instances of HttpClient for making Rest calls</param>
+        internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
         {
             _clientName = this.GetType().Name;
             _deepgramClientOptions = deepgramClientOptions;
