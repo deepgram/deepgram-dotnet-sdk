@@ -13,10 +13,9 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// <summary>
     ///  Transcribe a file by providing a url 
     /// </summary>
-    /// <param name="source">Url to the file that is to be transcribed</param>
-    /// <param name="prerecordedSchema">Option for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>SyncPrerecordedResponse</returns>
+    /// <param name="source">Url to the file that is to be transcribed <see cref="UrlSource"></param>
+    /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
+    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
     public async Task<SyncPrerecordedResponse> TranscribeUrlAsync(UrlSource source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeUrlAsync), prerecordedSchema);
@@ -31,9 +30,8 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// Transcribes a file using the provided byte array
     /// </summary>
     /// <param name="source">file is the form of a byte[]</param>
-    /// <param name="prerecordedSchema">Option for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>SyncPrerecordedResponse</returns>
+    /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
+    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(byte[] source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeFileAsync), prerecordedSchema);
@@ -48,10 +46,9 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// <summary>
     /// Transcribes a file using the provided stream
     /// </summary>
-    /// <param name="source">file is the form of a stream</param>
-    /// <param name="prerecordedSchema">Options for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>SyncPrerecordedResponse</returns>
+    /// <param name="source">file is the form of a stream <see cref="Stream"/></param>
+    /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
+    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
     public async Task<SyncPrerecordedResponse> TranscribeFileAsync(Stream source, PrerecordedSchema? prerecordedSchema)
     {
         VerifyNoCallBack(nameof(TranscribeFileAsync), prerecordedSchema);
@@ -67,11 +64,10 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// <summary>
     /// Transcribes a file using the provided byte array and providing a CallBack
     /// </summary>
-    /// <param name="source">file is the form of a byte[]</param>
+    /// <param name="source">file is the form of a byte[]</param>  
     /// <param name="callBack">CallBack url</param>    
-    /// <param name="prerecordedSchema">Options for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>AsyncPrerecordedResponse</returns>
+    /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
+    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallBackAsync(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         VerifyOneCallBackSet(nameof(TranscribeFileCallBackAsync), callBack, prerecordedSchema);
@@ -89,11 +85,10 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// <summary>
     /// Transcribes a file using the provided stream and providing a CallBack
     /// </summary>
-    /// <param name="source">file is the form of a stream</param>
+    /// <param name="source">file is the form of a stream <see cref="Stream"></param>  
     /// <param name="callBack">CallBack url</param>    
-    /// <param name="prerecordedSchema">Options for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>AsyncPrerecordedResponse</returns>
+    /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
+    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
     public async Task<AsyncPrerecordedResponse> TranscribeFileCallBackAsync(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         VerifyOneCallBackSet(nameof(TranscribeFileCallBackAsync), callBack, prerecordedSchema);
@@ -108,11 +103,10 @@ public class PrerecordedClient(string? apiKey, IHttpClientFactory httpClientFact
     /// <summary>
     /// Transcribe a file by providing a url and a CallBack
     /// </summary>
-    /// <param name="source">Url to the file that is to be transcribed</param>
+    /// <param name="source">Url to the file that is to be transcribed <see cref="UrlSource"/></param>
     /// <param name="callBack">CallBack url</param>    
-    /// <param name="prerecordedSchema">Options for the transcription</param>
-    /// <param name="deepgramRequestOptions">options specific to this request call</param>
-    /// <returns>AsyncPrerecordedResponse</returns>
+    /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
+    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
     public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBackAsync(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
         VerifyOneCallBackSet(nameof(TranscribeUrlCallBackAsync), callBack, prerecordedSchema);

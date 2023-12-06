@@ -89,7 +89,6 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
             throw new ArgumentException("Both ExpirationDate and TimeToLiveInSeconds is set. set either one but not both");
         }
 
-
         return await PostAsync<CreateProjectKeyResponse>(
                      $"{Constants.PROJECTS}/{projectId}/keys",
                      RequestContentUtil.CreatePayload(createProjectKeySchema));
@@ -158,7 +157,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>
-    /// <param name="updateProjectMemberScopeSchema"><see cref="UpdateProjectMemberScopeSchema"/> for member</param>
+    /// <param name="updateProjectMemberScopeSchema">updates scope options for member<see cref="UpdateProjectMemberScopeSchema"/></param>
     /// <returns><see cref="MessageResponse"/></returns>  
     public async Task<MessageResponse> UpdateProjectMemberScopeAsync(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema) =>
         await PutAsync<MessageResponse>(
@@ -180,7 +179,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// Get usage request  associated with the project
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageRequestsSchema"><see cref="GetProjectUsageRequestsSchema"/>  </param>
+    /// <param name="getProjectUsageRequestsSchema">Project usage request options<see cref="GetProjectUsageRequestsSchema"/>  </param>
     /// <returns><see cref="GetProjectUsageRequestsResponse"/></returns>
     public async Task<GetProjectUsageRequestsResponse> GetProjectsUsageRequestsAsync(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
     {
@@ -201,7 +200,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// Gets a summary of usage
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageSummarySchema"><see cref="GetProjectsUsageSummarySchema"/> constraints to limit the usage requests for summarizing</param>
+    /// <param name="getProjectUsageSummarySchema">Usage summmary options<see cref="GetProjectsUsageSummarySchema"/> </param>
     /// <returns><see cref="GetProjectUsageSummaryResponse"/></returns>
     public async Task<GetProjectUsageSummaryResponse> GetProjectUsageSummaryAsync(string projectId, GetProjectsUsageSummarySchema getProjectUsageSummarySchema)
     {
@@ -214,7 +213,7 @@ public class ManageClient(string? apiKey, IHttpClientFactory httpClientFactory, 
     /// Get usage fields 
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageFieldsSchema"><see cref="GetProjectUsageFieldsSchema"/> constraints on Usage request range</param>
+    /// <param name="getProjectUsageFieldsSchema">Project usage request field options<see cref="GetProjectUsageFieldsSchema"/></param>
     /// <returns><see cref="GetProjectUsageFieldsResponse"/></returns>
     public async Task<GetProjectUsageFieldsResponse> GetProjectUsageFieldsAsync(string projectId, GetProjectUsageFieldsSchema getProjectUsageFieldsSchema)
     {
