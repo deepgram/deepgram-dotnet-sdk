@@ -139,7 +139,6 @@
             try
             {
                 CheckForTimeout();
-                var rq = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
                 var response = await _httpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
             }

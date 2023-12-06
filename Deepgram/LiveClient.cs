@@ -56,7 +56,7 @@ public class LiveClient
         _clientWebSocket = WssClientUtil.SetHeaders(_apiKey, _deepgramClientOptions, _clientWebSocket);
         _tokenSource = new CancellationTokenSource();
 
-        _deepgramClientOptions = BaseAddressUtil.GetWss(_deepgramClientOptions);
+
         try
         {
             await _clientWebSocket.ConnectAsync(
