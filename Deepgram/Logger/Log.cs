@@ -1,6 +1,4 @@
-﻿using System.Net.WebSockets;
-
-namespace Deepgram.Logger;
+﻿namespace Deepgram.Logger;
 internal static partial class Log
 {
     [LoggerMessage(
