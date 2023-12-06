@@ -1,6 +1,4 @@
-﻿using System.Web;
-
-namespace Deepgram.Utilities;
+﻿namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
 {

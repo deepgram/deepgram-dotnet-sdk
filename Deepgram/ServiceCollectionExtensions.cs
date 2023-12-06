@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.Contrib.WaitAndRetry;
-
-namespace Deepgram;
+﻿namespace Deepgram;
 
 public static class ServiceCollectionExtensions
 {

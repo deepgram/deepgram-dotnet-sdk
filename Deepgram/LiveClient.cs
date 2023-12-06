@@ -1,8 +1,4 @@
-﻿using System.Net.WebSockets;
-using System.Threading.Channels;
-using Deepgram.DeepgramEventArgs;
-
-namespace Deepgram;
+﻿namespace Deepgram;
 
 public class LiveClient
 {

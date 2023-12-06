@@ -1,5 +1,4 @@
 ﻿namespace Deepgram.Utilities;
-
 internal static class HttpClientUtil
 {
     internal static HttpClient Configure(string apiKey, DeepgramClientOptions options, IHttpClientFactory httpClientFactory)

@@ -1,5 +1,4 @@
-﻿using Deepgram.Models;
-
+﻿
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class RequestContentUtilTests
 {

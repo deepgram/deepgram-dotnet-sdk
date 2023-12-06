@@ -1,6 +1,5 @@
 ﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
-
 public class QueryParameterUtilTests
 {
 

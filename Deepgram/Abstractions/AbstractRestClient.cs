@@ -1,7 +1,4 @@
-﻿using Deepgram.Logger;
-
-
-namespace Deepgram.Abstractions
+﻿namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {

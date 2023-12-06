@@ -1,6 +1,4 @@
-﻿using System.Net.WebSockets;
-
-namespace Deepgram.Utilities;
+﻿namespace Deepgram.Utilities;
 public static class WssClientUtil
 {
     public static ClientWebSocket SetHeaders(string apiKey, DeepgramClientOptions options, ClientWebSocket clientWebSocket)

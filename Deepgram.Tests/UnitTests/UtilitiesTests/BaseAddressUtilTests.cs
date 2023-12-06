@@ -1,5 +1,4 @@
-﻿
-namespace Deepgram.Tests.UnitTests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class BaseAddressUtilTests
 {
     DeepgramClientOptions _deepgramClientOptions;

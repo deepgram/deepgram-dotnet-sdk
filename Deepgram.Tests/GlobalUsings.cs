@@ -5,6 +5,7 @@ global using AutoBogus;
 global using Bogus;
 global using Deepgram.Abstractions;
 global using Deepgram.Common;
+global using Deepgram.Models;
 global using Deepgram.Models.Options;
 global using Deepgram.Models.Responses;
 global using Deepgram.Models.Schemas;

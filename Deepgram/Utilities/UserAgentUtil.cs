@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Deepgram.Utilities;
+﻿namespace Deepgram.Utilities;
 
 internal static class UserAgentUtil
 {

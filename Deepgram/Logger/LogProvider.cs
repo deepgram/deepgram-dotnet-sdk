@@ -1,6 +1,4 @@
-﻿
-
-namespace Deepgram.Logger
+﻿namespace Deepgram.Logger
 {
     public class LogProvider
     {
