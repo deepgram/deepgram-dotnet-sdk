@@ -52,12 +52,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "GET", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "GET", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during GET request to {uriSegment}: Message{ex.Message}", ex);
+                throw;
             }
         }
 
@@ -81,12 +81,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "POST", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "POST", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during StringContent POST request to {uriSegment}: Message {ex.Message}", ex);
+                throw;
             }
         }
 
@@ -110,12 +110,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "POST", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during GET request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "POST", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during HTTPContent POST request to {uriSegment}", ex);
+                throw;
             }
 
         }
@@ -125,7 +125,7 @@ namespace Deepgram.Abstractions
         /// Delete Method for use with calls that do not expect a response
         /// </summary>
         /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-        public async Task Delete(string uriSegment)
+        public async Task DeleteAsync(string uriSegment)
         {
             try
             {
@@ -135,12 +135,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "DELETE", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during DELETE request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "DELETE", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during DELETE request to {uriSegment}: Message {ex.Message} ", ex);
+                throw;
             }
         }
 
@@ -163,12 +163,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "DELETE ASYNC", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during DELETE ASYNC request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "DELETE ASYNC", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during DELETE ASYNC request to {uriSegment}: Message {ex.Message} ", ex);
+                throw;
             }
         }
 
@@ -196,12 +196,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "PATCH", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during PATCH request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "PATCH", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during PATCH request to {uriSegment}: Message {ex.Message} ", ex);
+                throw;
             }
 
         }
@@ -225,12 +225,12 @@ namespace Deepgram.Abstractions
             catch (HttpRequestException hre)
             {
                 Log.HttpRequestException(_logger, "PUT", uriSegment, hre);
-                throw new HttpRequestException($"Error occurred during PUT request to {uriSegment}: Message{hre.Message}", hre);
+                throw;
             }
             catch (Exception ex)
             {
                 Log.Exception(_logger, "PUT", ex.GetType().Name, ex);
-                throw new Exception($"Error occurred during PUT request to {uriSegment}: Message {ex.Message} ", ex);
+                throw;
             }
         }
     }

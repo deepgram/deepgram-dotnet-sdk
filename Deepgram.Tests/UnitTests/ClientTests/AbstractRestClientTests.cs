@@ -122,27 +122,27 @@ public class AbstractRestfulClientTests
     }
 
     [Test]
-    public void Delete_Should_Return_Nothing_On_SuccessfulResponse()
+    public async Task Delete_Should_Return_Nothing_On_SuccessfulResponse()
     {
         // Arrange   
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse(), HttpStatusCode.OK);
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
-        client.Invoking(y => y.Delete($"{Constants.PROJECTS}/1"))
+        await client.Invoking(async y => await y.DeleteAsync($"{Constants.PROJECTS}/1"))
             .Should().NotThrowAsync();
     }
 
 
     [Test]
-    public void Delete_Should_ThrowsException_On_Response_Containing_Error()
+    public async Task Delete_Should_ThrowsException_On_Response_Containing_Error()
     {
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new MessageResponse(), HttpStatusCode.BadRequest);
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
-        _ = client.Invoking(y => y.Delete(Constants.PROJECTS))
+        await client.Invoking(async y => await y.DeleteAsync(Constants.PROJECTS))
              .Should().ThrowAsync<HttpRequestException>();
     }
 
