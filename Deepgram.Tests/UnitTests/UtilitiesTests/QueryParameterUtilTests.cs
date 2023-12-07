@@ -9,7 +9,7 @@ public class QueryParameterUtilTests
         //Arrange
         var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
         var expectedModel = HttpUtility.UrlEncode(prerecordedOptions.Model)!;
-        var expected = $"{nameof(prerecordedOptions.Model).ToLower()}={expectedModel}";
+        var expected = $"{nameof(prerecordedOptions.Model).ToLower()}={expectedModel.ToLower()}";
         //Act
         var result = QueryParameterUtil.GetParameters(prerecordedOptions);
 
