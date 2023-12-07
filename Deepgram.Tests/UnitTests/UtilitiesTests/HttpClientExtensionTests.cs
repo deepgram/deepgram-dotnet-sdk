@@ -7,15 +7,13 @@ public class HttpClientExtensionTests
 {
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
-    string _apiKey;
     DeepgramClientOptions _clientOptions;
 
     [SetUp]
     public void Setup()
     {
-        _apiKey = Guid.NewGuid().ToString();
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
-        _clientOptions = new DeepgramClientOptions("fakeKey");
+        _clientOptions = new DeepgramClientOptions(Guid.NewGuid().ToString());
     }
 
 
