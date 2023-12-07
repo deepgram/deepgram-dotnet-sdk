@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Tests.Fakes;
 
-public class ConcreteRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, httpClientFactory, deepgramClientOptions)
+public class ConcreteRestClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
+    : AbstractRestClient(deepgramClientOptions, httpClientFactory)
 {
 }

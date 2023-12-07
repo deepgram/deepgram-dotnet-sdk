@@ -28,16 +28,14 @@
         /// <summary>
         /// Constructor that take a IHttpClientFactory
         /// </summary>
-        /// <param name="apiKey">ApiKey used for Authentication Header and is required</param>
-        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
-        /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/> for HttpClient Configuration</param>
-        internal AbstractRestClient(string? apiKey, IHttpClientFactory httpClientFactory, DeepgramClientOptions? deepgramClientOptions = null)
+        /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
+        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/>Factory to use to create instances of HttpClient for making Rest calls</param>
+        internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
         {
             _clientName = this.GetType().Name;
-            var validatedKey = ApiKeyUtil.Validate(apiKey, _clientName);
-            _deepgramClientOptions = deepgramClientOptions is null ? new DeepgramClientOptions() : deepgramClientOptions;
+            _deepgramClientOptions = deepgramClientOptions;
             _deepgramClientOptions = BaseAddressUtil.GetHttps(_deepgramClientOptions);
-            _httpClient = HttpClientUtil.Configure(validatedKey, _deepgramClientOptions, httpClientFactory);
+            _httpClient = HttpClientUtil.Configure(_deepgramClientOptions.ApiKey, _deepgramClientOptions, httpClientFactory);
         }
 
         /// <summary>

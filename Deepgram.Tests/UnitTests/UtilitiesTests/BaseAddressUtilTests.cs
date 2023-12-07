@@ -7,7 +7,7 @@ public class BaseAddressUtilTests
     [SetUp]
     public void SetUp()
     {
-        _deepgramClientOptions = new DeepgramClientOptions();
+        _deepgramClientOptions = new DeepgramClientOptions("fakeApiKey");
         _customAddressPart = "acme.com";
     }
 
