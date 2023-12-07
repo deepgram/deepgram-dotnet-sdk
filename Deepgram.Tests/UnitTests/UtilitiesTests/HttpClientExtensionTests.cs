@@ -3,7 +3,7 @@ using Deepgram.Models;
 using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
-public class HttpClientUtilTests
+public class HttpClientExtensionTests
 {
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
