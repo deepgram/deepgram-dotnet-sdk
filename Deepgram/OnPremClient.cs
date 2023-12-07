@@ -1,4 +1,7 @@
-﻿namespace Deepgram;
+﻿using Deepgram.Records;
+using Deepgram.Records.OnPrem;
+
+namespace Deepgram;
 
 /// <summary>
 /// Constructor that take a IHttpClientFactory

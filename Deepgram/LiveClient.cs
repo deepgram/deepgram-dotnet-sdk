@@ -1,4 +1,6 @@
-﻿namespace Deepgram;
+﻿using Deepgram.Records.Live;
+
+namespace Deepgram;
 
 public class LiveClient
 {
@@ -216,7 +218,7 @@ public class LiveClient
         {
             if (Encoding.UTF8.GetString(ms.ToArray()) != null)
             {
-                var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(Encoding.UTF8.GetString(ms.ToArray()));
+                var transcript = RequestContentUtil.Deserialize<LiveTranscriptionEvent>(Encoding.UTF8.GetString(ms.ToArray()));
                 if (transcript != null)
                     TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
             }

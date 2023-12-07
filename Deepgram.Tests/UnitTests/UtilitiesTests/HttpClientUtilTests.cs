@@ -1,4 +1,7 @@
-﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
+﻿using Deepgram.Models;
+using Deepgram.Records;
+
+namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class HttpClientUtilTests
 {
     readonly string _customUrl = "acme.com";

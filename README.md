@@ -104,7 +104,7 @@ Add to you ServiceCollection class
 
 ### Default  
 for default implementation add
-```csharp
+```csharp 
     services.AddDeepgram():
 ```
 #### Notes Regarding CORS
@@ -121,13 +121,14 @@ When creating a restclient you need to pass in the apikey and a HttpClientFactor
 >If you  need to customize the url or set optional headers then you can when creating  a client 
 >passing in a instance of DeepgramClientOptions. 
 ```csharp
-var manageClient = new ManageClient(apiKey,httpClientFactory,deepgramClientOptions);
+var manageClient = new ManageClient(deepgramClientOptions,httpClientFactory);
 ```
 #### DeepgramClientOptions
-| Property         | Value                       |          Description             |
-| --------         | :-----                      | :---------------------------:    |
-| BaseAddress      | string?                     | url of server, include protocol  |
-| Headers          | Dictionary<string, string>? | any headers that you want to add |
+| Property         | Value                       |          Description              |
+| --------         | :-----                      | :---------------------------:     |
+| BaseAddress      | string?                     | url of server, include protocol   |
+| Headers          | Dictionary<string, string>? | any headers that you want to add  |
+| ApiKey           | string                      | REQUIRED apikey for authorization |
 
 >UserAgent & Authorization headers are added internally
 
@@ -162,7 +163,8 @@ var response = await client.TranscribeUrlAsync(
 >There are 2 overloads for local files you can pass either a byte[] or a stream 
 
 ```csharp
-var client = new PrerecordedClient(apiKey,HttpClientFactory);
+var deepgramClientOptions = new DeepgramClientOptions("apikey");
+var client = new PrerecordedClient(deepgramClientOptions,HttpClientFactory);
 var response = await client.TranscribeFileAsync(
     stream,
      new PrerecordedSchema()
@@ -217,9 +219,8 @@ using Deepgram.CustomEventArgs;
 using Deepgram.Models;
 using System.Net.WebSockets;
 
-
-
-var deepgramClient = new LiveClient(apiKey);
+var deepgramClientOptions = new DeepgramClientOptions("apikey");
+var deepgramClient = new LiveClient(deepgramClientOptions);
 
 using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {

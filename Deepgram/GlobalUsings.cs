@@ -3,8 +3,6 @@ global using Deepgram.Common;
 global using Deepgram.DeepgramEventArgs;
 global using Deepgram.Logger;
 global using Deepgram.Models;
-global using Deepgram.Models.Options;
-global using Deepgram.Models.Responses;
 global using Deepgram.Models.Schemas;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.DependencyInjection;

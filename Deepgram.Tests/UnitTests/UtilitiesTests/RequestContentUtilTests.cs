@@ -1,4 +1,6 @@
 ﻿
+using Deepgram.Records;
+
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class RequestContentUtilTests
 {

@@ -1,4 +1,8 @@
-﻿namespace Deepgram.Tests.UnitTests.ClientTests;
+﻿using Deepgram.Models;
+using Deepgram.Records;
+using Deepgram.Records.PreRecorded;
+
+namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class AbstractRestfulClientTests
 {

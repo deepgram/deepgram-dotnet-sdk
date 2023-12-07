@@ -1,8 +1,9 @@
 ﻿namespace Deepgram.Models;
+
 public class LiveMetadataEvent
 {
     [JsonPropertyName("type")]
-    public LiveMetaData? Type { get; set; }
+    public string Type { get; set; } = "Metadata";
 
     [JsonPropertyName("transaction_key")]
     public string? TransactionKey { get; set; }
@@ -17,7 +18,7 @@ public class LiveMetadataEvent
     public DateTime? Created { get; set; }
 
     [JsonPropertyName("duration")]
-    public double Duration { get; set; }
+    public double? Duration { get; set; }
 
     [JsonPropertyName("channels")]
     public int? Channels { get; set; }

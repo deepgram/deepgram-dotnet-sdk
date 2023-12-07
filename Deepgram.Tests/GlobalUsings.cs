@@ -2,9 +2,6 @@
 global using Bogus;
 global using Deepgram.Abstractions;
 global using Deepgram.Common;
-global using Deepgram.Models;
-global using Deepgram.Models.Options;
-global using Deepgram.Models.Responses;
 global using Deepgram.Models.Schemas;
 global using Deepgram.Tests.Fakes;
 global using Deepgram.Utilities;

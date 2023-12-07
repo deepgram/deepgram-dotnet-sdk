@@ -1,4 +1,6 @@
-﻿namespace Deepgram;
+﻿using Deepgram.Records;
+
+namespace Deepgram;
 
 /// <summary>
 ///  Client containing methods for interacting with API's to manage project(s)
