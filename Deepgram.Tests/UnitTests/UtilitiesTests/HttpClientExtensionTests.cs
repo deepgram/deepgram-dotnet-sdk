@@ -1,20 +1,19 @@
-﻿using Deepgram.Models;
+﻿using Deepgram.Extensions;
+using Deepgram.Models;
 using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
-public class HttpClientUtilTests
+public class HttpClientExtensionTests
 {
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
-    string _apiKey;
     DeepgramClientOptions _clientOptions;
 
     [SetUp]
     public void Setup()
     {
-        _apiKey = Guid.NewGuid().ToString();
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
-        _clientOptions = new DeepgramClientOptions("fakeKey");
+        _clientOptions = new DeepgramClientOptions(Guid.NewGuid().ToString());
     }
 
 
@@ -25,8 +24,8 @@ public class HttpClientUtilTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
-        //Act 
-        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
+        //Act
+        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -45,8 +44,8 @@ public class HttpClientUtilTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
-        //Act 
-        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
+        //Act
+        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -64,8 +63,8 @@ public class HttpClientUtilTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
 
-        //Act 
-        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
+        //Act
+        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -86,8 +85,8 @@ public class HttpClientUtilTests
         var expectedBaseAddress = $"https://{_customUrl}/";
         _clientOptions.BaseAddress = expectedBaseAddress;
 
-        //Act 
-        var SUT = HttpClientUtil.Configure(_apiKey, _clientOptions, _httpClientFactory);
+        //Act
+        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
 
         //Assert 
         using (new AssertionScope())

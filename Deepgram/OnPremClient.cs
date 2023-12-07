@@ -4,12 +4,12 @@ using Deepgram.Records.OnPrem;
 namespace Deepgram;
 
 /// <summary>
-/// Constructor that take a IHttpClientFactory
+/// Constructor for the client that communicates with the on premise Deepgram Server
 /// </summary>
-/// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
+/// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class OnPremClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
-    : AbstractRestClient(deepgramClientOptions, httpClientFactory)
+public class OnPremClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
+    : AbstractRestClient(deepgramClientOptions, httpClient)
 {
     readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
     /// <summary>

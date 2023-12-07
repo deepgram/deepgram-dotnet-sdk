@@ -5,10 +5,10 @@ namespace Deepgram;
 /// <summary>
 ///  Client containing methods for interacting with API's to manage project(s)
 /// </summary>
-/// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
+/// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
-    : AbstractRestClient(deepgramClientOptions, httpClientFactory)
+public class ManageClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
+    : AbstractRestClient(deepgramClientOptions, httpClient)
 {
     readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
 
@@ -45,8 +45,8 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClie
     /// </summary>
     /// <param name="projectId">Id of project</param>
     // No response expected
-    public void DeleteProject(string projectId) =>
-        _ = Delete($"{_urlPrefix}/{projectId}");
+    public async Task DeleteProject(string projectId) =>
+        await DeleteAsync($"{_urlPrefix}/{projectId}");
 
     /// <summary>
     /// leave project associated with the project Id
@@ -54,7 +54,7 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClie
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="MessageResponse"/></returns>
     public async Task<MessageResponse> LeaveProjectAsync(string projectId) =>
-        await DeleteAsync<MessageResponse>($"{Constants.PROJECTS}/{projectId}/leave");
+        await DeleteAsync<MessageResponse>($"{_urlPrefix}/{projectId}/leave");
 
     #endregion
 
@@ -102,8 +102,8 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClie
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
-    public void DeleteProjectKey(string projectId, string keyId) =>
-        _ = Delete($"{_urlPrefix}/{projectId}/keys/{keyId}");
+    public async Task DeleteProjectKey(string projectId, string keyId) =>
+        await DeleteAsync($"{_urlPrefix}/{projectId}/keys/{keyId}");
 
     #endregion
 
@@ -121,8 +121,8 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClie
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <param name="email">email of the invite to be removed</param>
-    public void DeleteProjectInvite(string projectId, string email) =>
-        _ = Delete($"{_urlPrefix}/{projectId}/{Constants.INVITES}/{email}");
+    public async Task DeleteProjectInvite(string projectId, string email) =>
+        await DeleteAsync($"{_urlPrefix}/{projectId}/{Constants.INVITES}/{email}");
 
     /// <summary>
     /// Send a invite to the associated project
@@ -171,8 +171,8 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, IHttpClie
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>   
-    public void RemoveProjectMember(string projectId, string memberId) =>
-        _ = Delete($"{_urlPrefix}/{projectId}/{Constants.MEMBERS}/{memberId}");
+    public async Task RemoveProjectMember(string projectId, string memberId) =>
+        await DeleteAsync($"{_urlPrefix}/{projectId}/{Constants.MEMBERS}/{memberId}");
     #endregion
 
     #region Usage

@@ -4,12 +4,12 @@ using Deepgram.Records.PreRecorded;
 namespace Deepgram;
 
 /// <summary>
-/// Constructor that take a IHttpClientFactory
+/// Constructor to create a client for the Deepgram Prerecorded API
 /// </summary>
-/// <param name="httpClientFactory"><see cref="IHttpClientFactory"/> for creating instances of HttpClient for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
-    : AbstractRestClient(deepgramClientOptions, httpClientFactory)
+/// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
+public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
+    : AbstractRestClient(deepgramClientOptions, httpClient)
 {
     readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
     #region NoneCallBacks

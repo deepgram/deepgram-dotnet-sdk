@@ -246,5 +246,4 @@ orleans.codegen.cs
 web.config
 app.config
 settings.json
-appsettings.json
 project.lock.json
