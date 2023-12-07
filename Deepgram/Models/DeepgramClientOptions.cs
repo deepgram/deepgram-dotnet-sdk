@@ -1,4 +1,8 @@
 ﻿namespace Deepgram.Models;
+
+/// <summary>
+/// Configuration for the Deepgram client
+/// </summary>
 public class DeepgramClientOptions
 {
     /// <summary>
@@ -12,12 +16,19 @@ public class DeepgramClientOptions
     /// </summary>
     public string BaseAddress { get; set; } = Constants.DEFAULT_URI;
 
+    /// <summary>
+    /// Sets the timeout for calls to Deepgram.
+    /// If not set, the default is 120 seconds.
+    /// Not used if the HttpClient is provided.
+    /// </summary>
+    public TimeSpan HttpTimeout { get; set; } = TimeSpan.FromSeconds(120);
+
     internal string ApiKey { get; }
 
     /// <summary>
     /// Creates a new Deepgram client options
     /// </summary>
-    /// <param name="apiKey">The key to authenticate with deepgram</param>
+    /// <param name="apiKey">The key to authenticate with Deepgram</param>
     public DeepgramClientOptions(string apiKey)
     {
         if( string.IsNullOrWhiteSpace(apiKey))

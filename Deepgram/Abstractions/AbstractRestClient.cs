@@ -23,11 +23,6 @@ namespace Deepgram.Abstractions
         internal ILogger _logger => LogProvider.GetLogger(_clientName);
 
         /// <summary>
-        /// Timeout for HttpClient
-        /// </summary>
-        internal TimeSpan? _timeout;
-
-        /// <summary>
         /// Constructor that take the options and a httpClient
         /// </summary>
         /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
@@ -49,7 +44,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.GetAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
                 var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -78,7 +72,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
                 var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -108,7 +101,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.PostAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
                 var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -137,7 +129,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
             }
@@ -163,7 +154,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.DeleteAsync(uriSegment);
                 response.EnsureSuccessStatusCode();
                 var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -192,8 +182,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
-
 #if NETSTANDARD2_0
                 var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
                 var response = await _httpClient.SendAsync(request);
@@ -228,7 +216,6 @@ namespace Deepgram.Abstractions
         {
             try
             {
-                CheckForTimeout();
                 var response = await _httpClient.PutAsync(uriSegment, content);
                 response.EnsureSuccessStatusCode();
                 var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -246,21 +233,5 @@ namespace Deepgram.Abstractions
                 throw new Exception($"Error occurred during PUT request to {uriSegment}: Message {ex.Message} ", ex);
             }
         }
-
-
-
-        internal void CheckForTimeout()
-        {
-            if (_timeout != null)
-                _httpClient.Timeout = (TimeSpan)_timeout;
-        }
-
-        /// <summary>
-        /// Set the time out on the HttpClient
-        /// </summary>
-        /// <param name="timeSpan"></param>
-        public void SetTimeout(TimeSpan timeSpan)
-            => _timeout = timeSpan;
-
     }
 }

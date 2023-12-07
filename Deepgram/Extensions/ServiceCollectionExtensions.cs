@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDeepgram(this IServiceCollection services, DeepgramClientOptions options)
     {
         // Register the http client
-        services.AddHttpClient(Constants.HTTPCLIENT_NAME)
+        services.AddHttpClient(Constants.HTTPCLIENT_NAME, (hc) => hc.Timeout = options.HttpTimeout)
     .AddTransientHttpErrorPolicy(policyBuilder =>
     policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
@@ -44,9 +44,7 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddDeepgram(this IServiceCollection services, string apiKey)
     {
-        var deepgramOptions = new DeepgramClientOptions(apiKey)
-        { 
-        };
+        var deepgramOptions = new DeepgramClientOptions(apiKey);
         return services.AddDeepgram(deepgramOptions);
     }
 }
