@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Abstractions
+﻿using Deepgram.Extensions;
+
+namespace Deepgram.Abstractions
 {
     public abstract class AbstractRestClient
     {
@@ -26,16 +28,15 @@
         internal TimeSpan? _timeout;
 
         /// <summary>
-        /// Constructor that take a IHttpClientFactory
+        /// Constructor that take the options and a httpClient
         /// </summary>
         /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
-        /// <param name="httpClientFactory"><see cref="IHttpClientFactory"/>Factory to use to create instances of HttpClient for making Rest calls</param>
-        internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, IHttpClientFactory httpClientFactory)
+        /// <param name="httpClient"><see cref="HttpClient"/>HttpClient to use for all calls from the implementing class</param>
+        internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
         {
             _clientName = this.GetType().Name;
             _deepgramClientOptions = deepgramClientOptions;
-            _deepgramClientOptions = BaseAddressUtil.GetHttps(_deepgramClientOptions);
-            _httpClient = HttpClientUtil.Configure(_deepgramClientOptions.ApiKey, _deepgramClientOptions, httpClientFactory);
+            _httpClient = httpClient.ConfigureDeepgram(_deepgramClientOptions);
         }
 
         /// <summary>

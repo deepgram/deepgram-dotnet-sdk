@@ -1,4 +1,5 @@
-﻿using Deepgram.Records.Live;
+﻿using Deepgram.Extensions;
+using Deepgram.Records.Live;
 
 namespace Deepgram;
 
@@ -39,9 +40,8 @@ public class LiveClient
     public LiveClient(DeepgramClientOptions deepgramClientOptions)
     {
         _tokenSource = new CancellationTokenSource();
-
         _clientType = this.GetType().Name;
-        _deepgramClientOptions = BaseAddressUtil.GetWss(deepgramClientOptions);
+        _deepgramClientOptions = deepgramClientOptions;
     }
 
 
@@ -54,9 +54,8 @@ public class LiveClient
     {
         var cancelToken = cancellationToken ?? _tokenSource.Token;
         _clientWebSocket?.Dispose();
-        _clientWebSocket = new ClientWebSocket();
-        _clientWebSocket = WssClientUtil.SetHeaders(_deepgramClientOptions.ApiKey, _deepgramClientOptions, _clientWebSocket);
-
+        _clientWebSocket = new ClientWebSocket()
+            .SetHeaders(_deepgramClientOptions);
 
         try
         {
@@ -294,8 +293,9 @@ public class LiveClient
 
     internal Uri GetUri(LiveSchema queryParameters)
     {
+        var baseUrl = GetBaseUrl(_deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
-        return new Uri($"wss://{_deepgramClientOptions.BaseAddress}/{Constants.API_VERSION}/{Constants.LISTEN}?{query}");
+        return new Uri(new Uri(baseUrl), new Uri($"{Constants.API_VERSION}/{Constants.LISTEN}?{query}"));
     }
 
     public void KeepAlive()
@@ -305,6 +305,22 @@ public class LiveClient
 
         EnqueueForSending(new MessageToSend(keepAliveBytes, WebSocketMessageType.Text));
     }
+
+    internal static string GetBaseUrl(DeepgramClientOptions deepgramClientOptions)
+    {
+        var baseAddress = deepgramClientOptions.BaseAddress;
+        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
+        Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
+        if (regex.IsMatch(baseAddress))
+            return regex.Replace(baseAddress, "wss://");
+        else
+            //if no protocol in the address then https:// is added
+            return $"wss://{baseAddress}";
+    }
+
+    #endregion
+
+    #region Dispose
 
     public void Dispose()
     {

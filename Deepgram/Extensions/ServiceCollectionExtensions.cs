@@ -8,18 +8,31 @@ public static class ServiceCollectionExtensions
     /// <param name="options">The options to use with the registered deepgram services</param>
     public static IServiceCollection AddDeepgram(this IServiceCollection services, DeepgramClientOptions options)
     {
-        // Register options
-        services.AddSingleton(options);
-
-        services.AddTransient<LiveClient>();
-        services.AddTransient<PrerecordedClient>();
-        services.AddTransient<LiveClient>();
-
-        services.AddTransient<ManageClient>();
-
+        // Register the http client
         services.AddHttpClient(Constants.HTTPCLIENT_NAME)
+    .AddTransientHttpErrorPolicy(policyBuilder =>
+    policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+
+        // Should we use this?
+        services.AddHttpClient(Constants.WSSCLIENT_NAME)
             .AddTransientHttpErrorPolicy(policyBuilder =>
             policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+
+        services.AddTransient(sp =>
+        {
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+            return new PrerecordedClient(options, httpClient);
+        });
+
+        services.AddTransient(sp =>
+        {
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+            return new ManageClient(options, httpClient);
+        });
+
+        // TODO: Add the onprem client
+
+        services.AddTransient(_ => new LiveClient(options));
 
         return services;
     }
