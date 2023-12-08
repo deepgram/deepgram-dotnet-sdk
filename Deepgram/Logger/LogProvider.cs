@@ -1,9 +1,9 @@
 ﻿namespace Deepgram.Logger
 {
-    public class LogProvider
+    public sealed class LogProvider
     {
-        private static readonly ConcurrentDictionary<string, ILogger> _loggers = new();
-        private static ILoggerFactory _loggerFactory = new LoggerFactory();
+        internal static readonly ConcurrentDictionary<string, ILogger> _loggers = new();
+        internal static ILoggerFactory? _loggerFactory = NullLoggerFactory.Instance;
 
         public static void SetLogFactory(ILoggerFactory factory)
         {

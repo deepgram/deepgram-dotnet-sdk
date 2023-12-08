@@ -1,6 +1,4 @@
-﻿using Deepgram.Records.PreRecorded;
-
-namespace Deepgram.Records;
+﻿namespace Deepgram.Records.PreRecorded;
 
 public record Utterance
 {

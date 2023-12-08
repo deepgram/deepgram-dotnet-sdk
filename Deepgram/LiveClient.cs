@@ -3,7 +3,7 @@ using Deepgram.Records.Live;
 
 namespace Deepgram;
 
-public class LiveClient
+public sealed class LiveClient
 {
     #region Fields
     private readonly string _clientType;
@@ -88,7 +88,7 @@ public class LiveClient
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
-    public virtual void SendData(byte[] data) =>
+    public void SendData(byte[] data) =>
         EnqueueForSending(new MessageToSend(data, WebSocketMessageType.Binary));
 
     internal void EnqueueForSending(MessageToSend message)

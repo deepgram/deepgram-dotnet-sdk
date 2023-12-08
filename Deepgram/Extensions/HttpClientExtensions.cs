@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace Deepgram.Extensions;
+﻿namespace Deepgram.Extensions;
 
 internal static class HttpClientExtensions
 {
