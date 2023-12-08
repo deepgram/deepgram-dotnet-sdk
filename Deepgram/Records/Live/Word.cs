@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Records.Live;
 
-public class Word
+public record Word
 {
     [JsonPropertyName("word")]
     public string Name { get; set; }

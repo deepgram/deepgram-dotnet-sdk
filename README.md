@@ -86,7 +86,7 @@ To install the C# SDK using NuGet:
 
 Run the following command from your terminal in your projects directory:
 
-```bash
+```csharp
 dotnet add package Deepgram
 ```
 
@@ -96,6 +96,7 @@ Right click on project and select manage nuget packages
 
 # Targeted Frameworks
 
+- 8.0.x
 - 7.0.x
 - 6.0.x
 
@@ -105,8 +106,11 @@ Add to you ServiceCollection class
 ### Default  
 for default implementation add
 ```csharp 
-    services.AddDeepgram():
+    services.AddDeepgram(string apikey):
 ```
+
+### With 
+
 #### Notes Regarding CORS
     deepgram api does not support COR requests
 

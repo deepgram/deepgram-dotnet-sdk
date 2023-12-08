@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Records.PreRecorded;
 
-public class Search
+public record Search
 {
     [JsonPropertyName("query")]
     public string Query { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Deepgram;
+﻿namespace Deepgram.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -30,7 +30,12 @@ public static class ServiceCollectionExtensions
             return new ManageClient(options, httpClient);
         });
 
-        // TODO: Add the onprem client
+        services.AddTransient(sp =>
+        {
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+            return new OnPremClient(options, httpClient);
+        });
+
 
         services.AddTransient(_ => new LiveClient(options));
 

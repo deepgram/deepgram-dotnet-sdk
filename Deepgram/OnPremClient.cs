@@ -11,7 +11,7 @@ namespace Deepgram;
 public class OnPremClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
-    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
+    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.ONPREM}";
     /// <summary>
     /// get a list of credentials associated with project
     /// </summary>
