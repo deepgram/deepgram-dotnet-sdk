@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Models.Schemas;
+﻿namespace Deepgram.Models;
 public class CreateProjectKeySchema
 {
     /// <summary>
@@ -36,6 +36,6 @@ public class CreateProjectKeySchema
     /// Any other properties to associate with key creation
     /// </summary>
     // why allow for unknown values?? this is here as its in the other sdk
-    public Dictionary<string, object> AdditionalProperties { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> AdditionalProperties { get; set; } = [];
 
 }

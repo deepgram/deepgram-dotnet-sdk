@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Records.OnPrem;
 
-public class DistributionCredentials
+public record DistributionCredentials
 {
     [JsonPropertyName("distribution_credentials_id")]
     public string? DistributionCredentialsId { get; set; }

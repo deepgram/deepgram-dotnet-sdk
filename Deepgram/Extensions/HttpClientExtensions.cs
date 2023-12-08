@@ -25,6 +25,7 @@ internal static class HttpClientExtensions
 
     internal static void SetBaseUrl(HttpClient client, DeepgramClientOptions deepgramClientOptions)
     {
+
         var baseAddress = deepgramClientOptions.BaseAddress;
         //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
         Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
