@@ -2,24 +2,14 @@
 
 internal static class QueryParameterUtil
 {
-    public static string GetParameters<T>(T parameters)
+    internal static string GetParameters<T>(T parameters)
     {
-        try
-        {
-            if (parameters is null) return string.Empty;
+        if (parameters is null) return string.Empty;
 
-            var propertyInfoList = parameters.GetType()
-                .GetProperties()
-                .Where(v => v.GetValue(parameters) is not null);
-            return UrlEncode(parameters, propertyInfoList);
-
-        }
-        catch (Exception ex)
-        {
-            var type = typeof(T).Name;
-            Log.ParameterStringError(LogProvider.GetLogger(nameof(QueryParameterUtil)), type, ex);
-            throw new Exception($"Error creating a query string from object of type {type} ", ex);
-        }
+        var propertyInfoList = parameters.GetType()
+            .GetProperties()
+            .Where(v => v.GetValue(parameters) is not null);
+        return UrlEncode(parameters, propertyInfoList);
     }
 
     private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfoList)

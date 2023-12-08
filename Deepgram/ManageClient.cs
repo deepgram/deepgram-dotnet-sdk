@@ -7,7 +7,7 @@ namespace Deepgram;
 /// </summary>
 /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class ManageClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
+public sealed class ManageClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
     readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";

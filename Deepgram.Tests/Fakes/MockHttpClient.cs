@@ -11,10 +11,9 @@ public static class MockHttpClient
         };
     }
 
-    public static HttpClient CreateHttpClientWithException<T>(
-       T result, HttpStatusCode code = HttpStatusCode.OK)
+    public static HttpClient CreateHttpClientWithException(Exception Exception)
     {
-        return new HttpClient(new MockHttpMessageHandler<T>(result, code))
+        return new HttpClient(new MockHttpMessageHandlerException(Exception))
         {
             BaseAddress = new Uri($"https://{Constants.DEFAULT_URI}")
         };

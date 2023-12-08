@@ -1,10 +1,19 @@
-﻿using Deepgram.Models;
-
-namespace Deepgram.Tests.UnitTests.UtilitiesTests;
+﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
 public class QueryParameterUtilTests
 {
+    [Test]
+    public void GetParameters_Should_Return_EmptyString_When_Parameters_Is_Null()
+    {
+        //Arrange
+        PrerecordedSchema? para = null;
+        //Act
+        var result = QueryParameterUtil.GetParameters(para);
 
+        //Assert
+        result.Should().BeEmpty();
+
+    }
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
     {

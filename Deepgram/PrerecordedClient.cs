@@ -8,7 +8,7 @@ namespace Deepgram;
 /// </summary>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
-public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
+public sealed class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
     readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
