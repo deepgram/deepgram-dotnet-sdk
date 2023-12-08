@@ -2,7 +2,7 @@
 
 namespace Deepgram.Abstractions;
 
-public abstract class AbstractRestClient
+public abstract class AbstractRestClient : IAbstractRestClient
 {
     /// <summary>
     ///  HttpClient created by the factory
@@ -18,7 +18,7 @@ public abstract class AbstractRestClient
     /// </summary>
     internal string _clientName;
     /// <summary>
-    /// get the logger of catergory type of _clientName
+    /// get the logger of category type of _clientName
     /// </summary>
     internal ILogger _logger => LogProvider.GetLogger(_clientName);
 
