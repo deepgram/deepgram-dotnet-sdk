@@ -2,5 +2,5 @@
 public record ListOnPremCredentialsResponse
 {
     [JsonPropertyName("distribution_credentials")]
-    public IReadOnlyList<OnPremCredentialResponse> DistributionCredentials { get; set; }
+    public IReadOnlyList<OnPremCredentialsResponse> DistributionCredentials { get; set; }
 }

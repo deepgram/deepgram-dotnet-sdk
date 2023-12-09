@@ -27,3 +27,6 @@ var response = await deepgramClient.TranscribeUrlAsync(
 
 Console.WriteLine(JsonConvert.SerializeObject(response));
 Console.ReadKey();
+
+
+
