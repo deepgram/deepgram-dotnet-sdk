@@ -3,7 +3,7 @@ using Deepgram.Records.Live;
 
 namespace Deepgram;
 
-public sealed class LiveClient
+public class LiveClient
 {
     #region Fields
     private readonly string _clientType;

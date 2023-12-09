@@ -1,6 +1,7 @@
 ﻿namespace Deepgram.Records.OnPrem;
 
-public record OnPremCredentialResponse
+public record OnPremCredentialsResponse
+
 {
     [JsonPropertyName("member")]
     public Member? Member { get; set; }

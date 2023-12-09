@@ -6,7 +6,7 @@ namespace Deepgram.Tests.UnitTests.LoggerProviderTests;
 public class LogProviderTest
 {
     [Test]
-    public async Task SetLogFactory_Should_Set_LoggerFactory()
+    public void SetLogFactory_Should_Set_LoggerFactory()
     {
         //Arrange 
         var loggerFactory = Substitute.For<ILoggerFactory>();

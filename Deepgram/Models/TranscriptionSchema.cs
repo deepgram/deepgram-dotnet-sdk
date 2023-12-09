@@ -97,7 +97,7 @@ public class TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/callback">
     /// </summary>
     [JsonPropertyName("callback")]
-    public string? Callback { get; set; }
+    public string? CallBack { get; set; }
 
     /// <summary>
     /// Keywords can boost or suppress specialized terminology.

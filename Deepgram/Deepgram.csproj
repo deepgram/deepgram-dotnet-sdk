@@ -65,6 +65,7 @@
     <PackageReference Include="System.Text.Json" Version="8.*" />
     <PackageReference Include="System.Threading.Channels" Version="8.*" />
   </ItemGroup>
+ 
 
   <ItemGroup>
     <None Include="..\extras\dg_logo.png">
@@ -77,9 +78,7 @@
     </None>   
   </ItemGroup>
   
-  <ItemGroup>
-    <EditorConfigFiles Remove="D:\Sources\deepgram\deepgram-dotnet-sdk\Deepgram\.editorconfig" />
-  </ItemGroup>
+ 
   <ItemGroup>
     <InternalsVisibleTo Include="Deepgram.Tests" />    
   </ItemGroup>

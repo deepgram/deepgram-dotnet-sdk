@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Utilities;
+﻿using System.Collections;
+
+namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
 {
@@ -21,16 +23,18 @@ internal static class QueryParameterUtil
             var pValue = pInfo.GetValue(parameters);
 
             //need to check for the CallBack property so the value  is not changed to lowercase 
-            if (typeof(T) == typeof(PrerecordedSchema) && string.Compare(name, nameof(PrerecordedSchema.Callback).ToLower(), StringComparison.Ordinal) == 0)
+            if (typeof(T) == typeof(PrerecordedSchema) && string.Compare(name, nameof(PrerecordedSchema.CallBack).ToLower(), StringComparison.Ordinal) == 0)
             {
                 sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                 continue;
             }
 
+
+
             switch (pValue)
             {
-                case Array array:
-                    foreach (var value in array)
+                case IList list:
+                    foreach (var value in list)
                         sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
                     break;
                 case DateTime time:
@@ -41,6 +45,6 @@ internal static class QueryParameterUtil
                     break;
             }
         }
-        return sb.ToString();
+        return sb.ToString().TrimEnd('&');
     }
 }

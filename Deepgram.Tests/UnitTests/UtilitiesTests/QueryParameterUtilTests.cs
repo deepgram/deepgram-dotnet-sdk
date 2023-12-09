@@ -34,8 +34,8 @@ public class QueryParameterUtilTests
     {
         //Arrange
         var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
-        prerecordedOptions.Callback = "https://Signed23.com";
-        var expected = $"{nameof(prerecordedOptions.Callback).ToLower()}={HttpUtility.UrlEncode("https://Signed23.com")}";
+        prerecordedOptions.CallBack = "https://Signed23.com";
+        var expected = $"{nameof(prerecordedOptions.CallBack).ToLower()}={HttpUtility.UrlEncode("https://Signed23.com")}";
         //Act
         var result = QueryParameterUtil.GetParameters(prerecordedOptions);
 
@@ -135,7 +135,7 @@ public class QueryParameterUtilTests
         var expected = HttpUtility.UrlEncode(signedCallBackUrl);
 
         //Act
-        var result = QueryParameterUtil.GetParameters(new PrerecordedSchema() { Callback = signedCallBackUrl, Diarize = true });
+        var result = QueryParameterUtil.GetParameters(new PrerecordedSchema() { CallBack = signedCallBackUrl, Diarize = true });
 
         //Assert
         result.Should().NotBeNull();

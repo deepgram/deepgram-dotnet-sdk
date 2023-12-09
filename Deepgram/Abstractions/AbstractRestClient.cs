@@ -2,7 +2,7 @@
 
 namespace Deepgram.Abstractions;
 
-public abstract class AbstractRestClient : IAbstractRestClient
+public abstract class AbstractRestClient
 {
     /// <summary>
     ///  HttpClient created by the factory
@@ -40,7 +40,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <typeparam name="T">Type of class of response expected</typeparam>
     /// <param name="uriSegment">request uri Endpoint</param>
     /// <returns>Instance of T</returns>
-    public async Task<T> GetAsync<T>(string uriSegment)
+    public virtual async Task<T> GetAsync<T>(string uriSegment)
     {
         try
         {
@@ -68,7 +68,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param>   
     /// <param name="content">StringContent as content for HttpRequestMessage</param>   
     /// <returns>Instance of T</returns>
-    public async Task<T> PostAsync<T>(string uriSegment, StringContent content)
+    public virtual async Task<T> PostAsync<T>(string uriSegment, StringContent content)
     {
         try
         {
@@ -97,7 +97,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
-    public async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
+    public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
     {
         try
         {
@@ -125,7 +125,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// Delete Method for use with calls that do not expect a response
     /// </summary>
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-    public async Task DeleteAsync(string uriSegment)
+    public virtual async Task DeleteAsync(string uriSegment)
     {
         try
         {
@@ -150,7 +150,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <typeparam name="T">Class Type of expected response</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param>      
     /// <returns>Instance  of T or throws Exception</returns>
-    public async Task<T> DeleteAsync<T>(string uriSegment)
+    public virtual async Task<T> DeleteAsync<T>(string uriSegment)
     {
         try
         {
@@ -178,13 +178,13 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param>  
     /// <returns>Instance of T</returns>
-    public async Task<T> PatchAsync<T>(string uriSegment, StringContent content)
+    public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content)
     {
         try
         {
 #if NETSTANDARD2_0
-                var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
-                var response = await _httpClient.SendAsync(request);
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
+            var response = await _httpClient.SendAsync(request);
 #else
             var response = await _httpClient.PatchAsync(uriSegment, content);
 #endif
@@ -212,7 +212,7 @@ public abstract class AbstractRestClient : IAbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api</param>   
     /// <returns>Instance of T</returns>
-    public async Task<T> PutAsync<T>(string uriSegment, StringContent content)
+    public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content)
     {
         try
         {
