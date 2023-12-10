@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Extensions;
+﻿using Deepgram.Extensions;
 using Deepgram.Records.Live;
 
 namespace Deepgram;
@@ -45,6 +44,7 @@ public class LiveClient
         _deepgramClientOptions = deepgramClientOptions;
     }
 
+    //TODO when a response is recieved check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
 
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
@@ -218,6 +218,7 @@ public class LiveClient
         {
             if (Encoding.UTF8.GetString(ms.ToArray()) != null)
             {
+
                 var transcript = RequestContentUtil.Deserialize<LiveTranscriptionEvent>(Encoding.UTF8.GetString(ms.ToArray()));
                 if (transcript != null)
                     TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
@@ -297,12 +298,12 @@ public class LiveClient
         var baseUrl = GetBaseUrl(_deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
 
-/* Unmerged change from project 'Deepgram (net6.0)'
-Before:
-        return new Uri(new Uri(baseUrl), new Uri($"{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
-After:
-        return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
-*/
+        /* Unmerged change from project 'Deepgram (net6.0)'
+        Before:
+                return new Uri(new Uri(baseUrl), new Uri($"{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+        After:
+                return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+        */
         return new Uri(new Uri(baseUrl), new Uri($"{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
     }
 

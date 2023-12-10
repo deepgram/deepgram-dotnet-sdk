@@ -1,6 +1,4 @@
-﻿using Deepgram.Enums;
-
-namespace Deepgram.Models;
+﻿namespace Deepgram.Models;
 public class GetProjectsUsageSummarySchema
 {
     /// <summary>
@@ -9,74 +7,119 @@ public class GetProjectsUsageSummarySchema
     [JsonPropertyName("accessor")]
     public string? Accessor { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the alternatives feature.
+    /// </summary>
     [JsonPropertyName("alternatives")]
     public bool? Alternatives { get; set; }
+
     /// <summary>
-    /// Start date to limit range of requests to summarize
+    /// Start date of the requested date range.
     /// </summary>
     [JsonPropertyName("start")]
     public DateTime? Start { get; set; }
 
     /// <summary>
-    /// End date to limit range of requests to summarize
+    /// End date of the requested date range.
     /// </summary>
     [JsonPropertyName("end")]
-    public DateTime End { get; set; }
+    public DateTime? End { get; set; }
 
     /// <summary>
-    /// tags associated with request
+    /// Limits results to requests associated with the specified tag(s). 
     /// </summary>
     [JsonPropertyName("tag")]
-    public string? Tag { get; set; }
-
+    public List<string>? Tag { get; set; }
 
     /// <summary>
     /// Permitted values "sync" | "async" | "streaming"
     /// <see cref="RequestMethod">
     /// </summary>
     [JsonPropertyName("method")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public RequestMethod? Method { get; set; }
 
+    /// <summary>
+    /// Limits results to requests run with the specified model applied.
+    /// </summary>
     [JsonPropertyName("model")]
-    public string? Model { get; set; }
+    public List<string> Model { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the multichannel feature.
+    /// </summary>
     [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
-
+    /// <summary>
+    /// Limits results to requests that include the interim_results feature.
+    /// </summary>
     [JsonPropertyName("interim_results")]
     public bool? InterimResults { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the punctuate feature.
+    /// </summary>
     [JsonPropertyName("punctuate")]
     public bool? Punctuate { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the ner feature.
+    /// </summary>
     [JsonPropertyName("ner")]
     public bool? Ner { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the utterances feature.
+    /// </summary>
     [JsonPropertyName("utterances")]
     public bool? Utterances { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the replace feature.
+    /// </summary>
     [JsonPropertyName("replace")]
     public bool? Replace { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the profanity_filter feature.
+    /// </summary>
     [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the keywords feature.
+    /// </summary>
     [JsonPropertyName("keywords")]
     public bool? Keywords { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the topic detection feature.
+    /// </summary>
     [JsonPropertyName("detect_topics")]
     public bool? DetectTopics { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the diarize feature.
+    /// </summary>
     [JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the search feature.
+    /// </summary>
     [JsonPropertyName("search")]
     public bool? Search { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the redact feature.
+    /// </summary>
     [JsonPropertyName("redact")]
     public bool? Redact { get; set; }
 
+    /// <summary>
+    /// Limits results to requests that include the numerals feature.
+    /// </summary>
     [JsonPropertyName("numerals")]
     public bool? Numerals { get; set; }
 

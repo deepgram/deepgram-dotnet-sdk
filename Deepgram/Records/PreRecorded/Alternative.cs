@@ -2,27 +2,55 @@
 
 public record Alternative
 {
+    /// <summary>
+    /// Single-string transcript containing what the model hears in this channel of audio.
+    /// </summary>
     [JsonPropertyName("transcript")]
-    public string Transcript { get; set; }
+    public string Transcript { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Value between 0 and 1 indicating the model's relative confidence in this transcript.
+    /// </summary>
     [JsonPropertyName("confidence")]
-    public double Confidence { get; set; }
+    public decimal Confidence { get; set; }
 
+    /// <summary>
+    /// ReadOnly List of <see cref="Word"/> objects.
+    /// </summary>
     [JsonPropertyName("words")]
-    public IReadOnlyList<WordBase> Words { get; set; }
+    public IReadOnlyList<Word> Words { get; set; }
 
+    /// <summary>
+    /// ReadOnly List of <see cref="Summary "/> objects.
+    /// </summary>
+    /// <remark>Only used when the summarize feature is enabled on the request</remark>
     [JsonPropertyName("summaries")]
     public IReadOnlyList<Summary> Summaries { get; set; }
 
+    /// <summary>
+    /// ReadOnly List of <see cref="ParagraphGroup"/> containing  separated transcript and <see cref="Paragraph"/> objects.
+    /// </summary>
+    /// <remark>Only used when the paragraph feature is enabled on the request</remark>
     [JsonPropertyName("paragraphs")]
     public IReadOnlyList<ParagraphGroup> Paragraphs { get; set; }
 
+    /// <summary>
+    /// ReadOnlyList of <see cref="Entity"/> objects.
+    /// </summary>
+    /// <remark>Only used when the detect entities feature is enabled on the request</remark>
     [JsonPropertyName("entities")]
-    public Entity Entities { get; set; }
+    public IReadOnlyList<Entity> Entities { get; set; }
 
+    /// <summary>
+    /// ReadOnlyList of <see cref="Translation"/> objects.
+    /// </summary>
+    /// <remark>Only used when the translation feature is enabled on the request</remark>
     [JsonPropertyName("translations")]
     public IReadOnlyList<Translation> Translations { get; set; }
 
+    /// <summary>
+    /// Group of Topics<see cref="TopicGroup"/>
+    /// </summary>
     [JsonPropertyName("topics")]
     public TopicGroup Topics { get; set; }
 }

@@ -2,21 +2,22 @@
 public class TranscriptionSchema
 {
     /// <summary>
-    /// Model to use to process audio
+    /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
     [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
-    ///  Tier of model
+    ///  Level of model you would like to use in your request.
     ///  <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
     [JsonPropertyName("tier")]
-    public string? Tier { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ModelTier? Tier { get; set; }
 
     /// <summary>
-    /// Model version 
+    /// Version of the model to use.
     /// <see href="https://developers.deepgram.com/docs/version">
     /// </summary>
     [JsonPropertyName("version")]

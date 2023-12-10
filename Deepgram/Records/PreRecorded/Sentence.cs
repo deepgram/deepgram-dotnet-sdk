@@ -2,13 +2,22 @@
 
 public record Sentence
 {
+    /// <summary>
+    /// Text transcript of the sentence.
+    /// </summary>
     [JsonPropertyName("text")]
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
+    /// <summary>
+    /// Offset in seconds from the start of the audio to where the sentence starts.
+    /// </summary>
     [JsonPropertyName("start")]
-    public int Start { get; set; }
+    public decimal? Start { get; set; }
 
+    /// <summary>
+    /// Offset in seconds from the start of the audio to where the sentence ends.
+    /// </summary>
     [JsonPropertyName("end")]
-    public int End { get; set; }
+    public decimal? End { get; set; }
 }
 
