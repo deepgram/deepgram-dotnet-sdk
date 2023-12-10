@@ -2,9 +2,15 @@
 
 public record Key
 {
+    /// <summary>
+    /// Unique identifier of the Deepgram API key
+    /// </summary>
     [JsonPropertyName("api_key_id")]
     public string? ApiKeyId { get; set; }
 
+    /// <summary>
+    /// Comment for the Deepgram API key
+    /// </summary>
     [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 

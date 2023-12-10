@@ -2,22 +2,28 @@
 
 public record CreateProjectKeyResponse
 {
+    /// <summary>
+    /// Unique identifier of the Deepgram API key
+    /// </summary>
     [JsonPropertyName("api_key_id")]
-    public string? ApiKeyId { get; set; }
+    public string ApiKeyId { get; set; }
 
     [JsonPropertyName("key")]
-    public string? Key { get; set; }
+    public string Key { get; set; }
 
+    /// <summary>
+    /// Comment for the Deepgram API key
+    /// </summary>
     [JsonPropertyName("comment")]
-    public string? Comment { get; set; }
+    public string Comment { get; set; }
 
     [JsonPropertyName("scopes")]
-    public IReadOnlyList<string>? Scopes { get; set; }
+    public IReadOnlyList<string> Scopes { get; set; }
 
     [JsonPropertyName("tags")]
-    public IReadOnlyList<string>? Tags { get; set; }
+    public IReadOnlyList<string> Tags { get; set; }
 
     [JsonPropertyName("created")]
-    public string? Created { get; set; }
+    public DateTime Created { get; set; }
 }
 

@@ -22,14 +22,12 @@ internal static class QueryParameterUtil
             var name = pInfo.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name;
             var pValue = pInfo.GetValue(parameters);
 
-            //need to check for the CallBack property so the value  is not changed to lowercase 
+            //need to check for the CallBack property so the value  is not changed to lowercase - required by Signed uri
             if (typeof(T) == typeof(PrerecordedSchema) && string.Compare(name, nameof(PrerecordedSchema.CallBack).ToLower(), StringComparison.Ordinal) == 0)
             {
                 sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                 continue;
             }
-
-
 
             switch (pValue)
             {
@@ -40,6 +38,7 @@ internal static class QueryParameterUtil
                 case DateTime time:
                     sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
                     break;
+
                 default:
                     sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
                     break;

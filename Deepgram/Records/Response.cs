@@ -2,6 +2,9 @@
 
 public record Response
 {
+    /// <summary>
+    /// Details of the request <see cref="Detail"/>
+    /// </summary>
     [JsonPropertyName("details")]
     public Details? Details { get; set; }
 

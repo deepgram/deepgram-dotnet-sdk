@@ -2,7 +2,7 @@
 public class UpdateProjectMemberScopeSchema
 {
     /// <summary>
-    /// Scope to add for memeber
+    /// Scope to add for member
     /// </summary>
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }

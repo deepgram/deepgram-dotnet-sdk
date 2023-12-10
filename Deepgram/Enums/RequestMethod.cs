@@ -1,24 +1,17 @@
-﻿
-using System.Runtime.Serialization;
+﻿namespace Deepgram.Enums;
 
-namespace Deepgram.Enums;
-
-[DataContract]
 public enum RequestMethod
 {
     /// <summary>
     /// Synchronous
-    /// </summary> 
-    [EnumMember(Value = "sync")]
+    /// </summary>    
     sync,
     /// <summary>
     /// Asynchronous
-    /// </summary>
-    [EnumMember(Value = "async")]
+    /// </summary> 
     async,
     /// <summary>
     /// Streaming
-    /// </summary>
-    [EnumMember(Value = "streaming")]
+    /// </summary>  
     streaming
 }

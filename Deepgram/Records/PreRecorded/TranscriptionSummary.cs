@@ -3,9 +3,9 @@
 public record TranscriptionSummary
 {
     [JsonPropertyName("result")]
-    public string Result { get; set; }
+    public string? Result { get; set; }
 
     [JsonPropertyName("short")]
-    public string Short { get; set; }
+    public string? Short { get; set; }
 }
 
