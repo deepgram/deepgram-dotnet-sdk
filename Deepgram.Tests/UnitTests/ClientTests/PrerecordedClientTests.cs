@@ -1,4 +1,5 @@
-﻿using Deepgram.Records;
+﻿using Deepgram.Constants;
+using Deepgram.Records;
 using Deepgram.Records.PreRecorded;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
@@ -6,7 +7,7 @@ public class PrerecordedClientTests
 {
     DeepgramClientOptions _options;
 
-    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
+    readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
 
     [SetUp]
     public void Setup()

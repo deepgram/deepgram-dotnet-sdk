@@ -1,11 +1,12 @@
-﻿using Deepgram.Records;
+﻿using Deepgram.Constants;
+using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class ManageClientTest
 {
     DeepgramClientOptions _options;
     string _projectId;
-    readonly string _urlPrefix = $"/{Constants.API_VERSION}/{Constants.PROJECTS}";
+    readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
     [SetUp]
     public void Setup()
     {
@@ -63,6 +64,7 @@ public class ManageClientTest
 
         // Arrange
         var expectedResponse = new AutoFaker<GetProjectResponse>().Generate();
+        expectedResponse.ProjectId = _projectId;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_options, httpClient);
         manageClient.When(x => x.GetAsync<GetProjectResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -293,7 +295,7 @@ public class ManageClientTest
         var client = new ManageClient(_options, new HttpClient());
 
         //Act & Assert
-        await client.Invoking(y => y.CreateProjectKey(Constants.PROJECTS, createKeySchema))
+        await client.Invoking(y => y.CreateProjectKey(UriSegments.PROJECTS, createKeySchema))
              .Should().ThrowAsync<ArgumentException>();
     }
 

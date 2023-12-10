@@ -5,13 +5,13 @@ public class CreateProjectKeySchema
     /// Comment to describe key
     /// </summary>
     [JsonPropertyName("comment")]
-    public string? Comment { get; set; }
+    public string Comment { get; set; }
 
     /// <summary>
     /// Scopes of the key
     /// </summary>
     [JsonPropertyName("scopes")]
-    public List<string>? Scopes { get; set; }
+    public List<string> Scopes { get; set; }
 
     /// <summary>
     /// Tag names for key
@@ -32,10 +32,5 @@ public class CreateProjectKeySchema
     [JsonPropertyName("time_to_live_in_seconds")]
     public int? TimeToLiveInSeconds { get; set; }
 
-    /// <summary>
-    /// Any other properties to associate with key creation
-    /// </summary>
-    // why allow for unknown values?? this is here as its in the other sdk
-    public Dictionary<string, object> AdditionalProperties { get; set; } = [];
 
 }

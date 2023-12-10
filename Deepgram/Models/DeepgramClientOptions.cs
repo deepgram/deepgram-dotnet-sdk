@@ -1,4 +1,5 @@
-﻿namespace Deepgram.Models;
+﻿
+namespace Deepgram.Models;
 
 /// <summary>
 /// Configuration for the Deepgram client
@@ -14,7 +15,14 @@ public class DeepgramClientOptions
     /// BaseAddress of the server :defaults to api.deepgram.com
     /// no need to attach the protocol it will be added internally
     /// </summary>
-    public string BaseAddress { get; set; } = Constants.DEFAULT_URI;
+
+    /* Unmerged change from project 'Deepgram (net6.0)'
+    Before:
+        public string BaseAddress { get; set; } = Common.Defaults.DEFAULT_URI;
+    After:
+        public string BaseAddress { get; set; } = Defaults.DEFAULT_URI;
+    */
+    public string BaseAddress { get; set; } = Defaults.DEFAULT_URI;
 
     /// <summary>
     /// Sets the timeout for calls to Deepgram.
@@ -31,7 +39,7 @@ public class DeepgramClientOptions
     /// <param name="apiKey">The key to authenticate with Deepgram</param>
     public DeepgramClientOptions(string apiKey)
     {
-        if( string.IsNullOrWhiteSpace(apiKey))
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
             Log.ApiKeyNotPresent(LogProvider.GetLogger(nameof(DeepgramClientOptions)), nameof(DeepgramClientOptions));
             throw new ArgumentNullException(nameof(apiKey));

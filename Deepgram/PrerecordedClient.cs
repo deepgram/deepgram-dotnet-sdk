@@ -1,4 +1,5 @@
-﻿using Deepgram.Records;
+﻿using Deepgram.Constants;
+using Deepgram.Records;
 using Deepgram.Records.PreRecorded;
 
 namespace Deepgram;
@@ -11,7 +12,14 @@ namespace Deepgram;
 public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
-    internal readonly string UrlPrefix = $"/{Constants.API_VERSION}/{Constants.LISTEN}";
+
+/* Unmerged change from project 'Deepgram (net6.0)'
+Before:
+    internal readonly string UrlPrefix = $"/{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}";
+After:
+    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
+*/
+    internal readonly string UrlPrefix = $"/{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}";
     #region NoneCallBacks
     /// <summary>
     ///  Transcribe a file by providing a url 

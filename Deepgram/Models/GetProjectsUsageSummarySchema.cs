@@ -1,6 +1,16 @@
-﻿namespace Deepgram.Models;
+﻿using Deepgram.Enums;
+
+namespace Deepgram.Models;
 public class GetProjectsUsageSummarySchema
 {
+    /// <summary>
+    /// Name of who made request
+    /// </summary>
+    [JsonPropertyName("accessor")]
+    public string? Accessor { get; set; }
+
+    [JsonPropertyName("alternatives")]
+    public bool? Alternatives { get; set; }
     /// <summary>
     /// Start date to limit range of requests to summarize
     /// </summary>
@@ -11,13 +21,7 @@ public class GetProjectsUsageSummarySchema
     /// End date to limit range of requests to summarize
     /// </summary>
     [JsonPropertyName("end")]
-    public DateTime? End { get; set; }
-
-    /// <summary>
-    /// Name of who made request
-    /// </summary>
-    [JsonPropertyName("accessor")]
-    public string? Accessor { get; set; }
+    public DateTime End { get; set; }
 
     /// <summary>
     /// tags associated with request
@@ -26,9 +30,12 @@ public class GetProjectsUsageSummarySchema
     public string? Tag { get; set; }
 
 
+    /// <summary>
+    /// Permitted values "sync" | "async" | "streaming"
+    /// <see cref="RequestMethod">
+    /// </summary>
     [JsonPropertyName("method")]
-    public string? Method { get; set; }
-
+    public RequestMethod? Method { get; set; }
 
     [JsonPropertyName("model")]
     public string? Model { get; set; }
@@ -69,9 +76,6 @@ public class GetProjectsUsageSummarySchema
 
     [JsonPropertyName("redact")]
     public bool? Redact { get; set; }
-
-    [JsonPropertyName("alternatives")]
-    public bool? Alternatives { get; set; }
 
     [JsonPropertyName("numerals")]
     public bool? Numerals { get; set; }

@@ -9,30 +9,51 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDeepgram(this IServiceCollection services, DeepgramClientOptions options)
     {
         // Register the http client
-        services.AddHttpClient(Constants.HTTPCLIENT_NAME, (hc) => hc.Timeout = options.HttpTimeout)
+        services.AddHttpClient(Defaults.HTTPCLIENT_NAME, (hc) => hc.Timeout = options.HttpTimeout)
     .AddTransientHttpErrorPolicy(policyBuilder =>
     policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
         // Should we use this?
-        services.AddHttpClient(Constants.WSSCLIENT_NAME)
+        services.AddHttpClient(Defaults.WSSCLIENT_NAME)
             .AddTransientHttpErrorPolicy(policyBuilder =>
             policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 
         services.AddTransient(sp =>
         {
-            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+
+            /* Unmerged change from project 'Deepgram (net6.0)'
+            Before:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Common.Defaults.HTTPCLIENT_NAME);
+            After:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Defaults.HTTPCLIENT_NAME);
+            */
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.Defaults.HTTPCLIENT_NAME);
             return new PrerecordedClient(options, httpClient);
         });
 
         services.AddTransient(sp =>
         {
-            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+
+            /* Unmerged change from project 'Deepgram (net6.0)'
+            Before:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Common.Defaults.HTTPCLIENT_NAME);
+            After:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Defaults.HTTPCLIENT_NAME);
+            */
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.Defaults.HTTPCLIENT_NAME);
             return new ManageClient(options, httpClient);
         });
 
         services.AddTransient(sp =>
         {
-            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.HTTPCLIENT_NAME);
+
+            /* Unmerged change from project 'Deepgram (net6.0)'
+            Before:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Common.Defaults.HTTPCLIENT_NAME);
+            After:
+                        var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Defaults.HTTPCLIENT_NAME);
+            */
+            var httpClient = sp.GetService<IHttpClientFactory>().CreateClient(Constants.Defaults.HTTPCLIENT_NAME);
             return new OnPremClient(options, httpClient);
         });
 

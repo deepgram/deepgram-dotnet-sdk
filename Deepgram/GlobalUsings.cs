@@ -9,7 +9,7 @@ global using System.Text.RegularExpressions;
 global using System.Threading.Channels;
 global using System.Web;
 global using Deepgram.Abstractions;
-global using Deepgram.Common;
+global using Deepgram.Constants;
 global using Deepgram.DeepgramEventArgs;
 global using Deepgram.Logger;
 global using Deepgram.Models;

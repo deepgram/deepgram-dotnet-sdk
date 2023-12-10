@@ -192,16 +192,16 @@ var response = await client.TranscribeFileAsync(
 | Tier                   | string     |                                 Level of model you would like to use in your request                                 |
 | Punctuate              | bool       |                      Indicates whether to add punctuation and capitalization to the transcript                       |
 | ProfanityFilter        | bool       |                              Indicates whether to remove profanity from the transcript                               |
-| Redact                 | string[]   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
+| Redact                 | List<string>   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
 | Diarize                | bool       |                                    Indicates whether to recognize speaker changes                                    |
 | MultiChannel           | bool       |                           Indicates whether to transcribe each audio channel independently                           |
 | Alternatives           | int        |                                 Maximum number of transcript alternatives to return                                  |
 | Numerals               | bool       |                               Indicates whether to convert numbers from written format                               |
 | SmartFormat            | bool       |                               Indicates whether to use Smart Format on the transcript                                |
-| Search                 | string[]   |                                Terms or phrases to search for in the submitted audio                                 |
-| Replace                | string[]   |                          Terms or phrases to search for in the submitted audio and replace                           |
+| Search                 | List<string>   |                                Terms or phrases to search for in the submitted audio                                 |
+| Replace                | List<string>   |                          Terms or phrases to search for in the submitted audio and replace                           |
 | Callback               | string     |            Callback URL to provide if you would like your submitted audio to be processed asynchronously             |
-| Keywords               | string[]   | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context |
+| Keywords               | List<string>   | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context |
 | Utterances             | bool       |                    Indicates whether Deepgram will segment speech into meaningful semantic units                     |
 | DetectLanguage         | bool       |                            Indicates whether to detect the language of the provided audio                            |
 | Paragraphs             | bool       |                             Indicates whether Deepgram will split audio into paragraphs                              |
@@ -209,7 +209,7 @@ var response = await client.TranscribeFileAsync(
 | Summarize              | object     |              Indicates whether Deepgram should provide summarizations of sections of the provided audio              |
 | DetectEntities         | bool       |                     Indicates whether Deepgram should detect entities within the provided audio                      |
 | DetectTopics           | bool       |                      Indicates whether Deepgram should detect topics within the provided audio                       |
-| Tag                    | string[]   |                                                                                                                      |
+| Tag                    | List<string>   |                                                                                                                      |
 
 
 ## Live Audio
@@ -290,20 +290,20 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 | Tier                   | string   |                                          Level of model you would like to use in your request                                           |
 | Punctuate              | bool     |                                Indicates whether to add punctuation and capitalization to the transcript                                |
 | ProfanityFilter        | bool     |                                        Indicates whether to remove profanity from the transcript                                        |
-| Redact                 | string[] |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
+| Redact                 | List<string> |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
 | Diarize                | bool     |                                             Indicates whether to recognize speaker changes                                              |
 | MultiChannel           | bool     |                                    Indicates whether to transcribe each audio channel independently                                     |
 | Numerals               | bool     |                                        Indicates whether to convert numbers from written format                                         |
 | SmartFormat            | bool     |                                         Indicates whether to use Smart Format on the transcript                                         |
-| Search                 | string[] |                                          Terms or phrases to search for in the submitted audio                                          |
-| Replace                | string[] |                                    Terms or phrases to search for in the submitted audio and replace                                    |
+| Search                 | List<string> |                                          Terms or phrases to search for in the submitted audio                                          |
+| Replace                | List<string> |                                    Terms or phrases to search for in the submitted audio and replace                                    |
 | Callback               | string   |                      Callback URL to provide if you would like your submitted audio to be processed asynchronously                      |
-| Keywords               | string[] |          Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context           |
+| Keywords               | List<string> |          Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context           |
 | InterimResults         | bool     |          Indicates whether the streaming endpoint should send you updates to its transcription as more audio becomes available          |
 | EndPointing            | string   |                             Indicates whether Deepgram will detect whether a speaker has finished speaking                              |
 | Channels               | int      |                               Number of independent audio channels contained in submitted streaming audio                               |
 | SampleRate             | int      |                Sample rate of submitted streaming audio. Required (and only read) when a value is provided for encoding                 |
-| Tag                    | string[]   |                                                                                                                      |
+| Tag                    | List<string>   |                                                                                                                      |
 
 
 # Projects
@@ -402,16 +402,28 @@ Creates an API key with the provided scopes.
 ```csharp
 var createProjectKeyWithExpirationSchema = new createProjectKeyWithExpirationSchema
     {
-        Scopes= new string[]{"admin","member"},
+        Scopes= new List<string>{"admin","member"},
         Comment = "Yay a new key",
-        Tags = new string []{"boss"}
+        Tags = new List<string> {"boss"}
         Expiration = DateTime.Now.AddDays(7);
 };
 var result = await manageClient.CreateProjectKey(projectId,createProjectKeyWithExpirationSchema);
 ```
-> you can create a key with using either a CreateProjectKeySchema CreateProjectKeyWithExpirationSchema or CreateProjectKeyWithTimeToLiveSchema
+>Required - Scopes, Comment
+> You can set ExpirationDate or TimeToLive or neither, but you cannot set both
 
 [See our API reference for more info](https://developers.deepgram.com/reference/create-key).
+
+#### CreateProjectKeySchema
+| Property              | Type         | Required |              Description        |
+| -------------         | :-------     | :--------|:-------------------------------:|
+| Scopes                | List<string> |  *       | scopes for key                  |
+| Comment               | DateTime     |  *       | comment description of key      |
+| Tags                  | List<string> |          | Tag for key                     |
+| ExpirationDate        | string       |          | Specfic data for key to expire  |
+| TimeToLiveInSeconds   | string       |          | time to live in seconds         |
+
+
 
 ## Delete Key
 
@@ -532,7 +544,7 @@ var result = await manageClient.ListAllRequestsAsync(projectId,getProjectUsageRe
 | Property      | Type     |              Description               |
 | ------------- | :------- | :------------------------------------: |
 | Start         | DateTime | Start date of the requested date range |
-| End           | DateTime |  End date of the requested date range  |
+| End           | DateTime |  End date of the requested date range  | required
 | Limit         | int      |       number of results per page       |
 | Status        | string   |     status of requests to search for   |
 
@@ -648,7 +660,7 @@ var result = onPremClient.DeleteCredentialsASync(projectId,credentialsId);
 var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema()
  {
     Comment = "my new credentials",
-    Scopes = new  string[]{"team fab"},
+    Scopes = new  List<string>{"team fab"},
     Provider = "Acme credential provider"
  }
 var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremCredentialsSchema)
@@ -659,7 +671,7 @@ var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremC
 | Property      | Value     |              Description               |
 | ------------- | :-------  | :------------------------------------: |
 | Comment       | string?   | comment to associate with credentials  |
-| Scopes        | string[]? | scopes for the credentials             |
+| Scopes        | List<string>? | scopes for the credentials             |
 | Provider      | string?   | provider for the credentials             |
 
 

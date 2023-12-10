@@ -1,5 +1,4 @@
-﻿using Deepgram.Extensions;
-using Deepgram.Models;
+﻿using Deepgram.Constants;
 using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.ExtensionsTests;
@@ -22,7 +21,7 @@ public class HttpClientExtensionTests
     {
         //Arrange 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
         var SUT = httpClient.ConfigureDeepgram(_clientOptions);
@@ -31,7 +30,7 @@ public class HttpClientExtensionTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Constants.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/");
         };
     }
 
@@ -42,7 +41,7 @@ public class HttpClientExtensionTests
         var expectedBaseAddress = $"https://{_customUrl}/";
         _clientOptions.BaseAddress = expectedBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
-        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
         var SUT = httpClient.ConfigureDeepgram(_clientOptions);
@@ -61,7 +60,7 @@ public class HttpClientExtensionTests
         //Arrange 
         _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
         var SUT = httpClient.ConfigureDeepgram(_clientOptions);
@@ -70,7 +69,7 @@ public class HttpClientExtensionTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Constants.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/");
             SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
         };
     }
@@ -81,7 +80,7 @@ public class HttpClientExtensionTests
         //Arrange       
         _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        _httpClientFactory.CreateClient(Constants.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
         var expectedBaseAddress = $"https://{_customUrl}/";
         _clientOptions.BaseAddress = expectedBaseAddress;
 

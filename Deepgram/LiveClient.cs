@@ -1,4 +1,5 @@
-﻿using Deepgram.Extensions;
+﻿using Deepgram.Constants;
+using Deepgram.Extensions;
 using Deepgram.Records.Live;
 
 namespace Deepgram;
@@ -295,7 +296,14 @@ public class LiveClient
     {
         var baseUrl = GetBaseUrl(_deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
-        return new Uri(new Uri(baseUrl), new Uri($"{Constants.API_VERSION}/{Constants.LISTEN}?{query}"));
+
+/* Unmerged change from project 'Deepgram (net6.0)'
+Before:
+        return new Uri(new Uri(baseUrl), new Uri($"{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+After:
+        return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+*/
+        return new Uri(new Uri(baseUrl), new Uri($"{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
     }
 
     public void KeepAlive()

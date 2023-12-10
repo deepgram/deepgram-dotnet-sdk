@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Common;
+﻿namespace Deepgram.Constants;
 
 /// <summary> 
 /// Expected encoding of the submitted streaming audio. 

@@ -61,42 +61,24 @@ public abstract class AbstractRestClient
         }
     }
 
-    /// <summary>
-    /// Post method
-    /// </summary>
-    /// <typeparam name="T">Class type of what return type is expected</typeparam>
-    /// <param name="uriSegment">Uri for the api including the query parameters</param>   
-    /// <param name="content">StringContent as content for HttpRequestMessage</param>   
-    /// <returns>Instance of T</returns>
-    public virtual async Task<T> PostAsync<T>(string uriSegment, StringContent content)
-    {
-        try
-        {
-            var response = await _httpClient.PostAsync(uriSegment, content);
-            response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
-            return result;
-        }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "POST", uriSegment, hre);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            Log.Exception(_logger, "POST", ex.GetType().Name, ex);
-            throw;
-        }
-    }
+    /// <summary> 
+    /// Post method for use with stream requests 
+    /// </summary> 
+    /// <typeparam name="T">Class type of what return type is expected</typeparam> 
+    /// <param name="uriSegment">Uri for the api including the query parameters</param>  
+    /// <param name="content">HttpContent as content for HttpRequestMessage</param>   
+    /// <returns>Instance of T</returns> 
+
 
     /// <summary>
-    /// Post method for use with stream requests
+    /// Post method 
     /// </summary>
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
+
     public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
     {
         try

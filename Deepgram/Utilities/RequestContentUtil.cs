@@ -14,10 +14,14 @@
     /// <param name="body">instance value for the body</param>
     /// <param name="contentType">What type of content is being sent default is : application/json</param>
     /// <returns></returns>
-    internal static StringContent CreatePayload<T>(T body) => new (
-                                JsonSerializer.Serialize(body, _jsonSerializerOptions),
+    internal static StringContent CreatePayload<T>(T body)
+    {
+        var serialized = JsonSerializer.Serialize(body, _jsonSerializerOptions);
+        return new(
+                                serialized,
                                Encoding.UTF8,
-                               Constants.DEFAULT_CONTENT_TYPE);
+                               Defaults.DEFAULT_CONTENT_TYPE);
+    }
 
 
     /// <summary>
@@ -29,7 +33,7 @@
     {
         body.Seek(0, SeekOrigin.Begin);
         HttpContent httpContent = new StreamContent(body);
-        httpContent.Headers.Add("Content-Type", Constants.DEEPGRAM_CONTENT_TYPE);
+        httpContent.Headers.Add("Content-Type", Defaults.DEEPGRAM_CONTENT_TYPE);
         httpContent.Headers.Add("Content-Length", body.Length.ToString());
         return httpContent;
     }

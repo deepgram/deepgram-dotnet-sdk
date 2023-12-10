@@ -4,7 +4,6 @@ global using System.Web;
 global using AutoBogus;
 global using Bogus;
 global using Deepgram.Abstractions;
-global using Deepgram.Common;
 global using Deepgram.Extensions;
 global using Deepgram.Models;
 global using Deepgram.Tests.Fakes;
