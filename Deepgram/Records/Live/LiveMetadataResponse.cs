@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Records.Live;
 
-public record LiveMetadataEvent
+public record LiveMetadataResponse
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "Metadata";

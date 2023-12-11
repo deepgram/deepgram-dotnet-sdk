@@ -1,5 +1,5 @@
 ﻿namespace Deepgram.Records.Live;
-public record LiveTranscriptionEvent
+public record LiveTranscriptionResponse
 {
     [JsonPropertyName("type")]
     public string Type { get; set; } = "Results";
