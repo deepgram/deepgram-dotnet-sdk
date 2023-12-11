@@ -49,11 +49,6 @@ public abstract class AbstractRestClient
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
             return result;
         }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "GET", uriSegment, hre);
-            throw;
-        }
         catch (Exception ex)
         {
             Log.Exception(_logger, "GET", ex.GetType().Name, ex);
@@ -89,11 +84,6 @@ public abstract class AbstractRestClient
 
             return result;
         }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "POST", uriSegment, hre);
-            throw;
-        }
         catch (Exception ex)
         {
             Log.Exception(_logger, "POST", ex.GetType().Name, ex);
@@ -113,11 +103,6 @@ public abstract class AbstractRestClient
         {
             var response = await _httpClient.DeleteAsync(uriSegment);
             response.EnsureSuccessStatusCode();
-        }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "DELETE", uriSegment, hre);
-            throw;
         }
         catch (Exception ex)
         {
@@ -141,11 +126,6 @@ public abstract class AbstractRestClient
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
             return result;
-        }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "DELETE ASYNC", uriSegment, hre);
-            throw;
         }
         catch (Exception ex)
         {
@@ -175,11 +155,6 @@ public abstract class AbstractRestClient
             return result;
 
         }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "PATCH", uriSegment, hre);
-            throw;
-        }
         catch (Exception ex)
         {
             Log.Exception(_logger, "PATCH", ex.GetType().Name, ex);
@@ -203,11 +178,6 @@ public abstract class AbstractRestClient
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
             return result;
-        }
-        catch (HttpRequestException hre)
-        {
-            Log.HttpRequestException(_logger, "PUT", uriSegment, hre);
-            throw;
         }
         catch (Exception ex)
         {

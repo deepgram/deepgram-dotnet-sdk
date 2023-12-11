@@ -35,6 +35,12 @@ public class LiveClient
     /// Fires when a transcript is received from the Deepgram API
     /// </summary>
     public event EventHandler<TranscriptReceivedEventArgs>? TranscriptReceived;
+
+    /// <summary>
+    /// Fires when transcription metadata is received from the Deepgram API
+    /// </summary>
+    public event EventHandler<MetadataReceivedEventArgs>? MetadataReceived;
+
     #endregion
 
     public LiveClient(DeepgramClientOptions deepgramClientOptions)
@@ -70,8 +76,7 @@ public class LiveClient
         }
         catch (Exception ex)
         {
-            Log.WebSocketStartError(logger, ex);
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+            ProcessException("StartConnectionAsync", ex);
         }
 
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
@@ -100,13 +105,7 @@ public class LiveClient
         }
         catch (Exception ex)
         {
-            if (_disposed)
-                Log.SocketDisposed(logger, "Enqueue Message", ex);
-            else
-                Log.EnqueueFailure(logger);
-
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
-            throw;
+            ProcessException("Enqueue Message", ex);
         }
     }
 
@@ -116,9 +115,8 @@ public class LiveClient
         if (_disposed)
         {
             var ex = new Exception(
-                "Attempting to start a sender queue when the WebSocket has been disposed is not allowed.");
-            Log.SocketStartError(logger, ex);
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+               "Attempting to start a sender queue when the WebSocket has been disposed is not allowed.");
+            ProcessException("ProcessSenderQueue", ex);
             throw ex;
         }
 
@@ -139,30 +137,13 @@ public class LiveClient
                 }
             }
         }
-
-        catch (ObjectDisposedException ex)
-        {
-            if (_disposed)
-                Log.SocketDisposed(logger, "Processing send queue", ex);
-            else
-                Log.SendCancelledError(logger, ex);
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
-        }
-        catch (OperationCanceledException ex)
-        {
-            if (_disposed)
-                Log.SocketDisposed(logger, "Processing send queue", ex);
-            else
-                Log.SendCancelledError(logger, ex);
-
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
-        }
         catch (Exception ex)
         {
-            Log.SendWebSocketError(logger, ex);
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+            ProcessException("Process sender queue", ex);
         }
     }
+
+
 
     internal async Task Receive(CancellationToken? cancellationToken = null)
     {
@@ -191,7 +172,7 @@ public class LiveClient
                             result.Count);
                     } while (!result.EndOfMessage);
 
-                    RaiseTranscriptionReceived(result, ms);
+                    ProcessDataReceived(result, ms);
                 }
 
                 if (result.MessageType == WebSocketMessageType.Close)
@@ -202,29 +183,43 @@ public class LiveClient
             }
             catch (Exception ex)
             {
-                Log.ReceiptError(logger, ex);
-                ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+                ProcessException("Receive", ex);
                 break;
             }
 
         }
     }
 
-    private void RaiseTranscriptionReceived(WebSocketReceiveResult result, MemoryStream ms)
+    private void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
     {
         ms.Seek(0, SeekOrigin.Begin);
 
         if (result.MessageType == WebSocketMessageType.Text)
         {
-            if (Encoding.UTF8.GetString(ms.ToArray()) != null)
+            var response = Encoding.UTF8.GetString(ms.ToArray());
+            if (response != null)
             {
-
-                var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(Encoding.UTF8.GetString(ms.ToArray()));
-                if (transcript != null)
-                    TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+                //check the type of response
+                var value = JsonDocument.Parse(response).RootElement.GetProperty("type").GetString();
+                if (value.ToLower() == "metadata")
+                {
+                    var metaData = RequestContentUtil.Deserialize<LiveMetadataResponse>(response);
+                    if (metaData is not null)
+                    {
+                        MetadataReceived?.Invoke(null, new MetadataReceivedEventArgs(metaData));
+                    }
+                }
+                else
+                {
+                    var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(response);
+                    if (transcript != null)
+                        TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+                }
             }
         }
     }
+
+
 
     /// <summary>
     /// Closes the Web Socket connection to the Deepgram API
@@ -259,8 +254,7 @@ public class LiveClient
         }
         catch (Exception ex)
         {
-            Log.WebSocketCloseError(logger, ex);
-            ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+            ProcessException("Stop Connection ", ex);
         }
     }
 
@@ -297,14 +291,17 @@ public class LiveClient
     {
         var baseUrl = GetBaseUrl(_deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
+        return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+    }
 
-        /* Unmerged change from project 'Deepgram (net6.0)'
-        Before:
-                return new Uri(new Uri(baseUrl), new Uri($"{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
-        After:
-                return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
-        */
-        return new Uri(new Uri(baseUrl), new Uri($"{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+    private void ProcessException(string action, Exception ex)
+    {
+        if (_disposed)
+            Log.SocketDisposed(logger, action, ex);
+        else
+            Log.Exception(logger, action, ex);
+
+        ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
     }
 
     public void KeepAlive()
