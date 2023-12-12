@@ -1,11 +1,10 @@
 ﻿using System.Net.WebSockets;
-using System.Text;
-using Deepgram.Constants;
+
 using Deepgram.DeepgramEventArgs;
 using Deepgram.Records.Live;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
-public class Separators
+public class LiveClientTests
 {
     DeepgramClientOptions _options;
     WebSocketReceiveResult _webSocketReceiveResult;
@@ -26,15 +25,18 @@ public class Separators
     {
         //Arrange
         var liveTranscriptionResponse = new AutoFaker<LiveTranscriptionResponse>().Generate();
+        // ensure the right type is set for testing
+        liveTranscriptionResponse.Type = Enums.LiveType.Results;
         var json = JsonSerializer.Serialize(liveTranscriptionResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
         TranscriptReceivedEventArgs? eventArgs = null;
 
         _liveClient.TranscriptReceived += (sender, args) => eventArgs = args;
 
+
         //Act
         _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
-
+        Task.Delay(5000);
         //Assert
         using (new AssertionScope())
         {
@@ -50,6 +52,8 @@ public class Separators
     {
         //Arrange
         var liveMetadataResponse = new AutoFaker<LiveMetadataResponse>().Generate();
+        // ensure the right type is set for testing
+        liveMetadataResponse.Type = Enums.LiveType.Metadata;
         var json = JsonSerializer.Serialize(liveMetadataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
