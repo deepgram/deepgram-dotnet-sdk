@@ -98,6 +98,7 @@ public class TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/callback">
     /// </summary>
     [JsonPropertyName("callback")]
+
     public string? CallBack { get; set; }
 
     /// <summary>

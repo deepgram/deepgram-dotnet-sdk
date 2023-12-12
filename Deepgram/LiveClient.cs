@@ -12,7 +12,6 @@ public class LiveClient
     internal ClientWebSocket? _clientWebSocket;
     internal readonly CancellationTokenSource _tokenSource;
     internal bool _disposed;
-
     #endregion
 
     #region Subscribe Events
@@ -22,9 +21,9 @@ public class LiveClient
     public event EventHandler<ConnectionOpenEventArgs>? ConnectionOpened;
 
     /// <summary>
-    /// Fires on any error in the connection, sending or receiving
+    /// Fires on any error during sending,receiving or message processing
     /// </summary>
-    public event EventHandler<ConnectionErrorEventArgs>? ConnectionError;
+    public event EventHandler<LiveErrorEventArgs>? LiveError;
 
     /// <summary>
     /// Fires when the WebSocket connection is closed
@@ -67,7 +66,7 @@ public class LiveClient
         try
         {
             await _clientWebSocket.ConnectAsync(
-                GetUri(options),
+                GetUri(options, _deepgramClientOptions),
                 cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
@@ -190,30 +189,34 @@ public class LiveClient
         }
     }
 
-    private void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
+    internal void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
     {
         ms.Seek(0, SeekOrigin.Begin);
 
         if (result.MessageType == WebSocketMessageType.Text)
         {
             var response = Encoding.UTF8.GetString(ms.ToArray());
+
             if (response != null)
             {
-                //check the type of response
-                var value = JsonDocument.Parse(response).RootElement.GetProperty("type").GetString();
-                if (value.ToLower() == "metadata")
+                try
                 {
-                    var metaData = RequestContentUtil.Deserialize<LiveMetadataResponse>(response);
-                    if (metaData is not null)
+                    var data = JsonDocument.Parse(response);
+                    var val = Enum.Parse(typeof(LiveType), data.RootElement.GetProperty("type").GetString());
+                    switch (val)
                     {
-                        MetadataReceived?.Invoke(null, new MetadataReceivedEventArgs(metaData));
+                        case LiveType.Results:
+                            TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(data.Deserialize<LiveTranscriptionResponse>()!));
+                            break;
+                        case LiveType.Metadata:
+                            MetadataReceived?.Invoke(null, new MetadataReceivedEventArgs(data.Deserialize<LiveMetadataResponse>()!));
+                            break;
+
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var transcript = RequestContentUtil.Deserialize<LiveTranscriptionResponse>(response);
-                    if (transcript != null)
-                        TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+                    ProcessException("Live response received", ex);
                 }
             }
         }
@@ -287,11 +290,13 @@ public class LiveClient
     internal readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<MessageToSend>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal Uri GetUri(LiveSchema queryParameters)
+    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions deepgramClientOptions)
     {
-        var baseUrl = GetBaseUrl(_deepgramClientOptions);
+        var baseUrl = GetBaseUrl(deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
-        return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+        // format of URI cannot be determined if run like --
+        // return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
+        return new Uri($"{baseUrl}/{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}");
     }
 
     private void ProcessException(string action, Exception ex)
@@ -301,7 +306,7 @@ public class LiveClient
         else
             Log.Exception(logger, action, ex);
 
-        ConnectionError?.Invoke(null, new ConnectionErrorEventArgs(ex));
+        LiveError?.Invoke(null, new LiveErrorEventArgs(ex));
     }
 
     public void KeepAlive()

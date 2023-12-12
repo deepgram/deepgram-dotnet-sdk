@@ -51,7 +51,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "GET", ex.GetType().Name, ex);
+            Log.Exception(_logger, "GET", ex);
             throw;
         }
     }
@@ -86,7 +86,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "POST", ex.GetType().Name, ex);
+            Log.Exception(_logger, "POST", ex);
             throw;
         }
 
@@ -106,7 +106,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "DELETE", ex.GetType().Name, ex);
+            Log.Exception(_logger, "DELETE", ex);
             throw;
         }
     }
@@ -129,7 +129,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "DELETE ASYNC", ex.GetType().Name, ex);
+            Log.Exception(_logger, "DELETE ASYNC", ex);
             throw;
         }
     }
@@ -157,7 +157,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "PATCH", ex.GetType().Name, ex);
+            Log.Exception(_logger, "PATCH", ex);
             throw;
         }
 
@@ -181,7 +181,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "PUT", ex.GetType().Name, ex);
+            Log.Exception(_logger, "PUT", ex);
             throw;
         }
     }

@@ -3,7 +3,8 @@
 public record LiveMetadataResponse
 {
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "Metadata";
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LiveType Type { get; set; } = LiveType.Metadata;
 
     [JsonPropertyName("transaction_key")]
     public string? TransactionKey { get; set; }

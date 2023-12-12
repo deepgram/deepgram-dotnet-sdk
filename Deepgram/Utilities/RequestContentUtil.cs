@@ -5,6 +5,7 @@
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
+
     };
 
     /// <summary>
