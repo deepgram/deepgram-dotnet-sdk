@@ -2,7 +2,8 @@
 public record LiveTranscriptionResponse
 {
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "Results";
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LiveType Type { get; set; } = LiveType.Results;
 
     [JsonPropertyName("channel_index")]
     public IReadOnlyList<int> ChannelIndex { get; set; }

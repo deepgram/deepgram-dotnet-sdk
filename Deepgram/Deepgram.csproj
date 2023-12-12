@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net8.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>   
@@ -34,17 +34,7 @@
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" /> 
      <PackageReference Include="System.Text.Json" Version="6.*" />
     <PackageReference Include="System.Threading.Channels" Version="6.*" />   
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.*" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.*" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.*" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.*" />
-    <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-    <PackageReference Include="System.Text.Json" Version="6.*" />
-    <PackageReference Include="System.Threading.Channels" Version="6.*" />
-  </ItemGroup>
+  </ItemGroup> 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.*" />

@@ -5,7 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "not best option for this type", Scope = "member", Target = "~M:Deepgram.DeepgramEventArgs.ConnectionErrorEventArgs.#ctor(System.Exception)")]
+[assembly: SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "not best option for this type", Scope = "member", Target = "~M:Deepgram.DeepgramEventArgs.LiveErrorEventArgs.#ctor(System.Exception)")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "does not work in all supported frameworks", Scope = "member", Target = "~M:Deepgram.Extensions.HttpClientExtensions.SetBaseUrl(System.Net.Http.HttpClient,Deepgram.Models.DeepgramClientOptions)")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "does not work in all supported frameworks", Scope = "member", Target = "~M:Deepgram.LiveClient.GetBaseUrl(Deepgram.Models.DeepgramClientOptions)~System.String")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "does not work in all supported frameworks", Scope = "member", Target = "~M:Deepgram.Utilities.UserAgentUtil.GetInfo~System.String")]

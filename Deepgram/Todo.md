@@ -2,7 +2,7 @@
 
 ## Deepgram
 - Live client change event args to callback
-- Live client - when receiving data type of data needs to be check currently the
+- <del>Live client - when receiving data type of data needs to be check currently the
     recieve method only expects to recieve LiveTranscriptionResponse but the method 
     can recieve either LiveTranscriptionResponse or LiveMetadataResponse
 

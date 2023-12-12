@@ -26,10 +26,10 @@ public class DeepgramClientOptions
 
     /// <summary>
     /// Sets the timeout for calls to Deepgram.
-    /// If not set, the default is 120 seconds.
     /// Not used if the HttpClient is provided.
+    /// Default timeout is 100 seconds <see href="https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.timeout?view=net-6.0"/>
     /// </summary>
-    public TimeSpan HttpTimeout { get; set; } = TimeSpan.FromSeconds(120);
+    public TimeSpan HttpTimeout { get; set; }
 
     internal string ApiKey { get; }
 

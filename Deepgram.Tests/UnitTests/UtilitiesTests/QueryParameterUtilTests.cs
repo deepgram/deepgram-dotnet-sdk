@@ -5,6 +5,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_EmptyString_When_Parameters_Is_Null()
     {
+
         //Arrange
         PrerecordedSchema? para = null;
         //Act
@@ -152,4 +153,5 @@ public class QueryParameterUtilTests
         result.Should().NotBeNull();
         result.Should().Be(string.Empty);
     }
+
 }
