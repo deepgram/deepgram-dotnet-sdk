@@ -12,7 +12,7 @@ public record GetProjectBalanceResponse
     /// Balance amount
     /// </summary>
     [JsonPropertyName("amount")]
-    public decimal Amount { get; set; }
+    public int Amount { get; set; }
 
     /// <summary>
     /// Units of the balance. May use usd or hour, depending on the project billing settings

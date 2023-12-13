@@ -2,26 +2,26 @@
 public class GetProjectUsageRequestsSchema
 {
     // <summary>
-    /// Start date of the requested date range.
+    /// Start date of the requested date range. Formats accepted are YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, or YYYY-MM-DDTHH:MM:SS+HH:MM.
     /// </summary>
     [JsonPropertyName("start")]
     public DateTime? Start { get; set; }
 
     /// <summary>
-    /// End date of the requested date range.
+    /// End date of the requested date range. Formats accepted are YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, or YYYY-MM-DDTHH:MM:SS+HH:MM.
     /// </summary>
     [JsonPropertyName("end")]
     public DateTime? End { get; set; }
 
     /// <summary>
-    /// Number of results to return per page. 
+    /// Number of results to return per page. Default 10. Range [1,100].
     /// </summary>
-    /// <remarks>Defaults to 10</remarks>
+
     [JsonPropertyName("limit")]
-    public int? Limit { get; set; }
+    public int Limit { get; set; } = 10;
 
     /// <summary>
-    /// Status of requests to return.
+    /// Status of requests to return. Enables you to filter requests depending on whether they have succeeded or failed. If not specified, returns requests with all statuses.
     /// </summary>
     /// <remarks>Possible Values: null, succeeded OR failed</remarks>
     [JsonPropertyName("status")]

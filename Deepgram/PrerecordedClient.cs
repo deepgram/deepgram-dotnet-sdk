@@ -1,5 +1,4 @@
-﻿using Deepgram.Records;
-using Deepgram.Records.PreRecorded;
+﻿using Deepgram.Records.PreRecorded;
 
 namespace Deepgram;
 
