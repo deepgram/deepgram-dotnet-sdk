@@ -23,4 +23,7 @@ public record LiveMetadataResponse
 
     [JsonPropertyName("channels")]
     public int? Channels { get; set; }
+
+    [JsonPropertyName("models")]
+    public IReadOnlyList<string> Models { get; set; }
 }

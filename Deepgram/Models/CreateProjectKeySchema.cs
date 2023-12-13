@@ -1,6 +1,13 @@
 ﻿namespace Deepgram.Models;
 public class CreateProjectKeySchema
 {
+
+    public CreateProjectKeySchema(string comment, List<string> scopes)
+    {
+        Comment = comment;
+        Scopes = scopes;
+    }
+
     /// <summary>
     /// Comment to describe key
     /// </summary>

@@ -15,10 +15,10 @@ public record LiveTranscriptionResponse
     public double Start { get; set; }
 
     [JsonPropertyName("is_final")]
-    public bool? IsFinal { get; set; }
+    public bool IsFinal { get; set; }
 
     [JsonPropertyName("speech_final")]
-    public bool? SpeechFinal { get; set; }
+    public bool SpeechFinal { get; set; }
 
     [JsonPropertyName("channel")]
     public Channel Channel { get; set; }
