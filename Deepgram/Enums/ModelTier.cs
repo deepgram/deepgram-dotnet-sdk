@@ -2,6 +2,7 @@
 
 public enum ModelTier
 {
-    Basic,
-    Advanced
+    Base,
+    Advanced,
+    Nova
 }

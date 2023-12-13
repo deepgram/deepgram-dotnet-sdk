@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 using Deepgram.Records.PreRecorded;
 
 namespace Deepgram;
@@ -13,12 +12,6 @@ public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, Http
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
 
-/* Unmerged change from project 'Deepgram (net6.0)'
-Before:
-    internal readonly string UrlPrefix = $"/{Common.Defaults.API_VERSION}/{UriSegments.LISTEN}";
-After:
-    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
-*/
     internal readonly string UrlPrefix = $"/{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}";
     #region NoneCallBacks
     /// <summary>
@@ -35,8 +28,6 @@ After:
             $"{UrlPrefix}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source));
     }
-
-
     /// <summary>
     /// Transcribes a file using the provided byte array
     /// </summary>
@@ -132,21 +123,28 @@ After:
     #endregion
 
     #region CallbackChecks
-    private static void VerifyNoCallBack(string method, PrerecordedSchema? prerecordedSchema)
+    private void VerifyNoCallBack(string method, PrerecordedSchema? prerecordedSchema)
     {
         if (prerecordedSchema != null && prerecordedSchema.CallBack != null)
-            throw new ArgumentException($"CallBack cannot be provided as schema option to a synchronous transcription. Use {nameof(TranscribeFileCallBack)} or {nameof(TranscribeUrlCallBack)}");
+            throw new ArgumentException($"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(TranscribeFileCallBack)} or {nameof(TranscribeUrlCallBack)}");
     }
 
-    private static void VerifyOneCallBackSet(string callingMethod, string? callBack, PrerecordedSchema? prerecordedSchema)
+    private void VerifyOneCallBackSet(string callingMethod, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
-        //check if no CallBack set in either callBack parameter or PrerecordedSchema
-        if (prerecordedSchema.CallBack == null && callBack == null)
-            throw new ArgumentException($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrl)} or {nameof(TranscribeFile)}");
 
-        //check that only one CallBack is set in either callBack parameter or PrerecordedSchema
-        if (!string.IsNullOrEmpty(prerecordedSchema.CallBack) && !string.IsNullOrEmpty(callBack))
-            throw new ArgumentException("CallBack should be set in either the CallBack parameter or PrerecordedSchema.CallBack not in both.");
+        if (prerecordedSchema.CallBack == null && callBack == null)
+        { //check if no CallBack set in either callBack parameter or PrerecordedSchema
+            var ex = new ArgumentException($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrl)} or {nameof(TranscribeFile)}");
+            Log.Exception(_logger, $"While calling {callingMethod} no callback set", ex);
+            throw ex;
+        }
+        else if (!string.IsNullOrEmpty(prerecordedSchema.CallBack) && !string.IsNullOrEmpty(callBack))
+        {
+            //check that only one CallBack is set in either callBack parameter or PrerecordedSchema
+            var ex = new ArgumentException("CallBack should be set in either the CallBack parameter or PrerecordedSchema.CallBack not in both.");
+            Log.Exception(_logger, $"While calling {callingMethod}, callback set in both parameter and property", ex);
+            throw ex;
+        }
     }
     #endregion    
 }

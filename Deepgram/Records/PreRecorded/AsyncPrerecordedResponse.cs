@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Records;
+﻿namespace Deepgram.Records.PreRecorded;
 public record AsyncPrerecordedResponse
 {
     /// <summary>
