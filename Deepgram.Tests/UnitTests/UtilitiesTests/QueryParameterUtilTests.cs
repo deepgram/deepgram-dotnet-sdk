@@ -113,15 +113,14 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
         //Arrange 
-        var obj = DateTime.Now;
-        var option = new CreateProjectKeySchema()
-        {
-            ExpirationDate = obj
-        };
-        var expected = $"expiration_date={HttpUtility.UrlEncode(obj.ToString("yyyy-MM-dd"))}";
+        var options = new AutoFaker<CreateProjectKeySchema>().Generate();
+        var time = DateTime.Now;
+        options.ExpirationDate = time;
+
+        var expected = $"expiration_date={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}";
 
         //Act
-        var result = QueryParameterUtil.GetParameters(option);
+        var result = QueryParameterUtil.GetParameters(options);
 
         //Assert
         result.Should().NotBeNull();

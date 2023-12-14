@@ -11,12 +11,6 @@ public class ManageClient(DeepgramClientOptions deepgramClientOptions, HttpClien
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
 
-    /* Unmerged change from project 'Deepgram (net6.0)'
-    Before:
-        internal readonly string UrlPrefix = $"/{Common.Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-    After:
-        internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-    */
     internal readonly string UrlPrefix = $"/{Constants.Defaults.API_VERSION}/{UriSegments.PROJECTS}";
 
     #region Projects

@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class ManageClientTest
