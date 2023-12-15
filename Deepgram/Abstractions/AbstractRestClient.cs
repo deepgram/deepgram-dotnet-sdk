@@ -14,13 +14,9 @@ public abstract class AbstractRestClient
     internal DeepgramClientOptions _deepgramClientOptions;
 
     /// <summary>
-    /// name of the type of client - for logging
-    /// </summary>
-    internal string _clientName;
-    /// <summary>
     /// get the logger of category type of _clientName
     /// </summary>
-    internal ILogger _logger => LogProvider.GetLogger(_clientName);
+    internal ILogger _logger => LogProvider.GetLogger(this.GetType().Name);
 
     /// <summary>
     /// Constructor that take the options and a httpClient
@@ -29,7 +25,7 @@ public abstract class AbstractRestClient
     /// <param name="httpClient"><see cref="HttpClient"/>HttpClient to use for all calls from the implementing class</param>
     internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     {
-        _clientName = this.GetType().Name;
+
         _deepgramClientOptions = deepgramClientOptions;
         _httpClient = httpClient.ConfigureDeepgram(_deepgramClientOptions);
     }

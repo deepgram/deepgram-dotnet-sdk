@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 using Deepgram.Records.PreRecorded;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
@@ -21,6 +20,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
         // Act & Assert
         client.Invoking(y => y.GetAsync<GetProjectsResponse>(UriSegments.PROJECTS))
@@ -33,6 +33,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<GetProjectsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
         // Act & Assert
         client.Invoking(y => y.GetAsync<GetProjectsResponse>(UriSegments.PROJECTS))
@@ -47,6 +48,7 @@ public class AbstractRestfulClientTests
         var response = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var httpContent = Substitute.For<HttpContent>();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert      
@@ -76,6 +78,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var response = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert  
@@ -90,10 +93,10 @@ public class AbstractRestfulClientTests
         // Arrange       
         var response = new AutoFaker<SyncPrerecordedResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert      
-
         client.Invoking(y =>
         y.PostAsync<SyncPrerecordedResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
              .Should().ThrowAsync<HttpRequestException>();
@@ -106,6 +109,7 @@ public class AbstractRestfulClientTests
     {
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
@@ -119,6 +123,7 @@ public class AbstractRestfulClientTests
     {
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
@@ -133,6 +138,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
@@ -146,6 +152,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         // Act & Assert
@@ -159,6 +166,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         //Act & Assert
@@ -172,6 +180,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
 
         //Act & Assert
@@ -185,6 +194,7 @@ public class AbstractRestfulClientTests
     {
         // Arrange       
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
         // Act & Assert
         client.Invoking(y => y.PutAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
@@ -196,6 +206,7 @@ public class AbstractRestfulClientTests
     {
         // Arrange       
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
+
         var client = new ConcreteRestClient(_clientOptions, httpClient);
         // Act & Assert
         client.Invoking(y => y.PutAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))

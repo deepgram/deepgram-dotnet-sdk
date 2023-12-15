@@ -1,17 +1,20 @@
-﻿using Deepgram.Constants;
-
-namespace Deepgram.Tests.Fakes;
+﻿namespace Deepgram.Tests.Fakes;
 public static class MockHttpClient
 {
     public static HttpClient CreateHttpClientWithResult<T>(
-       T result, HttpStatusCode code = HttpStatusCode.OK, string url = $"https://{Defaults.DEFAULT_URI}")
+       T result, HttpStatusCode code = HttpStatusCode.OK, string? url = null)
     {
+        if (string.IsNullOrEmpty(url))
+        {
+            url = $"https://{Defaults.DEFAULT_URI}";
+        }
 
         return new HttpClient(new MockHttpMessageHandler<T>(result, code))
         {
             BaseAddress = new Uri(url)
         };
     }
+
 
     public static HttpClient CreateHttpClientWithException(Exception Exception)
     {

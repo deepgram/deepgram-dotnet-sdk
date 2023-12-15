@@ -4,8 +4,10 @@ internal static class HttpClientExtensions
 {
     internal static HttpClient ConfigureDeepgram(this HttpClient client, DeepgramClientOptions options)
     {
-        SetBaseUrl(client, options);
+        client.SetBaseUrl(options);
         client.SetDefaultHeaders(options);
+        client.SetTimeout(options);
+
         return client;
     }
 
@@ -21,19 +23,31 @@ internal static class HttpClientExtensions
             { client.DefaultRequestHeaders.Add(header.Key, header.Value); }
     }
 
-    internal static void SetBaseUrl(HttpClient client, DeepgramClientOptions deepgramClientOptions)
+    internal static void SetBaseUrl(this HttpClient client, DeepgramClientOptions deepgramClientOptions)
     {
+        //if the baseaddress is already set on the client then do not check any further
+        if (client.BaseAddress is null)
+        {
+            var baseAddress = string.IsNullOrEmpty(deepgramClientOptions.BaseAddress) ? Defaults.DEFAULT_URI : deepgramClientOptions.BaseAddress;
 
-        var baseAddress = deepgramClientOptions.BaseAddress;
-        //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
-        Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
-        if (regex.IsMatch(baseAddress))
-            baseAddress = regex.Replace(baseAddress, "https://");
-        else
-            //if no protocol in the address then https:// is added
-            baseAddress = $"https://{baseAddress}";
+            //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
+            Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
+            if (regex.IsMatch(baseAddress))
+                baseAddress = regex.Replace(baseAddress, "https://");
+            else
+                //if no protocol in the address then https:// is added
+                baseAddress = $"https://{baseAddress}";
 
-        client.BaseAddress = new Uri(baseAddress);
+            client.BaseAddress = new Uri(baseAddress);
+
+        }
+    }
+    internal static void SetTimeout(this HttpClient client, DeepgramClientOptions options)
+    {
+        if (options.HttpTimeout is not null)
+        {
+            client.Timeout = (TimeSpan)options.HttpTimeout;
+        }
     }
 }
 

@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 using Deepgram.Records.OnPrem;
 
 namespace Deepgram;
@@ -13,13 +12,15 @@ public class OnPremClient(DeepgramClientOptions deepgramClientOptions, HttpClien
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
 
-/* Unmerged change from project 'Deepgram (net6.0)'
-Before:
-    internal readonly string UrlPrefix = $"/{Common.Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-After:
+    /// <summary>
+    /// Constructor with default Options
+    /// </summary>
+    /// <param name="apiKey">The key to authenticate with Deepgram</param>
+    /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
+    public OnPremClient(string apiKey, HttpClient httpClient) : this(new DeepgramClientOptions(apiKey), httpClient) { }
+
+
     internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-*/
-    internal readonly string UrlPrefix = $"/{Constants.Defaults.API_VERSION}/{UriSegments.PROJECTS}";
     /// <summary>
     /// get a list of credentials associated with project
     /// </summary>

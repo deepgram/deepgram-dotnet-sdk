@@ -102,7 +102,8 @@ public class LiveClientTests
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_DeepgramClientOptions_BaseAddress_Contains_No_Protocol()
     {
         //Arrange
-        var expectedUrl = $"wss://{_options.BaseAddress}";
+        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
+        _options.BaseAddress = Defaults.DEFAULT_URI;
         //Act
         var result = LiveClient.GetBaseUrl(_options);
 
@@ -119,8 +120,8 @@ public class LiveClientTests
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WS_Protocol()
     {
         //Arrange
-        var expectedUrl = $"wss://{_options.BaseAddress}";
-        _options.BaseAddress = $"ws://{_options.BaseAddress}";
+        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
+        _options.BaseAddress = $"ws://{Defaults.DEFAULT_URI}";
 
         //Act
         var result = LiveClient.GetBaseUrl(_options);
@@ -139,8 +140,8 @@ public class LiveClientTests
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WSS_Protocol()
     {
         //Arrange
-        var expectedUrl = $"wss://{_options.BaseAddress}";
-        _options.BaseAddress = $"wss://{_options.BaseAddress}";
+        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
+        _options.BaseAddress = $"wss://{Defaults.DEFAULT_URI}";
 
         //Act
         var result = LiveClient.GetBaseUrl(_options);
@@ -163,7 +164,8 @@ public class LiveClientTests
         {
             Diarize = true,
         };
-        var expectedUriStart = $"wss://{_options.BaseAddress}";
+        _options.BaseAddress = Defaults.DEFAULT_URI;
+        var expectedUriStart = $"wss://{Defaults.DEFAULT_URI}";
         var expectedQuery = $"{Defaults.API_VERSION}/{UriSegments.LISTEN}?diarize=true";
         var expectedCompleteUri = new Uri($"{expectedUriStart}/{expectedQuery}");
         //Act

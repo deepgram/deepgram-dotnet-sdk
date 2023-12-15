@@ -3,7 +3,6 @@
 public class PrerecordedSchema : TranscriptionSchema
 {
 
-
     /// <summary>
     /// Entity Detection identifies and extracts key entities from content in submitted audio
     /// <see href="https://developers.deepgram.com/docs/detect-entities">
@@ -16,7 +15,7 @@ public class PrerecordedSchema : TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/language-detection">
     /// </summary>
     [JsonPropertyName("detect_language")]
-    public bool DetectLanguage { get; set; } = default;
+    public bool? DetectLanguage { get; set; }
 
     /// <summary>
     /// Topic Detection identifies and extracts key topics from content in submitted audio. 
@@ -24,7 +23,7 @@ public class PrerecordedSchema : TranscriptionSchema
     /// Default is false
     /// </summary>
     [JsonPropertyName("detect_topics")]
-    public bool DetectTopics { get; set; } = default;
+    public bool? DetectTopics { get; set; }
 
     /// <summary>
     /// Spoken dictation commands will be converted to their corresponding punctuation marks. e.g., comma to ,
@@ -32,14 +31,14 @@ public class PrerecordedSchema : TranscriptionSchema
     /// Default is false
     /// </summary>
     [JsonPropertyName("dictation")]
-    public bool Dictation { get; set; } = false;
+    public bool? Dictation { get; set; }
 
     /// <summary>
     /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg
     /// Default is false
     /// </summary>
     [JsonPropertyName("measurements")]
-    public bool Measurements { get; set; } = false;
+    public bool? Measurements { get; set; }
 
     [JsonPropertyName("ner")]
     [Obsolete("Replaced with SmartFormat")]
@@ -50,13 +49,13 @@ public class PrerecordedSchema : TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/paragraphs">
     /// </summary>
     [JsonPropertyName("paragraphs")]
-    public bool Paragraphs { get; set; } = default;
+    public bool? Paragraphs { get; set; }
 
     [JsonPropertyName("sentiment")]
-    public bool Sentiment { get; set; }
+    public bool? Sentiment { get; set; }
 
     [JsonPropertyName("sentiment_threshold")]
-    public double SentimentThreshold { get; set; }
+    public double? SentimentThreshold { get; set; }
 
     /// <summary>
     /// Summarizes content of submitted audio. 
@@ -64,7 +63,7 @@ public class PrerecordedSchema : TranscriptionSchema
     /// Default is v2
     /// </summary>
     [JsonPropertyName("summarize")]
-    public object Summarize { get; set; } = "v2";
+    public object? Summarize { get; set; }
 
     /// <summary>
     /// Utterances segments speech into meaningful semantic units.
@@ -72,7 +71,7 @@ public class PrerecordedSchema : TranscriptionSchema
     /// default is false
     /// </summary>
     [JsonPropertyName("utterances")]
-    public bool Utterances { get; set; } = default;
+    public bool? Utterances { get; set; }
 
     /// <summary>
     /// Utterance Split detects pauses between words in submitted audio. 
@@ -81,6 +80,6 @@ public class PrerecordedSchema : TranscriptionSchema
     /// Default is 0.8
     /// </summary>
     [JsonPropertyName("utt_split")]
-    public double UttSplit { get; set; } = 0.8;
+    public double? UttSplit { get; set; }
 
 }

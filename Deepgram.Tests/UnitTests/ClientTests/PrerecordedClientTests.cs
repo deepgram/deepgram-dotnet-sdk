@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records.PreRecorded;
+﻿using Deepgram.Records.PreRecorded;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class PrerecordedClientTests
@@ -12,7 +11,6 @@ public class PrerecordedClientTests
     public void Setup()
     {
         _options = new DeepgramClientOptions("fake");
-
     }
 
 
@@ -22,7 +20,6 @@ public class PrerecordedClientTests
         //Arrange 
         var expected = "/v1/listen";
         var client = new PrerecordedClient(_options, new HttpClient());
-
 
         //Assert
         using (new AssertionScope())
@@ -37,11 +34,11 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = new AutoFaker<UrlSource>().Generate();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
@@ -66,17 +63,16 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = new AutoFaker<UrlSource>().Generate();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act and Assert
-
         await prerecordedClient.Invoking(y => y.TranscribeUrl(source, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
@@ -88,18 +84,16 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = prerecordedSchema.CallBack;
-
         //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
         prerecordedSchema.CallBack = null;
 
@@ -109,7 +103,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -123,12 +116,12 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -137,7 +130,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -151,12 +143,12 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = prerecordedSchema.CallBack;
@@ -173,13 +165,13 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -196,12 +188,11 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-
         var source = GetFakeStream(GetFakeByteArray());
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
@@ -212,7 +203,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -226,12 +216,11 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<SyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-
         var source = GetFakeByteArray();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
@@ -242,7 +231,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -256,12 +244,10 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-
         var source = GetFakeStream(GetFakeByteArray());
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
@@ -272,7 +258,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -286,12 +271,10 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-
         var source = GetFakeByteArray();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
@@ -316,13 +299,13 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeStream(GetFakeByteArray());
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -336,7 +319,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -350,13 +332,13 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
+
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -370,7 +352,6 @@ public class PrerecordedClientTests
 
         // Assert
         await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -384,11 +365,12 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeStream(GetFakeByteArray());
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         var callBack = prerecordedSchema.CallBack;
@@ -408,13 +390,13 @@ public class PrerecordedClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<AsyncPrerecordedResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-
         // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
+
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var prerecordedClient = Substitute.For<PrerecordedClient>(_options, httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         prerecordedSchema.CallBack = null;
@@ -424,12 +406,7 @@ public class PrerecordedClientTests
            .Should().ThrowAsync<ArgumentException>();
 
         await prerecordedClient.DidNotReceive().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>());
-
-
     }
-
-
-
 
     private static Stream GetFakeStream(byte[] source)
     {
