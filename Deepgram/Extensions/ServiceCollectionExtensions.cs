@@ -17,11 +17,16 @@ public static class ServiceCollectionExtensions
     /// Adds the Deepgram services to the service collection
     /// </summary>
     /// <param name="options">The options to use with the registered deepgram services</param>
-    public static IServiceCollection AddDeepgram(this IServiceCollection services, DeepgramClientOptions? options = null)
+    public static IServiceCollection AddDeepgram(this IServiceCollection services, DeepgramClientOptions options)
     {
+
         // Register the http client
         services.AddHttpClient(Defaults.HTTPCLIENT_NAME,
-            (hc) => hc.Timeout = (TimeSpan)options.HttpTimeout)
+            (hc) =>
+            {
+                if (options.HttpTimeout != null)
+                    hc.Timeout = (TimeSpan)options.HttpTimeout;
+            })
             .AddTransientHttpErrorPolicy(policyBuilder =>
             policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
 

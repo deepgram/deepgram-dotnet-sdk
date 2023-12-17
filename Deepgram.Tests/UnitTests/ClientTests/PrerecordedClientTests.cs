@@ -6,11 +6,16 @@ public class PrerecordedClientTests
     DeepgramClientOptions _options;
 
     readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
-
+    IHttpClientFactory _httpClientFactory;
     [SetUp]
     public void Setup()
     {
         _options = new DeepgramClientOptions("fake");
+        var services = new ServiceCollection();
+        _options = new DeepgramClientOptions("fa5766db0677ff8b272fd3a954ccb73154c99ff5");
+        services.AddDeepgram(_options);
+        var sp = services.BuildServiceProvider();
+        _httpClientFactory = sp.GetService<IHttpClientFactory>();
     }
 
 
@@ -28,6 +33,8 @@ public class PrerecordedClientTests
             client.UrlPrefix.Should().BeEquivalentTo(expected);
         }
     }
+
+
 
     [Test]
     public async Task TranscribeUrl_Should_Call_PostAsync_Returning_SyncPrerecordedResponse()

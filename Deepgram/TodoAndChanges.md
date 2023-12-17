@@ -15,6 +15,10 @@
 - <del>Test for Prerecorded client
 
 AbstractClient tests--
+- need to test all endpoints to ensure the returned type match the defined c# types. 
+   - <del> TopicGroup causing deserializer to throw json error when topice detection used.
+   
+- implemented read client
 
 - Intergration Test need to be written
 - Either Intergration soultion needs to be exclude from git action tests   

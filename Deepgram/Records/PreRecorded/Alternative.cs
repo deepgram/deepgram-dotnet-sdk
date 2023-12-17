@@ -52,5 +52,5 @@ public record Alternative
     /// Group of Topics<see cref="TopicGroup"/>
     /// </summary>
     [JsonPropertyName("topics")]
-    public TopicGroup Topics { get; set; }
+    public List<TopicGroup> Topics { get; set; }
 }

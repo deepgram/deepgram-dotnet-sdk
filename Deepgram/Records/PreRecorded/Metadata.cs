@@ -29,16 +29,16 @@ public record Metadata
     /// Duration in seconds of the submitted audio.
     /// </summary>
     [JsonPropertyName("duration")]
-    public decimal Duration { get; set; }
+    public decimal? Duration { get; set; }
 
     /// <summary>
     /// Number of channels detected in the submitted audio.
     /// </summary>
     [JsonPropertyName("channels")]
-    public int Channels { get; set; }
+    public int? Channels { get; set; }
 
     [JsonPropertyName("models")]
-    public string[] Models { get; set; }
+    public IReadOnlyList<string>? Models { get; set; }
 
     /// <summary>
     /// IReadonlyDictionary of <see cref="ModelInfo"/>

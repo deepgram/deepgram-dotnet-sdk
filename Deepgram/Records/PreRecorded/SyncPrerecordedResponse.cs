@@ -27,7 +27,7 @@ public record SyncPrerecordedResponse
 
         if (Metadata != null)
         {
-            webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: {Metadata.RequestId}\nCreated: {Metadata.Created}\nDuration: {Math.Round(Metadata.Duration, 3)}\nChannels: {Metadata.Channels}\n\n";
+            webVTT += $"NOTE\nTranscription provided by Deepgram\nRequest Id: {Metadata.RequestId}\nCreated: {Metadata.Created}\nDuration: {Math.Round((decimal)Metadata.Duration, 3)}\nChannels: {Metadata.Channels}\n\n";
         }
 
         var index = 1;
