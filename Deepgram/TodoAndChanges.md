@@ -15,6 +15,10 @@
 - <del>Test for Prerecorded client
 
 AbstractClient tests--
+- need to test all endpoints to ensure the returned type match the defined c# types. 
+   - <del> TopicGroup causing deserializer to throw json error when topice detection used.
+   
+- implemented read client
 
 - Intergration Test need to be written
 - Either Intergration soultion needs to be exclude from git action tests   
@@ -27,3 +31,11 @@ AbstractClient tests--
 - <del>test for the get QueryParametesUtil class to catch exceptions
 - <del>ServiceCollectionExtension test
 - <del>ClientWebSocketExtensions test - now way yo get the headers or mock clientwebsocket
+
+
+# Changes
+added redundencies in for people not wanting to/ or dont have access to servicecollection(in pre exisiting apps upgrading to this version of the sdk) use Dependency Injection such as if they just want to create a simple
+console app demo and new up a client 
+
+added checks to see if there is a predefined client passed in - if there is then the sdk will assume the base address
+is in the correct format - the reason being that if it is a onPrem there is no way to knwo what there server address is

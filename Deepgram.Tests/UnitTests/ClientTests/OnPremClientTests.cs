@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 using Deepgram.Records.OnPrem;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
@@ -38,6 +37,7 @@ public class OnPremClientTests
         //Arrange 
         var expectedResponse = new AutoFaker<ListOnPremCredentialsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+
         var onPremClient = Substitute.For<OnPremClient>(_options, httpClient);
         onPremClient.When(x => x.GetAsync<ListOnPremCredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.GetAsync<ListOnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}").Returns(expectedResponse);
@@ -61,8 +61,9 @@ public class OnPremClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<OnPremCredentialsResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var credentialsId = new Faker().Random.Guid().ToString();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+
         var onPremClient = Substitute.For<OnPremClient>(_options, httpClient);
         onPremClient.When(x => x.GetAsync<OnPremCredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.GetAsync<OnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
@@ -85,8 +86,9 @@ public class OnPremClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var credentialsId = new Faker().Random.Guid().ToString();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+
         var onPremClient = Substitute.For<OnPremClient>(_options, httpClient);
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
@@ -97,7 +99,6 @@ public class OnPremClientTests
 
         // Assert
         await onPremClient.Received().DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
-
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -112,9 +113,8 @@ public class OnPremClientTests
     {
         //Arrange 
         var expectedResponse = new AutoFaker<OnPremCredentialsResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var client = new OnPremClient(_options, httpClient);
         var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema();
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var onPremClient = Substitute.For<OnPremClient>(_options, httpClient);
         onPremClient.When(x => x.PostAsync<OnPremCredentialsResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();

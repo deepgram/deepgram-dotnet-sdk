@@ -7,7 +7,7 @@ public class TranscriptionSchema
     /// Default is 1
     /// </summary>
     [JsonPropertyName("alternatives")]
-    public int Alternatives { get; set; } = 1;
+    public int? Alternatives { get; set; }
 
     /// <summary>
     /// CallBack allows you to have your submitted audio processed asynchronously.
@@ -23,7 +23,7 @@ public class TranscriptionSchema
     /// default is false
     /// </summary>
     [JsonPropertyName("diarize")]
-    public bool Diarize { get; set; } = default;
+    public bool? Diarize { get; set; }
 
     // <summary>
     /// <see href="https://developers.deepgram.com/docs/diarization">
@@ -37,7 +37,7 @@ public class TranscriptionSchema
     ///<see href="https://developers.deepgram.com/reference/pre-recorded"/>
     /// </summary>
     [JsonPropertyName("filler_words")]
-    public bool FillerWords { get; set; } = default;
+    public bool? FillerWords { get; set; }
 
     /// <summary>
     /// Keywords can boost or suppress specialized terminology.
@@ -52,7 +52,7 @@ public class TranscriptionSchema
     /// default value is 'en' 
     /// </summary>
     [JsonPropertyName("language")]
-    public string Language { get; set; } = "en";
+    public string? Language { get; set; }
 
     /// <summary>
     /// AI model used to process submitted audio
@@ -60,13 +60,13 @@ public class TranscriptionSchema
     /// for possibles values <see cref="AIModel" /> default is General
     /// </summary>
     [JsonPropertyName("model")]
-    public string Model { get; set; } = "general";
+    public string? Model { get; set; }
 
     /// <summary>
     /// Multichannel transcribes each channel in submitted audio independently. <see href="https://developers.deepgram.com/docs/multichannel">
     /// </summary>
     [JsonPropertyName("multichannel")]
-    public bool MultiChannel { get; set; } = default;
+    public bool? MultiChannel { get; set; }
 
     /// <summary>
     /// Multichannel transcribes each channel in submitted audio independently. 
@@ -84,14 +84,14 @@ public class TranscriptionSchema
     /// for use with base model tier only
     /// </summary>
     [JsonPropertyName("profanity_filter")]
-    public bool ProfanityFilter { get; set; } = default;
+    public bool? ProfanityFilter { get; set; }
 
     /// <summary>
     /// Adds punctuation and capitalization to transcript
     /// <see href="https://developers.deepgram.com/docs/punctuation">
     /// </summary>
     [JsonPropertyName("punctuate")]
-    public bool Punctuate { get; set; } = default;
+    public bool? Punctuate { get; set; }
 
     /// <summary>
     ///  Indicates whether to redact sensitive information, replacing redacted content with asterisks (*). Can send multiple instances in query string (for example, redact=pci&redact=numbers).
@@ -99,7 +99,7 @@ public class TranscriptionSchema
     ///  default is List<string>("false") 
     /// </summary>
     [JsonPropertyName("redact")]
-    public List<string> Redact { get; set; } = ["false"];
+    public List<string>? Redact { get; set; }
 
     /// <summary>
     /// Find and Replace searches for terms or phrases in submitted audio and replaces them.
@@ -122,7 +122,7 @@ public class TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/smart-format">
     /// </summary>
     [JsonPropertyName("smart_format")]
-    public bool SmartFormat { get; set; } = default;
+    public bool? SmartFormat { get; set; }
 
     /// <summary>
     /// Tagging allows you to label your requests with one or more tags in a list,for the purpose of identification during usage reporting.
@@ -146,5 +146,5 @@ public class TranscriptionSchema
     /// default value is "latest"
     /// </summary>
     [JsonPropertyName("version")]
-    public string Version { get; set; } = "latest";
+    public string? Version { get; set; }
 }

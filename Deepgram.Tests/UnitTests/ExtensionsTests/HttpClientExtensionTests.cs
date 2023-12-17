@@ -1,5 +1,4 @@
-﻿using Deepgram.Constants;
-using Deepgram.Records;
+﻿using Deepgram.Records;
 
 namespace Deepgram.Tests.UnitTests.ExtensionsTests;
 public class HttpClientExtensionTests
@@ -79,8 +78,11 @@ public class HttpClientExtensionTests
     {
         //Arrange       
         _clientOptions.Headers = FakeHeaders();
+
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
+        httpClient.BaseAddress = null;
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+
         var expectedBaseAddress = $"https://{_customUrl}/";
         _clientOptions.BaseAddress = expectedBaseAddress;
 
@@ -96,6 +98,27 @@ public class HttpClientExtensionTests
         };
     }
 
+    [Test]
+    public void Should_Return_HttpClient_With_Predfined_values()
+    {
+        //Arrange       
+        _clientOptions.Headers = FakeHeaders();
+        var expectedBaseAddress = $"https://{_customUrl}/";
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
+        _clientOptions.BaseAddress = expectedBaseAddress;
+        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+
+        //Act
+        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+
+        //Assert 
+        using (new AssertionScope())
+        {
+            SUT.Should().NotBeNull();
+            SUT.BaseAddress.Should().Be(expectedBaseAddress);
+            SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
+        };
+    }
 
     private static Dictionary<string, string> FakeHeaders()
     {

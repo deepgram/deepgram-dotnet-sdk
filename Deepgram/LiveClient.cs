@@ -6,11 +6,11 @@ namespace Deepgram;
 public class LiveClient
 {
     #region Fields
-    private readonly string _clientType;
-    internal ILogger logger => LogProvider.GetLogger(_clientType);
+
+    internal ILogger logger => LogProvider.GetLogger(this.GetType().Name);
     internal readonly DeepgramClientOptions _deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
-    internal readonly CancellationTokenSource _tokenSource;
+    internal readonly CancellationTokenSource _tokenSource = new();
     internal bool _disposed;
     #endregion
 
@@ -42,10 +42,17 @@ public class LiveClient
 
     #endregion
 
+    /// <summary>
+    /// Constructor with default Options
+    /// </summary>
+    /// <param name="apiKey">The key to authenticate with Deepgram</param>
+
+    public LiveClient(string apiKey) : this(new DeepgramClientOptions(apiKey)) { }
+
+
+    /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
     public LiveClient(DeepgramClientOptions deepgramClientOptions)
     {
-        _tokenSource = new CancellationTokenSource();
-        _clientType = this.GetType().Name;
         _deepgramClientOptions = deepgramClientOptions;
     }
 

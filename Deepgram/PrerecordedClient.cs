@@ -10,8 +10,14 @@ namespace Deepgram;
 public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
     : AbstractRestClient(deepgramClientOptions, httpClient)
 {
+    /// <summary>
+    /// Constructor with default Options
+    /// </summary>
+    /// <param name="apiKey">The key to authenticate with Deepgram</param>
+    /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
+    public PrerecordedClient(string apiKey, HttpClient httpClient) : this(new DeepgramClientOptions(apiKey), httpClient) { }
 
-    internal readonly string UrlPrefix = $"/{Constants.Defaults.API_VERSION}/{UriSegments.LISTEN}";
+    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
     #region NoneCallBacks
     /// <summary>
     ///  Transcribe a file by providing a url 
