@@ -14,6 +14,12 @@ public record SyncPrerecordedResponse
     [JsonPropertyName("results")]
     public Result? Results { get; set; }
 
+    /// <summary>
+    /// Returns a list text segments and the intents found within each segment.
+    /// </summary>
+    [JsonPropertyName("intents")]
+    public Intents? Intents { get; set; }
+
     public string ToWebVTT()
     {
         if (Results == null || Results.Utterances == null)

@@ -341,27 +341,28 @@ also see [TranscribeSchema] which LiveSchema is derived from for more options
 
 
 ### TranscribeSchema
-| Property               | Type          |                                                               Description                                              |
-| ---------------------- | :-------      | :--------------------------------------------------------------------------------------------------------------------- |
-| Alternatives           | int?          | Number of transcripts to return per request                                                                            |
-| Callback               | string?       | Callback URL to provide if you would like your submitted audio to be processed asynchronously                          |
-| Diarize                | bool?         | Indicates whether to recognize speaker changes                                                                         |
-| Diarize                | string?       |                                                                                                                        |
-| FillerWords            | int?          | Whether to include words like "uh" and "um" in transcription output.                                                   |
-| Keywords               | List<string>? | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context   |
-| Language               | string?       | BCP-47 language tag that hints at the primary spoken language                                                          |
-| Model                  | string?       | AI model used to process submitted audio                                                                               |
-| MultiChannel           | bool?         | Indicates whether to transcribe each audio channel independently                                                       |
-| Numerals               | bool?         | Indicates whether to convert numbers from written format                                                               |
-| ProfanityFilter        | bool?         | Indicates whether to remove profanity from the transcript                                                              |
-| Punctuate              | bool?         | Indicates whether to add punctuation and capitalization to the transcript                                              |
-| Redact                 | List<string>? | Indicates whether to redact sensitive information                                                                      |
-| Replace                | List<string>? | Terms or phrases to search for in the submitted audio and replace                                                      |
-| Search                 | List<string>? | Terms or phrases to search for in the submitted audio                                                                  |
-| SmartFormat            | bool?         | Indicates whether to use Smart Format on the transcript                                                                |
-| Tag                    | List<string>? |                                                                                                                        |
-| Tier                   | string?       | Level of model you would like to use in your request                                                                   |
-| Version                | string?       | Version of the model to use                                                                                            |
+| Property               | Type                      |                                                               Description                                              |
+| ---------------------- | :-------------------------| :--------------------------------------------------------------------------------------------------------------------- |
+| Alternatives           | int?                      | Number of transcripts to return per request                                                                            |
+| Callback               | string?                   | Callback URL to provide if you would like your submitted audio to be processed asynchronously                          |
+| Diarize                | bool?                     | Indicates whether to recognize speaker changes                                                                         |
+| DiarizeVersion         | string?                   |                                                                                                                        |
+| Extra                  | Dictonary<string,string>? |  additonal values you want echoing bac                                                                                 |                                                                                                                        |
+| FillerWords            | int?                      | Whether to include words like "uh" and "um" in transcription output.                                                   |
+| Keywords               | List<string>?             | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context   |
+| Language               | string?                   | BCP-47 language tag that hints at the primary spoken language                                                          |
+| Model                  | string?                   | AI model used to process submitted audio                                                                               |
+| MultiChannel           | bool?                     | Indicates whether to transcribe each audio channel independently                                                       |
+| Numerals               | bool?                     | Indicates whether to convert numbers from written format                                                               |
+| ProfanityFilter        | bool?                     | Indicates whether to remove profanity from the transcript                                                              |
+| Punctuate              | bool?                     | Indicates whether to add punctuation and capitalization to the transcript                                              |
+| Redact                 | List<string>?             | Indicates whether to redact sensitive information                                                                      |
+| Replace                | List<string>?             | Terms or phrases to search for in the submitted audio and replace                                                      |
+| Search                 | List<string>?             | Terms or phrases to search for in the submitted audio                                                                  |
+| SmartFormat            | bool?                     | Indicates whether to use Smart Format on the transcript                                                                |
+| Tag                    | List<string>?             |                                                                                                                        |
+| Tier                   | string?                   | Level of model you would like to use in your request                                                                   |
+| Version                | string?                   | Version of the model to use                                                                                            |
 
 
 # Projects
