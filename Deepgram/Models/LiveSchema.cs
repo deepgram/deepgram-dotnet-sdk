@@ -47,11 +47,5 @@ public class LiveSchema : TranscriptionSchema
     [JsonPropertyName("utterance_end_ms")]
     public string? UtteranceEnd { get; set; }
 
-    /// <summary>
-    /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
-    /// Extra metadata is limited to 2048 characters per key-value pair.
-    /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
-    /// </summary>
-    [JsonPropertyName("extra")]
-    public Dictionary<string, string> Extra { get; set; }
+
 }
