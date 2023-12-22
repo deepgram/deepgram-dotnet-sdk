@@ -33,6 +33,8 @@ public class PrerecordedSchema : TranscriptionSchema
     [JsonPropertyName("dictation")]
     public bool? Dictation { get; set; }
 
+
+
     /// <summary>
     /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg
     /// Default is false
@@ -50,12 +52,6 @@ public class PrerecordedSchema : TranscriptionSchema
     /// </summary>
     [JsonPropertyName("paragraphs")]
     public bool? Paragraphs { get; set; }
-
-    [JsonPropertyName("sentiment")]
-    public bool? Sentiment { get; set; }
-
-    [JsonPropertyName("sentiment_threshold")]
-    public double? SentimentThreshold { get; set; }
 
     /// <summary>
     /// Summarizes content of submitted audio. 

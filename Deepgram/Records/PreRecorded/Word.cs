@@ -43,5 +43,11 @@ public record Word
     /// </summary>
     [JsonPropertyName("speaker_confidence")]
     public decimal? SpeakerConfidence { get; set; }
+
+    [JsonPropertyName("sentiment")]
+    public string Sentiment;
+
+    [JsonPropertyName("sentiment_score")]
+    public double? SentimentScore;
 }
 

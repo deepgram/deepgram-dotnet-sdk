@@ -2,12 +2,6 @@
 public record Channel
 {
     /// <summary>
-    /// ReadOnlyList of Search objects.
-    /// </summary>
-    [JsonPropertyName("search")]
-    public IReadOnlyList<Search>? Search { get; set; }
-
-    /// <summary>
     /// ReadOnlyList of <see cref="Alternative"/> objects.
     /// </summary>
     [JsonPropertyName("alternatives")]
@@ -23,4 +17,10 @@ public record Channel
 
     [JsonPropertyName("language_confidence")]
     public double? LanguageConfidence { get; set; }
+
+    /// <summary>
+    /// ReadOnlyList of Search objects.
+    /// </summary>
+    [JsonPropertyName("search")]
+    public IReadOnlyList<Search>? Search { get; set; }
 }

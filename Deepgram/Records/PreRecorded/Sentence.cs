@@ -19,5 +19,8 @@ public record Sentence
     /// </summary>
     [JsonPropertyName("end")]
     public decimal? End { get; set; }
+
+    [JsonPropertyName("sentiments")]
+    public List<SentimentGroup> Sentiments;
 }
 

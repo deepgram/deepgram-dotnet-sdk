@@ -1,11 +1,34 @@
 ﻿namespace Deepgram.Records.PreRecorded;
 public record Metadata
 {
+
     /// <summary>
-    /// Blob of text that helps Deepgram engineers debug any problems you encounter.
+    /// Timestamp that indicates when the audio was submitted.
     /// </summary>
-    [JsonPropertyName("transaction_key")]
-    public string? TransactionKey { get; set; }
+    [JsonPropertyName("created")]
+    public DateTime? Created { get; set; }
+
+    /// <summary>
+    /// Number of channels detected in the submitted audio.
+    /// </summary>
+    [JsonPropertyName("channels")]
+    public int? Channels { get; set; }
+
+    /// <summary>
+    /// Duration in seconds of the submitted audio.
+    /// </summary>
+    [JsonPropertyName("duration")]
+    public decimal? Duration { get; set; }
+
+    /// <summary>
+    /// IReadonlyDictionary of <see cref="ModelInfo"/>
+    /// </summary>
+    [JsonPropertyName("model_info")]
+    public Dictionary<string, ModelInfo> ModelInfo { get; set; }
+
+
+    [JsonPropertyName("models")]
+    public List<string>? Models { get; set; }
 
     /// <summary>
     /// Unique identifier for the submitted audio and derived data returned.
@@ -20,36 +43,29 @@ public record Metadata
     public string? Sha256 { get; set; }
 
     /// <summary>
-    /// Timestamp that indicates when the audio was submitted.
+    /// Tags relating to the project
     /// </summary>
-    [JsonPropertyName("created")]
-    public DateTime? Created { get; set; }
+    public List<string>? Tags { get; set; }
 
     /// <summary>
-    /// Duration in seconds of the submitted audio.
+    /// Blob of text that helps Deepgram engineers debug any problems you encounter.
+    /// 
     /// </summary>
-    [JsonPropertyName("duration")]
-    public decimal? Duration { get; set; }
+    [JsonPropertyName("transaction_key")]
+    [Obsolete]
+    public string? TransactionKey { get; set; }
 
-    /// <summary>
-    /// Number of channels detected in the submitted audio.
-    /// </summary>
-    [JsonPropertyName("channels")]
-    public int? Channels { get; set; }
+    [JsonPropertyName("sentiment_info")]
+    public SentimentInfo SentimentInfo { get; set; }
 
-    [JsonPropertyName("models")]
-    public IReadOnlyList<string>? Models { get; set; }
-
-    /// <summary>
-    /// IReadonlyDictionary of <see cref="ModelInfo"/>
-    /// </summary>
-    [JsonPropertyName("model_info")]
-    public IReadOnlyDictionary<string, ModelInfo> ModelInfo { get; set; }
-
+    [JsonPropertyName("intents_info")]
+    public IntentsInfo IntentsInfo { get; set; }
 
     /// <summary>
     /// Warnings to provide feedback about unsupported and deprecated queries.
     /// </summary>
     [JsonPropertyName("warnings")]
-    public IReadOnlyList<Warning>? Warnings { get; set; }
+    public List<Warning>? Warnings { get; set; }
+
+
 }
