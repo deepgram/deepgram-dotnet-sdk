@@ -1,19 +1,26 @@
 ﻿namespace Deepgram.Records;
 
-public class Segment
+public class SentimentSegment
 {
-    [JsonPropertyName("text")]
-    public string Text { get; set; }
-
-    [JsonPropertyName("start_word")]
-    public int? StartWord { get; set; }
-
-    [JsonPropertyName("end_word")]
-    public int? EndWord { get; set; }
 
     [JsonPropertyName("sentiment")]
     public string Sentiment { get; set; }
 
-    [JsonPropertyName("sentiment_score")]
-    public double? SentimentScore { get; set; }
+
+    [JsonPropertyName("confidence")]
+    public double? Confidence { get; set; }
+
+
+    [JsonPropertyName("text")]
+    public string Text { get; set; }
+
+
+    [JsonPropertyName("start_word")]
+    public int? StartWord { get; set; }
+
+
+    [JsonPropertyName("end_word")]
+    public int? EndWord { get; set; }
 }
+
+

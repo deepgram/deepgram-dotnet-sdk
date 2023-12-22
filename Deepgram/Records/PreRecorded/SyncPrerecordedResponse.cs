@@ -9,16 +9,18 @@ public record SyncPrerecordedResponse
     public Metadata? Metadata { get; set; }
 
     /// <summary>
-    /// Results of Response <see cref="Result"/>
+    /// Results of Response <see cref="PreRecorded.Results"/>
     /// </summary>
     [JsonPropertyName("results")]
-    public Result? Results { get; set; }
+    public Results? Results { get; set; }
 
     /// <summary>
     /// Returns a list text segments and the intents found within each segment.
     /// </summary>
     [JsonPropertyName("intents")]
     public Intents? Intents { get; set; }
+
+
 
     public string ToWebVTT()
     {

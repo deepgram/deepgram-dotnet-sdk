@@ -6,12 +6,12 @@ public record ParagraphGroup
     /// Full transcript
     /// </summary>
     [JsonPropertyName("transcript")]
-    public string Transcript { get; set; }
+    public string? Transcript { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="Paragraph"/>
     /// </summary>
     [JsonPropertyName("paragraphs")]
-    public IReadOnlyList<Paragraph> Paragraphs { get; set; }
+    public IReadOnlyList<Paragraph>? Paragraphs { get; set; }
 }
 

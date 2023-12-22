@@ -1,6 +1,7 @@
 ﻿namespace Deepgram.Models;
 public class TranscriptionSchema
 {
+
     /// <summary>
     /// Number of transcripts to return per request
     /// <see href="https://developers.deepgram.com/reference/pre-recorded"/>
@@ -16,6 +17,19 @@ public class TranscriptionSchema
     /// </summary>
     [JsonPropertyName("callback")]
     public string? CallBack { get; set; }
+
+    /// <summary>
+    /// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
+    /// </summary>
+    [JsonPropertyName("custom_intent")]
+    public string CustomIntent { get; set; }
+
+    /// <summary>
+    /// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
+    /// </summary>
+    [JsonPropertyName("custom_intent_mode")]
+    public string CustomIntentMode { get; set; }
+
 
     /// <summary>
     /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript. 
@@ -49,6 +63,12 @@ public class TranscriptionSchema
     public bool? FillerWords { get; set; }
 
     /// <summary>
+    /// Enables intent recognition
+    /// </summary>
+    [JsonPropertyName("intents")]
+    public bool? Intents { get; set; }
+
+    /// <summary>
     /// Keywords can boost or suppress specialized terminology.
     /// <see href="https://developers.deepgram.com/docs/keywords">
     /// </summary>
@@ -66,7 +86,6 @@ public class TranscriptionSchema
     /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
-    /// for possibles values <see cref="AIModel" /> default is General
     /// </summary>
     [JsonPropertyName("model")]
     public string? Model { get; set; }
@@ -125,6 +144,15 @@ public class TranscriptionSchema
     /// </summary>
     [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
+
+    /// <summary>
+    /// Enables sentiment analysis false by default
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public bool? Sentiment { get; set; }
+
+    [JsonPropertyName("sentiment_threshold")]
+    public double? SentimentThreshold { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 

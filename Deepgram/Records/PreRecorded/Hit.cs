@@ -8,11 +8,6 @@ public record Hit
     [JsonPropertyName("confidence")]
     public decimal Confidence { get; set; }
 
-    /// <summary>
-    /// Offset in seconds from the start of the audio to where the hit occurs.
-    /// </summary>
-    [JsonPropertyName("start")]
-    public decimal Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the hit ends.
@@ -25,4 +20,11 @@ public record Hit
     /// </summary>
     [JsonPropertyName("snippet")]
     public string Snippet { get; set; }
+
+    /// <summary>
+    /// Offset in seconds from the start of the audio to where the hit occurs.
+    /// </summary>
+    [JsonPropertyName("start")]
+    public decimal Start { get; set; }
+
 }

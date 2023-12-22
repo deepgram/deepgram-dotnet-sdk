@@ -3,9 +3,9 @@ public record Intents
 {
     /// <summary> 
     /// <see href="https://developers.deepgram.com/reference/audio-intelligence-apis#intent-recognition"/>
-    /// <see cref="Segment"/>
+    /// <see cref="IntentSegment"/>
     /// </summary>
     [JsonPropertyName("segments")]
-    public IReadOnlyList<Segment>? Segments { get; set; }
+    public IReadOnlyList<IntentSegment>? Segments { get; set; }
 
 }

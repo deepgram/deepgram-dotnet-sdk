@@ -35,7 +35,6 @@ public class PrerecordedClientTests
     }
 
 
-
     [Test]
     public async Task TranscribeUrl_Should_Call_PostAsync_Returning_SyncPrerecordedResponse()
     {
