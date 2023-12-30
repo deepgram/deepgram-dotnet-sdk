@@ -35,7 +35,7 @@ namespace Deepgram.Utilities
             // If the timeout has a new value, create a new HttpClient
             if (HttpClient.Timeout != timeSpan)
             {
-                HttpClient = Create();
+                // HttpClient = Create(); // temporary bug fix until SDK v4 is released
             }
 
             // Set the timeout

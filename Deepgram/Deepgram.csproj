@@ -14,6 +14,9 @@
     <Product>Deepgram.NET SDK</Product>
     <PackageId>Deepgram</PackageId>
     <Title>Deepgram.NET</Title>
+    <Version>3.4.1-beta</Version>
+    <Authors>deepgram</Authors>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>
