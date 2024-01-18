@@ -5,7 +5,6 @@
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
-
     };
 
     /// <summary>
@@ -53,13 +52,4 @@
         return deepgramResponse;
     }
 
-
-    /// <summary>
-    /// method that deserializes DeepgramResponse and performs null checks on values
-    /// </summary>
-    /// <typeparam name="TResponse">Class Type of expected response</typeparam>
-    /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
-    /// <returns>instance of TResponse or a Exception</returns>
-    internal static TResponse Deserialize<TResponse>(string content) =>
-        JsonSerializer.Deserialize<TResponse>(content, _jsonSerializerOptions);
 }

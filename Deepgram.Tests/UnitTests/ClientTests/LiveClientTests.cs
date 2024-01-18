@@ -15,10 +15,14 @@ public class LiveClientTests
     {
         var apiKey = new Faker().Random.Guid().ToString();
         // will set up with base address set to - api.deepgram.com
-        _options = new DeepgramClientOptions(apiKey);
+        _options = new DeepgramClientOptions();
         _webSocketReceiveResult = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
-        _liveClient = new LiveClient(_options);
+        _liveClient = new LiveClient(apiKey, _options);
     }
+
+    [TearDown]
+    public void Teardown()
+    { _liveClient.Dispose(); }
 
     [Test]
     public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_LiveTranscriptionResponse()

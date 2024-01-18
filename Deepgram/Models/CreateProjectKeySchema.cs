@@ -1,24 +1,18 @@
 ﻿namespace Deepgram.Models;
-public class CreateProjectKeySchema
+public class CreateProjectKeySchema(string comment, List<string> scopes)
 {
-
-    public CreateProjectKeySchema(string comment, List<string> scopes)
-    {
-        Comment = comment;
-        Scopes = scopes;
-    }
 
     /// <summary>
     /// Comment to describe key
     /// </summary>
     [JsonPropertyName("comment")]
-    public string Comment { get; set; }
+    public string Comment { get; set; } = comment;
 
     /// <summary>
     /// Scopes of the key
     /// </summary>
     [JsonPropertyName("scopes")]
-    public List<string> Scopes { get; set; }
+    public List<string> Scopes { get; set; } = scopes;
 
     /// <summary>
     /// Tag names for key

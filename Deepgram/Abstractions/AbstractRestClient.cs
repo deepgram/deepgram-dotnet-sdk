@@ -1,4 +1,4 @@
-﻿using Deepgram.Extensions;
+﻿using Deepgram.DeepgramHttpClient;
 
 namespace Deepgram.Abstractions;
 
@@ -6,28 +6,24 @@ public abstract class AbstractRestClient
 {
     /// <summary>
     ///  HttpClient created by the factory
-    internal HttpClient? _httpClient;
-
-    /// <summary>
-    /// Options for setting HttpClient and request
-    /// </summary>
-    internal DeepgramClientOptions _deepgramClientOptions;
+    internal HttpClientWrapper _httpClientWrapper;
 
     /// <summary>
     /// get the logger of category type of _clientName
     /// </summary>
     internal ILogger _logger => LogProvider.GetLogger(this.GetType().Name);
 
+
+
+
     /// <summary>
     /// Constructor that take the options and a httpClient
     /// </summary>
     /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
-    /// <param name="httpClient"><see cref="HttpClient"/>HttpClient to use for all calls from the implementing class</param>
-    internal AbstractRestClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
-    {
 
-        _deepgramClientOptions = deepgramClientOptions;
-        _httpClient = httpClient.ConfigureDeepgram(_deepgramClientOptions);
+    internal AbstractRestClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+    {
+        _httpClientWrapper = DeepgramHttpClientFactory.Create(apiKey, deepgramClientOptions);
     }
 
     /// <summary>
@@ -40,7 +36,8 @@ public abstract class AbstractRestClient
     {
         try
         {
-            var response = await _httpClient.GetAsync(uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Get, uriSegment);
+            var response = await _httpClientWrapper.SendAsync(req);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
             return result;
@@ -52,16 +49,6 @@ public abstract class AbstractRestClient
         }
     }
 
-
-    /// <summary> 
-    /// Post method for use with stream requests 
-    /// </summary> 
-    /// <typeparam name="T">Class type of what return type is expected</typeparam> 
-    /// <param name="uriSegment">Uri for the api including the query parameters</param>  
-    /// <param name="content">HttpContent as content for HttpRequestMessage</param>   
-    /// <returns>Instance of T</returns> 
-
-
     /// <summary>
     /// Post method 
     /// </summary>
@@ -69,12 +56,12 @@ public abstract class AbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
-
     public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content)
     {
         try
         {
-            var response = await _httpClient.PostAsync(uriSegment, content);
+            var req = new HttpRequestMessage(HttpMethod.Post, uriSegment) { Content = content };
+            var response = await _httpClientWrapper.SendAsync(req);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
@@ -97,7 +84,8 @@ public abstract class AbstractRestClient
     {
         try
         {
-            var response = await _httpClient.DeleteAsync(uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
+            var response = await _httpClientWrapper.SendAsync(req);
             response.EnsureSuccessStatusCode();
         }
         catch (Exception ex)
@@ -117,7 +105,8 @@ public abstract class AbstractRestClient
     {
         try
         {
-            var response = await _httpClient.DeleteAsync(uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
+            var response = await _httpClientWrapper.SendAsync(req);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
@@ -142,9 +131,11 @@ public abstract class AbstractRestClient
         {
 #if NETSTANDARD2_0
             var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
-            var response = await _httpClient.SendAsync(request);
+            var response = await _httpClientWrapper.SendAsync(request);
 #else
-            var response = await _httpClient.PatchAsync(uriSegment, content);
+            var req = new HttpRequestMessage(HttpMethod.Patch, uriSegment) { Content = content };
+            var response = await _httpClientWrapper.SendAsync(req);
+
 #endif
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -169,7 +160,11 @@ public abstract class AbstractRestClient
     {
         try
         {
-            var response = await _httpClient.PutAsync(uriSegment, content);
+            var req = new HttpRequestMessage(HttpMethod.Put, uriSegment)
+            {
+                Content = content
+            };
+            var response = await _httpClientWrapper.SendAsync(req);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
 
@@ -181,5 +176,15 @@ public abstract class AbstractRestClient
             throw;
         }
     }
+
+
+    /// <summary>
+    /// Allow for the setting of a HttpClient timeout, timeout will change for any future calls 
+    /// calls that are currently running will not be affected
+    /// </summary>
+    /// <param name="timeout"></param>
+    public void SpecifyTimeOut(TimeSpan timeout) => _httpClientWrapper.SetTimeOut(timeout);
+
+
 }
 

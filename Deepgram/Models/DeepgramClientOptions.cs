@@ -18,27 +18,4 @@ public class DeepgramClientOptions
 
     public string? BaseAddress { get; set; }
 
-    /// <summary>
-    /// Sets the timeout for calls to Deepgram.
-    /// Not used if the HttpClient is provided.
-    /// Default timeout is 100 seconds <see href="https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.timeout?view=net-6.0"/>
-    /// </summary>
-    public TimeSpan? HttpTimeout { get; set; }
-
-    internal string ApiKey { get; }
-
-    /// <summary>
-    /// Creates a new Deepgram client options
-    /// </summary>
-    /// <param name="apiKey">The key to authenticate with Deepgram</param>
-    public DeepgramClientOptions(string apiKey)
-    {
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            Log.ApiKeyNotPresent(LogProvider.GetLogger(nameof(DeepgramClientOptions)), nameof(DeepgramClientOptions));
-            throw new ArgumentNullException(nameof(apiKey));
-        }
-
-        ApiKey = apiKey;
-    }
 }

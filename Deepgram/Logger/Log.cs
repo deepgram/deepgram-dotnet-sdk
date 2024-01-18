@@ -10,8 +10,8 @@ internal static partial class Log
     [LoggerMessage(
         EventId = 0005,
         Level = LogLevel.Information,
-        Message = "Whilst creating `{clientType}` there was no ApiKey ")]
-    internal static partial void ApiKeyNotPresent(this ILogger logger, string clientType);
+        Message = "Whilst creating RestClient there was no ApiKey ")]
+    internal static partial void ApiKeyNotPresent(this ILogger logger);
 
 
     [LoggerMessage(

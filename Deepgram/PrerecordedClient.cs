@@ -5,18 +5,12 @@ namespace Deepgram;
 /// <summary>
 /// Constructor to create a client for the Deepgram Prerecorded API
 /// </summary>
+/// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-/// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
-public class PrerecordedClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
-    : AbstractRestClient(deepgramClientOptions, httpClient)
-{
-    /// <summary>
-    /// Constructor with default Options
-    /// </summary>
-    /// <param name="apiKey">The key to authenticate with Deepgram</param>
-    /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
-    public PrerecordedClient(string apiKey, HttpClient httpClient) : this(new DeepgramClientOptions(apiKey), httpClient) { }
+public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+    : AbstractRestClient(apiKey, deepgramClientOptions)
 
+{
     internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
     #region NoneCallBacks
     /// <summary>

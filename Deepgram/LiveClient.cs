@@ -3,12 +3,14 @@ using Deepgram.Records.Live;
 
 namespace Deepgram;
 
-public class LiveClient
+/// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
+public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : IDisposable
 {
     #region Fields
 
     internal ILogger logger => LogProvider.GetLogger(this.GetType().Name);
-    internal readonly DeepgramClientOptions _deepgramClientOptions;
+    internal string _apiKey = apiKey;
+    internal readonly DeepgramClientOptions? _deepgramClientOptions = deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
     internal readonly CancellationTokenSource _tokenSource = new();
     internal bool _disposed;
@@ -42,21 +44,7 @@ public class LiveClient
 
     #endregion
 
-    /// <summary>
-    /// Constructor with default Options
-    /// </summary>
-    /// <param name="apiKey">The key to authenticate with Deepgram</param>
-
-    public LiveClient(string apiKey) : this(new DeepgramClientOptions(apiKey)) { }
-
-
-    /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-    public LiveClient(DeepgramClientOptions deepgramClientOptions)
-    {
-        _deepgramClientOptions = deepgramClientOptions;
-    }
-
-    //TODO when a response is recieved check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
+    //TODO when a response is received check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
 
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
@@ -68,7 +56,7 @@ public class LiveClient
         var cancelToken = cancellationToken ?? _tokenSource.Token;
         _clientWebSocket?.Dispose();
         _clientWebSocket = new ClientWebSocket()
-            .SetHeaders(_deepgramClientOptions);
+            .SetHeaders(_apiKey, _deepgramClientOptions);
 
         try
         {
@@ -297,7 +285,7 @@ public class LiveClient
     internal readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<MessageToSend>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions deepgramClientOptions)
+    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions? deepgramClientOptions)
     {
         var baseUrl = GetBaseUrl(deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
@@ -324,9 +312,15 @@ public class LiveClient
         EnqueueForSending(new MessageToSend(keepAliveBytes, WebSocketMessageType.Text));
     }
 
-    internal static string GetBaseUrl(DeepgramClientOptions deepgramClientOptions)
+    internal static string GetBaseUrl(DeepgramClientOptions? deepgramClientOptions)
     {
-        var baseAddress = deepgramClientOptions.BaseAddress;
+        string baseAddress = Defaults.DEFAULT_URI;
+        if (deepgramClientOptions is not null && deepgramClientOptions.BaseAddress is not null)
+        {
+            baseAddress = deepgramClientOptions.BaseAddress;
+        }
+
+
         //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
         Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
         if (regex.IsMatch(baseAddress))

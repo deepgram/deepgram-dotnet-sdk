@@ -1,11 +1,11 @@
 ﻿namespace Deepgram.Extensions;
 public static class ClientWebSocketExtensions
 {
-    public static ClientWebSocket SetHeaders(this ClientWebSocket clientWebSocket, DeepgramClientOptions options)
+    public static ClientWebSocket SetHeaders(this ClientWebSocket clientWebSocket, string apiKey, DeepgramClientOptions? options)
     {
-        clientWebSocket.Options.SetRequestHeader("Authorization", $"token {options.ApiKey}");
+        clientWebSocket.Options.SetRequestHeader("Authorization", $"token {apiKey}");
 
-        if (options.Headers is not null)
+        if (options is not null && options.Headers is not null)
             foreach (var header in options.Headers)
             { clientWebSocket.Options.SetRequestHeader(header.Key, header.Value); }
 

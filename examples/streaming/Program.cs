@@ -1,17 +1,18 @@
-using Deepgram.CustomEventArgs;
-using Deepgram.Models;
 using System.Net.WebSockets;
+using Deepgram.Constants;
+using Deepgram.DeepgramEventArgs;
+using Deepgram.Models;
 
-const string DEEPGRAM_API_KEY = "YOUR_DEEPGRAM_API_KEY";
-var credentials = new Credentials(DEEPGRAM_API_KEY);
+const string DEEPGRAM_API_KEY = "";
 
-var deepgramClient = new DeepgramClient(credentials);
 
-using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
+
+
+using (var deepgramLive = new LiveClient(DEEPGRAM_API_KEY))
 {
     deepgramLive.ConnectionOpened += HandleConnectionOpened;
     deepgramLive.ConnectionClosed += HandleConnectionClosed;
-    deepgramLive.ConnectionError += HandleConnectionError;
+    deepgramLive.LiveError += HandleConnectionError;
     deepgramLive.TranscriptReceived += HandleTranscriptReceived;
 
     // Connection opened so start sending audio.
@@ -19,7 +20,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
     {
         byte[] buffer;
 
-        using (FileStream fs = File.OpenRead("preamble.wav"))
+        using (FileStream fs = File.OpenRead(@"\preamble.wav"))
         {
             buffer = new byte[fs.Length];
             fs.Read(buffer, 0, (int)fs.Length);
@@ -38,9 +39,10 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 
     void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)
     {
-        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0) {
+        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0)
+        {
             var transcript = e.Transcript;
-            Console.WriteLine($"[Speaker: {transcript.Channel.Alternatives.First().Words.First().Speaker}] {transcript.Channel.Alternatives.First().Transcript}");
+            Console.WriteLine($"[Speaker: {transcript.Channel.Alternatives.First().Words.First()}] {transcript.Channel.Alternatives.First().Transcript}");
         }
     }
 
@@ -49,12 +51,12 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
         Console.Write("Connection Closed");
     }
 
-    void HandleConnectionError(object? sender, ConnectionErrorEventArgs e)
+    void HandleConnectionError(object? sender, LiveErrorEventArgs e)
     {
         Console.WriteLine(e.Exception.Message);
     }
 
-    var options = new LiveTranscriptionOptions() { Punctuate = true, Diarize = true, Encoding = Deepgram.Common.AudioEncoding.Linear16 };
+    var options = new LiveSchema() { Punctuate = true, Diarize = true, Encoding = AudioEncoding.Linear16 };
     await deepgramLive.StartConnectionAsync(options);
 
     while (deepgramLive.State() == WebSocketState.Open) { }
