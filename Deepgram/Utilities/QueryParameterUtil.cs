@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
@@ -34,6 +35,10 @@ namespace Deepgram.Utilities
                         else if (prop.Value.Type == JTokenType.Date)
                         {
                             paramList.Add(new KeyValuePair<string, string>(prop.Name, HttpUtility.UrlEncode(((DateTime)prop.Value).ToString("yyyy-MM-dd"))));
+                        }
+                        else if (prop.Value.Type == JTokenType.Float)
+                        {
+                            paramList.Add(new KeyValuePair<string, string>(prop.Name, ((JValue)prop.Value).ToString(CultureInfo.InvariantCulture)));
                         }
                         else
                         {
