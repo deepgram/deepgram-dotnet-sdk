@@ -45,7 +45,45 @@ namespace Deepgram.Models
         /// Warnings to provide feedback about unsupported and deprecated queries.
         /// </summary>
         [JsonProperty("warnings")]
-        public Warning[] Warnings  { get; set; }  
+        public Warning[] Warnings  { get; set; }
+
+        /// <summary>
+        /// Models used in this API Request
+        /// </summary>
+        [JsonProperty("models")]
+        public Guid[] Models { get; set; }
+
+        /// <summary>
+        /// Info about the Model
+        /// </summary>
+        [JsonProperty("model_info")]
+        public ModelInfo ModelInfo { get; set; }
+
+        /*
+            /// <summary>
+            /// Intent tokens used in API Request
+            /// </summary>
+            [JsonProperty("intents_info")]
+            public IntentsInfo IntentsInfo { get; set; } = null;
+
+            /// <summary>
+            /// Summary tokens used in API Request
+            /// </summary>
+            [JsonProperty("summary_info")]
+            public SummaryInfo SummaryInfo { get; set; } = null;
+
+            /// <summary>
+            /// Sentiment tokens used in API Request
+            /// </summary>
+            [JsonProperty("sentiment_info")]
+            public SentimentInfo SentimentInfo { get; set; } = null;
+
+            /// <summary>
+            /// Topic tokens used in API Request
+            /// </summary>
+            [JsonProperty("topics_info")]
+            public TopicsInfo TopicsInfo { get; set; } = null;
+        */
 
         /// <summary>
         /// Allows labeling your requests for the purpose of identification during usage reporting.
