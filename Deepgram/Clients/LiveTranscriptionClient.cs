@@ -252,6 +252,8 @@ namespace Deepgram.Clients
                             if (result.MessageType == WebSocketMessageType.Close)
                             {
                                 Console.WriteLine(result.CloseStatusDescription);
+                                var logger = Logger.LogProvider.GetLogger(LOGGER_CATEGORY);
+                                logger.LogDebug("WebSocket sent close message.");
                                 break;
                             }
 
