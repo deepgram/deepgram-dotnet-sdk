@@ -20,7 +20,7 @@ public record Sentiments
 
 
     [JsonPropertyName("segments")]
-    public List<Segment> Segments { get; } = new List<Segment>();
+    public List<Segment> Segments { get; } = [];
 
 
     [JsonPropertyName("average")]

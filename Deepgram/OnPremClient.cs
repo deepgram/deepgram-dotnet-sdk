@@ -6,21 +6,13 @@ namespace Deepgram;
 /// <summary>
 /// Constructor for the client that communicates with the on premise Deepgram Server
 /// </summary>
-/// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
+/// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class OnPremClient(DeepgramClientOptions deepgramClientOptions, HttpClient httpClient)
-    : AbstractRestClient(deepgramClientOptions, httpClient)
+public class OnPremClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+    : AbstractRestClient(apiKey, deepgramClientOptions)
 {
-
-    /// <summary>
-    /// Constructor with default Options
-    /// </summary>
-    /// <param name="apiKey">The key to authenticate with Deepgram</param>
-    /// <param name="httpClient"><see cref="HttpClient"/> for making Rest calls</param>
-    public OnPremClient(string apiKey, HttpClient httpClient) : this(new DeepgramClientOptions(apiKey), httpClient) { }
-
-
     internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
+
     /// <summary>
     /// get a list of credentials associated with project
     /// </summary>

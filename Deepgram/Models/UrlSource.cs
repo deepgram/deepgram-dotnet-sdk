@@ -1,17 +1,11 @@
 ﻿namespace Deepgram.Models;
 
-public class UrlSource
+public class UrlSource(string url)
 {
-    public UrlSource(string url)
-    {
-        Url = url;
-    }
     /// <summary>
     /// Url of the file to transcribe
     /// </summary>
     [JsonPropertyName("url")]
-    public string? Url { get; set; }
-
-
+    public string? Url { get; set; } = url;
 }
 

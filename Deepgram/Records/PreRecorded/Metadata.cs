@@ -18,7 +18,7 @@ public record Metadata
     /// Duration in seconds of the submitted audio.
     /// </summary>
     [JsonPropertyName("duration")]
-    public decimal? Duration { get; set; }
+    public double? Duration { get; set; }
 
     /// <summary>
     /// IReadonlyDictionary of <see cref="ModelInfo"/>
@@ -49,7 +49,6 @@ public record Metadata
 
     /// <summary>
     /// Blob of text that helps Deepgram engineers debug any problems you encounter.
-    /// 
     /// </summary>
     [JsonPropertyName("transaction_key")]
     [Obsolete]

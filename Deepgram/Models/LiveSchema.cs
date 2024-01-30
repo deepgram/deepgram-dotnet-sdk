@@ -45,7 +45,7 @@ public class LiveSchema : TranscriptionSchema
     /// <see href="https://developers.deepgram.com/docs/understanding-end-of-speech-detection-while-streaming"/>
     /// </summary>
     [JsonPropertyName("utterance_end_ms")]
-    public string? UtteranceEnd { get; set; }
+    public int? UtteranceEnd { get; set; }
 
 
 }

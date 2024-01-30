@@ -11,13 +11,11 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Documentation](#documentation)
 - [Installation](#installation)
 - [Targeted Frameworks](#targeted-frameworks)
-- [Configuration](#configuration)
-  - [Default](#default) 
-   - [Notes regarding Cors](#notes-regarding-cors)
-  - [Examples](#examples)  
+- [Notes regarding Cors](#notes-regarding-cors)  
 - [Creating A Rest Client](#creating-a-rest-client)
   - [Default Client Creation](#default-client-creation)    
 - [Examples](#examples)
+- [HttpClientTimeout](#http-client-timeout)
 - [Transcription](#transcription)
   - [Remote File](#remote-file) 
     - [UrlSource](#urlsource)
@@ -101,22 +99,6 @@ Right click on project and select manage nuget packages
 - 6.0.x
 - NetStandard2.0
 
-# Configuration
-Add to you ServiceCollection class
-
-## to use default values 
-```csharp     
-    services.AddDeepgram(apiKey):
-```
-
-### With modified values
-```csharp
-    var options = new DeepgramOptions("apiKey")
-    {
-        BaseAddress  = "https://AcmeNemesisServices.com"
-    }
-    services.AddDeepgram(options)
-```
 
 #### Notes Regarding CORS
     deepgram api does not support COR requests
@@ -124,6 +106,14 @@ Add to you ServiceCollection class
 
 ### Examples
 
+### HttpClient Timeout
+Timeout can be set on calling the various RestClients SpecifyTimeOut passing in a Timespan
+
+default Timout is set to 5 minutes. 
+In general the default timeout will be all that you need. However, when using the prerecorded client
+to Transcibe you may find out that sending longer file to transcribe or choosing more Transcription options
+will increase the time it take to transcibe your content, in there cases you can either change the HttpClientsTimeout
+or use one of the Callback approaches if you dont want to be waiting around for the response.
 
 # Creating a Client
 The Sdk is configure to support Dependency injection. But you can also creat client with new()
@@ -135,12 +125,9 @@ y
 ## Default Client Creation
 ```csharp
    
-var manageClient = new ManageClient(apikey,httpClient);
-
+var manageClient = new ManageClient(apikey,deepgramClientOptions);
     or
-
-    var options = new DeepgramClientOptions("yourapikey");
-    var manageClient = new ManageClient(options,httpClient);
+    var manageClient = new ManageClient(apiKey);
 ```
 
 
@@ -148,11 +135,11 @@ var manageClient = new ManageClient(apikey,httpClient);
 >If you  need to customize the urlmset optional headers or change the deault HttpClient timeout then you can when creating  a client 
 >passing in a instance of DeepgramClientOptions. 
 ```csharp
- var options = new DeepgramOptions("apiKey")
+ var options = new DeepgramOptions()
     {
         BaseAddress  = "https://ScoobyDooDetectives.org"
     }
-var manageClient = new ManageClient(options,HttpClient);
+var manageClient = new ManageClient("apiKey",options);
 ```
 
 ### DeepgramClientOptions
@@ -160,41 +147,8 @@ var manageClient = new ManageClient(options,HttpClient);
 | --------         | :-----                      | :---------------------------:          |
 | BaseAddress      | string?                     | url of server, include protocol        |
 | Headers          | Dictionary<string, string>? | any headers that you want to add       |
-| HttpTimeout      | TimeSpan?                   | Optional Timeout setting for HttpClient|
-| ApiKey           | string                      | Deepgram API Key|
-
-#### Notes on client Creaton
-Options and predefined HttpCLients take presedence over values passed in by throught the ServiceCollection
-if a HttpClient has a base address - the SDK will not check it is properly formatted with protocols attached
-
-if you use the new() approach you need to pass in the HttpClient instance- it is recommend you use the name client type
-as it has Polly wait and retry polices set on it.
-
-
-**Default.HTTPCLIENT_NAME** is a const string included in the SDK
-```csharp
-    var httpClient = httpClientFactory.CreateClient(Default.HTTPCLIENT_NAME);
-```
-
-if you decided on creating a HttpClient without using the name type included in the SDK. 
-the HttpClient and HttpClientMessageHandler Lifetime and resource management are your responsiblity
-the only thing that the SDK can change at this point is the Timeout
-
-if you are using a console app and dont have access to the service collection create a local service collection.
-An example of doing this  -- 
-```csharp
-    var services = new ServiceCollection();
-    var httpClientFactory = services.BuildServiceProvider();
-    var client = _serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient(Defaults.HTTPCLIENT_NAME);
-    var deepgramClientOptions = new DeepgramClientOptions("yourapikey");
-
-    var manageClient = new ManageClient(deepgramClientOptions,client);
-    
-```
 
 >UserAgent & Authorization headers are added internally
-
->Timeout can also be set by callling the RestClients SetTimeout(Timespan)
 
 
 # Examples

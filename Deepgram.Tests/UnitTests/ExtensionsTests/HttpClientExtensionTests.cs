@@ -6,12 +6,13 @@ public class HttpClientExtensionTests
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
     DeepgramClientOptions _clientOptions;
-
+    string _apiKey;
     [SetUp]
     public void Setup()
     {
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
-        _clientOptions = new DeepgramClientOptions(Guid.NewGuid().ToString());
+        _clientOptions = new DeepgramClientOptions();
+        _apiKey = new Faker().Random.Guid().ToString();
     }
 
 
@@ -23,7 +24,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -43,7 +44,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -62,7 +63,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -87,7 +88,7 @@ public class HttpClientExtensionTests
         _clientOptions.BaseAddress = expectedBaseAddress;
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -99,7 +100,7 @@ public class HttpClientExtensionTests
     }
 
     [Test]
-    public void Should_Return_HttpClient_With_Predfined_values()
+    public void Should_Return_HttpClient_With_Predefined_values()
     {
         //Arrange       
         _clientOptions.Headers = FakeHeaders();
@@ -109,7 +110,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_clientOptions);
+        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())

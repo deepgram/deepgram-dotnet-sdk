@@ -26,4 +26,5 @@ public record LiveMetadataResponse
 
     [JsonPropertyName("models")]
     public IReadOnlyList<string> Models { get; set; }
+    public IReadOnlyDictionary<Guid, ModelInfo> ModelInfo { get; set; }
 }

@@ -3,60 +3,27 @@ using Deepgram.Records.Live;
 
 namespace Deepgram;
 
-public class LiveClient
+/// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
+public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : IDisposable
 {
     #region Fields
 
     internal ILogger logger => LogProvider.GetLogger(this.GetType().Name);
-    internal readonly DeepgramClientOptions _deepgramClientOptions;
+    internal string _apiKey = apiKey;
+    internal readonly DeepgramClientOptions? _deepgramClientOptions = deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
     internal readonly CancellationTokenSource _tokenSource = new();
-    internal bool _disposed;
+    internal bool _isDisposed;
     #endregion
 
     #region Subscribe Events
     /// <summary>
-    /// Fires when the WebSocket connection to Deepgram has been opened
-    /// </summary>
-    public event EventHandler<ConnectionOpenEventArgs>? ConnectionOpened;
-
-    /// <summary>
-    /// Fires on any error during sending,receiving or message processing
-    /// </summary>
-    public event EventHandler<LiveErrorEventArgs>? LiveError;
-
-    /// <summary>
-    /// Fires when the WebSocket connection is closed
-    /// </summary>
-    public event EventHandler<ConnectionClosedEventArgs>? ConnectionClosed;
-
-    /// <summary>
-    /// Fires when a transcript is received from the Deepgram API
-    /// </summary>
-    public event EventHandler<TranscriptReceivedEventArgs>? TranscriptReceived;
-
-    /// <summary>
     /// Fires when transcription metadata is received from the Deepgram API
-    /// </summary>
-    public event EventHandler<MetadataReceivedEventArgs>? MetadataReceived;
-
+    /// </summary>  
+    public event EventHandler<LiveResponseReceivedEventArgs>? LiveResponseReceived;
     #endregion
 
-    /// <summary>
-    /// Constructor with default Options
-    /// </summary>
-    /// <param name="apiKey">The key to authenticate with Deepgram</param>
-
-    public LiveClient(string apiKey) : this(new DeepgramClientOptions(apiKey)) { }
-
-
-    /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-    public LiveClient(DeepgramClientOptions deepgramClientOptions)
-    {
-        _deepgramClientOptions = deepgramClientOptions;
-    }
-
-    //TODO when a response is recieved check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
+    //TODO when a response is received check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
 
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
@@ -66,9 +33,8 @@ public class LiveClient
     public async Task StartConnectionAsync(LiveSchema options, CancellationToken? cancellationToken = null)
     {
         var cancelToken = cancellationToken ?? _tokenSource.Token;
-        _clientWebSocket?.Dispose();
         _clientWebSocket = new ClientWebSocket()
-            .SetHeaders(_deepgramClientOptions);
+           .SetHeaders(_apiKey, _deepgramClientOptions);
 
         try
         {
@@ -77,8 +43,7 @@ public class LiveClient
                 cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
-            ConnectionOpened?.Invoke(null, new ConnectionOpenEventArgs());
-            _disposed = false;
+
         }
         catch (Exception ex)
         {
@@ -95,6 +60,9 @@ public class LiveClient
             TaskCreationOptions.LongRunning,
             cancelToken);
     }
+
+
+
 
     /// <summary>
     /// Sends a binary message over the WebSocket connection.
@@ -115,10 +83,9 @@ public class LiveClient
         }
     }
 
-    internal async Task ProcessSenderQueue(CancellationToken? cancellationToken = null)
+    internal async Task ProcessSenderQueue(CancellationToken cancellationToken = default)
     {
-        var cancelToken = cancellationToken ?? _tokenSource.Token;
-        if (_disposed)
+        if (_isDisposed)
         {
             var ex = new Exception(
                "Attempting to start a sender queue when the WebSocket has been disposed is not allowed.");
@@ -128,18 +95,12 @@ public class LiveClient
 
         try
         {
-            while (await _sendChannel.Reader.WaitToReadAsync(cancelToken))
+            while (await _sendChannel.Reader.WaitToReadAsync())
             {
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
-                    if (_clientWebSocket!.State != WebSocketState.Open)
-                        Log.LiveSendWarning(logger, _clientWebSocket.State);
+                    await _clientWebSocket.SendAsync(message.Message, message.MessageType, true, cancellationToken).ConfigureAwait(false);
 
-                    await _clientWebSocket.SendAsync(
-                        message.Message,
-                        WebSocketMessageType.Text,
-                        true,
-                        cancelToken).ConfigureAwait(false);
                 }
             }
         }
@@ -148,8 +109,6 @@ public class LiveClient
             ProcessException("Process sender queue", ex);
         }
     }
-
-
 
     internal async Task Receive(CancellationToken? cancellationToken = null)
     {
@@ -208,18 +167,32 @@ public class LiveClient
             {
                 try
                 {
+                    var liveResponse = new LiveResponse();
                     var data = JsonDocument.Parse(response);
+                    using (var stream = new MemoryStream())
+                    {
+                        Utf8JsonWriter writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+                        data.WriteTo(writer);
+                        writer.Flush();
+                        string json = Encoding.UTF8.GetString(stream.ToArray());
+                        File.AppendAllText(@"D:\Projects\deepgram-dotnet-sdk\Deepgram\Test2.json", json);
+                    }
+
                     var val = Enum.Parse(typeof(LiveType), data.RootElement.GetProperty("type").GetString());
+
                     switch (val)
                     {
                         case LiveType.Results:
-                            TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(data.Deserialize<LiveTranscriptionResponse>()!));
+                            liveResponse.Transcription = data.Deserialize<LiveTranscriptionResponse>()!;
                             break;
                         case LiveType.Metadata:
-                            MetadataReceived?.Invoke(null, new MetadataReceivedEventArgs(data.Deserialize<LiveMetadataResponse>()!));
+                            liveResponse.MetaData = data.Deserialize<LiveMetadataResponse>()!;
                             break;
-
+                        case LiveType.UtteranceEnd:
+                            liveResponse.UtteranceEnd = data.Deserialize<LiveUtteranceEndResponse>()!;
+                            break;
                     }
+                    LiveResponseReceived?.Invoke(null, new LiveResponseReceivedEventArgs(liveResponse));
                 }
                 catch (Exception ex)
                 {
@@ -245,7 +218,7 @@ public class LiveClient
                 Log.ClosingSocket(logger);
             }
 
-            if (!_disposed)
+            if (!_isDisposed)
             {
                 if (_clientWebSocket!.State != WebSocketState.Closed)
                 {
@@ -259,8 +232,6 @@ public class LiveClient
                 // Always request cancellation to the local token source, if some function has been called without a token
                 _tokenSource?.Cancel();
             }
-
-            ConnectionClosed?.Invoke(null, new ConnectionClosedEventArgs());
         }
         catch (Exception ex)
         {
@@ -292,12 +263,12 @@ public class LiveClient
     /// Retrieves the connection state of the WebSocket
     /// </summary>
     /// <returns>Returns the connection state of the WebSocket</returns>
-    public WebSocketState State() => _clientWebSocket == null ? WebSocketState.None : _clientWebSocket.State;
+    public WebSocketState State() => _clientWebSocket.State;
 
     internal readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<MessageToSend>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions deepgramClientOptions)
+    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions? deepgramClientOptions)
     {
         var baseUrl = GetBaseUrl(deepgramClientOptions);
         var query = QueryParameterUtil.GetParameters(queryParameters);
@@ -308,25 +279,23 @@ public class LiveClient
 
     private void ProcessException(string action, Exception ex)
     {
-        if (_disposed)
+        if (_isDisposed)
             Log.SocketDisposed(logger, action, ex);
         else
             Log.Exception(logger, action, ex);
-
-        LiveError?.Invoke(null, new LiveErrorEventArgs(ex));
     }
 
-    public void KeepAlive()
-    {
-        var keepAliveMessage = JsonSerializer.Serialize(new { type = "KeepAlive" });
-        var keepAliveBytes = Encoding.Default.GetBytes(keepAliveMessage);
 
-        EnqueueForSending(new MessageToSend(keepAliveBytes, WebSocketMessageType.Text));
-    }
 
-    internal static string GetBaseUrl(DeepgramClientOptions deepgramClientOptions)
+    internal static string GetBaseUrl(DeepgramClientOptions? deepgramClientOptions)
     {
-        var baseAddress = deepgramClientOptions.BaseAddress;
+        string baseAddress = Defaults.DEFAULT_URI;
+        if (deepgramClientOptions is not null && deepgramClientOptions.BaseAddress is not null)
+        {
+            baseAddress = deepgramClientOptions.BaseAddress;
+        }
+
+
         //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
         Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
         if (regex.IsMatch(baseAddress))
@@ -342,7 +311,7 @@ public class LiveClient
 
     public void Dispose()
     {
-        if (_disposed)
+        if (_isDisposed)
         {
             return;
         }
@@ -352,7 +321,7 @@ public class LiveClient
         _sendChannel?.Writer.Complete();
         _clientWebSocket?.Dispose();
 
-        _disposed = true;
+        _isDisposed = true;
     }
 
     #endregion

@@ -1,13 +1,9 @@
 ﻿namespace Deepgram.Models;
-public class UpdateProjectMemberScopeSchema
+public class UpdateProjectMemberScopeSchema(string scope)
 {
-    public UpdateProjectMemberScopeSchema(string scope)
-    {
-        Scope = scope;
-    }
     /// <summary>
     /// Scope to add for member
     /// </summary>
     [JsonPropertyName("scope")]
-    public string Scope { get; set; }
+    public string Scope { get; set; } = scope;
 }

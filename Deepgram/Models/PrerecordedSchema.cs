@@ -7,7 +7,7 @@ public class PrerecordedSchema : TranscriptionSchema
     /// Entity Detection identifies and extracts key entities from content in submitted audio
     /// <see href="https://developers.deepgram.com/docs/detect-entities">
     /// </summary>
-    [JsonPropertyName("detect_entites")]
+    [JsonPropertyName("detect_entities")]
     public bool? DetectEntities { get; set; }
 
     /// <summary>
