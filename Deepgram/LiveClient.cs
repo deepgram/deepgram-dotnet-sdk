@@ -18,35 +18,9 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
 
     #region Subscribe Events
     /// <summary>
-    /// Fires when the WebSocket connection to Deepgram has been opened
-    /// </summary>
-    public event EventHandler<ConnectionOpenEventArgs>? ConnectionOpened;
-
-    /// <summary>
-    /// Fires on any error during sending,receiving or message processing
-    /// </summary>
-    public event EventHandler<LiveErrorEventArgs>? LiveError;
-
-    /// <summary>
-    /// Fires when the WebSocket connection is closed
-    /// </summary>
-    public event EventHandler<ConnectionClosedEventArgs>? ConnectionClosed;
-
-    /// <summary>
-    /// Fires when a transcript is received from the Deepgram API
-    /// </summary>
-    public event EventHandler<TranscriptReceivedEventArgs>? TranscriptReceived;
-
-    /// <summary>
     /// Fires when transcription metadata is received from the Deepgram API
-    /// </summary>
-    public event EventHandler<MetadataReceivedEventArgs>? MetadataReceived;
-
-    /// <summary>
-    /// Fires when transcription metadata is received from the Deepgram API
-    /// </summary>
-    public event EventHandler<UtteranceEndReceivedEventArgs>? UtteranceEndReceived;
-
+    /// </summary>  
+    public event EventHandler<LiveResponseReceivedEventArgs>? LiveResponseReceived;
     #endregion
 
     //TODO when a response is received check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
@@ -69,6 +43,7 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
                 cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
+
         }
         catch (Exception ex)
         {
@@ -192,29 +167,32 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
             {
                 try
                 {
+                    var liveResponse = new LiveResponse();
                     var data = JsonDocument.Parse(response);
-                    //using (var stream = new MemoryStream())
-                    //{
-                    //    Utf8JsonWriter writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
-                    //    data.WriteTo(writer);
-                    //    writer.Flush();
-                    //    string json = Encoding.UTF8.GetString(stream.ToArray());
-                    //    File.AppendAllText(@"D:\Projects\deepgram-dotnet-sdk\Deepgram\Test2.json", json);
-                    //}
+                    using (var stream = new MemoryStream())
+                    {
+                        Utf8JsonWriter writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+                        data.WriteTo(writer);
+                        writer.Flush();
+                        string json = Encoding.UTF8.GetString(stream.ToArray());
+                        File.AppendAllText(@"D:\Projects\deepgram-dotnet-sdk\Deepgram\Test2.json", json);
+                    }
+
                     var val = Enum.Parse(typeof(LiveType), data.RootElement.GetProperty("type").GetString());
 
                     switch (val)
                     {
                         case LiveType.Results:
-                            TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(data.Deserialize<LiveTranscriptionResponse>()!));
+                            liveResponse.Transcription = data.Deserialize<LiveTranscriptionResponse>()!;
                             break;
                         case LiveType.Metadata:
-                            MetadataReceived?.Invoke(null, new MetadataReceivedEventArgs(data.Deserialize<LiveMetadataResponse>()!));
+                            liveResponse.MetaData = data.Deserialize<LiveMetadataResponse>()!;
                             break;
                         case LiveType.UtteranceEnd:
-                            UtteranceEndReceived?.Invoke(null, new UtteranceEndReceivedEventArgs(data.Deserialize<LiveUtteranceEndResponse>()!));
+                            liveResponse.UtteranceEnd = data.Deserialize<LiveUtteranceEndResponse>()!;
                             break;
                     }
+                    LiveResponseReceived?.Invoke(null, new LiveResponseReceivedEventArgs(liveResponse));
                 }
                 catch (Exception ex)
                 {
@@ -254,8 +232,6 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
                 // Always request cancellation to the local token source, if some function has been called without a token
                 _tokenSource?.Cancel();
             }
-
-            ConnectionClosed?.Invoke(null, new ConnectionClosedEventArgs());
         }
         catch (Exception ex)
         {
@@ -307,8 +283,6 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
             Log.SocketDisposed(logger, action, ex);
         else
             Log.Exception(logger, action, ex);
-
-        LiveError?.Invoke(null, new LiveErrorEventArgs(ex));
     }
 
 
