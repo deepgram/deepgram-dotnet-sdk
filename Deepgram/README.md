@@ -228,11 +228,8 @@ var deepgramClient = new LiveClient(apiKey);
 
 using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {
-    deepgramLive.ConnectionOpened += HandleConnectionOpened;
-    deepgramLive.ConnectionClosed += HandleConnectionClosed;
-    deepgramLive.ConnectionError += HandleConnectionError;
-    deepgramLive.TranscriptReceived += HandleTranscriptReceived;
-    deepgramLive.MetaDataReceivedReceived += HandleMetadataReceived;
+    
+    deepgramLive.LiveResponseReceived += LiveResponseReceived;
 
     // Connection opened so start sending audio.
     async void HandleConnectionOpened(object? sender, ConnectionOpenEventArgs e)
@@ -256,22 +253,21 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
         await deepgramLive.FinishAsync();
     }
 
-    void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)
+    private async void HandleLiveResponseReceived(object? sender, LiveResponseReceivedEventArgs e)
     {
-        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0) {
-            var transcript = e.Transcript;
-            Console.WriteLine($"[Speaker: {transcript.Channel.Alternatives.First().Words.First().Speaker}] {transcript.Channel.Alternatives.First().Transcript}");
+        if (e.Response.Error is not null)
+        {
+            System.Console.WriteLine(e.Response.Error.Message);
+        } 
+    }
+        else if (e.Response.Transcription is not null)
+    {
+        var transcripts = response.Transcription.Channel.Alternatives
+                .Where(a => a.Transcript.Length > 0);
+        if (transcripts.Any())
+        {
+            await HandleTranscription(transcripts.ToList()).ConfigureAwait(false);
         }
-    }
-
-    void HandleConnectionClosed(object? sender, ConnectionClosedEventArgs e)
-    {
-        Console.Write("Connection Closed");
-    }
-
-    void HandleConnectionError(object? sender, ConnectionErrorEventArgs e)
-    {
-        Console.WriteLine(e.Exception.Message);
     }
 
     var options = new LiveTranscriptionOptions() { Punctuate = true, Diarize = true, Encoding = Deepgram.Common.AudioEncoding.Linear16 };

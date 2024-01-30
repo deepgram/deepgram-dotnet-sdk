@@ -283,6 +283,8 @@ public class LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOpti
             Log.SocketDisposed(logger, action, ex);
         else
             Log.Exception(logger, action, ex);
+        LiveResponseReceived?.Invoke(null, new LiveResponseReceivedEventArgs(new LiveResponse() { Error = ex }));
+
     }
 
 

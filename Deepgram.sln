@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram", "Deepgram\Deepgr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Tests", "Deepgram.Tests\Deepgram.Tests.csproj", "{12C80273-08DD-494C-B06D-DFC6D40B1D95}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepGram.Live.Console", "C:\Users\davin\OneDrive\Desktop\Deepgram.Live.Console-main\Deepgram.Live.Console-main\src\DeepGram.Live.Console\DeepGram.Live.Console.csproj", "{B375CD06-26CF-4204-BCF9-9F74B14B31D9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B375CD06-26CF-4204-BCF9-9F74B14B31D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B375CD06-26CF-4204-BCF9-9F74B14B31D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B375CD06-26CF-4204-BCF9-9F74B14B31D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B375CD06-26CF-4204-BCF9-9F74B14B31D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
