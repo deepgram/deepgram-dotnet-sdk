@@ -2,5 +2,6 @@
 public enum LiveType
 {
     Metadata,
-    Results
+    Results,
+    UtteranceEnd
 }

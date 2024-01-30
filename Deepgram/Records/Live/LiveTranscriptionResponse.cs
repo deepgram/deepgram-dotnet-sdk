@@ -31,4 +31,6 @@ public record LiveTranscriptionResponse
     /// </summary>
     [JsonPropertyName("intents")]
     public Intents? Intents { get; set; }
+
+    public Exception? Error { get; set; }
 }
