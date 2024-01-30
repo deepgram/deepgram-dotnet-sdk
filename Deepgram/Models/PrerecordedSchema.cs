@@ -33,8 +33,6 @@ public class PrerecordedSchema : TranscriptionSchema
     [JsonPropertyName("dictation")]
     public bool? Dictation { get; set; }
 
-
-
     /// <summary>
     /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg
     /// Default is false

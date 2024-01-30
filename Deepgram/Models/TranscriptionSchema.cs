@@ -19,16 +19,22 @@ public class TranscriptionSchema
     public string? CallBack { get; set; }
 
     /// <summary>
-    /// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
+    /// Enables callback method
     /// </summary>
-    [JsonPropertyName("custom_intent")]
-    public string CustomIntent { get; set; }
+    [JsonPropertyName("callback_method")]
+    public bool? CallbackMethod { get; set; }
 
-    /// <summary>
-    /// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
-    /// </summary>
-    [JsonPropertyName("custom_intent_mode")]
-    public string CustomIntentMode { get; set; }
+    ///// <summary>
+    ///// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
+    ///// </summary>
+    //[JsonPropertyName("custom_intent")]
+    //public string CustomIntent { get; set; }
+
+    ///// <summary>
+    ///// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
+    ///// </summary>
+    //[JsonPropertyName("custom_intent_mode")]
+    //public string CustomIntentMode { get; set; }
 
 
     /// <summary>
@@ -62,11 +68,11 @@ public class TranscriptionSchema
     [JsonPropertyName("filler_words")]
     public bool? FillerWords { get; set; }
 
-    /// <summary>
-    /// Enables intent recognition
-    /// </summary>
-    [JsonPropertyName("intents")]
-    public bool? Intents { get; set; }
+    ///// <summary>
+    ///// Enables intent recognition
+    ///// </summary>
+    //[JsonPropertyName("intents")]
+    //public bool? Intents { get; set; }
 
     /// <summary>
     /// Keywords can boost or suppress specialized terminology.
@@ -91,19 +97,12 @@ public class TranscriptionSchema
     public string? Model { get; set; }
 
     /// <summary>
-    /// Multichannel transcribes each channel in submitted audio independently. <see href="https://developers.deepgram.com/docs/multichannel">
+    /// Multichannel transcribes each channel in submitted audio independently. 
+    /// <see href="https://developers.deepgram.com/docs/multichannel">
     /// </summary>
     [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
-    /// <summary>
-    /// Multichannel transcribes each channel in submitted audio independently. 
-    /// <see href="https://developers.deepgram.com/docs/">
-    /// available for English only
-    /// </summary>
-    [JsonPropertyName("numerals")]
-    [Obsolete("Replaced with SmartFormat")]
-    public bool? Numerals { get; set; }
 
     /// <summary>
     /// Profanity Filter looks for recognized profanity and converts it to the nearest recognized 
@@ -145,14 +144,14 @@ public class TranscriptionSchema
     [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
 
-    /// <summary>
-    /// Enables sentiment analysis false by default
-    /// </summary>
-    [JsonPropertyName("sentiment")]
-    public bool? Sentiment { get; set; }
+    ///// <summary>
+    ///// Enables sentiment analysis false by default
+    ///// </summary>
+    //[JsonPropertyName("sentiment")]
+    //public bool? Sentiment { get; set; }
 
-    [JsonPropertyName("sentiment_threshold")]
-    public double? SentimentThreshold { get; set; }
+    //[JsonPropertyName("sentiment_threshold")]
+    //public double? SentimentThreshold { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 
@@ -169,13 +168,13 @@ public class TranscriptionSchema
     [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
 
-    /// <summary>
-    ///  Level of model you would like to use in your request.
-    ///  <see href="https://developers.deepgram.com/docs/model">   
-    /// </summary>
-    [JsonPropertyName("tier")]
-    [Obsolete("Use Model with joint model syntax https://developers.deepgram.com/docs/models-languages-overview")]
-    public string? Tier { get; set; }
+    ///// <summary>
+    /////  Level of model you would like to use in your request.
+    /////  <see href="https://developers.deepgram.com/docs/model">   
+    ///// </summary>
+    //[JsonPropertyName("tier")]
+    //[Obsolete("Use Model with joint model syntax https://developers.deepgram.com/docs/models-languages-overview")]
+    //public string? Tier { get; set; }
 
     /// <summary>
     /// Version of the model to use.
