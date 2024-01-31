@@ -1,17 +1,26 @@
-﻿
-namespace Deepgram.Tests.Fakes
+﻿namespace Deepgram.Tests.Fakes;
+public static class MockHttpClient
 {
-    public static class MockHttpClient
+    public static HttpClient CreateHttpClientWithResult<T>(
+       T result, HttpStatusCode code = HttpStatusCode.OK, string? url = null)
     {
-        public static HttpClient CreateHttpClientWithResult<T>(
-           T result, HttpStatusCode code = HttpStatusCode.OK)
+        if (string.IsNullOrEmpty(url))
         {
-            var httpClient = new HttpClient(new MockHttpMessageHandler(result, code))
-            {
-                BaseAddress = new Uri(new Faker().Internet.Url()),
-            };
-
-            return httpClient;
+            url = $"https://{Defaults.DEFAULT_URI}";
         }
+
+        return new HttpClient(new MockHttpMessageHandler<T>(result, code))
+        {
+            BaseAddress = new Uri(url)
+        };
+    }
+
+
+    public static HttpClient CreateHttpClientWithException(Exception Exception)
+    {
+        return new HttpClient(new MockHttpMessageHandlerException(Exception))
+        {
+            BaseAddress = new Uri($"https://{Defaults.DEFAULT_URI}")
+        };
     }
 }

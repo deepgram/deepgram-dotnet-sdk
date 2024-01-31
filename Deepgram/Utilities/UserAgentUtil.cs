@@ -1,32 +1,19 @@
-﻿using System.Reflection;
+﻿namespace Deepgram.Utilities;
 
-namespace Deepgram.Utilities
+internal static class UserAgentUtil
 {
-    internal static class UserAgentUtil
+    /// <summary>
+    /// determines the UserAgent Library version
+    /// </summary>
+    /// <returns></returns>
+    public static string GetInfo()
     {
-        /// <summary>
-        /// determines the useragent for the httpclient
-        /// </summary>
-        /// <returns></returns>
-        public static string GetUserAgent()
-        {
+        var libraryVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
-            var languageVersion = (System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription)
-                .Replace(" ", string.Empty)
-                .Replace("/", string.Empty)
-                .Replace(":", string.Empty)
-                .Replace(";", string.Empty)
-                .Replace("_", string.Empty)
-                .Replace("(", string.Empty)
-                .Replace(")", string.Empty);
+        var languageVersion = new Regex("[ ,/,:,;,_,(,)]")
+             .Replace(System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+             string.Empty);
 
-            var libraryVersion = typeof(UserAgentUtil)
-                .GetTypeInfo()
-                .Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                .InformationalVersion;
-
-            return $"deepgram/{libraryVersion} dotnet/{languageVersion}";
-        }
+        return $"deepgram/{libraryVersion} dotnet/{languageVersion} ";
     }
 }

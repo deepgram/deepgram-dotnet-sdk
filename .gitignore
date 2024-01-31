@@ -5,8 +5,10 @@
 .cr*
 
 # User-specific files
+*.rsuser
 *.suo
 *.user
+*.userosscache
 *.sln.docstates
 
 # Build results
@@ -29,23 +31,27 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-#NUNIT
+# NUnit
 *.VisualState.xml
 TestResult.xml
+nunit-*.xml
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
 
+# Files built by Visual Studio
 *_i.c
 *_p.c
-*_i.h
+*_h.h
 *.ilk
 *.meta
 *.obj
+*.iobj
 *.pch
 *.pdb
+*.ipdb
 *.pgc
 *.pgd
 *.rsp
@@ -55,13 +61,20 @@ dlldata.c
 *.tlh
 *.tmp
 *.tmp_proj
+*_wpftmp.csproj
 *.log
+*.tlog
 *.vspscc
 *.vssscc
 .builds
 *.pidb
 *.svclog
 *.scc
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
 # Chutzpah Test files
 _Chutzpah*
@@ -70,14 +83,32 @@ _Chutzpah*
 ipch/
 *.aps
 *.ncb
+*.opendb
 *.opensdf
 *.sdf
 *.cachefile
+*.VC.db
+*.VC.VC.opendb
 
 # Visual Studio profiler
 *.psess
 *.vsp
 *.vspx
+*.sap
+
+# Visual Studio Trace Files
+*.e2e
+
+# VS Code files for those working on multiple tools
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
 
 # TFS 2012 Local Workspace
 $tf/
@@ -135,12 +166,17 @@ publish/
 
 # NuGet Packages
 *.nupkg
+# NuGet Symbol Packages
+*.snupkg
 # The packages folder can be ignored because of Package Restore
-**/packages/*
+**/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
-!**/packages/build/
-# If using the old MSBuild-Integrated Package Restore, uncomment this:
-#!**/packages/repositories.config
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
 
 # Windows Azure Build Output
 csx/
@@ -174,6 +210,13 @@ Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
 
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+
 # SQL Server files
 *.mdf
 *.ldf
@@ -186,7 +229,16 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 
-# Other
+# Others
+ClientBin/
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
 .DS_Store
 /packages
 
@@ -194,5 +246,4 @@ FakesAssemblies/
 web.config
 app.config
 settings.json
-appsettings.json
 project.lock.json

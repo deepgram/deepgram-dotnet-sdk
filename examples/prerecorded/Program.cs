@@ -1,35 +1,21 @@
-using Deepgram.Clients;
+using Deepgram;
 using Deepgram.Models;
-using Newtonsoft.Json;
 
-namespace SampleApp
-{
-    class Program
+
+var apiKey = "deepgramApiKey";
+
+var deepgramClient = new PrerecordedClient(apiKey);
+
+var response = await deepgramClient.TranscribeUrl(
+    new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
+    new PrerecordedSchema()
     {
-        const string API_KEY = "YOUR_DEEPGRAM_API_KEY";
+        Punctuate = true,
+        Utterances = true,
+    });
 
-        static async Task Main(string[] args)
-        {   
-            var credentials = new Credentials(API_KEY);
-            var deepgramClient = new DeepgramClient(credentials);
+Console.WriteLine(response);
+Console.ReadKey();
 
-            // UNCOMMENT IF USING LOCAL FILE:
-            // using (FileStream fs = File.OpenRead("YOUR_FILE_LOCATION"))
-            {
-                var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-                    // UNCOMMENT IF USING LOCAL FILE:
-                    // new Deepgram.Transcription.StreamSource(
-                    //     fs,
-                    //     "audio/wav"),
-                    new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-                    new PrerecordedTranscriptionOptions()
-                    {
-                        Punctuate = true,
-                        Utterances = true,
-                    });
 
-                Console.WriteLine(JsonConvert.SerializeObject(response));
-            }
-        }
-    }
-}
+

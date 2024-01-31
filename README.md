@@ -12,22 +12,26 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Installation](#installation)
 - [Targeted Frameworks](#targeted-frameworks)
 - [Configuration](#configuration)
-  - [Custom API Endpoint](#custom-api-endpoint)   
+  - [Default](#default) 
+   - [Notes regarding Cors](#notes-regarding-cors)
+  - [Examples](#examples)  
+- [Creating A Rest Client](#creating-a-rest-client)
+  - [Default Client Creation](#default-client-creation)    
 - [Examples](#examples)
 - [Transcription](#transcription)
-  - [Remote Files](#remote-files)
+  - [Remote File](#remote-file) 
     - [UrlSource](#urlsource)
-  - [Local files](#local-files)
-    - [StreamSource](#streamsource)
-    - [PrerecordedTranscriptionOptions](#prerecordedtranscriptionoptions)
-- [Generating Captions](#generating-captions)
+  - [Local files](#local-files)    
+    - [PrerecordedSchema](#prerecordedschema)
+  - [CallBackAsync Methods](#callbackasync-methods) 
   - [Live Audio](#live-audio)
-    - [LiveTranscriptionOptions](#livetranscriptionoptions)
+    - [LiveSchema](#liveSchema)
 - [Projects](#projects)
   - [Get Projects](#get-projects)
   - [Get Project](#get-project)
   - [Update Project](#update-project)
   - [Delete Project](#delete-project)
+  - [Leave Project](#leave-project)
 - [Keys](#keys)
   - [List Keys](#list-keys)
   - [Get Key](#get-key)
@@ -52,6 +56,14 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
     - [GetUsageSummaryOptions](#getusagesummaryoptions)
   - [Get Fields](#get-fields)
     - [GetUsageFieldsOptions](#getusagefieldsoptions)
+- [Balances](#balances)
+  - [Get Balances](#get-balances) 
+  - [Get Balance](#get-balance) 
+- [OnPrem](#onprem)
+  - [List Credentials](#list-credentials)
+  - [Get Credentials](#get-credentials)
+  - [Remove Credentials](#remove-credentials)
+  - [Create Credentials](#create-credentials)
 - [Logging](#logging)
 - [Development and Contributing](#development-and-contributing)
 - [Testing](#testing)
@@ -74,7 +86,7 @@ To install the C# SDK using NuGet:
 
 Run the following command from your terminal in your projects directory:
 
-```bash
+```csharp
 dotnet add package Deepgram
 ```
 
@@ -84,29 +96,48 @@ Right click on project and select manage nuget packages
 
 # Targeted Frameworks
 
+- 8.0.x
 - 7.0.x
 - 6.0.x
 
 # Configuration
+Add to you ServiceCollection class
 
-To setup the configuration of the Deepgram Client you can do one of the following:
-
-- Create a Deepgram Client instance and pass in credentials in the constructor.
-
-```csharp
-var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY);
-var deepgramClient = new DeepgramClient(credentials);
+### Default  
+for default implementation add
+```csharp 
+    services.AddDeepgram(string apikey):
 ```
-## Custom API Endpoint
 
-In order to point the SDK at a different API endpoint (e.g., for on-prem deployments), you can pass in an object setting the `API_URL` when initializing the Deepgram client.
+### With 
 
+#### Notes Regarding CORS
+    deepgram api does not support COR requests
+
+### Examples
+
+
+# Creating a Client
+To create rest clients to communitcate with the deepgram apis, instantiate them directly.
+When creating a restclient you need to pass in the apikey and a HttpClientFactory
+
+## Default Client Creation
+>If you  need to customize the url or set optional headers then you can when creating  a client 
+>passing in a instance of DeepgramClientOptions. 
 ```csharp
-bool REQUIRE_SSL = false; // defaults to true - set depending on server configuration
-var API_URL = "localhost:8080"; // defaults to api.deepgram.com
-var credentials = new Credentials(YOUR_DEEPGRAM_API_KEY, API_URL, REQUIRE_SSL);
-var deepgram = new DeepgramClient(credentials);
+var manageClient = new ManageClient(deepgramClientOptions,httpClientFactory);
 ```
+#### DeepgramClientOptions
+| Property         | Value                       |          Description              |
+| --------         | :-----                      | :---------------------------:     |
+| BaseAddress      | string?                     | url of server, include protocol   |
+| Headers          | Dictionary<string, string>? | any headers that you want to add  |
+| ApiKey           | string                      | REQUIRED apikey for authorization |
+
+>UserAgent & Authorization headers are added internally
+
+>Timeout can also be set by callling the RestClients SetTimeout(Timespan)
+
 
 # Examples
 
@@ -114,18 +145,13 @@ To quickly get started with examples for prerecorded and streaming, run the file
 
 # Transcription
 
-## Remote Files
-
+## Remote File
+> for available options see PrerecordedSchema
 ```csharp
-using Deepgram.Models;
-
-var credentials = new Credentials(DEEPGRAM_API_KEY);
-
-var deepgramClient = new DeepgramClient(credentials);
-
-var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
+var client = new PrerecordedClient(apiKey,HttpClientFactory);
+var response = await client.TranscribeUrlAsync(
     new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-    new PrerecordedTranscriptionOptions()
+    new PrerecordedSchema()
     {
         Punctuate = true
     });
@@ -138,35 +164,25 @@ var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAs
 | Url      | string | Url of the file to transcribe |
 
 ## Local files
+>There are 2 overloads for local files you can pass either a byte[] or a stream 
 
 ```csharp
-using Deepgram.Models;
-
-var credentials = new Credentials(DEEPGRAM_API_KEY);
-
-var deepgramClient = new DeepgramClient(credentials);
-
-using (FileStream fs = File.OpenRead("path\\to\\file"))
-{
-    var response = await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(
-        new StreamSource(
-            fs,
-            "audio/wav"),
-        new PrerecordedTranscriptionOptions()
-        {
-            Punctuate = true
-        });
-}
+var deepgramClientOptions = new DeepgramClientOptions("apikey");
+var client = new PrerecordedClient(deepgramClientOptions,HttpClientFactory);
+var response = await client.TranscribeFileAsync(
+    stream,
+     new PrerecordedSchema()
+    {
+        Punctuate = true
+    });
 ```
 
-#### StreamSource
+### CallBackAsync Methods
+>TranscibeFileCallBackAsync and TranscibeUrlCallBackAsync are the methods to use if you want to use a CallBack url
+>you can either pass the the CallBack in the method or by setting  the CallBack proeprty in the PrerecordedSchema, but NOT in both
 
-| Property | Value Type |      reason for      |
-| -------- | :--------- | :------------------: |
-| Stream   | Stream     | stream to transcribe |
-| MimeType | string     |  MIMETYPE of stream  |
 
-#### PrerecordedTranscriptionOptions
+#### PrerecordedSchema
 
 | Property               | Value Type |                                                      reason for                                                      |       Possible values       |
 | ---------------------- | :--------- | :------------------------------------------------------------------------------------------------------------------: | :-------------------------: |
@@ -176,45 +192,25 @@ using (FileStream fs = File.OpenRead("path\\to\\file"))
 | Tier                   | string     |                                 Level of model you would like to use in your request                                 |
 | Punctuate              | bool       |                      Indicates whether to add punctuation and capitalization to the transcript                       |
 | ProfanityFilter        | bool       |                              Indicates whether to remove profanity from the transcript                               |
-| Redaction              | string[]   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
+| Redact                 | List<string>   |                                  Indicates whether to redact sensitive information                                   |      pci, numbers, ssn      |
 | Diarize                | bool       |                                    Indicates whether to recognize speaker changes                                    |
-| DiarizationVersion     | string     |                                    Indicates which version of the diarizer to use                                    |
-| NamedEntityRecognition | bool       |                                 Indicates whether to recognize alphanumeric strings.                                 | **obselete** **deprecated** |
 | MultiChannel           | bool       |                           Indicates whether to transcribe each audio channel independently                           |
 | Alternatives           | int        |                                 Maximum number of transcript alternatives to return                                  |
 | Numerals               | bool       |                               Indicates whether to convert numbers from written format                               |
-| Numbers                | bool       |                               Indicates whether to convert numbers from written format                               |
-| NumbersSpaces          | bool       |                                Indicates whether to add spaces between spoken numbers                                |
-| Dates                  | bool       |                                Indicates whether to convert dates from written format                                |
-| DateFormat             | string     |                                        Indicates the format to use for dates                                         |
-| Times                  | bool       |                                Indicates whether to convert times from written format                                |
-| Dictation              | bool       |                                         Option to format punctuated commands                                         |
-| Measurements           | bool       |                                  Option to convert measurments to numerical format                                   |
 | SmartFormat            | bool       |                               Indicates whether to use Smart Format on the transcript                                |
-| SearchTerms            | string[]   |                                Terms or phrases to search for in the submitted audio                                 |
-| Replace                | string[]   |                          Terms or phrases to search for in the submitted audio and replace                           |
+| Search                 | List<string>   |                                Terms or phrases to search for in the submitted audio                                 |
+| Replace                | List<string>   |                          Terms or phrases to search for in the submitted audio and replace                           |
 | Callback               | string     |            Callback URL to provide if you would like your submitted audio to be processed asynchronously             |
-| Keywords               | string[]   | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context |
-| KeywordBoost           | string     |                                            Support for out-of-vocabulary                                             |
+| Keywords               | List<string>   | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context |
 | Utterances             | bool       |                    Indicates whether Deepgram will segment speech into meaningful semantic units                     |
 | DetectLanguage         | bool       |                            Indicates whether to detect the language of the provided audio                            |
 | Paragraphs             | bool       |                             Indicates whether Deepgram will split audio into paragraphs                              |
 | UtteranceSplit         | decimal    |              Length of time in seconds of silence between words that Deepgram will use when determining              |
 | Summarize              | object     |              Indicates whether Deepgram should provide summarizations of sections of the provided audio              |
 | DetectEntities         | bool       |                     Indicates whether Deepgram should detect entities within the provided audio                      |
-| Translate              | string[]   |                              anguage codes to which transcripts should be translated to                              |
 | DetectTopics           | bool       |                      Indicates whether Deepgram should detect topics within the provided audio                       |
-| AnalyzeSentiment       | bool       |                         Indicates whether Deepgram will identify sentiment in the transcript                         |
-| Sentiment              | bool       |                           Indicates whether Deepgram will identify sentiment in the audio                            |
-| SentimentThreshold     | decimal    |                            Indicates the confidence requirement for non-neutral sentiment                            |
+| Tag                    | List<string>   |                                                                                                                      |
 
-# Generating Captions
-
-```
-var preRecordedTranscription =  await deepgramClient.Transcription.Prerecorded.GetTranscriptionAsync(streamSource,prerecordedtranscriptionOptions);
-var WebVTT = preRecordedTranscription.ToWebVTT();
-var SRT =  preRecordedTranscription.ToSRT();
-```
 
 ## Live Audio
 
@@ -227,9 +223,8 @@ using Deepgram.CustomEventArgs;
 using Deepgram.Models;
 using System.Net.WebSockets;
 
-var credentials = new Credentials(DEEPGRAM_API_KEY);
-
-var deepgramClient = new DeepgramClient(credentials);
+var deepgramClientOptions = new DeepgramClientOptions("apikey");
+var deepgramClient = new LiveClient(deepgramClientOptions);
 
 using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {
@@ -285,7 +280,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 }
 ```
 
-#### LiveTranscriptionOptions
+#### LiveSchema
 
 | Property               | Type     |                                                               Description                                                               |             Possible values |
 | ---------------------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------------: | --------------------------: |
@@ -295,35 +290,21 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 | Tier                   | string   |                                          Level of model you would like to use in your request                                           |
 | Punctuate              | bool     |                                Indicates whether to add punctuation and capitalization to the transcript                                |
 | ProfanityFilter        | bool     |                                        Indicates whether to remove profanity from the transcript                                        |
-| Redaction              | string[] |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
+| Redact                 | List<string> |                                            Indicates whether to redact sensitive information                                            |           pci, numbers, ssn |
 | Diarize                | bool     |                                             Indicates whether to recognize speaker changes                                              |
-| DiarizationVersion     | string   |                                             Indicates which version of the diarizer to use                                              |
-| NamedEntityRecognition | bool     |                                          Indicates whether to recognize alphanumeric strings.                                           | **obselete** **deprecated** |
 | MultiChannel           | bool     |                                    Indicates whether to transcribe each audio channel independently                                     |
-| Alternatives           | int      |                                           Maximum number of transcript alternatives to return                                           |
 | Numerals               | bool     |                                        Indicates whether to convert numbers from written format                                         |
-| Numbers                | bool     |                                        Indicates whether to convert numbers from written format                                         |
-| NumbersSpaces          | bool     |                                         Indicates whether to add spaces between spoken numbers                                          |
-| Dates                  | bool     |                                         Indicates whether to convert dates from written format                                          |
-| DateFormat             | string   |                                                  Indicates the format to use for dates                                                  |
-| Times                  | bool     |                                         Indicates whether to convert times from written format                                          |
-| Dictation              | bool     |                                                  Option to format punctuated commands                                                   |
-| Measurements           | bool     |                                            Option to convert measurments to numerical format                                            |
 | SmartFormat            | bool     |                                         Indicates whether to use Smart Format on the transcript                                         |
-| SearchTerms            | string[] |                                          Terms or phrases to search for in the submitted audio                                          |
-| Replace                | string[] |                                    Terms or phrases to search for in the submitted audio and replace                                    |
+| Search                 | List<string> |                                          Terms or phrases to search for in the submitted audio                                          |
+| Replace                | List<string> |                                    Terms or phrases to search for in the submitted audio and replace                                    |
 | Callback               | string   |                      Callback URL to provide if you would like your submitted audio to be processed asynchronously                      |
-| Keywords               | string[] |          Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context           |
-| KeywordBoost           | string   |                                                      Support for out-of-vocabulary                                                      |
-| Utterances             | bool     |                              Indicates whether Deepgram will segment speech into meaningful semantic units                              |
-| DetectLanguage         | bool     |                                     Indicates whether to detect the language of the provided audio                                      |
-| Paragraphs             | bool     |                                       Indicates whether Deepgram will split audio into paragraphs                                       |
+| Keywords               | List<string> |          Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context           |
 | InterimResults         | bool     |          Indicates whether the streaming endpoint should send you updates to its transcription as more audio becomes available          |
 | EndPointing            | string   |                             Indicates whether Deepgram will detect whether a speaker has finished speaking                              |
-| VADTurnOff             | int      | Length of time in milliseconds of silence that voice activation detection (VAD) will use to detect that a speaker has finished speaking |
-| Encoding               | string   |                                           Expected encoding of the submitted streaming audio                                            |
 | Channels               | int      |                               Number of independent audio channels contained in submitted streaming audio                               |
 | SampleRate             | int      |                Sample rate of submitted streaming audio. Required (and only read) when a value is provided for encoding                 |
+| Tag                    | List<string>   |                                                                                                                      |
+
 
 # Projects
 
@@ -334,7 +315,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 Returns all projects accessible by the API key.
 
 ```csharp
-var result = await deepgramClient.Projects.ListProjectsAsync();
+    var result = await manageClient.GetProjectsAsync();
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-projects).
@@ -344,7 +325,7 @@ var result = await deepgramClient.Projects.ListProjectsAsync();
 Retrieves a specific project based on the provided projectId.
 
 ```csharp
-var result = await deepgramClient.Projects.GetProjectAsync(projectId);
+var result = await manageClient.GetProject(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-project).
@@ -354,20 +335,19 @@ var result = await deepgramClient.Projects.GetProjectAsync(projectId);
 Update a project.
 
 ```csharp
-var project = new Project()
+var updateProjectSchema = new UpdateProjectSchema()
 {
-    Project = "projectId string",
-    Name = "New name for Project"
+    Company = "Acme",
+    Name = "Mega Speech inc"
 }
-var result = await deepgramClient.Projects.UpdateProjectAsync(project);
+var result = await manageClient.UpdateProjectAsync(projectid,updateProjectSchema);
 
 ```
 
-**Project Type**
+**UpdateProjectSchema Type**
 
 | Property Name | Type   |                       Description                        |
 | ------------- | :----- | :------------------------------------------------------: |
-| Id            | string |        Unique identifier of the Deepgram project         |
 | Name          | string |                   Name of the project                    |
 | Company       | string | Name of the company associated with the Deepgram project |
 
@@ -378,10 +358,18 @@ var result = await deepgramClient.Projects.UpdateProjectAsync(project);
 Delete a project.
 
 ```csharp
-var result = await deepgramClient.Projects.DeleteProjectAsync(projectId);
+manageClient.DeleteProject(projectId);
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/delete-project).
+## Leave Project
+
+Leave a project.
+
+```csharp
+var result = await manageClient.LeaveProjectAsync(projectId);
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/leave-project).
 
 # Keys
 
@@ -392,7 +380,7 @@ var result = await deepgramClient.Projects.DeleteProjectAsync(projectId);
 Retrieves all keys associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.ListKeysAsync(projectId);
+var result = await manageClient.GetProjectAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/list-keys).
@@ -402,7 +390,7 @@ var result = await deepgramClient.Keys.ListKeysAsync(projectId);
 Retrieves a specific key associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.GetKeyAsync(projectId,keyId);
+var result = await manageClient.GetProjectKeyAsync(projectId,keyId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-key).
@@ -412,18 +400,37 @@ var result = await deepgramClient.Keys.GetKeyAsync(projectId,keyId);
 Creates an API key with the provided scopes.
 
 ```csharp
-var scopes = new string[]{"admin","member"};
-var result = await deepgramClient.Keys.CreateKeyAsync(projectId,comment,scopes);
+var createProjectKeyWithExpirationSchema = new createProjectKeyWithExpirationSchema
+    {
+        Scopes= new List<string>{"admin","member"},
+        Comment = "Yay a new key",
+        Tags = new List<string> {"boss"}
+        Expiration = DateTime.Now.AddDays(7);
+};
+var result = await manageClient.CreateProjectKey(projectId,createProjectKeyWithExpirationSchema);
 ```
+>Required - Scopes, Comment
+> You can set ExpirationDate or TimeToLive or neither, but you cannot set both
 
 [See our API reference for more info](https://developers.deepgram.com/reference/create-key).
+
+#### CreateProjectKeySchema
+| Property              | Type         | Required |              Description        |
+| -------------         | :-------     | :--------|:-------------------------------:|
+| Scopes                | List<string> |  *       | scopes for key                  |
+| Comment               | DateTime     |  *       | comment description of key      |
+| Tags                  | List<string> |          | Tag for key                     |
+| ExpirationDate        | string       |          | Specfic data for key to expire  |
+| TimeToLiveInSeconds   | string       |          | time to live in seconds         |
+
+
 
 ## Delete Key
 
 Deletes a specific key associated with the provided project_id.
 
 ```csharp
-var result = await deepgramClient.Keys.DeleteKeyAsync(projectId, keyId);
+manageClient.DeleteKey(projectId, keyId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/delete-key).
@@ -437,7 +444,7 @@ var result = await deepgramClient.Keys.DeleteKeyAsync(projectId, keyId);
 Retrieves account objects for all of the accounts in the specified project_id.
 
 ```csharp
-var result = await deepgramClient.Projects.GetMembersScopesAsync(projectId,memberId);
+var result = await manageClient.GetMembersAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-members).
@@ -447,7 +454,7 @@ var result = await deepgramClient.Projects.GetMembersScopesAsync(projectId,membe
 Removes member account for specified member_id.
 
 ```csharp
-var result = await deepgramClient.Projects.RemoveMemberAsync(projectId,memberId);
+var result = manageClient.RemoveProjectMember(projectId,memberId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/remove-member).
@@ -456,12 +463,13 @@ var result = await deepgramClient.Projects.RemoveMemberAsync(projectId,memberId)
 
 > projectId and memberId are of type`string`
 
+
 ## Get Member Scopes
 
 Retrieves scopes of the specified member in the specified project.
 
 ```csharp
-var result = await deepgramClient.Keys. GetMemberScopesAsync(projectId,memberId);
+var result = await manageClient.GetProjectMemberScopesAsync(projectId,memberId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-member-scopes).
@@ -471,8 +479,8 @@ var result = await deepgramClient.Keys. GetMemberScopesAsync(projectId,memberId)
 Updates the scope for the specified member in the specified project.
 
 ```csharp
-var scopeOptions = new UpdateScopeOption(){Scope = "admin"};
-var result = await deepgramClient.Keys.UpdateScopeAsync(projectId,memberId,scopeOptions);
+var scopeOptions = new UpdateProjectMemeberScopeSchema(){Scope = "admin"};
+var result = await manageClient.UpdateProjectMemberScopeAsync(projectId,memberId,scopeOptions);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/update-scope).
@@ -484,7 +492,7 @@ var result = await deepgramClient.Keys.UpdateScopeAsync(projectId,memberId,scope
 Retrieves all invitations associated with the provided project_id.
 
 ```csharp
-to be implmented
+var result = await manageClient.GetProjectInvitesAsync(projectId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/list-invites).
@@ -494,7 +502,12 @@ to be implmented
 Sends an invitation to the provided email address.
 
 ```csharp
-to be implmentented
+var sendProjectInviteSchema = new SendProjectInviteSchema()
+{
+    Email = "awesome@person.com",
+    Scope = "fab"
+}
+var result = manageClient.SendProjectInviteAsync(projectId,sendProjectInviteSchema)
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/send-invites).
@@ -504,20 +517,11 @@ to be implmentented
 Removes the specified invitation from the project.
 
 ```csharp
-to be implemented
+ manageClient.DeleteProjectInvite(projectId,emailOfInvite)
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/delete-invite).
 
-## Leave Project
-
-Removes the authenticated user from the project.
-
-```csharp
-var result = await deepgramClient.Projects.LeaveProjectAsync(projectId);
-```
-
-[See our API reference for more info](https://developers.deepgram.com/reference/leave-project).
 
 # Usage
 
@@ -528,20 +532,21 @@ var result = await deepgramClient.Projects.LeaveProjectAsync(projectId);
 Retrieves all requests associated with the provided projectId based on the provided options.
 
 ```csharp
-var listAllRequestOptions = new listAllRequestOptions()
+var getProjectUsageRequestsSchema = new GetProjectUsageRequestsSchema ()
 {
-     StartDateTime = DateTime.Now
+     Start = DateTime.Now.AddDays(-7);
 };
-var result = await deepgramClient.Usage.ListAllRequestsAsync(projectId,listAllRequestOptions);
+var result = await manageClient.ListAllRequestsAsync(projectId,getProjectUsageRequestsSchema);
 ```
 
-#### ListAllRequestOptions
+#### GetProjectUsageRequestsSchema
 
 | Property      | Type     |              Description               |
 | ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
+| Start         | DateTime | Start date of the requested date range |
+| End           | DateTime |  End date of the requested date range  | required
 | Limit         | int      |       number of results per page       |
+| Status        | string   |     status of requests to search for   |
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-all-requests).
 
@@ -550,7 +555,7 @@ var result = await deepgramClient.Usage.ListAllRequestsAsync(projectId,listAllRe
 Retrieves a specific request associated with the provided projectId.
 
 ```csharp
-var result = await deepgramClient.Usage.GetUsageRequestAsync(projectId,requestId);
+var result = await manageClient.GetProjectUsageRequestAsync(projectId,requestId);
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-request).
@@ -560,20 +565,37 @@ var result = await deepgramClient.Usage.GetUsageRequestAsync(projectId,requestId
 Retrieves usage associated with the provided project_id based on the provided options.
 
 ```csharp
-var getUsageSummmaryOptions = new GetUsageSummmaryOptions()
+var getProjectUsageSummarySchema = new GetProjectUsageSummarySchema ()
 {
     StartDateTime = DateTime.Now
 }
-var result = await deepgramClient.Usage.GetUsageSummaryAsync(projectId,getUsageSummmaryOptions);
+var result = await manageClient.GetProjectUsageSummaryAsync(projectId,getProjectUsageSummarySchema);
 ```
 
-#### GetUsageSummaryOptions
+#### GetProjectUsageSummarySchema
 
-| Property      | Value    |              Description               |
-| ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
-| Limit         | int      |       number of results per page       |
+| Property        | Value    |              Description               |
+| -------------   | :------- | :------------------------------------: |
+| Start           | DateTime | Start date of the requested date range |
+| End             | DateTime |  End date of the requested date range  |
+| Accessor        | string   ||
+| Model           | string   ||
+| MultiChannel    | bool     ||
+| InterimResults  | bool     ||
+| Punctuate       | bool     ||
+| Ner             | bool     ||
+| Utterances      | bool     ||
+| Replace         | bool     ||
+| ProfanityFilter | bool     ||
+| Keywords        | bool     ||
+| DetectTopics    | bool     ||
+| Diarize         | bool     ||
+| Search          | bool     ||
+| Redact          | bool     ||
+| Alternatives    | bool     ||
+| Numerals        | bool     ||
+| SmartFormat     | bool     ||
+
 
 [See our API reference for more info](https://developers.deepgram.com/reference/summarize-usage).
 
@@ -582,21 +604,76 @@ var result = await deepgramClient.Usage.GetUsageSummaryAsync(projectId,getUsageS
 Lists the features, models, tags, languages, and processing method used for requests in the specified project.
 
 ```csharp
-var getUsageFieldsOptions = new getUsageFieldsOptions()
+var getProjectUsageFieldsSchema = new GetProjectUsageFieldsSchema()
 {
-    StartDateTime = Datetime.Now
+    Start = Datetime.Now
 }
-var result = await deepgramClient.Usage.GetUsageFieldsAsync(projectId,getUsageFieldsOptions);
+var result = await manageClient.GetProjectUsageFieldsAsync(projectId,getProjectUsageFieldsSchema);
 ```
 
-#### GetUsageFieldsOptions
+#### GetProjectUsageFieldsSchema
 
 | Property      | Value    |              Description               |
 | ------------- | :------- | :------------------------------------: |
-| StartDateTime | DateTime | Start date of the requested date range |
-| EndDateTime   | DateTime |  End date of the requested date range  |
+| Start         | DateTime | Start date of the requested date range |
+| End           | DateTime |  End date of the requested date range  |
 
 [See our API reference for more info](https://developers.deepgram.com/reference/get-fields).
+
+
+# Balances
+
+## Get Balances
+Get balances associated with project
+```csharp
+var result = await manageClient.GetProjectBalancesAsync(projectId)
+```
+## Get Balance
+Get Balance associated with id
+```csharp
+var result = await manageClient.GetProjectBalanceAsync(projectId,balanceId)
+```
+
+# OnPrem
+OnPremClient methods
+
+## List Credentials
+list credenetials 
+```csharp
+var result = onPremClient.ListCredentialsAsync(projectId);
+```
+
+## Get Credentials
+get the credentials associated with the credentials id
+```csharp
+var result = onPremClient.GetCredentialsASync(projectId,credentialsId);
+```
+
+## Remove Credentials
+remove credentials associated with the credentials id
+```csharp
+var result = onPremClient.DeleteCredentialsASync(projectId,credentialsId);
+```
+
+## Create Credentials
+```csharp
+var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema()
+ {
+    Comment = "my new credentials",
+    Scopes = new  List<string>{"team fab"},
+    Provider = "Acme credential provider"
+ }
+var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremCredentialsSchema)
+```
+
+#### CreateOnPremCredentialsSchema
+
+| Property      | Value     |              Description               |
+| ------------- | :-------  | :------------------------------------: |
+| Comment       | string?   | comment to associate with credentials  |
+| Scopes        | List<string>? | scopes for the credentials             |
+| Provider      | string?   | provider for the credentials             |
+
 
 # Logging
 
@@ -618,6 +695,13 @@ var factory = new LoggerFactory();
 factory.AddSerilog(log);
 LogProvider.SetLogFactory(factory);
 ```
+The sdk will generate loggers with the cateroryName of the client being used for example 
+ to get the logger for the ManageClient you would call
+```csharp
+LogProvider.GetLogger(nameof(ManageClient));
+```
+
+
 
 # Development and Contributing
 

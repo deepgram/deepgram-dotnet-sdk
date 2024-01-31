@@ -2,19 +2,24 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Deepgram\Deepgram.csproj" />
+    <PackageReference Include="Deepgram.Net.SDK" Version="4.0.0-alpha98" />
   </ItemGroup>
+  
   <ItemGroup>
     <Using Include="Deepgram" />
   </ItemGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <None Update="preamble.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
 
 </Project>

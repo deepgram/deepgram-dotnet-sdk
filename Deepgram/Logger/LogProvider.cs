@@ -1,15 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-
-namespace Deepgram.Logger
+﻿namespace Deepgram.Logger
 {
-    public class LogProvider
+    public sealed class LogProvider
     {
-        private static IDictionary<string, ILogger> _loggers = new ConcurrentDictionary<string, ILogger>();
-        private static ILoggerFactory _loggerFactory = new LoggerFactory();
+        internal static readonly ConcurrentDictionary<string, ILogger> _loggers = new();
+        internal static ILoggerFactory? _loggerFactory = NullLoggerFactory.Instance;
 
         public static void SetLogFactory(ILoggerFactory factory)
         {
@@ -20,11 +14,19 @@ namespace Deepgram.Logger
 
         public static ILogger GetLogger(string category)
         {
-            if (!_loggers.ContainsKey(category))
+            // Try to get the logger from the dictionary
+            if (!_loggers.TryGetValue(category, out var logger))
             {
-                _loggers[category] = _loggerFactory?.CreateLogger(category) ?? NullLogger.Instance;
+                // If not found, create a new logger and add it to the dictionary
+                logger = _loggerFactory?.CreateLogger(category) ?? NullLogger.Instance;
+                _loggers[category] = logger;
             }
-            return _loggers[category];
+            // Return the logger
+            return logger;
         }
+
+
+
+
     }
 }
