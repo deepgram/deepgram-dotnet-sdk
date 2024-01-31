@@ -13,7 +13,6 @@ global using Deepgram.Constants;
 global using Deepgram.DeepgramEventArgs;
 global using Deepgram.Enums;
 global using Deepgram.Logger;
-global using Deepgram.Models;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;

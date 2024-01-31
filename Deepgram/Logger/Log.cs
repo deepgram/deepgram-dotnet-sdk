@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Logger;
+﻿using Deepgram.Models.Manage;
+
+namespace Deepgram.Logger;
 internal static partial class Log
 {
     [LoggerMessage(

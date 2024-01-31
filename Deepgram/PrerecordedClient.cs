@@ -1,4 +1,5 @@
-﻿using Deepgram.Records.PreRecorded;
+﻿using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram;
 
@@ -11,7 +12,6 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     : AbstractRestClient(apiKey, deepgramClientOptions)
 
 {
-    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
     #region NoneCallBacks
     /// <summary>
     ///  Transcribe a file by providing a url 
@@ -24,7 +24,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
         VerifyNoCallBack(nameof(TranscribeUrl), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source));
     }
     /// <summary>
@@ -40,7 +40,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream));
     }
 
@@ -55,7 +55,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
         VerifyNoCallBack(nameof(TranscribeFile), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<SyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
     }
 
@@ -79,7 +79,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream));
     }
 
@@ -97,7 +97,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
             prerecordedSchema.CallBack = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source));
     }
 
@@ -116,7 +116,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
             prerecordedSchema.CallBack = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         return await PostAsync<AsyncPrerecordedResponse>(
-            $"{UrlPrefix}?{stringedOptions}",
+            $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source));
     }
     #endregion

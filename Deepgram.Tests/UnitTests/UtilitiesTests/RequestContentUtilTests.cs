@@ -1,5 +1,5 @@
 ﻿
-using Deepgram.Records;
+using Deepgram.Models.Manage.v1;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 public class RequestContentUtilTests

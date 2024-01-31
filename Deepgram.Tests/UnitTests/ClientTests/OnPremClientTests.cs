@@ -1,13 +1,13 @@
 ﻿using Deepgram.DeepgramHttpClient;
-using Deepgram.Records;
-using Deepgram.Records.OnPrem;
+using Deepgram.Models.Manage.v1;
+using Deepgram.Models.OnPrem.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class OnPremClientTests
 {
     DeepgramClientOptions _options;
     string _projectId;
-    readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
     string _apiKey;
     [SetUp]
     public void Setup()
@@ -18,21 +18,7 @@ public class OnPremClientTests
     }
 
 
-    [Test]
-    public void OnPremClient_urlPrefix_Should_Match_Expected()
-    {
-        //Arrange 
-        var expected = "/v1/projects";
-        var client = new OnPremClient(_apiKey, _options);
 
-
-        //Assert
-        using (new AssertionScope())
-        {
-            client.UrlPrefix.Should().NotBeNull();
-            client.UrlPrefix.Should().BeEquivalentTo(expected);
-        }
-    }
 
     [Test]
     public async Task ListCredentials_Should_Call_GetAsync_Returning_ListOnPremCredentialsResponse()
@@ -45,14 +31,14 @@ public class OnPremClientTests
         onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         onPremClient.When(x => x.GetAsync<ListOnPremCredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.GetAsync<ListOnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}").Returns(expectedResponse);
+        onPremClient.GetAsync<ListOnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}").Returns(expectedResponse);
 
         // Act
 
         var result = await onPremClient.ListCredentials(_projectId);
 
         // Assert
-        await onPremClient.Received().GetAsync<ListOnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}");
+        await onPremClient.Received().GetAsync<ListOnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -72,13 +58,13 @@ public class OnPremClientTests
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         onPremClient.When(x => x.GetAsync<OnPremCredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.GetAsync<OnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
+        onPremClient.GetAsync<OnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
 
         // Act
         var result = await onPremClient.GetCredentials(_projectId, credentialsId);
 
         // Assert
-        await onPremClient.Received().GetAsync<OnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        await onPremClient.Received().GetAsync<OnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -98,14 +84,14 @@ public class OnPremClientTests
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
+        onPremClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
 
         // Act
 
         var result = await onPremClient.DeleteCredentials(_projectId, credentialsId);
 
         // Assert
-        await onPremClient.Received().DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        await onPremClient.Received().DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -126,14 +112,14 @@ public class OnPremClientTests
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         onPremClient.When(x => x.PostAsync<OnPremCredentialsResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        onPremClient.PostAsync<OnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        onPremClient.PostAsync<OnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
 
         var result = await onPremClient.CreateCredentials(_projectId, createOnPremCredentialsSchema);
 
         // Assert
-        await onPremClient.Received().PostAsync<OnPremCredentialsResponse>($"{_urlPrefix}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>());
+        await onPremClient.Received().PostAsync<OnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {

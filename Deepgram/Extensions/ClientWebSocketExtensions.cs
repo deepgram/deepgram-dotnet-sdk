@@ -1,4 +1,6 @@
-﻿namespace Deepgram.Extensions;
+﻿using Deepgram.Models.Shared.v1;
+
+namespace Deepgram.Extensions;
 public static class ClientWebSocketExtensions
 {
     public static ClientWebSocket SetHeaders(this ClientWebSocket clientWebSocket, string apiKey, DeepgramClientOptions? options)

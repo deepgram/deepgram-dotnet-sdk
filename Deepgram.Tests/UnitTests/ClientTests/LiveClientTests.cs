@@ -1,4 +1,7 @@
 ﻿using System.Net.WebSockets;
+using Deepgram.DeepgramEventArgs;
+using Deepgram.Models.Live.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class LiveClientTests
@@ -21,81 +24,79 @@ public class LiveClientTests
     public void Teardown()
     { _liveClient.Dispose(); }
 
-    //[Test]
-    //public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_LiveTranscriptionResponse()
-    //{
-    //    //Arrange
-    //    var liveTranscriptionResponse = new AutoFaker<LiveTranscriptionResponse>().Generate();
-    //    // ensure the right type is set for testing
-    //    liveTranscriptionResponse.Type = Enums.LiveType.Results;
-    //    var json = JsonSerializer.Serialize(liveTranscriptionResponse);
-    //    var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-    //    TranscriptReceivedEventArgs? eventArgs = null;
+    [Test]
+    public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_LiveTranscriptionResponse()
+    {
+        //Arrange
+        var liveTranscriptionResponse = new AutoFaker<LiveTranscriptionResponse>().Generate();
+        // ensure the right type is set for testing
+        liveTranscriptionResponse.Type = Enums.LiveType.Results;
+        var json = JsonSerializer.Serialize(liveTranscriptionResponse);
+        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        LiveResponseReceivedEventArgs? eventArgs = null;
 
-    //    _liveClient.TranscriptReceived += (sender, args) => eventArgs = args;
+        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
 
 
-    //    //Act
-    //    _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
-    //    Task.Delay(5000);
-    //    //Assert
-    //    using (new AssertionScope())
-    //    {
-    //        eventArgs.Should().NotBeNull();
-    //        eventArgs!.Transcript.Should().NotBeNull();
-    //        eventArgs.Transcript.Should().BeAssignableTo<LiveTranscriptionResponse>();
-    //        eventArgs.Transcript.Should().BeEquivalentTo(liveTranscriptionResponse);
-    //    }
-    //}
+        //Act
+        _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
+        Task.Delay(5000);
+        //Assert
 
-    //[Test]
-    //public void ProcessDataReceived_Should_Raise_MetaDataReceived_Event_When_Response_Contains_Type_LiveMetadataResponse()
-    //{
-    //    //Arrange
-    //    var liveMetadataResponse = new AutoFaker<LiveMetadataResponse>().Generate();
-    //    // ensure the right type is set for testing
-    //    liveMetadataResponse.Type = Enums.LiveType.Metadata;
-    //    var json = JsonSerializer.Serialize(liveMetadataResponse);
-    //    var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        eventArgs.Should().NotBeNull();
+        eventArgs!.Response.Transcription.Should().NotBeNull();
+        eventArgs.Response.Transcription.Should().BeAssignableTo<LiveTranscriptionResponse>();
+    }
 
-    //    MetadataReceivedEventArgs? eventArgs = null;
-    //    _liveClient.MetadataReceived += (sender, args) => eventArgs = args;
+    [Test]
+    public void ProcessDataReceived_Should_Raise_MetaDataReceived_Event_When_Response_Contains_Type_LiveMetadataResponse()
+    {
+        //Arrange
+        var liveMetadataResponse = new AutoFaker<LiveMetadataResponse>().Generate();
+        // ensure the right type is set for testing
+        liveMetadataResponse.Type = Enums.LiveType.Metadata;
+        var json = JsonSerializer.Serialize(liveMetadataResponse);
+        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-    //    //Act
-    //    _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
+        LiveResponseReceivedEventArgs? eventArgs = null;
 
-    //    //Assert
-    //    using (new AssertionScope())
-    //    {
-    //        eventArgs.Should().NotBeNull();
-    //        eventArgs!.MetaData.Should().NotBeNull();
-    //        eventArgs.MetaData.Should().BeAssignableTo<LiveMetadataResponse>();
-    //        eventArgs.MetaData.Should().BeEquivalentTo(liveMetadataResponse);
-    //    }
-    //}
+        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
 
-    //[Test]
-    //public void ProcessDataReceived_Should_Raise_LiveError_Event_When_Response_Contains_Unknown_Type()
-    //{
-    //    //Arrange
-    //    var unknownDataResponse = new Dictionary<string, string>() { { "wiley", "coyote" } };
-    //    var json = JsonSerializer.Serialize(unknownDataResponse);
-    //    var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        //Act
+        _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
 
-    //    LiveErrorEventArgs? eventArgs = null;
-    //    _liveClient.LiveError += (sender, args) => eventArgs = args;
+        //Assert
+        using (new AssertionScope())
+        {
+            eventArgs.Should().NotBeNull();
+            eventArgs!.Response.MetaData.Should().NotBeNull();
+            eventArgs.Response.MetaData.Should().BeAssignableTo<LiveMetadataResponse>();
+        }
+    }
 
-    //    //Act
-    //    _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
+    [Test]
+    public void ProcessDataReceived_Should_Raise_LiveError_Event_When_Response_Contains_Unknown_Type()
+    {
+        //Arrange
+        var unknownDataResponse = new Dictionary<string, string>() { { "Wiley", "coyote" } };
+        var json = JsonSerializer.Serialize(unknownDataResponse);
+        var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-    //    //Assert
-    //    using (new AssertionScope())
-    //    {
-    //        eventArgs.Should().NotBeNull();
-    //        eventArgs!.Exception.Should().NotBeNull();
-    //        eventArgs.Exception.Should().BeAssignableTo<Exception>();
-    //    }
-    //}
+        LiveResponseReceivedEventArgs? eventArgs = null;
+
+        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
+
+        //Act
+        _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
+
+        //Assert
+        using (new AssertionScope())
+        {
+            eventArgs.Should().NotBeNull();
+            eventArgs!.Response.Error.Should().NotBeNull();
+            eventArgs.Response.Error.Should().BeAssignableTo<Exception>();
+        }
+    }
 
 
     #region Helpers
@@ -104,17 +105,16 @@ public class LiveClientTests
     {
         //Arrange
         var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
-        _options.BaseAddress = Defaults.DEFAULT_URI;
+
         //Act
         var result = LiveClient.GetBaseUrl(_options);
 
         //Assert
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNullOrEmpty();
-            result.Should().StartWith("wss://");
-            result.Should().BeEquivalentTo(expectedUrl);
-        }
+
+        result.Should().NotBeNullOrEmpty();
+        result.Should().StartWith("wss://");
+        result.Should().BeEquivalentTo(expectedUrl);
+
     }
 
     [Test]
@@ -166,8 +166,8 @@ public class LiveClientTests
             Diarize = true,
         };
         _options.BaseAddress = Defaults.DEFAULT_URI;
-        var expectedUriStart = $"wss://{Defaults.DEFAULT_URI}";
-        var expectedQuery = $"{Defaults.API_VERSION}/{UriSegments.LISTEN}?diarize=true";
+        var expectedUriStart = $"wss://{Defaults.DEFAULT_URI}/v1";
+        var expectedQuery = $"{UriSegments.LISTEN}?diarize=true";
         var expectedCompleteUri = new Uri($"{expectedUriStart}/{expectedQuery}");
         //Act
         var result = LiveClient.GetUri(liveSchema, _options);

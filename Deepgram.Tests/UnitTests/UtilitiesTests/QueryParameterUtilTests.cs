@@ -1,4 +1,7 @@
-﻿namespace Deepgram.Tests.UnitTests.UtilitiesTests;
+﻿using Deepgram.Models.Manage;
+using Deepgram.Models.PreRecorded.v1;
+
+namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
 public class QueryParameterUtilTests
 {

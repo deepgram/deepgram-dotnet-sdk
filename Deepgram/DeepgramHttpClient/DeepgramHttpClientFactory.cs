@@ -1,9 +1,10 @@
 ﻿using Deepgram.Extensions;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.DeepgramHttpClient;
 internal class DeepgramHttpClientFactory
 {
-    public static HttpClientWrapper Create(string apiKey, DeepgramClientOptions? deepgramClientOptions)
+    public static HttpClientWrapper Create(string apiKey, DeepgramClientOptions deepgramClientOptions)
     {
         var services = new ServiceCollection();
         services.AddHttpClient(Defaults.HTTPCLIENT_NAME)

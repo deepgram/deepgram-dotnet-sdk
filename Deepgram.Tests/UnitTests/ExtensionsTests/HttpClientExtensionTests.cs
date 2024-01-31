@@ -1,4 +1,5 @@
-﻿using Deepgram.Records;
+﻿using Deepgram.Models.Manage.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ExtensionsTests;
 public class HttpClientExtensionTests
@@ -30,7 +31,7 @@ public class HttpClientExtensionTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1/");
         };
     }
 
@@ -38,8 +39,9 @@ public class HttpClientExtensionTests
     public void Should_Return_HttpClient_With_Custom_BaseAddress()
     {
         //Arrange        
-        var expectedBaseAddress = $"https://{_customUrl}/";
-        _clientOptions.BaseAddress = expectedBaseAddress;
+        var expectedBaseAddress = $"https://{_customUrl}/v1/";
+        var customBaseAddress = $"https://{_customUrl}";
+        _clientOptions.BaseAddress = customBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
@@ -69,7 +71,7 @@ public class HttpClientExtensionTests
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1/");
             SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
         };
     }
@@ -84,8 +86,10 @@ public class HttpClientExtensionTests
         httpClient.BaseAddress = null;
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
-        var expectedBaseAddress = $"https://{_customUrl}/";
-        _clientOptions.BaseAddress = expectedBaseAddress;
+        var expectedBaseAddress = $"https://{_customUrl}/v1/";
+        var customBaseAddress = $"https://{_customUrl}";
+        _clientOptions.BaseAddress = customBaseAddress;
+
 
         //Act
         var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
@@ -104,9 +108,11 @@ public class HttpClientExtensionTests
     {
         //Arrange       
         _clientOptions.Headers = FakeHeaders();
-        var expectedBaseAddress = $"https://{_customUrl}/";
+        var expectedBaseAddress = $"https://{_customUrl}/v1/";
+        var customBaseAddress = $"https://{_customUrl}";
+        _clientOptions.BaseAddress = customBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
-        _clientOptions.BaseAddress = expectedBaseAddress;
+
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act

@@ -1,4 +1,6 @@
-﻿namespace Deepgram;
+﻿using Deepgram.Models.Shared.v1;
+
+namespace Deepgram;
 
 /// <summary>
 ///  Client containing methods for interacting with Read API's
@@ -8,9 +10,4 @@
 public class ReadClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, deepgramClientOptions)
 {
-
-
-    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-
-
 }
