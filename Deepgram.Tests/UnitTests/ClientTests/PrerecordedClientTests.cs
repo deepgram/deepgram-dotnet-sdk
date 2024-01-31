@@ -1,12 +1,12 @@
 ﻿using Deepgram.DeepgramHttpClient;
-using Deepgram.Records.PreRecorded;
+using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class PrerecordedClientTests
 {
     DeepgramClientOptions _options;
     string _apiKey;
-    readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.LISTEN}";
 
     [SetUp]
     public void Setup()
@@ -14,23 +14,6 @@ public class PrerecordedClientTests
         _options = new DeepgramClientOptions();
         _apiKey = new Faker().Random.Guid().ToString();
     }
-
-
-    [Test]
-    public void PrerecordedClient_urlPrefix_Should_Match_Expected()
-    {
-        //Arrange 
-        var expected = "/v1/listen";
-        var client = new PrerecordedClient(_apiKey, _options);
-
-        //Assert
-        using (new AssertionScope())
-        {
-            client.UrlPrefix.Should().NotBeNull();
-            client.UrlPrefix.Should().BeEquivalentTo(expected);
-        }
-    }
-
 
     [Test]
     public async Task TranscribeUrl_Should_Call_PostAsync_Returning_SyncPrerecordedResponse()
@@ -47,13 +30,13 @@ public class PrerecordedClientTests
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeUrl(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {
@@ -76,13 +59,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrl(source, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -99,7 +82,7 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = prerecordedSchema.CallBack;
         //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
         prerecordedSchema.CallBack = null;
@@ -109,7 +92,7 @@ public class PrerecordedClientTests
         var result = await prerecordedClient.TranscribeUrlCallBack(source, callBackParameter, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -131,13 +114,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeUrlCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -159,14 +142,14 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = prerecordedSchema.CallBack;
 
         // Act Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrlCallBack(source, callBackParameter, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -183,14 +166,14 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
 
         // Act Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrlCallBack(source, null, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -207,13 +190,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFile(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -236,13 +219,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<SyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFile(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<SyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -264,13 +247,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -292,13 +275,13 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
 
         using (new AssertionScope())
         {
@@ -322,7 +305,7 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         var callBack = prerecordedSchema.CallBack;
 
@@ -333,7 +316,7 @@ public class PrerecordedClientTests
         var result = await prerecordedClient.TranscribeFileCallBack(source, callBack, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -356,7 +339,7 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         var callBack = prerecordedSchema.CallBack;
 
@@ -367,7 +350,7 @@ public class PrerecordedClientTests
         var result = await prerecordedClient.TranscribeFileCallBack(source, callBack, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -389,7 +372,7 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         var callBack = prerecordedSchema.CallBack;
 
 
@@ -397,7 +380,7 @@ public class PrerecordedClientTests
         await prerecordedClient.Invoking(y => y.TranscribeFileCallBack(source, callBack, prerecordedSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
 
 
     }
@@ -416,14 +399,14 @@ public class PrerecordedClientTests
         var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
         prerecordedClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         prerecordedClient.When(x => x.PostAsync<AsyncPrerecordedResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        prerecordedClient.PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         prerecordedSchema.CallBack = null;
 
         // Act  Assert
         await prerecordedClient.Invoking(y => y.TranscribeFileCallBack(source, null, prerecordedSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<AsyncPrerecordedResponse>($"{_urlPrefix}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<AsyncPrerecordedResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
     }
 
     private static Stream GetFakeStream(byte[] source)

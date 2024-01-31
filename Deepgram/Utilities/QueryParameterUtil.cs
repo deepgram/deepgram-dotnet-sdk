@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Deepgram.Models.PreRecorded.v1;
 
 namespace Deepgram.Utilities;
 

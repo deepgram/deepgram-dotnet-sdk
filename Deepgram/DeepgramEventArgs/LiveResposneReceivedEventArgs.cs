@@ -1,4 +1,4 @@
-﻿using Deepgram.Records.Live;
+﻿using Deepgram.Models.Live.v1;
 
 namespace Deepgram.DeepgramEventArgs
 {

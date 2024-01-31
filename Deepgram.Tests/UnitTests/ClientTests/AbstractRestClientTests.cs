@@ -1,6 +1,7 @@
 ﻿using Deepgram.DeepgramHttpClient;
-using Deepgram.Records;
-using Deepgram.Records.PreRecorded;
+using Deepgram.Models.Manage.v1;
+using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

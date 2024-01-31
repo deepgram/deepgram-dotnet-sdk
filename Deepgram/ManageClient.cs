@@ -1,4 +1,6 @@
-﻿using Deepgram.Records;
+﻿using Deepgram.Models.Manage;
+using Deepgram.Models.Manage.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram;
 
@@ -9,18 +11,14 @@ namespace Deepgram;
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, deepgramClientOptions)
-
 {
-
-    internal readonly string UrlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
-
     #region Projects
     /// <summary>
     /// Gets projects associated to ApiKey 
     /// </summary>
     /// <returns><see cref="GetProjectsResponse"/></returns>
     public async Task<GetProjectsResponse> GetProjects() =>
-        await GetAsync<GetProjectsResponse>(UrlPrefix);
+        await GetAsync<GetProjectsResponse>(UriSegments.PROJECTS);
 
     /// <summary>
     /// Gets project associated with project Id
@@ -28,7 +26,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of Project</param>
     /// <returns><see cref="GetProjectResponse"/></returns>
     public async Task<GetProjectResponse> GetProject(string projectId) =>
-        await GetAsync<GetProjectResponse>($"{UrlPrefix}/{projectId}");
+        await GetAsync<GetProjectResponse>($"{UriSegments.PROJECTS}/{projectId}");
 
     /// <summary>
     /// Update a project associated with the projectID
@@ -39,7 +37,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     // USES PATCH
     public async Task<MessageResponse> UpdateProject(string projectId, UpdateProjectSchema updateProjectSchema) =>
         await PatchAsync<MessageResponse>(
-            $"{UrlPrefix}/{projectId}",
+            $"{UriSegments.PROJECTS}/{projectId}",
             RequestContentUtil.CreatePayload(updateProjectSchema));
 
     /// <summary>
@@ -48,7 +46,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     // No response expected
     public async Task DeleteProject(string projectId) =>
-     await DeleteAsync($"{UrlPrefix}/{projectId}");
+     await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}");
 
     /// <summary>
     /// leave project associated with the project Id
@@ -56,7 +54,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="MessageResponse"/></returns>
     public async Task<MessageResponse> LeaveProject(string projectId) =>
-        await DeleteAsync<MessageResponse>($"{UrlPrefix}/{projectId}/leave");
+        await DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{projectId}/leave");
 
     #endregion
 
@@ -68,7 +66,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectKeysResponse"/></returns>
     public async Task<GetProjectKeysResponse> GetProjectKeys(string projectId) =>
-        await GetAsync<GetProjectKeysResponse>($"{UrlPrefix}/{projectId}/{UriSegments.KEYS}");
+        await GetAsync<GetProjectKeysResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}");
 
     /// <summary>
     /// Get details of key associated with the key ID
@@ -77,7 +75,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="keyId">Id of key</param>
     /// <returns><see cref="GetProjectKeyResponse"/></returns>
     public async Task<GetProjectKeyResponse> GetProjectKey(string projectId, string keyId) =>
-        await GetAsync<GetProjectKeyResponse>($"{UrlPrefix}/{projectId}/{UriSegments.KEYS}/{keyId}");
+        await GetAsync<GetProjectKeyResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}/{keyId}");
 
     /// <summary>
     /// Create a key in the associated project
@@ -94,7 +92,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
         }
 
         return await PostAsync<CreateProjectKeyResponse>(
-                     $"{UrlPrefix}/{projectId}/keys",
+                     $"{UriSegments.PROJECTS}/{projectId}/keys",
                      RequestContentUtil.CreatePayload(createProjectKeySchema));
     }
 
@@ -106,7 +104,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="keyId">Id of key</param>
     // Nothing being returned
     public async Task DeleteProjectKey(string projectId, string keyId) =>
-        await DeleteAsync($"{UrlPrefix}/{projectId}/keys/{keyId}");
+        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/keys/{keyId}");
 
     #endregion
 
@@ -117,7 +115,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectInvitesResponse"/></returns>
     public async Task<GetProjectInvitesResponse> GetProjectInvites(string projectId) =>
-        await GetAsync<GetProjectInvitesResponse>($"{UrlPrefix}/{projectId}/{UriSegments.INVITES}");
+        await GetAsync<GetProjectInvitesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}");
 
     /// <summary>
     /// Delete a project invite that has been sent
@@ -126,7 +124,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="email">email of the invite to be removed</param>
     //no response expected
     public async Task DeleteProjectInvite(string projectId, string email) =>
-        await DeleteAsync($"{UrlPrefix}/{projectId}/{UriSegments.INVITES}/{email}");
+        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}/{email}");
 
     /// <summary>
     /// Send a invite to the associated project
@@ -136,7 +134,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <returns><see cref="MessageResponse"/></returns>
     public async Task<MessageResponse> SendProjectInvite(string projectId, SendProjectInviteSchema sendProjectInviteSchema) =>
         await PostAsync<MessageResponse>(
-            $"{UrlPrefix}/{projectId}/{UriSegments.INVITES}",
+            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}",
             RequestContentUtil.CreatePayload(sendProjectInviteSchema));
     #endregion
 
@@ -147,7 +145,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectMembersResponse"/></returns>
     public async Task<GetProjectMembersResponse> GetProjectMembers(string projectId) =>
-        await GetAsync<GetProjectMembersResponse>($"{UrlPrefix}/{projectId}/{UriSegments.MEMBERS}");
+        await GetAsync<GetProjectMembersResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}");
 
     /// <summary>
     /// Get the scopes associated with member
@@ -156,7 +154,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="memberId">Id of member</param>
     /// <returns><see cref="GetProjectMemberScopesResponse"/></returns>
     public async Task<GetProjectMemberScopesResponse> GetProjectMemberScopes(string projectId, string memberId) =>
-        await GetAsync<GetProjectMemberScopesResponse>($"{UrlPrefix}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}");
+        await GetAsync<GetProjectMemberScopesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}");
 
     /// <summary>
     /// Update the scopes fot the member
@@ -167,7 +165,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <returns><see cref="MessageResponse"/></returns>  
     public async Task<MessageResponse> UpdateProjectMemberScope(string projectId, string memberId, UpdateProjectMemberScopeSchema updateProjectMemberScopeSchema) =>
         await PutAsync<MessageResponse>(
-            $"{UrlPrefix}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}",
+            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}",
             RequestContentUtil.CreatePayload(updateProjectMemberScopeSchema));
 
     /// <summary>
@@ -177,7 +175,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="memberId">Id of member</param>   
     //No response expected
     public async Task RemoveProjectMember(string projectId, string memberId) =>
-        await DeleteAsync($"{UrlPrefix}/{projectId}/{UriSegments.MEMBERS}/{memberId}");
+        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}");
     #endregion
 
     #region Usage
@@ -191,7 +189,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     public async Task<GetProjectUsageRequestsResponse> GetProjectUsageRequests(string projectId, GetProjectUsageRequestsSchema getProjectUsageRequestsSchema)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageRequestsSchema);
-        return await GetAsync<GetProjectUsageRequestsResponse>($"{UrlPrefix}/{projectId}/{UriSegments.REQUESTS}?{stringedOptions}");
+        return await GetAsync<GetProjectUsageRequestsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}?{stringedOptions}");
     }
 
     /// <summary>
@@ -201,7 +199,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="requestId">Id of request</param>
     /// <returns><see cref="GetProjectUsageRequestResponse"/></returns>
     public async Task<GetProjectUsageRequestResponse> GetProjectUsageRequest(string projectId, string requestId) =>
-        await GetAsync<GetProjectUsageRequestResponse>($"{UrlPrefix}/{projectId}/{UriSegments.REQUESTS}/{requestId}");
+        await GetAsync<GetProjectUsageRequestResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}/{requestId}");
 
     /// <summary>
     /// Gets a summary of usage
@@ -213,7 +211,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
         return await GetAsync<GetProjectUsageSummaryResponse>(
-            $"{UrlPrefix}/{projectId}/{UriSegments.USAGE}?{stringedOptions}");
+            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}?{stringedOptions}");
     }
 
     /// <summary>
@@ -226,7 +224,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
         return await GetAsync<GetProjectUsageFieldsResponse>(
-            $"{UrlPrefix}/{projectId}/{UriSegments.USAGE}/fields?{stringedOptions}");
+            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}/fields?{stringedOptions}");
     }
     #endregion
 
@@ -238,7 +236,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="GetProjectBalancesResponse"/></returns>
     public async Task<GetProjectBalancesResponse> GetProjectBalances(string projectId) =>
-        await GetAsync<GetProjectBalancesResponse>($"{UrlPrefix}/{projectId}/{UriSegments.BALANCES}");
+        await GetAsync<GetProjectBalancesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}");
 
     /// <summary>
     /// Get the balance details associated with the balance id
@@ -247,6 +245,6 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="balanceId">Id of balance</param>
     /// <returns><see cref="GetProjectBalanceResponse"/></returns>
     public async Task<GetProjectBalanceResponse> GetProjectBalance(string projectId, string balanceId) =>
-        await GetAsync<GetProjectBalanceResponse>($"{UrlPrefix}/{projectId}/{UriSegments.BALANCES}/{balanceId}");
+        await GetAsync<GetProjectBalanceResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}/{balanceId}");
     #endregion
 }

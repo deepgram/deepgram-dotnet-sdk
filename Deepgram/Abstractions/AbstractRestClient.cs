@@ -1,4 +1,5 @@
 ﻿using Deepgram.DeepgramHttpClient;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Abstractions;
 
@@ -13,9 +14,6 @@ public abstract class AbstractRestClient
     /// </summary>
     internal ILogger _logger => LogProvider.GetLogger(this.GetType().Name);
 
-
-
-
     /// <summary>
     /// Constructor that take the options and a httpClient
     /// </summary>
@@ -23,6 +21,7 @@ public abstract class AbstractRestClient
 
     internal AbstractRestClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     {
+        deepgramClientOptions ??= new DeepgramClientOptions();
         _httpClientWrapper = DeepgramHttpClientFactory.Create(apiKey, deepgramClientOptions);
     }
 

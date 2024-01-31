@@ -1,12 +1,13 @@
 ﻿using Deepgram.DeepgramHttpClient;
-using Deepgram.Records;
+using Deepgram.Models.Manage;
+using Deepgram.Models.Manage.v1;
+using Deepgram.Models.Shared.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class ManageClientTest
 {
     DeepgramClientOptions _options;
     string _projectId;
-    readonly string _urlPrefix = $"/{Defaults.API_VERSION}/{UriSegments.PROJECTS}";
     string _apiKey;
     [SetUp]
     public void Setup()
@@ -18,21 +19,6 @@ public class ManageClientTest
 
     #region Projects
 
-    [Test]
-    public void ManageClient_urlPrefix_Should_Match_Expected()
-    {
-        //Arrange 
-        var expected = "/v1/projects";
-        var client = new ManageClient(_apiKey, _options);
-
-
-        //Assert
-        using (new AssertionScope())
-        {
-            client.UrlPrefix.Should().NotBeNull();
-            client.UrlPrefix.Should().BeEquivalentTo(expected);
-        }
-    }
 
 
 
@@ -47,13 +33,13 @@ public class ManageClientTest
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         manageClient.When(x => x.GetAsync<GetProjectsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectsResponse>(_urlPrefix).Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectsResponse>(UriSegments.PROJECTS).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjects();
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectsResponse>(_urlPrefix);
+        await manageClient.Received().GetAsync<GetProjectsResponse>(UriSegments.PROJECTS);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -75,13 +61,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectResponse>($"{_urlPrefix}/{_projectId}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectResponse>($"{UriSegments.PROJECTS}/{_projectId}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProject(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectResponse>($"/v1/projects/{_projectId}");
+        await manageClient.Received().GetAsync<GetProjectResponse>($"projects/{_projectId}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -101,13 +87,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PatchAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PatchAsync<MessageResponse>($"{_urlPrefix}/{_projectId}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PatchAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.UpdateProject(_projectId, updateProjectSchema);
 
         //Assert
-        await manageClient.Received().PatchAsync<MessageResponse>($"{_urlPrefix}/{_projectId}", Arg.Any<StringContent>());
+        await manageClient.Received().PatchAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -126,13 +112,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/leave").Returns(expectedResponse);
+        manageClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/leave").Returns(expectedResponse);
 
         //Act
         var result = await manageClient.LeaveProject(_projectId);
 
         //Assert
-        await manageClient.Received().DeleteAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/leave");
+        await manageClient.Received().DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/leave");
 
         using (new AssertionScope())
         {
@@ -151,13 +137,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{_urlPrefix}/{_projectId}").Returns(Task.CompletedTask);
+        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}").Returns(Task.CompletedTask);
 
         // Act
         await manageClient.DeleteProject(_projectId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{_urlPrefix}/{_projectId}");
+        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}");
     }
 
     #endregion
@@ -173,13 +159,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectKeysResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectKeysResponse>($"{_urlPrefix}/{_projectId}/keys").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectKeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys").Returns(expectedResponse);
 
         //Act
         var result = await manageClient.GetProjectKeys(_projectId);
 
         //Assert
-        await manageClient.Received().GetAsync<GetProjectKeysResponse>($"{_urlPrefix}/{_projectId}/keys");
+        await manageClient.Received().GetAsync<GetProjectKeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -199,12 +185,12 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectKeyResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys/{keyId}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(expectedResponse);
 
 
         //Act
         var result = await manageClient.GetProjectKey(_projectId, keyId);
-        await manageClient.Received().GetAsync<GetProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys/{keyId}");
+        await manageClient.Received().GetAsync<GetProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
 
         //Assert
         using (new AssertionScope())
@@ -228,7 +214,7 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PostAsync<CreateProjectKeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
 
 
@@ -236,7 +222,7 @@ public class ManageClientTest
         var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {
@@ -258,7 +244,7 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PostAsync<CreateProjectKeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
 
 
@@ -266,7 +252,7 @@ public class ManageClientTest
         var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {
@@ -288,13 +274,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PostAsync<CreateProjectKeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{_urlPrefix}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<CreateProjectKeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {
@@ -327,13 +313,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{_urlPrefix}/{_projectId}/keys/{keyId}").Returns(Task.CompletedTask);
+        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(Task.CompletedTask);
 
         // Act
         await manageClient.DeleteProjectKey(_projectId, keyId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{_urlPrefix}/{_projectId}/keys/{keyId}");
+        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
     }
 
     #endregion
@@ -350,13 +336,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectInvitesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectInvitesResponse>($"{_urlPrefix}/{_projectId}/invites").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectInvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectInvites(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectInvitesResponse>($"{_urlPrefix}/{_projectId}/invites");
+        await manageClient.Received().GetAsync<GetProjectInvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -376,13 +362,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PostAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/invites", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.SendProjectInvite(_projectId, sendProjectInviteSchema);
 
         // Assert
-        await manageClient.Received().PostAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/invites", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -401,13 +387,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{_urlPrefix}/{_projectId}/invites/{email}").Returns(Task.CompletedTask);
+        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}").Returns(Task.CompletedTask);
 
         // Act
         await manageClient.DeleteProjectInvite(_projectId, email);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{_urlPrefix}/{_projectId}/invites/{email}");
+        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}");
 
     }
     #endregion
@@ -423,13 +409,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectMembersResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectMembersResponse>($"{_urlPrefix}/{_projectId}/members").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectMembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectMembers(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectMembersResponse>($"{_urlPrefix}/{_projectId}/members");
+        await manageClient.Received().GetAsync<GetProjectMembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -450,13 +436,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectMemberScopesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectMemberScopesResponse>($"{_urlPrefix}/{_projectId}/members/{memberId}/scopes").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectMemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectMemberScopes(_projectId, memberId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectMemberScopesResponse>($"{_urlPrefix}/{_projectId}/members/{memberId}/scopes");
+        await manageClient.Received().GetAsync<GetProjectMemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -477,13 +463,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.PutAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PutAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>()).Returns(expectedResponse);
+        manageClient.PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.UpdateProjectMemberScope(_projectId, memberId, updateProjectMemberScopeSchema);
 
         // Assert
-        await manageClient.Received().PutAsync<MessageResponse>($"{_urlPrefix}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>());
+        await manageClient.Received().PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -502,13 +488,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{_urlPrefix}/{_projectId}/members/{memberId}").Returns(Task.CompletedTask);
+        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}").Returns(Task.CompletedTask);
 
         // Act
         await manageClient.RemoveProjectMember(_projectId, memberId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{_urlPrefix}/{_projectId}/members/{memberId}");
+        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}");
 
     }
     #endregion
@@ -526,13 +512,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectUsageRequestsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectUsageRequestsResponse>($"{_urlPrefix}/{_projectId}/requests?{stringedOptions}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectUsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectUsageRequests(_projectId, getProjectUsageRequestsSchema);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectUsageRequestsResponse>($"{_urlPrefix}/{_projectId}/requests?{stringedOptions}");
+        await manageClient.Received().GetAsync<GetProjectUsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}");
 
         using (new AssertionScope())
         {
@@ -553,13 +539,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectUsageRequestResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectUsageRequestResponse>($"{_urlPrefix}/{_projectId}/requests/{requestId}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectUsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectUsageRequest(_projectId, requestId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectUsageRequestResponse>($"{_urlPrefix}/{_projectId}/requests/{requestId}");
+        await manageClient.Received().GetAsync<GetProjectUsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -580,13 +566,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectUsageSummaryResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectUsageSummaryResponse>($"{_urlPrefix}/{_projectId}/usage?{stringedOptions}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectUsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectUsageSummary(_projectId, getProjectUsageSummarySchema);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectUsageSummaryResponse>($"{_urlPrefix}/{_projectId}/usage?{stringedOptions}");
+        await manageClient.Received().GetAsync<GetProjectUsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}");
 
         using (new AssertionScope())
         {
@@ -608,13 +594,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectUsageFieldsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectUsageFieldsResponse>($"{_urlPrefix}/{_projectId}/usage/fields?{stringedOptions}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectUsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectUsageFields(_projectId, getProjectUsageFieldsSchema);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectUsageFieldsResponse>($"{_urlPrefix}/{_projectId}/usage/fields?{stringedOptions}");
+        await manageClient.Received().GetAsync<GetProjectUsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}");
 
         using (new AssertionScope())
         {
@@ -638,13 +624,13 @@ public class ManageClientTest
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         manageClient.When(x => x.GetAsync<GetProjectBalancesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectBalancesResponse>($"{_urlPrefix}/{_projectId}/balances").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectBalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectBalances(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectBalancesResponse>($"{_urlPrefix}/{_projectId}/balances");
+        await manageClient.Received().GetAsync<GetProjectBalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -663,13 +649,13 @@ public class ManageClientTest
         manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
         var balanceId = new Faker().Random.Guid().ToString();
         manageClient.When(x => x.GetAsync<GetProjectBalanceResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<GetProjectBalanceResponse>($"{_urlPrefix}/{_projectId}/balances/{balanceId}").Returns(expectedResponse);
+        manageClient.GetAsync<GetProjectBalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}").Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjectBalance(_projectId, balanceId);
 
         // Assert
-        await manageClient.Received().GetAsync<GetProjectBalanceResponse>($"{_urlPrefix}/{_projectId}/balances/{balanceId}");
+        await manageClient.Received().GetAsync<GetProjectBalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}");
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
