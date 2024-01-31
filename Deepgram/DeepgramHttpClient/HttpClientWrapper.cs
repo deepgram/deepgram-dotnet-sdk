@@ -2,9 +2,10 @@
 
 internal class HttpClientWrapper(HttpClient HttpClient)
 {
-    internal Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
+    internal Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
     {
-        return HttpClient.SendAsync(request);
+
+        return HttpClient.SendAsync(request, cancellationToken);
     }
 
     /// <summary>
