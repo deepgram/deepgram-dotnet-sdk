@@ -21,6 +21,7 @@ public class LiveClient : IDisposable
     internal string _apiKey;
     internal readonly DeepgramClientOptions _deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
+    internal readonly CancellationTokenSource _tokenSource = new();
     internal bool _isDisposed;
     #endregion
 
@@ -38,8 +39,9 @@ public class LiveClient : IDisposable
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task StartConnectionAsync(LiveSchema options, CancellationToken cancellationToken = default)
+    public async Task StartConnectionAsync(LiveSchema options, CancellationToken? cancellationToken = null)
     {
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         _clientWebSocket = new ClientWebSocket()
            .SetHeaders(_apiKey, _deepgramClientOptions);
 
@@ -47,7 +49,7 @@ public class LiveClient : IDisposable
         {
             await _clientWebSocket.ConnectAsync(
                 GetUri(options, _deepgramClientOptions),
-                cancellationToken).ConfigureAwait(false);
+                cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
 
@@ -60,12 +62,12 @@ public class LiveClient : IDisposable
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
             _ => ProcessSenderQueue(),
                 TaskCreationOptions.LongRunning,
-                cancellationToken);
+                cancelToken);
 
         void StartReceiverBackgroundThread() => _ = Task.Factory.StartNew(
                 _ => Receive(),
             TaskCreationOptions.LongRunning,
-            cancellationToken);
+            cancelToken);
     }
 
 
@@ -117,9 +119,9 @@ public class LiveClient : IDisposable
         }
     }
 
-    internal async Task Receive(CancellationToken cancellationToken = default)
+    internal async Task Receive(CancellationToken? cancellationToken = null)
     {
-
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
             try
@@ -131,7 +133,7 @@ public class LiveClient : IDisposable
                 {
                     do
                     {
-                        result = await _clientWebSocket.ReceiveAsync(buffer, cancellationToken);
+                        result = await _clientWebSocket.ReceiveAsync(buffer, cancelToken);
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
                             Log.RequestedSocketClose(logger, result.CloseStatusDescription!);
@@ -149,7 +151,7 @@ public class LiveClient : IDisposable
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await StopConnectionAsync(cancellationToken);
+                    await StopConnectionAsync();
                     break;
                 }
             }
@@ -206,9 +208,9 @@ public class LiveClient : IDisposable
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task StopConnectionAsync(CancellationToken cancellationToken = default)
+    public async Task StopConnectionAsync(CancellationToken? cancellationToken = null)
     {
-
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         try
         {
             if (_clientWebSocket!.CloseStatus.HasValue)
@@ -223,9 +225,12 @@ public class LiveClient : IDisposable
                     await _clientWebSocket.CloseOutputAsync(
                         WebSocketCloseStatus.NormalClosure,
                         string.Empty,
-                        cancellationToken)
+                        cancelToken)
                         .ConfigureAwait(false);
                 }
+
+                // Always request cancellation to the local token source, if some function has been called without a token
+                _tokenSource?.Cancel();
             }
         }
         catch (Exception ex)
@@ -238,9 +243,9 @@ public class LiveClient : IDisposable
     /// Signals to Deepgram that the audio has completed so it can return the final transcription output
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task FinishAsync(CancellationToken cancellationToken = default)
+    public async Task FinishAsync(CancellationToken? cancellationToken = null)
     {
-
+        var cancelToken = cancellationToken ?? _tokenSource.Token;
         if (_clientWebSocket!.State != WebSocketState.Open)
             return;
 
@@ -248,7 +253,7 @@ public class LiveClient : IDisposable
             new ArraySegment<byte>([]),
             WebSocketMessageType.Binary,
             true,
-            cancellationToken)
+            cancelToken)
             .ConfigureAwait(false);
     }
 
@@ -309,10 +314,15 @@ public class LiveClient : IDisposable
     public void Dispose()
     {
         if (_isDisposed)
+        {
             return;
+        }
 
+        _tokenSource.Cancel();
+        _tokenSource.Dispose();
         _sendChannel?.Writer.Complete();
         _clientWebSocket?.Dispose();
+
         _isDisposed = true;
         GC.SuppressFinalize(this);
     }
