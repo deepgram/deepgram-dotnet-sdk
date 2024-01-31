@@ -1,4 +1,4 @@
-﻿using Deepgram.Models.Shared.v1;
+﻿using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Extensions;
 

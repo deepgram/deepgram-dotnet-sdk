@@ -1,6 +1,4 @@
-﻿using Deepgram.Models.Shared.v1;
-
-namespace Deepgram.Models.PreRecorded.v1;
+﻿namespace Deepgram.Models.PreRecorded.v1;
 
 public record Sentence
 {

@@ -1,5 +1,5 @@
 ﻿using Deepgram.Models.Manage.v1;
-using Deepgram.Models.Shared.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ExtensionsTests;
 public class HttpClientExtensionTests

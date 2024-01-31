@@ -116,7 +116,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
         //Arrange 
-        var options = new AutoFaker<CreateProjectKeySchema>().Generate();
+        var options = new AutoFaker<KeySchema>().Generate();
         var time = DateTime.Now;
         options.ExpirationDate = time;
 

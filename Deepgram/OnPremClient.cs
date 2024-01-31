@@ -1,6 +1,6 @@
 ﻿using Deepgram.Models.Manage.v1;
 using Deepgram.Models.OnPrem.v1;
-using Deepgram.Models.Shared.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;
 
@@ -18,18 +18,18 @@ public class OnPremClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// get a list of credentials associated with project
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <returns><see cref="ListOnPremCredentialsResponse"/></returns>
-    public async Task<ListOnPremCredentialsResponse> ListCredentials(string projectId, CancellationToken cancellationToken = default) =>
-        await GetAsync<ListOnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}", cancellationToken);
+    /// <returns><see cref="CredentialsResponse"/></returns>
+    public async Task<CredentialsResponse> ListCredentials(string projectId, CancellationToken cancellationToken = default) =>
+        await GetAsync<CredentialsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}", cancellationToken);
 
     /// <summary>
     /// Get credentials for the project that is associated with credential ID
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <param name="credentialsId">Id of credentials</param>
-    /// <returns><see cref="OnPremCredentialsResponse"/></returns>
-    public async Task<OnPremCredentialsResponse> GetCredentials(string projectId, string credentialsId, CancellationToken cancellationToken = default) =>
-        await GetAsync<OnPremCredentialsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}", cancellationToken);
+    /// <returns><see cref="CredentialResponse"/></returns>
+    public async Task<CredentialResponse> GetCredentials(string projectId, string credentialsId, CancellationToken cancellationToken = default) =>
+        await GetAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}", cancellationToken);
 
     /// <summary>
     /// Remove credentials in the project associated with the credentials ID
@@ -44,10 +44,10 @@ public class OnPremClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// Create credentials for the associated projects
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="createOnPremCredentialsSchema"><see cref="CreateOnPremCredentialsSchema"/> for credentials to be created</param>
-    /// <returns><see cref="OnPremCredentialsResponse"/></returns>
-    public async Task<OnPremCredentialsResponse> CreateCredentials(string projectId, CreateOnPremCredentialsSchema createOnPremCredentialsSchema, CancellationToken cancellationToken = default) =>
-        await PostAsync<OnPremCredentialsResponse>(
+    /// <param name="createOnPremCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
+    /// <returns><see cref="CredentialResponse"/></returns>
+    public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema createOnPremCredentialsSchema, CancellationToken cancellationToken = default) =>
+        await PostAsync<CredentialResponse>(
             $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}",
             RequestContentUtil.CreatePayload(createOnPremCredentialsSchema), cancellationToken);
 

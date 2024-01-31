@@ -1,6 +1,6 @@
 ﻿using Deepgram.Extensions;
 using Deepgram.Models.Live.v1;
-using Deepgram.Models.Shared.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;
 
@@ -29,7 +29,7 @@ public class LiveClient : IDisposable
     /// <summary>
     /// Fires when transcription metadata is received from the Deepgram API
     /// </summary>  
-    public event EventHandler<LiveResponseReceivedEventArgs>? LiveResponseReceived;
+    public event EventHandler<ResponseReceivedEventArgs>? EventResponseReceived;
     #endregion
 
     //TODO when a response is received check if it is a transcript(LiveTranscriptionEvent) or metadata (LiveMetadataEvent) response 
@@ -176,23 +176,23 @@ public class LiveClient : IDisposable
             {
                 try
                 {
-                    var liveResponse = new LiveResponse();
+                    var eventResponse = new EventResponse();
                     var data = JsonDocument.Parse(response);
                     var val = Enum.Parse(typeof(LiveType), data.RootElement.GetProperty("type").GetString()!);
 
                     switch (val)
                     {
                         case LiveType.Results:
-                            liveResponse.Transcription = data.Deserialize<LiveTranscriptionResponse>()!;
+                            eventResponse.Transcription = data.Deserialize<TranscriptionResponse>()!;
                             break;
                         case LiveType.Metadata:
-                            liveResponse.MetaData = data.Deserialize<LiveMetadataResponse>()!;
+                            eventResponse.MetaData = data.Deserialize<MetadataResponse>()!;
                             break;
                         case LiveType.UtteranceEnd:
-                            liveResponse.UtteranceEnd = data.Deserialize<LiveUtteranceEndResponse>()!;
+                            eventResponse.UtteranceEnd = data.Deserialize<UtteranceEndResponse>()!;
                             break;
                     }
-                    LiveResponseReceived?.Invoke(null, new LiveResponseReceivedEventArgs(liveResponse));
+                    EventResponseReceived?.Invoke(null, new ResponseReceivedEventArgs(eventResponse));
                 }
                 catch (Exception ex)
                 {
@@ -283,7 +283,7 @@ public class LiveClient : IDisposable
             Log.SocketDisposed(logger, action, ex);
         else
             Log.Exception(logger, action, ex);
-        LiveResponseReceived?.Invoke(null, new LiveResponseReceivedEventArgs(new LiveResponse() { Error = ex }));
+        EventResponseReceived?.Invoke(null, new ResponseReceivedEventArgs(new EventResponse() { Error = ex }));
 
     }
 
