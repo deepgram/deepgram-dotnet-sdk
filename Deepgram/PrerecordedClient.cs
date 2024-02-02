@@ -1,5 +1,5 @@
 ﻿using Deepgram.Models.PreRecorded.v1;
-using Deepgram.Models.Shared.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;
 
@@ -18,12 +18,12 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// </summary>
     /// <param name="source">Url to the file that is to be transcribed <see cref="UrlSource"></param>
     /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
-    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
-    public async Task<SyncPrerecordedResponse> TranscribeUrl(UrlSource source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="SyncResponse"/></returns>
+    public async Task<SyncResponse> TranscribeUrl(UrlSource source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyNoCallBack(nameof(TranscribeUrl), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-        return await PostAsync<SyncPrerecordedResponse>(
+        return await PostAsync<SyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source), cancellationToken);
     }
@@ -32,14 +32,14 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// </summary>
     /// <param name="source">file is the form of a byte[]</param>
     /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
-    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
-    public async Task<SyncPrerecordedResponse> TranscribeFile(byte[] source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="SyncResponse"/></returns>
+    public async Task<SyncResponse> TranscribeFile(byte[] source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyNoCallBack(nameof(TranscribeFile), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
-        return await PostAsync<SyncPrerecordedResponse>(
+        return await PostAsync<SyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream), cancellationToken);
     }
@@ -49,12 +49,12 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// </summary>
     /// <param name="source">file is the form of a stream <see cref="Stream"/></param>
     /// <param name="prerecordedSchema">Options for the transcription <see cref="PrerecordedSchema"/></param>
-    /// <returns><see cref="SyncPrerecordedResponse"/></returns>
-    public async Task<SyncPrerecordedResponse> TranscribeFile(Stream source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="SyncResponse"/></returns>
+    public async Task<SyncResponse> TranscribeFile(Stream source, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyNoCallBack(nameof(TranscribeFile), prerecordedSchema);
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-        return await PostAsync<SyncPrerecordedResponse>(
+        return await PostAsync<SyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source), cancellationToken);
     }
@@ -68,8 +68,8 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// <param name="source">file is the form of a byte[]</param>  
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
-    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeFileCallBack(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="AsyncResponse"/></returns>
+    public async Task<AsyncResponse> TranscribeFileCallBack(byte[] source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyOneCallBackSet(nameof(TranscribeFileCallBack), callBack, prerecordedSchema);
 
@@ -78,7 +78,7 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var stream = new MemoryStream();
         stream.Write(source, 0, source.Length);
-        return await PostAsync<AsyncPrerecordedResponse>(
+        return await PostAsync<AsyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(stream), cancellationToken);
     }
@@ -89,14 +89,14 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// <param name="source">file is the form of a stream <see cref="Stream"></param>  
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
-    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeFileCallBack(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="AsyncResponse"/></returns>
+    public async Task<AsyncResponse> TranscribeFileCallBack(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyOneCallBackSet(nameof(TranscribeFileCallBack), callBack, prerecordedSchema);
         if (callBack != null)
             prerecordedSchema.CallBack = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-        return await PostAsync<AsyncPrerecordedResponse>(
+        return await PostAsync<AsyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreateStreamPayload(source), cancellationToken);
     }
@@ -107,15 +107,15 @@ public class PrerecordedClient(string apiKey, DeepgramClientOptions? deepgramCli
     /// <param name="source">Url to the file that is to be transcribed <see cref="UrlSource"/></param>
     /// <param name="callBack">CallBack url</param>    
     /// <param name="prerecordedSchema">Options for the transcription<see cref="PrerecordedSchema"></param>
-    /// <returns><see cref="AsyncPrerecordedResponse"/></returns>
-    public async Task<AsyncPrerecordedResponse> TranscribeUrlCallBack(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
+    /// <returns><see cref="AsyncResponse"/></returns>
+    public async Task<AsyncResponse> TranscribeUrlCallBack(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationToken cancellationToken = default)
     {
         VerifyOneCallBackSet(nameof(TranscribeUrlCallBack), callBack, prerecordedSchema);
 
         if (callBack != null)
             prerecordedSchema.CallBack = callBack;
         var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
-        return await PostAsync<AsyncPrerecordedResponse>(
+        return await PostAsync<AsyncResponse>(
             $"{UriSegments.LISTEN}?{stringedOptions}",
             RequestContentUtil.CreatePayload(source), cancellationToken);
     }

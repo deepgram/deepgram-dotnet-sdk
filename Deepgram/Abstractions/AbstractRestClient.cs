@@ -1,5 +1,5 @@
-﻿using Deepgram.DeepgramHttpClient;
-using Deepgram.Models.Shared.v1;
+﻿using Deepgram.Encapsulations;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Abstractions;
 
@@ -22,7 +22,7 @@ public abstract class AbstractRestClient
     internal AbstractRestClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     {
         deepgramClientOptions ??= new DeepgramClientOptions();
-        _httpClientWrapper = DeepgramHttpClientFactory.Create(apiKey, deepgramClientOptions);
+        _httpClientWrapper = HttpClientFactory.Create(apiKey, deepgramClientOptions);
     }
 
     /// <summary>

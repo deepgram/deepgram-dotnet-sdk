@@ -10,6 +10,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.bak
 
 # Build results
 [Dd]ebug/

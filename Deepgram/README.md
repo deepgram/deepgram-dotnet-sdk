@@ -229,7 +229,7 @@ var deepgramClient = new LiveClient(apiKey);
 using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 {
     
-    deepgramLive.LiveResponseReceived += LiveResponseReceived;
+    deepgramLive.EventResponseReceived += EventResponseReceived;
 
     // Connection opened so start sending audio.
     async void HandleConnectionOpened(object? sender, ConnectionOpenEventArgs e)
@@ -253,7 +253,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
         await deepgramLive.FinishAsync();
     }
 
-    private async void HandleLiveResponseReceived(object? sender, LiveResponseReceivedEventArgs e)
+    private async void HandleEventResponseReceived(object? sender, ResponseReceivedEventArgs e)
     {
         if (e.Response.Error is not null)
         {
@@ -344,7 +344,7 @@ var result = await manageClient.GetProject(projectId);
 Update a project.
 
 ```csharp
-var updateProjectSchema = new UpdateProjectSchema()
+var updateProjectSchema = new ProjectSchema()
 {
     Company = "Acme",
     Name = "Mega Speech inc"
@@ -353,7 +353,7 @@ var result = await manageClient.UpdateProjectAsync(projectid,updateProjectSchema
 
 ```
 
-**UpdateProjectSchema Type**
+**ProjectSchema Type**
 
 | Property Name | Type   |                       Description                        |
 | ------------- | :----- | :------------------------------------------------------: |
@@ -423,7 +423,7 @@ var result = await manageClient.CreateProjectKey(projectId,createProjectKeyWithE
 
 [See our API reference for more info](https://developers.deepgram.com/reference/create-key).
 
-### CreateProjectKeySchema
+### KeySchema
 | Property              | Type         | Required |              Description        |
 | -------------         | :-------     | :--------|:-------------------------------:|
 | Scopes                | List<string> |  *       | scopes for key                  |
@@ -511,12 +511,12 @@ var result = await manageClient.GetProjectInvitesAsync(projectId);
 Sends an invitation to the provided email address.
 
 ```csharp
-var sendProjectInviteSchema = new SendProjectInviteSchema()
+var inviteSchema = new InviteSchema()
 {
     Email = "awesome@person.com",
     Scope = "fab"
 }
-var result = manageClient.SendProjectInviteAsync(projectId,sendProjectInviteSchema)
+var result = manageClient.SendProjectInviteAsync(projectId,inviteSchema)
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/send-invites).
@@ -541,14 +541,14 @@ Removes the specified invitation from the project.
 Retrieves all requests associated with the provided projectId based on the provided options.
 
 ```csharp
-var getProjectUsageRequestsSchema = new GetProjectUsageRequestsSchema ()
+var UsageRequestsSchema = new UsageRequestsSchema ()
 {
      Start = DateTime.Now.AddDays(-7);
 };
-var result = await manageClient.ListAllRequestsAsync(projectId,getProjectUsageRequestsSchema);
+var result = await manageClient.ListAllRequestsAsync(projectId,UsageRequestsSchema);
 ```
 
-### GetProjectUsageRequestsSchema
+### UsageRequestsSchema
 
 | Property      | Type     |              Description               |
 | ------------- | :------- | :------------------------------------: |
@@ -613,14 +613,14 @@ var result = await manageClient.GetProjectUsageSummaryAsync(projectId,getProject
 Lists the features, models, tags, languages, and processing method used for requests in the specified project.
 
 ```csharp
-var getProjectUsageFieldsSchema = new GetProjectUsageFieldsSchema()
+var getProjectUsageFieldsSchema = new UsageFieldsSchema()
 {
     Start = Datetime.Now
 }
 var result = await manageClient.GetProjectUsageFieldsAsync(projectId,getProjectUsageFieldsSchema);
 ```
 
-### GetProjectUsageFieldsSchema
+### UsageFieldsSchema
 
 | Property      | Value    |              Description               |
 | ------------- | :------- | :------------------------------------: |
@@ -666,7 +666,7 @@ var result = onPremClient.DeleteCredentialsASync(projectId,credentialsId);
 
 ## Create Credentials
 ```csharp
-var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema()
+var createOnPremCredentialsSchema = new CredentialsSchema()
  {
     Comment = "my new credentials",
     Scopes = new  List<string>{"team fab"},
@@ -675,7 +675,7 @@ var createOnPremCredentialsSchema = new CreateOnPremCredentialsSchema()
 var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremCredentialsSchema)
 ```
 
-### CreateOnPremCredentialsSchema
+### CredentialsSchema
 
 | Property      | Value     |              Description               |
 | ------------- | :-------  | :------------------------------------: |

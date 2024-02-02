@@ -1,7 +1,7 @@
 ﻿using System.Net.WebSockets;
 using Deepgram.DeepgramEventArgs;
 using Deepgram.Models.Live.v1;
-using Deepgram.Models.Shared.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 public class LiveClientTests
@@ -25,17 +25,17 @@ public class LiveClientTests
     { _liveClient.Dispose(); }
 
     [Test]
-    public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_LiveTranscriptionResponse()
+    public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_TranscriptionResponse()
     {
         //Arrange
-        var liveTranscriptionResponse = new AutoFaker<LiveTranscriptionResponse>().Generate();
+        var liveTranscriptionResponse = new AutoFaker<TranscriptionResponse>().Generate();
         // ensure the right type is set for testing
         liveTranscriptionResponse.Type = Enums.LiveType.Results;
         var json = JsonSerializer.Serialize(liveTranscriptionResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-        LiveResponseReceivedEventArgs? eventArgs = null;
+        ResponseReceivedEventArgs? eventArgs = null;
 
-        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
+        _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
 
         //Act
@@ -45,22 +45,22 @@ public class LiveClientTests
 
         eventArgs.Should().NotBeNull();
         eventArgs!.Response.Transcription.Should().NotBeNull();
-        eventArgs.Response.Transcription.Should().BeAssignableTo<LiveTranscriptionResponse>();
+        eventArgs.Response.Transcription.Should().BeAssignableTo<TranscriptionResponse>();
     }
 
     [Test]
-    public void ProcessDataReceived_Should_Raise_MetaDataReceived_Event_When_Response_Contains_Type_LiveMetadataResponse()
+    public void ProcessDataReceived_Should_Raise_MetaDataReceived_Event_When_Response_Contains_Type_MetadataResponse()
     {
         //Arrange
-        var liveMetadataResponse = new AutoFaker<LiveMetadataResponse>().Generate();
+        var liveMetadataResponse = new AutoFaker<MetadataResponse>().Generate();
         // ensure the right type is set for testing
         liveMetadataResponse.Type = Enums.LiveType.Metadata;
         var json = JsonSerializer.Serialize(liveMetadataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-        LiveResponseReceivedEventArgs? eventArgs = null;
+        ResponseReceivedEventArgs? eventArgs = null;
 
-        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
+        _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
         //Act
         _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
@@ -70,7 +70,7 @@ public class LiveClientTests
         {
             eventArgs.Should().NotBeNull();
             eventArgs!.Response.MetaData.Should().NotBeNull();
-            eventArgs.Response.MetaData.Should().BeAssignableTo<LiveMetadataResponse>();
+            eventArgs.Response.MetaData.Should().BeAssignableTo<MetadataResponse>();
         }
     }
 
@@ -82,9 +82,9 @@ public class LiveClientTests
         var json = JsonSerializer.Serialize(unknownDataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-        LiveResponseReceivedEventArgs? eventArgs = null;
+        ResponseReceivedEventArgs? eventArgs = null;
 
-        _liveClient.LiveResponseReceived += (sender, args) => eventArgs = args;
+        _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
         //Act
         _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
