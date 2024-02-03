@@ -14,20 +14,12 @@ public record SyncResponse
     [JsonPropertyName("results")]
     public Results? Results { get; set; }
 
-    /// <summary>
-    /// Returns a list text segments and the intents found within each segment.
-    /// </summary>
-    [JsonPropertyName("intents")]
-    public Intents? Intents { get; set; }
-
-
-
     public string ToWebVTT()
     {
         if (Results == null || Results.Utterances == null)
         {
             throw new Exception(
-              "This method requires a transcript that was generated with the utterances feature."
+                "This method requires a transcript that was generated with the utterances feature."
             );
         }
 
@@ -55,7 +47,7 @@ public record SyncResponse
         if (Results == null || Results.Utterances == null)
         {
             throw new Exception(
-              "This method requires a transcript that was generated with the utterances feature."
+                "This method requires a transcript that was generated with the utterances feature."
             );
         }
 
@@ -73,6 +65,6 @@ public record SyncResponse
         return srt;
     }
 
-    private static string SecondsToTimestamp(decimal seconds) =>
-        new TimeSpan((long)(seconds * 10000000)).ToString().Substring(0, seconds % 1 == 0 ? 8 : 12);
+    private static string SecondsToTimestamp(decimal? seconds) =>
+        new TimeSpan((long)(seconds??0 * 10000000)).ToString().Substring(0, seconds % 1 == 0 ? 8 : 12);
 }

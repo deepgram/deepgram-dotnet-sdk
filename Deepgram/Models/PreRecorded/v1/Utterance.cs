@@ -3,22 +3,22 @@
 public record Utterance
 {
     /// <summary>
-    /// Value between 0 and 1 indicating the model's relative confidence in this word.
-    /// </summary>
-    [JsonPropertyName("confidence")]
-    public decimal? Confidence { get; set; }
-
-    /// <summary>
     /// Audio channel to which the utterance belongs.
     /// </summary>
     [JsonPropertyName("channel")]
     public int? Channel { get; set; }
 
     /// <summary>
+    /// Value between 0 and 1 indicating the model's relative confidence in this word.
+    /// </summary>
+    [JsonPropertyName("confidence")]
+    public double? Confidence { get; set; }
+
+    /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word ends.
     /// </summary>
     [JsonPropertyName("end")]
-    public decimal End { get; set; }
+    public decimal? End { get; set; }
 
     /// <summary>
     /// Unique identifier of the utterance
@@ -26,8 +26,17 @@ public record Utterance
     [JsonPropertyName("id")]
     public string? Id { get; set; }
 
-    [JsonPropertyName("sentiments")]
-    public List<SentimentGroup> Sentiments;
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public string? Sentiment { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment_score")]
+    public double? SentimentScore { get; set; }
 
     /// <summary>
     /// Integer indicating the speaker who is saying the word being processed.
@@ -39,7 +48,7 @@ public record Utterance
     /// Offset in seconds from the start of the audio to where the spoken word starts.
     /// </summary>
     [JsonPropertyName("start")]
-    public decimal Start { get; set; }
+    public decimal? Start { get; set; }
 
     /// <summary>
     /// Transcript for the audio segment being processed.
@@ -53,6 +62,6 @@ public record Utterance
     /// <see cref="Word"/>
     /// </summary>
     [JsonPropertyName("words")]
-    public List<Word> Words { get; set; }
+    public List<Word>? Words { get; set; }
 }
 

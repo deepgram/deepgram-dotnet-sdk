@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Models.PreRecorded.v1;
 
-public class SentimentInfo
+public record SummaryInfo
 {
     /// <summary>
     /// TODO
@@ -12,7 +12,7 @@ public class SentimentInfo
     /// TODO
     /// </summary>
     [JsonPropertyName("model_uuid")]
-    public string? ModelUuid { get; set; }
+    public string? ModelUUID { get; set; }
 
     /// <summary>
     /// TODO
@@ -20,5 +20,3 @@ public class SentimentInfo
     [JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }
 }
-
-

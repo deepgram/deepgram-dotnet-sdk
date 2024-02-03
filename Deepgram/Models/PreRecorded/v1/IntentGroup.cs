@@ -1,5 +1,6 @@
 ﻿namespace Deepgram.Models.PreRecorded.v1;
-public record Intents
+
+public record IntentGroup
 {
     /// <summary> 
     /// <see href="https://developers.deepgram.com/reference/audio-intelligence-apis#intent-recognition"/>
@@ -7,5 +8,4 @@ public record Intents
     /// </summary>
     [JsonPropertyName("segments")]
     public IReadOnlyList<IntentSegment>? Segments { get; set; }
-
 }

@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Models.PreRecorded.v1;
 
-public class SentimentInfo
+public record TopicsInfo
 {
     /// <summary>
     /// TODO

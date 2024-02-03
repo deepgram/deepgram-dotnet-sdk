@@ -20,7 +20,16 @@ public record Sentence
     [JsonPropertyName("end")]
     public decimal? End { get; set; }
 
-    [JsonPropertyName("sentiments")]
-    public List<SentimentGroup> Sentiments;
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public string? Sentiment { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment_score")]
+    public double? SentimentScore { get; set; }
 }
 
