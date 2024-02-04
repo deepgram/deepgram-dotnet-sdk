@@ -12,8 +12,11 @@
     <PackageTags>speech-to-text,captions,speech-recognition,deepgram</PackageTags>
     <PackageIcon>dg_logo.png</PackageIcon>
     <Product>Deepgram.NET SDK</Product>
-    <PackageId>Deepgram</PackageId>
-    <Title>Deepgram.NET</Title>
+    <PackageId>Deepgram .NET SDK</PackageId>
+    <Title>Deepgram .NET SDK</Title>
+    <Version>3.4.1</Version>
+    <Authors>Deepgram Contributors</Authors>
+    <Company>Deepgram</Company>
   </PropertyGroup>
 
   <ItemGroup>
