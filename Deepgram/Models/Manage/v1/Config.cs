@@ -8,8 +8,17 @@ public record Config
     [JsonPropertyName("alternatives")]
     public int? Alternatives { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("callback")]
     public string? Callback { get; set; }
+
+    /// <summary>
+    /// Indicates whether topic detection was requested.
+    /// </summary>
+    [JsonPropertyName("detect_topics")]
+    public bool? DetectTopics { get; set; }
 
     /// <summary>
     /// Indicates whether diarization was requested.
@@ -22,6 +31,12 @@ public record Config
     /// </summary>
     [JsonPropertyName("keywords")]
     public IReadOnlyList<string>? Keywords { get; set; }
+
+    /// <summary>
+    /// Indicates whether InterimResults was associated with the request.
+    /// </summary>
+    [JsonPropertyName("interim_results")]
+    public bool? InterimResults { get; set; }
 
     /// <summary>
     /// Language associated with the request.
@@ -40,18 +55,6 @@ public record Config
     /// </summary>
     [JsonPropertyName("multichannel")]
     public bool? Multichannel { get; set; }
-
-    /// <summary>
-    /// Indicates whether named-entity recognition (NER) was requested.
-    /// </summary>
-    [JsonPropertyName("ner")]
-    public bool? Ner { get; set; }
-
-    /// <summary>
-    /// Indicates whether numeral conversion was requested.
-    /// </summary>
-    [JsonPropertyName("numerals")]
-    public bool? Numerals { get; set; }
 
     /// <summary>
     /// Indicates whether filtering profanity was requested.
@@ -79,10 +82,10 @@ public record Config
     public IReadOnlyList<string>? Search { get; set; }
 
     /// <summary>
-    /// Indicates whether utterance segmentation was requested.
+    /// Indicates whether SmartFormat was associated with the request.
     /// </summary>
-    [JsonPropertyName("utterances")]
-    public bool? Utterances { get; set; }
+    [JsonPropertyName("smart_format")]
+    public bool? SmartFormat { get; set; }
 
     /// <summary>
     /// ReadOnlyList of translations associated with the request.
@@ -91,9 +94,8 @@ public record Config
     public IReadOnlyList<string>? Translation { get; set; }
 
     /// <summary>
-    /// Indicates whether topic detection was requested.
+    /// Indicates whether utterance segmentation was requested.
     /// </summary>
-    [JsonPropertyName("detect_topics")]
-    public bool? DetectTopics { get; set; }
-
+    [JsonPropertyName("utterances")]
+    public bool? Utterances { get; set; }
 }

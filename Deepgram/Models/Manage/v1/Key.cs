@@ -14,12 +14,22 @@ public record Key
     [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("created")]
+    public DateTime? Created { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("tags")]
     public IReadOnlyList<string>? Tags { get; set; }
-
-    [JsonPropertyName("created")]
-    public string? Created { get; set; }
 }
+

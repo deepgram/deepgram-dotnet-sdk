@@ -6,5 +6,5 @@ public record MessageResponse
     /// A message denoting the success of the operation
     /// </summary>
     [JsonPropertyName("message")]
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

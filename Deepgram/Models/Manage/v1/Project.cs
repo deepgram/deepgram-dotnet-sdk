@@ -13,5 +13,10 @@ public record Project
     /// </summary>
     [JsonPropertyName("name")]
     public string? Name { get; set; }
-}
 
+    /// <summary>
+    /// Name of the company
+    /// </summary>
+    [JsonPropertyName("company")]
+    public string? Company { get; set; }
+}

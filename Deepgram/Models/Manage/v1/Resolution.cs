@@ -14,4 +14,3 @@ public record Resolution
     [JsonPropertyName("amount")]
     public int? Amount { get; set; }
 }
-

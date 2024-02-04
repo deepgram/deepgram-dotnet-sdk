@@ -6,13 +6,13 @@ public class KeySchema(string comment, List<string> scopes)
     /// Comment to describe key
     /// </summary>
     [JsonPropertyName("comment")]
-    public string Comment { get; set; } = comment;
+    public string? Comment { get; set; } = comment;
 
     /// <summary>
     /// Scopes of the key
     /// </summary>
     [JsonPropertyName("scopes")]
-    public List<string> Scopes { get; set; } = scopes;
+    public List<string>? Scopes { get; set; } = scopes;
 
     /// <summary>
     /// Tag names for key
@@ -32,6 +32,4 @@ public class KeySchema(string comment, List<string> scopes)
     /// </summary>
     [JsonPropertyName("time_to_live_in_seconds")]
     public int? TimeToLiveInSeconds { get; set; }
-
-
 }

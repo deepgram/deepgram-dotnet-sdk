@@ -5,5 +5,5 @@ public class MemberScopeSchema(string scope)
     /// Scope to add for member
     /// </summary>
     [JsonPropertyName("scope")]
-    public string Scope { get; set; } = scope;
+    public string? Scope { get; set; } = scope;
 }

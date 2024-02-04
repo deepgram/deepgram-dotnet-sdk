@@ -17,8 +17,8 @@ public class UsageSummarySchema
     /// Limits results to requests fulfilled in either Deepgram hosted cloud or your onprem deployment environment.
     /// multiple deployments can be included in list
     /// </summary>
-    [JsonPropertyName("deployment")]
-    public List<string>? Deployment { get; set; }
+    [JsonPropertyName("detect_entities")]
+    public bool? DetectEntities { get; set; }
 
     /// <summary>
     /// Limits results to requests that include the topic detection feature.
@@ -62,7 +62,7 @@ public class UsageSummarySchema
     /// Limits results to requests run with the specified model UUID applied.
     /// </summary>
     [JsonPropertyName("model")]
-    public List<string> Model { get; set; }
+    public List<string>? Model { get; set; }
 
     /// <summary>
     /// Limits results to requests that include the multichannel feature.
@@ -83,11 +83,22 @@ public class UsageSummarySchema
     public bool? Numerals { get; set; }
 
     /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("numbers")]
+    public bool? Numbers { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("paragraphs")]
+    public bool? Paragraphs { get; set; }
+
+    /// <summary>
     /// Limits results to requests that include the profanity_filter feature.
     /// </summary>
     [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
-
 
     /// <summary>
     /// Limits results to requests that include the punctuate feature.
@@ -114,7 +125,20 @@ public class UsageSummarySchema
     public bool? Search { get; set; }
 
     /// <summary>
-    /// 
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public bool? Sentiment { get; set; }
+
+    /// <summary>
+    /// Limits results to requests that include the search feature.
+    /// </summary>
+    [JsonPropertyName("sentiment_threshold")]
+    public double? SentimentThreshold { get; set; }
+
+
+    /// <summary>
+    /// TODO
     /// </summary>
     [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
@@ -126,10 +150,22 @@ public class UsageSummarySchema
     public DateTime? Start { get; set; }
 
     /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("summarize")]
+    public bool? Summarize { get; set; }
+
+    /// <summary>
     /// List of Tags, Limits results to requests associated with the specified tag(s). 
     /// </summary>
     [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("translate")]
+    public bool? translate { get; set; }
 
     /// <summary>
     /// Limits results to requests that include the utterances feature.
@@ -137,4 +173,9 @@ public class UsageSummarySchema
     [JsonPropertyName("utterances")]
     public bool? Utterances { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("utt_split")]
+    public bool? UttSplit { get; set; }
 }

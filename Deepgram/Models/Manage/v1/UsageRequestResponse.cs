@@ -9,6 +9,12 @@ public record UsageRequestResponse
     public string? RequestId { get; set; }
 
     /// <summary>
+    /// UUID of the project.
+    /// </summary>
+    [JsonPropertyName("project_uuid")]
+    public string? ProjectUUID { get; set; }
+
+    /// <summary>
     /// Date/time when request was created.
     /// </summary>
     [JsonPropertyName("created")]
@@ -19,6 +25,12 @@ public record UsageRequestResponse
     /// </summary>
     [JsonPropertyName("path")]
     public string? Path { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("accessor")]
+    public string? Accessor { get; set; }
 
     /// <summary>
     /// Identifier of the API Key with which the request was submitted.
