@@ -7,10 +7,4 @@ public record Channel
     /// </summary>
     [JsonPropertyName("alternatives")]
     public IReadOnlyList<Alternative>? Alternatives { get; set; }
-
-    /// <summary>
-    /// <see cref="Search"/>
-    /// </summary>
-    [JsonPropertyName("search")]
-    public IReadOnlyList<Search>? Searches { get; set; }
 }

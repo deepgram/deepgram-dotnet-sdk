@@ -2,28 +2,29 @@
 
 public record MetaData
 {
-    [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType Type { get; set; } = LiveType.Metadata;
-
-    [JsonPropertyName("transaction_key")]
-    public string? TransactionKey { get; set; }
-
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
-    [JsonPropertyName("sha256")]
-    public string? Sha256 { get; set; }
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("model_uuid")]
+    public string? ModelUUID { get; set; }
 
-    [JsonPropertyName("created")]
-    public DateTime? Created { get; set; }
+    /// <summary>
+    /// IReadonlyDictionary of <see cref="ModelInfo"/>
+    /// </summary>
+    [JsonPropertyName("model_info")]
+    public Dictionary<string, ModelInfo> ModelInfo { get; set; }
 
-    [JsonPropertyName("duration")]
-    public double? Duration { get; set; }
-
-    [JsonPropertyName("channels")]
-    public int? Channels { get; set; }
-
-    [JsonPropertyName("models")]
-    public IReadOnlyList<string> Models { get; set; }
+    /// <summary>
+    /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
+    /// Extra metadata is limited to 2048 characters per key-value pair.
+    /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
+    /// </summary>
+    [JsonPropertyName("extra")]
+    public Dictionary<string, string>? Extra { get; set; }
 }

@@ -11,13 +11,11 @@ public record Alternative
     /// Value between 0 and 1 indicating the model's relative confidence in this transcript.
     /// </summary>
     [JsonPropertyName("confidence")]
-    public decimal? Confidence { get; set; }
+    public double? Confidence { get; set; }
 
     /// <summary>
     /// ReadOnly List of <see cref="Word"/> objects.
     /// </summary>
     [JsonPropertyName("words")]
     public IReadOnlyList<Word>? Words { get; set; }
-
-
 }

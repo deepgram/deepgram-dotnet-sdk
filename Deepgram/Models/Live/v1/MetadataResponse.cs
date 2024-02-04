@@ -2,29 +2,66 @@
 
 public record MetadataResponse
 {
-    [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType Type { get; set; } = LiveType.Metadata;
-
-    [JsonPropertyName("transaction_key")]
-    public string? TransactionKey { get; set; }
-
-    [JsonPropertyName("request_id")]
-    public string? RequestId { get; set; }
-
-    [JsonPropertyName("sha256")]
-    public string? Sha256 { get; set; }
-
-    [JsonPropertyName("created")]
-    public DateTime? Created { get; set; }
-
-    [JsonPropertyName("duration")]
-    public double? Duration { get; set; }
-
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("channels")]
     public int? Channels { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("created")]
+    public DateTime? Created { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("duration")]
+    public double? Duration { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("model_info")]
+    public IReadOnlyDictionary<Guid, ModelInfo>? ModelInfo { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<string> Models { get; set; }
-    public IReadOnlyDictionary<Guid, ModelInfo> ModelInfo { get; set; }
+    public IReadOnlyList<string>? Models { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("request_id")]
+    public string? RequestId { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sha256")]
+    public string? Sha256 { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("transaction_key")]
+    public string? TransactionKey { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LiveType? Type { get; set; } = LiveType.Metadata;
+
+    /// <summary>
+    /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
+    /// Extra metadata is limited to 2048 characters per key-value pair.
+    /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
+    /// </summary>
+    [JsonPropertyName("extra")]
+    public Dictionary<string, string>? Extra { get; set; }
 }

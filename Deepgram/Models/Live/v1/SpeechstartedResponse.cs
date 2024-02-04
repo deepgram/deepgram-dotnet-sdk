@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Models.Live.v1;
 
-public class UtteranceEndResponse
+public class SpeechStartedResponse
 {
     /// <summary>
     /// TODO
@@ -19,5 +19,5 @@ public class UtteranceEndResponse
     /// TODO
     /// </summary>
     [JsonPropertyName("last_word_end")]
-    public decimal? LastWordEnd { get; set; }
+    public decimal? Timestamp { get; set; }
 }
