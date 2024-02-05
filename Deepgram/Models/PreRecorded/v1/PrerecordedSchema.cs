@@ -2,7 +2,6 @@
 
 public class PrerecordedSchema
 {
-
     /// <summary>
     /// Number of transcripts to return per request
     /// <see href="https://developers.deepgram.com/reference/pre-recorded"/>
@@ -25,18 +24,49 @@ public class PrerecordedSchema
     [JsonPropertyName("callback_method")]
     public bool? CallbackMethod { get; set; }
 
-    ///// <summary>
-    ///// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
-    ///// </summary>
-    //[JsonPropertyName("custom_intent")]
-    //public string CustomIntent { get; set; }
+    /// <summary>
+    /// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
+    /// </summary>
+    [JsonPropertyName("custom_intent")]
+    public List<string>? CustomIntent { get; set; }
 
-    ///// <summary>
-    ///// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
-    ///// </summary>
-    //[JsonPropertyName("custom_intent_mode")]
-    //public string CustomIntentMode { get; set; }
+    /// <summary>
+    /// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
+    /// </summary>
+    [JsonPropertyName("custom_intent_mode")]
+    public string? CustomIntentMode { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("custom_topic")]
+    public List<string>? CustomTopic { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("custom_topic_mode")]
+    public string? CustomTopicMode { get; set; }
+
+    /// <summary>
+    /// Entity Detection identifies and extracts key entities from content in submitted audio
+    /// <see href="https://developers.deepgram.com/docs/detect-entities">
+    /// </summary>
+    [JsonPropertyName("detect_entities")]
+    public bool? DetectEntities { get; set; }
+
+    /// <summary>
+    /// Language Detection identifies the dominant language spoken in submitted audio.
+    /// <see href="https://developers.deepgram.com/docs/language-detection">
+    /// </summary>
+    [JsonPropertyName("detect_language")]
+    public bool? DetectLanguage { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("detect_topics")]
+    public bool? DetectTopics { get; set; }
 
     /// <summary>
     /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript. 
@@ -53,14 +83,20 @@ public class PrerecordedSchema
     [JsonPropertyName("diarize_version")]
     public string? DiarizeVersion { get; set; }
 
+    // <summary>
+    /// <see href="https://developers.deepgram.com/docs/diarization">
+    /// default is null, only applies if Diarize is set to true
+    /// </summary>
+    [JsonPropertyName("dictation")]
+    public bool? Dictation { get; set; }
+
     /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
     /// Extra metadata is limited to 2048 characters per key-value pair.
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
     [JsonPropertyName("extra")]
-    public Dictionary<string, string> Extra { get; set; }
-
+    public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>
     /// Whether to include words like "uh" and "um" in transcription output. 
@@ -69,11 +105,11 @@ public class PrerecordedSchema
     [JsonPropertyName("filler_words")]
     public bool? FillerWords { get; set; }
 
-    ///// <summary>
-    ///// Enables intent recognition
-    ///// </summary>
-    //[JsonPropertyName("intents")]
-    //public bool? Intents { get; set; }
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("intents")]
+    public bool? Intents { get; set; }
 
     /// <summary>
     /// Keywords can boost or suppress specialized terminology.
@@ -91,6 +127,12 @@ public class PrerecordedSchema
     public string? Language { get; set; }
 
     /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("measurements")]
+    public bool? Measurements { get; set; }
+
+    /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
@@ -104,12 +146,16 @@ public class PrerecordedSchema
     [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("paragraphs")]
+    public bool? Paragraphs { get; set; }
 
     /// <summary>
     /// Profanity Filter looks for recognized profanity and converts it to the nearest recognized 
     /// non-profane word or removes it from the transcript completely.
     /// <see href="https://developers.deepgram.com/docs/profanity-filter">
-    /// for use with base model tier only
     /// </summary>
     [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
@@ -145,14 +191,11 @@ public class PrerecordedSchema
     [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
 
-    ///// <summary>
-    ///// Enables sentiment analysis false by default
-    ///// </summary>
-    //[JsonPropertyName("sentiment")]
-    //public bool? Sentiment { get; set; }
-
-    //[JsonPropertyName("sentiment_threshold")]
-    //public double? SentimentThreshold { get; set; }
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public bool? Sentiment { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 
@@ -160,6 +203,13 @@ public class PrerecordedSchema
     /// </summary>
     [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
+
+    ///// <summary>
+    ///// TODO
+    ///// </summary>
+    [JsonPropertyName("summarize")]
+    public string? Summarize { get; set; }
+
 
     /// <summary>
     /// Tagging allows you to label your requests with one or more tags in a list,for the purpose of identification during usage reporting.
@@ -170,12 +220,22 @@ public class PrerecordedSchema
     public List<string>? Tag { get; set; }
 
     ///// <summary>
-    /////  Level of model you would like to use in your request.
-    /////  <see href="https://developers.deepgram.com/docs/model">   
+    ///// TODO
     ///// </summary>
-    //[JsonPropertyName("tier")]
-    //[Obsolete("Use Model with joint model syntax https://developers.deepgram.com/docs/models-languages-overview")]
-    //public string? Tier { get; set; }
+    [JsonPropertyName("topics")]
+    public bool? Topics { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("utt_split")]
+    public double? UttSplit { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("utterances")]
+    public bool? Utterances { get; set; }
 
     /// <summary>
     /// Version of the model to use.
@@ -184,78 +244,4 @@ public class PrerecordedSchema
     /// </summary>
     [JsonPropertyName("version")]
     public string? Version { get; set; }
-
-    /// <summary>
-    /// Entity Detection identifies and extracts key entities from content in submitted audio
-    /// <see href="https://developers.deepgram.com/docs/detect-entities">
-    /// </summary>
-    [JsonPropertyName("detect_entities")]
-    public bool? DetectEntities { get; set; }
-
-    /// <summary>
-    /// Language Detection identifies the dominant language spoken in submitted audio.
-    /// <see href="https://developers.deepgram.com/docs/language-detection">
-    /// </summary>
-    [JsonPropertyName("detect_language")]
-    public bool? DetectLanguage { get; set; }
-
-    /// <summary>
-    /// Topic Detection identifies and extracts key topics from content in submitted audio. 
-    /// <see href="https://developers.deepgram.com/docs/topic-detection">
-    /// Default is false
-    /// </summary>
-    [JsonPropertyName("detect_topics")]
-    public bool? DetectTopics { get; set; }
-
-    /// <summary>
-    /// Spoken dictation commands will be converted to their corresponding punctuation marks. e.g., comma to ,
-    /// <see href="https://developers.deepgram.com/reference/pre-recorded"/>
-    /// Default is false
-    /// </summary>
-    [JsonPropertyName("dictation")]
-    public bool? Dictation { get; set; }
-
-    /// <summary>
-    /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg
-    /// Default is false
-    /// </summary>
-    [JsonPropertyName("measurements")]
-    public bool? Measurements { get; set; }
-
-    [JsonPropertyName("ner")]
-    [Obsolete("Replaced with SmartFormat")]
-    public bool? Ner { get; set; }
-
-    /// <summary>
-    /// Paragraphs splits audio into paragraphs to improve transcript readability.
-    /// <see href="https://developers.deepgram.com/docs/paragraphs">
-    /// </summary>
-    [JsonPropertyName("paragraphs")]
-    public bool? Paragraphs { get; set; }
-
-    /// <summary>
-    /// Summarizes content of submitted audio. 
-    /// <see href="https://developers.deepgram.com/docs/summarization">
-    /// Default is v2
-    /// </summary>
-    [JsonPropertyName("summarize")]
-    public object? Summarize { get; set; }
-
-    /// <summary>
-    /// Utterances segments speech into meaningful semantic units.
-    /// <see href="https://developers.deepgram.com/docs/utterances">
-    /// default is false
-    /// </summary>
-    [JsonPropertyName("utterances")]
-    public bool? Utterances { get; set; }
-
-    /// <summary>
-    /// Utterance Split detects pauses between words in submitted audio. 
-    /// Used when the Utterances feature is enabled for pre-recorded audio.
-    /// <see href="https://developers.deepgram.com/docs/utterance-split">
-    /// Default is 0.8
-    /// </summary>
-    [JsonPropertyName("utt_split")]
-    public double? UttSplit { get; set; }
-
 }

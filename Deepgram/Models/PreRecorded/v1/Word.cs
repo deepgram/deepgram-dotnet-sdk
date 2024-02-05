@@ -3,16 +3,11 @@
 public record Word
 {
     /// <summary>
-    /// Distinct word heard by the model.
+    /// Value between 0 and 1 indicating the model's relative confidence in this word.
     /// </summary>
-    [JsonPropertyName("word")]
-    public string HeardWord { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Offset in seconds from the start of the audio to where the spoken word starts.
-    /// </summary>
-    [JsonPropertyName("start")]
-    public decimal Start { get; set; }
+    [JsonPropertyName("confidence")]
+    public double? Confidence { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word ends.
@@ -21,16 +16,22 @@ public record Word
     public decimal? End { get; set; }
 
     /// <summary>
-    /// Value between 0 and 1 indicating the model's relative confidence in this word.
-    /// </summary>
-    [JsonPropertyName("confidence")]
-    public decimal? Confidence { get; set; }
-
-    /// <summary>
     /// Punctuated version of the word
     /// </summary>
     [JsonPropertyName("punctuated_word")]
     public string? PunctuatedWord { get; set; }
+
+    /// <summary>
+    /// Punctuated version of the word
+    /// </summary>
+    [JsonPropertyName("sentiment")]
+    public string? Sentiment { get; set; }
+
+    /// <summary>
+    /// Punctuated version of the word
+    /// </summary>
+    [JsonPropertyName("sentiment_score")]
+    public double? SentimentScore { get; set; }
 
     /// <summary>
     /// Integer indicating the speaker who is saying the word being processed.
@@ -42,12 +43,18 @@ public record Word
     /// Value between 0 and 1 indicating the model's relative confidence in its choice of speaker.
     /// </summary>
     [JsonPropertyName("speaker_confidence")]
-    public decimal? SpeakerConfidence { get; set; }
+    public double? SpeakerConfidence { get; set; }
 
-    [JsonPropertyName("sentiment")]
-    public string Sentiment;
+    /// <summary>
+    /// Offset in seconds from the start of the audio to where the spoken word starts.
+    /// </summary>
+    [JsonPropertyName("start")]
+    public decimal? Start { get; set; }
 
-    [JsonPropertyName("sentiment_score")]
-    public double? SentimentScore;
+    /// <summary>
+    /// Distinct word heard by the model.
+    /// </summary>
+    [JsonPropertyName("word")]
+    public string? HeardWord { get; set; }
 }
 

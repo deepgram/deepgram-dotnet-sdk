@@ -2,8 +2,23 @@
 
 public record Paragraph
 {
-    [JsonPropertyName("channel")]
-    public int? Channel { get; set; }
+    /// <summary>
+    /// ReadOnly of Sentence objects.
+    /// </summary>
+    [JsonPropertyName("sentences")]
+    public IReadOnlyList<Sentence>? Sentences { get; set; }
+
+    /// <summary>
+    /// Number of words in the paragraph
+    /// </summary>
+    [JsonPropertyName("num_words")]
+    internal int? NumWords { get; set; }
+
+    /// <summary>
+    /// Offset in seconds from the start of the audio to where the paragraph starts.
+    /// </summary>
+    [JsonPropertyName("start")]
+    public decimal? Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph ends.
@@ -12,31 +27,15 @@ public record Paragraph
     public decimal? End { get; set; }
 
     /// <summary>
-    /// Number of words in the paragraph
+    /// TODO
     /// </summary>
-    [JsonPropertyName("num_words")]
-    internal int? NumWords { get; set; }
-
-    [JsonPropertyName("paragraphs")]
-    public IReadOnlyList<Paragraph>? Paragraphs { get; set; }
-    /// <summary>
-    /// ReadOnly of Sentence objects.
-    /// </summary>
-    [JsonPropertyName("sentences")]
-    public IReadOnlyList<Sentence>? Sentences { get; set; }
-
-    [JsonPropertyName("transcript")]
-    public string Transcript { get; set; }
-
-    [JsonPropertyName("sentiments")]
-    public List<Sentiments> Sentiments;
+    [JsonPropertyName("sentiment")]
+    public string? Sentiment { get; set; }
 
     /// <summary>
-    /// Offset in seconds from the start of the audio to where the paragraph starts.
+    /// TODO
     /// </summary>
-    [JsonPropertyName("start")]
-    public decimal? Start { get; set; }
-
-
+    [JsonPropertyName("sentiment_score")]
+    public double? SentimentScore { get; set; }
 }
 

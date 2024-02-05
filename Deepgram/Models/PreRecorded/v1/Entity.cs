@@ -31,5 +31,5 @@ public record Entity
     /// Value between 0 and 1 indicating the model's relative confidence in this detected entity.
     /// </summary>
     [JsonPropertyName("confidence")]
-    public decimal? Confidence { get; set; }
+    public double? Confidence { get; set; }
 }

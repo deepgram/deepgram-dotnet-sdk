@@ -14,7 +14,9 @@ public record Channel
     [JsonPropertyName("detected_language")]
     public string? DetectedLanguage { get; set; }
 
-
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("language_confidence")]
     public double? LanguageConfidence { get; set; }
 
