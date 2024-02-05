@@ -24,7 +24,11 @@ public record Member
     /// Email address of member
     /// </summary>
     [JsonPropertyName("email")]
-    public string? Email { get; set; } = string.Empty;
+    public string? Email { get; set; }
 
-
+    /// <summary>
+    /// Scopes of the key
+    /// </summary>
+    [JsonPropertyName("scopes")]
+    public List<string>? Scopes { get; set; }
 }

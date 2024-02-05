@@ -11,7 +11,7 @@ public record UsageFieldsResponse
     /// ReadOnlyList of <see cref="UsageModel"/>
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<UsageModel>? Models { get; set; }
+    public IReadOnlyList<Model>? Models { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="RequestMethod"/>

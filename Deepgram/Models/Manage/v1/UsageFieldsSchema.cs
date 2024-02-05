@@ -1,4 +1,5 @@
 ﻿namespace Deepgram.Models.Manage.v1;
+
 public class UsageFieldsSchema
 {
     /// <summary>

@@ -12,7 +12,7 @@ public record Details
     /// Length of time (in hours) of audio processed in the request.
     /// </summary>
     [JsonPropertyName("duration")]
-    public decimal? Duration { get; set; }
+    public double? Duration { get; set; }
 
     /// <summary>
     /// Number of audio files processed in the request.
@@ -36,29 +36,29 @@ public record Details
     /// Model applied when running the request.
     /// </summary>
     [JsonPropertyName("models")]
-    public IReadOnlyList<string> Models { get; set; }
+    public IReadOnlyList<string>? Models { get; set; }
 
     /// <summary>
     /// Processing method used when running the request.
     /// </summary>
     [JsonPropertyName("method")]
-    public string Method { get; set; }
+    public string? Method { get; set; }
 
     /// <summary>
     /// List of tags applied when running the request.
     /// </summary>
     [JsonPropertyName("tags")]
-    public IReadOnlyList<string> Tags { get; set; }
+    public IReadOnlyList<string>? Tags { get; set; }
 
     /// <summary>
     /// List of features used when running the request.
     /// </summary>
     [JsonPropertyName("features")]
-    public IReadOnlyList<string> Features { get; set; }
+    public IReadOnlyList<string>? Features { get; set; }
 
     /// <summary>
     /// Configuration used when running the request.<see cref="v1.Config"/>
     /// </summary>
     [JsonPropertyName("config")]
-    public Config Config { get; set; }
+    public Config? Config { get; set; }
 }

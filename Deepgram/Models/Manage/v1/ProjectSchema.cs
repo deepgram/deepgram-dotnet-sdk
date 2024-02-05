@@ -13,4 +13,3 @@ public class ProjectSchema
     [JsonPropertyName("company")]
     public string? Company { get; set; }
 }
-

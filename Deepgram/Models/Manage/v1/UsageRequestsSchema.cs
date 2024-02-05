@@ -14,11 +14,16 @@ public class UsageRequestsSchema
     public DateTime? End { get; set; }
 
     /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("page")]
+    public int? Page { get; set; }
+
+    /// <summary>
     /// Number of results to return per page. Default 10. Range [1,100].
     /// </summary>
-
     [JsonPropertyName("limit")]
-    public int Limit { get; set; } = 10;
+    public int? Limit { get; set; } = 10;
 
     /// <summary>
     /// Status of requests to return. Enables you to filter requests depending on whether they have succeeded or failed. If not specified, returns requests with all statuses.
