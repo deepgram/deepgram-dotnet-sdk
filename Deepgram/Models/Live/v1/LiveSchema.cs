@@ -25,18 +25,13 @@ public class LiveSchema
     [JsonPropertyName("callback_method")]
     public bool? CallbackMethod { get; set; }
 
-    ///// <summary>
-    ///// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
-    ///// </summary>
-    //[JsonPropertyName("custom_intent")]
-    //public string CustomIntent { get; set; }
-
-    ///// <summary>
-    ///// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
-    ///// </summary>
-    //[JsonPropertyName("custom_intent_mode")]
-    //public string CustomIntentMode { get; set; }
-
+    /// <summary>
+    /// Channels allows you to specify the number of independent audio channels your submitted audio contains. 
+    /// Used when the Encoding feature is also being used to submit streaming raw audio
+    /// <see href="https://developers.deepgram.com/docs/channels">
+    /// </summary>
+    [JsonPropertyName("channels")]
+    public int? Channels { get; set; }
 
     /// <summary>
     /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript. 
@@ -54,13 +49,27 @@ public class LiveSchema
     public string? DiarizeVersion { get; set; }
 
     /// <summary>
+    /// Encoding allows you to specify the expected encoding of your submitted audio.
+    /// <see href="https://developers.deepgram.com/docs/encoding">
+    /// supported encodings <see cref="AudioEncoding"/>
+    /// </summary>
+    [JsonPropertyName("encoding")]
+    public string? Encoding { get; set; }
+
+    /// <summary>
+    /// Endpointing returns transcripts when pauses in speech are detected.
+    /// <see href="https://developers.deepgram.com/docs/endpointing">
+    /// </summary>
+    [JsonPropertyName("endpointing")]
+    public string? EndPointing { get; set; }
+
+    /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
     /// Extra metadata is limited to 2048 characters per key-value pair.
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
     [JsonPropertyName("extra")]
-    public Dictionary<string, string> Extra { get; set; }
-
+    public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>
     /// Whether to include words like "uh" and "um" in transcription output. 
@@ -69,11 +78,12 @@ public class LiveSchema
     [JsonPropertyName("filler_words")]
     public bool? FillerWords { get; set; }
 
-    ///// <summary>
-    ///// Enables intent recognition
-    ///// </summary>
-    //[JsonPropertyName("intents")]
-    //public bool? Intents { get; set; }
+    /// <summary>
+    /// Interim Results provides preliminary results for streaming audio to solve the need for immediate results combined with high levels of accuracy.
+    /// <see href="https://developers.deepgram.com/docs/interim-results">
+    /// </summary>
+    [JsonPropertyName("interim_results")]
+    public bool? InterimResults { get; set; }
 
     /// <summary>
     /// Keywords can boost or suppress specialized terminology.
@@ -138,21 +148,20 @@ public class LiveSchema
     public List<string>? Replace { get; set; }
 
     /// <summary>
+    /// Sample Rate allows you to specify the sample rate of your submitted audio.
+    /// <see href="https://developers.deepgram.com/docs/sample-rate">
+    /// only applies when Encoding has a value
+    /// </summary>
+    [JsonPropertyName("sample_rate")]
+    public int? SampleRate { get; set; }
+
+    /// <summary>
     /// Search searches for terms or phrases in submitted audio. 
     /// <see href="https://developers.deepgram.com/docs/search">
     /// default is null
     /// </summary>
     [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
-
-    ///// <summary>
-    ///// Enables sentiment analysis false by default
-    ///// </summary>
-    //[JsonPropertyName("sentiment")]
-    //public bool? Sentiment { get; set; }
-
-    //[JsonPropertyName("sentiment_threshold")]
-    //public double? SentimentThreshold { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 
@@ -169,63 +178,6 @@ public class LiveSchema
     [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
 
-    ///// <summary>
-    /////  Level of model you would like to use in your request.
-    /////  <see href="https://developers.deepgram.com/docs/model">   
-    ///// </summary>
-    //[JsonPropertyName("tier")]
-    //[Obsolete("Use Model with joint model syntax https://developers.deepgram.com/docs/models-languages-overview")]
-    //public string? Tier { get; set; }
-
-    /// <summary>
-    /// Version of the model to use.
-    /// <see href="https://developers.deepgram.com/docs/version">
-    /// default value is "latest"
-    /// </summary>
-    [JsonPropertyName("version")]
-    public string? Version { get; set; }
-
-    /// <summary>
-    /// Channels allows you to specify the number of independent audio channels your submitted audio contains. 
-    /// Used when the Encoding feature is also being used to submit streaming raw audio
-    /// <see href="https://developers.deepgram.com/docs/channels">
-    /// </summary>
-    [JsonPropertyName("channels")]
-    public int? Channels { get; set; }
-
-    /// <summary>
-    /// Encoding allows you to specify the expected encoding of your submitted audio.
-    /// <see href="https://developers.deepgram.com/docs/encoding">
-    /// supported encodings <see cref="AudioEncoding"/>
-    /// </summary>
-    [JsonPropertyName("encoding")]
-    public string? Encoding { get; set; }
-
-    /// <summary>
-    /// Endpointing returns transcripts when pauses in speech are detected.
-    /// <see href="https://developers.deepgram.com/docs/endpointing">
-    /// </summary>
-    [JsonPropertyName("endpointing")]
-    public string? EndPointing { get; set; }
-
-    /// <summary>
-    /// Interim Results provides preliminary results for streaming audio to solve the need for immediate results combined with high levels of accuracy.
-    /// <see href="https://developers.deepgram.com/docs/interim-results">
-    /// </summary>
-    [JsonPropertyName("interim_results")]
-    public bool? InterimResults { get; set; }
-
-    [JsonPropertyName("numerals")]
-    [Obsolete("Replaced with SmartFormat")]
-    public bool? Numerals { get; set; }
-    /// <summary>
-    /// Sample Rate allows you to specify the sample rate of your submitted audio.
-    /// <see href="https://developers.deepgram.com/docs/sample-rate">
-    /// only applies when Encoding has a value
-    /// </summary>
-    [JsonPropertyName("sample_rate")]
-    public int? SampleRate { get; set; }
-
     /// <summary>
     /// Indicates how long Deepgram will wait to send a {"type": "UtteranceEnd"} message after a word has been transcribed
     /// <see href="https://developers.deepgram.com/docs/understanding-end-of-speech-detection-while-streaming"/>
@@ -234,9 +186,16 @@ public class LiveSchema
     public int? UtteranceEnd { get; set; }
 
     /// <summary>
-    /// This is achieved through a Voice Activity Detector (VAD), which gauges the tonal nuances of human speech and can better differentiate between silent and non-silent audio.
-    /// <see href="https://developers.deepgram.com/docs/start-of-speech-detection"/>
+    /// TODO
     /// </summary>
     [JsonPropertyName("vad_events")]
-    public bool? DetectSpeechStart { get; set; }
+    public int? VadEvents { get; set; }
+
+    /// <summary>
+    /// Version of the model to use.
+    /// <see href="https://developers.deepgram.com/docs/version">
+    /// default value is "latest"
+    /// </summary>
+    [JsonPropertyName("version")]
+    public string? Version { get; set; }
 }

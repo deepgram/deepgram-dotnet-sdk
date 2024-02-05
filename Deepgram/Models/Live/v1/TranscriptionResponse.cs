@@ -1,36 +1,57 @@
 ﻿namespace Deepgram.Models.Live.v1;
 public record TranscriptionResponse
 {
-    [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType Type { get; set; } = LiveType.Results;
-
-    [JsonPropertyName("channel_index")]
-    public IReadOnlyList<int> ChannelIndex { get; set; }
-
-    [JsonPropertyName("duration")]
-    public double Duration { get; set; }
-
-    [JsonPropertyName("start")]
-    public double Start { get; set; }
-
-    [JsonPropertyName("is_final")]
-    public bool IsFinal { get; set; }
-
-    [JsonPropertyName("speech_final")]
-    public bool SpeechFinal { get; set; }
-
+    /// <summary>
+    /// TODO
+    /// </summary>
     [JsonPropertyName("channel")]
-    public Channel Channel { get; set; }
-
-    [JsonPropertyName("metadata")]
-    public MetaData MetaData { get; set; }
+    public Channel? Channel { get; set; }
 
     /// <summary>
-    /// Returns a list text segments and the intents found within each segment.
+    /// TODO
     /// </summary>
-    [JsonPropertyName("intents")]
-    public Intents? Intents { get; set; }
+    [JsonPropertyName("channel_index")]
+    public IReadOnlyList<int>? ChannelIndex { get; set; }
 
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("duration")]
+    public double? Duration { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("is_final")]
+    public bool? IsFinal { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("metadata")]
+    public MetaData? MetaData { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("speech_final")]
+    public bool? SpeechFinal { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("start")]
+    public decimal? Start { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public LiveType? Type { get; set; } = LiveType.Results;
+
+    /// <summary>
+    /// TODO
+    /// </summary>
     public Exception? Error { get; set; }
 }
