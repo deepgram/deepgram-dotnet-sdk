@@ -11,11 +11,10 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>speech-to-text,captions,speech-recognition,deepgram</PackageTags>
     <PackageIcon>dg_logo.png</PackageIcon>
-    <Product>Deepgram.NET SDK</Product>
-    <PackageId>Deepgram .NET SDK</PackageId>
+    <Product>Deepgram .NET SDK</Product>
+    <PackageId>Deepgram</PackageId>
     <Title>Deepgram .NET SDK</Title>
-    <Version>3.4.1</Version>
-    <Authors>Deepgram Contributors</Authors>
+    <Authors>Deepgram .NET SDK Contributors</Authors>
     <Company>Deepgram</Company>
   </PropertyGroup>
 
