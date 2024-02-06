@@ -10,11 +10,12 @@
   <PropertyGroup>
     <!-- Properties related to NuGet packaging: -->
     <IsPackable>true</IsPackable>
-    <PackageId>Deepgram.Net.SDK</PackageId>
-    <Title>Deepgram SDK</Title>  
+    <Company>Deepgram</Company>
+    <PackageId>Deepgram</PackageId>
+    <Title>Deepgram .NET SDK</Title>
     <Description>SDK for communicating with the Deepgram APIs </Description>
     <Summary>SDK for communicating with the Deepgram APIs </Summary>
-    <Authors>Deepgram</Authors>
+    <Authors>Deepgram .NET SDK Contributors</Authors>
     <Copyright>2021 Deepgram</Copyright>
     <PackageIcon>dg_logo.png</PackageIcon>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
@@ -23,7 +24,6 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/deepgram-devs/deepgram-dotnet-sdk</RepositoryUrl>
     <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <Version>4.0.0-alpha</Version>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">     

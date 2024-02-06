@@ -30,5 +30,5 @@ public record DistributionCredentials
     /// TODO
     /// </summary>
     [JsonPropertyName("created")]
-    public string? Created { get; set; }
+    public DateTime? Created { get; set; }
 }

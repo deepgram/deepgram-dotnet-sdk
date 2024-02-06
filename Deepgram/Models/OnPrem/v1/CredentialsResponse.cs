@@ -1,4 +1,5 @@
 ﻿namespace Deepgram.Models.OnPrem.v1;
+
 public record CredentialsResponse
 {
     /// <summary>
