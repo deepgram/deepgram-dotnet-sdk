@@ -9,6 +9,7 @@ public class LiveClient : IDisposable
 {
     public LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     {
+        if (string.IsNullOrEmpty(apiKey)) throw new ArgumentNullException(nameof(apiKey), "ApiKey is required");
         _apiKey = apiKey;
         _deepgramClientOptions = deepgramClientOptions is not null ? deepgramClientOptions : new DeepgramClientOptions();
     }
