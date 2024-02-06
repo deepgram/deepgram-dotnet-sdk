@@ -1,6 +1,6 @@
 ﻿using Deepgram.Extensions;
-using Deepgram.Models.Live.v1;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Live.v1;
 
 namespace Deepgram;
 
@@ -10,10 +10,7 @@ public class LiveClient : IDisposable
     public LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
     {
         _apiKey = apiKey;
-        if (deepgramClientOptions is null)
-        {
-            _deepgramClientOptions = new DeepgramClientOptions();
-        }
+        _deepgramClientOptions = deepgramClientOptions is not null ? deepgramClientOptions : new DeepgramClientOptions();
     }
     #region Fields
 
