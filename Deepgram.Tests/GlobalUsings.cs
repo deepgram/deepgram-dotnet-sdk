@@ -1,4 +1,8 @@
-﻿global using System.Net;
+﻿// Copyright 2021-2023 Deepgram .NET SDK contributors. All Rights Reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
+global using System.Net;
 global using System.Text;
 global using System.Text.Json;
 global using System.Web;
