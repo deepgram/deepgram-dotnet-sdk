@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Deepgram.Models.PreRecorded.v1;
 
 namespace Deepgram.Utilities;
@@ -39,7 +39,18 @@ internal static class QueryParameterUtil
                 case DateTime time:
                     sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
                     break;
-
+                //specific case for the Extra Parameter dictionary to format the querystring correctly
+                //no case changing of the key or values as theses are unknowns and the casing may have 
+                //significance to the user
+                case Dictionary<string, string> dict:
+                    if (name == "extra")
+                    {
+                        foreach (var kvp in dict)
+                        {
+                            sb.Append($"{name}={HttpUtility.UrlEncode($"{kvp.Key}:{kvp.Value}")}&");
+                        }
+                    }
+                    break;
                 default:
                     sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
                     break;
