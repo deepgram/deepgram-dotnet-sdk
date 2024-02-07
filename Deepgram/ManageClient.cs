@@ -1,5 +1,4 @@
-﻿using Deepgram.Models.Manage;
-using Deepgram.Models.Manage.v1;
+﻿using Deepgram.Models.Manage.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;

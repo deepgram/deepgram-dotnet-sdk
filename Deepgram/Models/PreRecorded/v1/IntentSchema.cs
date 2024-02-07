@@ -1,4 +1,5 @@
 ﻿namespace Deepgram.Models.PreRecorded.v1;
+
 public class IntentSchema
 {
     /// <summary>

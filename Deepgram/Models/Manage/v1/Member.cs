@@ -1,4 +1,5 @@
 ﻿namespace Deepgram.Models.Manage.v1;
+
 public record Member
 {
     /// <summary>
