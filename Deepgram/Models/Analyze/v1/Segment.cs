@@ -1,4 +1,4 @@
-﻿namespace Deepgram.Models.PreRecorded.v1;
+﻿namespace Deepgram.Models.Analyze.v1;
 
 public record Segment
 {

@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Models.Live.v1;
 
-public class UtteranceEndResponse
+public record UtteranceEndResponse
 {
     /// <summary>
     /// TODO

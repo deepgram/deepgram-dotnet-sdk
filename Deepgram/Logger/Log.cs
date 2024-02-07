@@ -1,4 +1,4 @@
-﻿using Deepgram.Models.Manage;
+﻿using Deepgram.Models.Manage.v1;
 
 namespace Deepgram.Logger;
 internal static partial class Log

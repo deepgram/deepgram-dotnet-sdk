@@ -1,6 +1,6 @@
 ﻿namespace Deepgram.Models.Live.v1;
 
-public class Average
+public record Average
 {
     /// <summary>
     /// TODO

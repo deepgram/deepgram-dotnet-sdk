@@ -1,4 +1,5 @@
-﻿namespace Deepgram.Models.Manage;
+﻿namespace Deepgram.Models.Manage.v1;
+
 public class KeySchema(string comment, List<string> scopes)
 {
 

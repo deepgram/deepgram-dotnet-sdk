@@ -15,4 +15,5 @@ public static class UriSegments
     public const string LISTEN = "listen";
     public const string ONPREM = "onprem/distribution/credentials";
     public const string TRANSCRIPTION = "listen";
+    public const string ANALYZE = "read";
 }

@@ -1,4 +1,4 @@
-﻿using Deepgram.Models.Manage;
+﻿using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
