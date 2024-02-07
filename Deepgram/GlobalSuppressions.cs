@@ -1,4 +1,8 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage
+﻿// Copyright 2021-2023 Deepgram .NET SDK contributors. All Rights Reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
+// This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
