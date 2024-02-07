@@ -7,6 +7,7 @@ using Deepgram.Models.PreRecorded.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
+
 public class PrerecordedClientTests
 {
     DeepgramClientOptions _options;
