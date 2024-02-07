@@ -81,6 +81,27 @@ public class QueryParameterUtilTests
         result.Should().Contain(expected);
     }
 
+    public void GetParameters_Should_Return_String_When_Passing_Dictonary_Parameter()
+    {
+        //Arrange
+        var prerecordedOptions = new PrerecordedSchema()
+        {
+            Extra = new Dictionary<string, string>
+            {
+                {"KeyOne","ValueOne" },
+                {"KeyTwo","ValueTwo" }
+            }
+        };
+        var expected = $"extra={HttpUtility.UrlEncode("KeyOne:ValueOne")}&extra={HttpUtility.UrlEncode("KeyTwo:ValueTwo")}";
+
+        //Act
+        var result = QueryParameterUtil.GetParameters(prerecordedOptions);
+
+        //Assert
+        result.Should().NotBeNull();
+        result.Should().Contain(expected);
+    }
+
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Decimal_Parameter()
     {
