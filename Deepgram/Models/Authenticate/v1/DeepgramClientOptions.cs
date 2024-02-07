@@ -16,12 +16,12 @@ public class DeepgramClientOptions
     /// no need to attach the protocol it will be added internally
     /// </summary>
 
-    public string BaseAddress { get; set; } = "api.deepgram.com";
+    public string? BaseAddress { get; set; } = "api.deepgram.com";
 
     /// <summary>
     /// Api endpoint version
     /// </summary>
-    public string APIVersion { get; set; } = "v1";
+    public string? APIVersion { get; set; } = "v1";
 
 
 }
