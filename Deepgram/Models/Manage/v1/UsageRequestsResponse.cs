@@ -22,5 +22,5 @@ public record UsageRequestsResponse
     /// TODO
     /// </summary>
     [JsonPropertyName("requests")]
-    public IReadOnlyList<UsageRequestResponse>? Requests { get; set; }
+    public IReadOnlyList<UsageRequest>? Requests { get; set; }
 }

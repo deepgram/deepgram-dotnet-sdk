@@ -28,5 +28,5 @@ public record UsageSummaryResponse
     /// Result summaries <see cref="UsageSummary"/>
     /// </summary>
     [JsonPropertyName("results")]
-    public IReadOnlyList<UsageSummary>? Results { get; set; }
+    public IReadOnlyList<Result>? Results { get; set; }
 }
