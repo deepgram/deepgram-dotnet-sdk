@@ -49,5 +49,5 @@ internal static partial class Log
     EventId = 0018,
     Level = LogLevel.Error,
     Message = "Error creating project key both ExpirationDate and TimeToLiveInSeconds are set: `{createProjectKeySchema}`")]
-    internal static partial void CreateProjectKeyError(this ILogger logger, KeySchema createProjectKeySchema);
+    internal static partial void CreateKeyError(this ILogger logger, KeySchema createProjectKeySchema);
 }

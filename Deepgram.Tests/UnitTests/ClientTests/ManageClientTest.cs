@@ -150,7 +150,7 @@ public class ManageClientTest
 
     #region ProjectKeys
     [Test]
-    public async Task GetProjectKeys_Should_Call_GetAsync_Returning_KeysResponse()
+    public async Task GetKeys_Should_Call_GetAsync_Returning_KeysResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<KeysResponse>().Generate();
@@ -162,7 +162,7 @@ public class ManageClientTest
         manageClient.GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys").Returns(expectedResponse);
 
         //Act
-        var result = await manageClient.GetProjectKeys(_projectId);
+        var result = await manageClient.GetKeys(_projectId);
 
         //Assert
         await manageClient.Received().GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys");
@@ -175,7 +175,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectKey_Should_Call_GetAsync_Returning_KeyResponse()
+    public async Task GetKey_Should_Call_GetAsync_Returning_KeyResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<KeyScopeResponse>().Generate();
@@ -189,7 +189,7 @@ public class ManageClientTest
 
 
         //Act
-        var result = await manageClient.GetProjectKey(_projectId, keyId);
+        var result = await manageClient.GetKey(_projectId, keyId);
         await manageClient.Received().GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
 
         //Assert
@@ -202,7 +202,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task CreateProjectKey_Should_Call_PostAsync_Returning_KeyResponse_Without_Expiration_TimeToLive_Set()
+    public async Task CreateKey_Should_Call_PostAsync_Returning_KeyResponse_Without_Expiration_TimeToLive_Set()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
@@ -219,7 +219,7 @@ public class ManageClientTest
 
 
         //Act
-        var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
+        var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
         await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
@@ -233,7 +233,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task CreateProjectKey_Should_Call_PostAsync_Returning_KeyResponse_With_Expiration_Set()
+    public async Task CreateKey_Should_Call_PostAsync_Returning_KeyResponse_With_Expiration_Set()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
@@ -249,7 +249,7 @@ public class ManageClientTest
 
 
         //Act
-        var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
+        var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
         await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
@@ -263,7 +263,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task CreateProjectKey_Should_Return_KeyResponse_Without_TimeToLive_Set()
+    public async Task CreateKey_Should_Return_KeyResponse_Without_TimeToLive_Set()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
@@ -277,7 +277,7 @@ public class ManageClientTest
         manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         //Act
-        var result = await manageClient.CreateProjectKey(_projectId, createKeySchema);
+        var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
         await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
@@ -291,7 +291,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task CreateProjectKey_Should_Throw_ArgumentException_When_Both_Expiration_And_TimeToLive_Set()
+    public async Task CreateKey_Should_Throw_ArgumentException_When_Both_Expiration_And_TimeToLive_Set()
     {
         //Arrange 
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
@@ -299,12 +299,12 @@ public class ManageClientTest
         var manageClient = new ManageClient(_apiKey, _options) { _httpClientWrapper = new HttpClientWrapper(new HttpClient()) };
 
         //Act & Assert
-        await manageClient.Invoking(y => y.CreateProjectKey(UriSegments.PROJECTS, createKeySchema))
+        await manageClient.Invoking(y => y.CreateKey(UriSegments.PROJECTS, createKeySchema))
              .Should().ThrowAsync<ArgumentException>();
     }
 
     [Test]
-    public async Task DeleteProjectKey_Should_Call_DeleteAsync()
+    public async Task DeleteKey_Should_Call_DeleteAsync()
     {
         //Arrange
         var keyId = new Faker().Random.Guid().ToString();
@@ -316,7 +316,7 @@ public class ManageClientTest
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(Task.CompletedTask);
 
         // Act
-        await manageClient.DeleteProjectKey(_projectId, keyId);
+        await manageClient.DeleteKey(_projectId, keyId);
 
         // Assert
         await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
@@ -327,7 +327,7 @@ public class ManageClientTest
     #region ProjectInvites
 
     [Test]
-    public async Task GetProjectInvites_Should_Call_GetAsync_Returning_InvitesResponse()
+    public async Task GetInvites_Should_Call_GetAsync_Returning_InvitesResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<InvitesResponse>().Generate();
@@ -339,7 +339,7 @@ public class ManageClientTest
         manageClient.GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectInvites(_projectId);
+        var result = await manageClient.GetInvites(_projectId);
 
         // Assert
         await manageClient.Received().GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites");
@@ -352,7 +352,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task SendProjectInvite_Should_Call_PostAsync_Returning_MessageResponse()
+    public async Task SendInvite_Should_Call_PostAsync_Returning_MessageResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
@@ -365,7 +365,7 @@ public class ManageClientTest
         manageClient.PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.SendProjectInvite(_projectId, inviteSchema);
+        var result = await manageClient.SendInvite(_projectId, inviteSchema);
 
         // Assert
         await manageClient.Received().PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>());
@@ -378,7 +378,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task DeleteProjectInvite_Should_Call_DeleteAsync()
+    public async Task DeleteInvite_Should_Call_DeleteAsync()
     {
         //Arrange        
         var email = new Faker().Internet.Email();
@@ -390,7 +390,7 @@ public class ManageClientTest
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}").Returns(Task.CompletedTask);
 
         // Act
-        await manageClient.DeleteProjectInvite(_projectId, email);
+        await manageClient.DeleteInvite(_projectId, email);
 
         // Assert
         await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}");
@@ -400,7 +400,7 @@ public class ManageClientTest
 
     #region Members
     [Test]
-    public async Task GetProjectMembers_Should_Call_GetAsync_Returning_MembersResponse()
+    public async Task GetMembers_Should_Call_GetAsync_Returning_MembersResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<MembersResponse>().Generate();
@@ -412,7 +412,7 @@ public class ManageClientTest
         manageClient.GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectMembers(_projectId);
+        var result = await manageClient.GetMembers(_projectId);
 
         // Assert
         await manageClient.Received().GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members");
@@ -425,7 +425,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectMemberScopes_Should_Call_GetAsync_Returning_MemberScopesResponse()
+    public async Task GetMemberScopes_Should_Call_GetAsync_Returning_MemberScopesResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<MemberScopesResponse>().Generate();
@@ -439,7 +439,7 @@ public class ManageClientTest
         manageClient.GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectMemberScopes(_projectId, memberId);
+        var result = await manageClient.GetMemberScopes(_projectId, memberId);
 
         // Assert
         await manageClient.Received().GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes");
@@ -452,7 +452,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task UpdateProjectMemberScope_Should_Call_PutAsync_Returning_MessageResponse()
+    public async Task UpdateMemberScope_Should_Call_PutAsync_Returning_MessageResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
@@ -466,7 +466,7 @@ public class ManageClientTest
         manageClient.PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.UpdateProjectMemberScope(_projectId, memberId, memberScopeSchema);
+        var result = await manageClient.UpdateMemberScope(_projectId, memberId, memberScopeSchema);
 
         // Assert
         await manageClient.Received().PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>());
@@ -479,7 +479,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task RemoveProjectMember_Should_Call_DeleteAsync()
+    public async Task RemoveMember_Should_Call_DeleteAsync()
     {
         //Arrange         
         var memberId = new Faker().Random.Guid().ToString();
@@ -491,7 +491,7 @@ public class ManageClientTest
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}").Returns(Task.CompletedTask);
 
         // Act
-        await manageClient.RemoveProjectMember(_projectId, memberId);
+        await manageClient.RemoveMember(_projectId, memberId);
 
         // Assert
         await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}");
@@ -501,7 +501,7 @@ public class ManageClientTest
 
     #region Usage
     [Test]
-    public async Task GetProjectUsageRequests_Should_Call_GetAsync_Returning_UsageRequestsResponse()
+    public async Task GetUsageRequests_Should_Call_GetAsync_Returning_UsageRequestsResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<UsageRequestsResponse>().Generate();
@@ -515,7 +515,7 @@ public class ManageClientTest
         manageClient.GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectUsageRequests(_projectId, UsageRequestsSchema);
+        var result = await manageClient.GetUsageRequests(_projectId, UsageRequestsSchema);
 
         // Assert
         await manageClient.Received().GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}");
@@ -529,7 +529,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectsUsageRequest_Should_Call_GetAsync_Returning_UsageRequestResponse()
+    public async Task GetsUsageRequest_Should_Call_GetAsync_Returning_UsageRequestResponse()
     {
         //Arrange 
         var requestId = new Faker().Random.Guid().ToString();
@@ -542,7 +542,7 @@ public class ManageClientTest
         manageClient.GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectUsageRequest(_projectId, requestId);
+        var result = await manageClient.GetUsageRequest(_projectId, requestId);
 
         // Assert
         await manageClient.Received().GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}");
@@ -555,7 +555,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectsUsageSummary_Should_Call_GetAsync_Returning_UsageSummaryResponse()
+    public async Task GetsUsageSummary_Should_Call_GetAsync_Returning_UsageSummaryResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<UsageSummaryResponse>().Generate();
@@ -569,7 +569,7 @@ public class ManageClientTest
         manageClient.GetAsync<UsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectUsageSummary(_projectId, getProjectUsageSummarySchema);
+        var result = await manageClient.GetUsageSummary(_projectId, getProjectUsageSummarySchema);
 
         // Assert
         await manageClient.Received().GetAsync<UsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}");
@@ -583,7 +583,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectUsageFields_Should_GetAsync_Returning_UsageSummaryResponse()
+    public async Task GetUsageFields_Should_GetAsync_Returning_UsageSummaryResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<UsageFieldsResponse>().Generate();
@@ -597,7 +597,7 @@ public class ManageClientTest
         manageClient.GetAsync<UsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectUsageFields(_projectId, getProjectUsageFieldsSchema);
+        var result = await manageClient.GetUsageFields(_projectId, getProjectUsageFieldsSchema);
 
         // Assert
         await manageClient.Received().GetAsync<UsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}");
@@ -615,7 +615,7 @@ public class ManageClientTest
     #region Balances
 
     [Test]
-    public async Task GetProjectBalances_Should_Call_GetAsync_Returning_BalancesResponse()
+    public async Task GetBalances_Should_Call_GetAsync_Returning_BalancesResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<BalancesResponse>().Generate();
@@ -627,7 +627,7 @@ public class ManageClientTest
         manageClient.GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectBalances(_projectId);
+        var result = await manageClient.GetBalances(_projectId);
 
         // Assert
         await manageClient.Received().GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances");
@@ -640,7 +640,7 @@ public class ManageClientTest
     }
 
     [Test]
-    public async Task GetProjectBalance_Should_Call_GetAsync_Returning_BalanceResponse()
+    public async Task GetBalance_Should_Call_GetAsync_Returning_BalanceResponse()
     {
         //Arrange 
         var expectedResponse = new AutoFaker<BalanceResponse>().Generate();
@@ -652,7 +652,7 @@ public class ManageClientTest
         manageClient.GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}").Returns(expectedResponse);
 
         // Act
-        var result = await manageClient.GetProjectBalance(_projectId, balanceId);
+        var result = await manageClient.GetBalance(_projectId, balanceId);
 
         // Assert
         await manageClient.Received().GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}");
