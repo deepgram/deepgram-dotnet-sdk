@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Encapsulations;
-using Deepgram.Models.Manage;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
+
 public class ManageClientTest
 {
     DeepgramClientOptions _options;
@@ -22,10 +22,6 @@ public class ManageClientTest
     }
 
     #region Projects
-
-
-
-
     [Test]
     public async Task GetProjects_Should_Call_GetAsync_Returning_ProjectsResponse()
     {

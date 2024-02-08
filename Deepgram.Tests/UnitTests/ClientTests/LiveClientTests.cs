@@ -8,6 +8,7 @@ using Deepgram.Models.Live.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
+
 public class LiveClientTests
 {
     DeepgramClientOptions _options;

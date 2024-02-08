@@ -8,6 +8,7 @@ using Deepgram.Models.OnPrem.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
+
 public class OnPremClientTests
 {
     DeepgramClientOptions _options;
@@ -20,9 +21,6 @@ public class OnPremClientTests
         _projectId = new Faker().Random.Guid().ToString();
         _apiKey = new Faker().Random.Guid().ToString();
     }
-
-
-
 
     [Test]
     public async Task ListCredentials_Should_Call_GetAsync_Returning_CredentialsResponse()
