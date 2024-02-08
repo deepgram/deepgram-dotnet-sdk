@@ -4,7 +4,7 @@
 
 namespace Deepgram.Models.Manage.v1;
 
-public record UsageSummary
+public record Result
 {
     /// <summary>
     /// Start date for included requests.
