@@ -68,7 +68,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="KeysResponse"/></returns>
-    public async Task<KeysResponse> GetProjectKeys(string projectId, CancellationToken cancellationToken = default) =>
+    public async Task<KeysResponse> GetKeys(string projectId, CancellationToken cancellationToken = default) =>
         await GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}", cancellationToken);
 
     /// <summary>
@@ -77,7 +77,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     /// <returns><see cref="KeyScopeResponse"/></returns>
-    public async Task<KeyScopeResponse> GetProjectKey(string projectId, string keyId, CancellationToken cancellationToken = default) =>
+    public async Task<KeyScopeResponse> GetKey(string projectId, string keyId, CancellationToken cancellationToken = default) =>
         await GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}/{keyId}", cancellationToken);
 
     /// <summary>
@@ -86,11 +86,11 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="createProjectKeySchema"><see cref="KeySchema"/> for the key to be created</param>
     /// <returns><see cref="KeyResponse"/></returns>
-    public async Task<KeyResponse> CreateProjectKey(string projectId, KeySchema createProjectKeySchema, CancellationToken cancellationToken = default)
+    public async Task<KeyResponse> CreateKey(string projectId, KeySchema createProjectKeySchema, CancellationToken cancellationToken = default)
     {
         if (createProjectKeySchema.ExpirationDate is not null && createProjectKeySchema.TimeToLiveInSeconds is not null)
         {
-            Log.CreateProjectKeyError(_logger, createProjectKeySchema);
+            Log.CreateKeyError(_logger, createProjectKeySchema);
             throw new ArgumentException("Both ExpirationDate and TimeToLiveInSeconds is set. set either one but not both");
         }
 
@@ -106,7 +106,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     // Nothing being returned
-    public async Task DeleteProjectKey(string projectId, string keyId, CancellationToken cancellationToken = default) =>
+    public async Task DeleteKey(string projectId, string keyId, CancellationToken cancellationToken = default) =>
         await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/keys/{keyId}", cancellationToken);
 
     #endregion
@@ -117,7 +117,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="InvitesResponse"/></returns>
-    public async Task<InvitesResponse> GetProjectInvites(string projectId, CancellationToken cancellationToken = default) =>
+    public async Task<InvitesResponse> GetInvites(string projectId, CancellationToken cancellationToken = default) =>
         await GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}", cancellationToken);
 
     /// <summary>
@@ -126,7 +126,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="email">email of the invite to be removed</param>
     //no response expected
-    public async Task DeleteProjectInvite(string projectId, string email, CancellationToken cancellationToken = default) =>
+    public async Task DeleteInvite(string projectId, string email, CancellationToken cancellationToken = default) =>
         await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}/{email}", cancellationToken);
 
     /// <summary>
@@ -135,7 +135,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="inviteSchema"><see cref="InviteSchema"/> for a invite to project</param>
     /// <returns><see cref="MessageResponse"/></returns>
-    public async Task<MessageResponse> SendProjectInvite(string projectId, InviteSchema inviteSchema, CancellationToken cancellationToken = default) =>
+    public async Task<MessageResponse> SendInvite(string projectId, InviteSchema inviteSchema, CancellationToken cancellationToken = default) =>
         await PostAsync<MessageResponse>(
             $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}",
             RequestContentUtil.CreatePayload(inviteSchema), cancellationToken);
@@ -147,7 +147,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="MembersResponse"/></returns>
-    public async Task<MembersResponse> GetProjectMembers(string projectId, CancellationToken cancellationToken = default) =>
+    public async Task<MembersResponse> GetMembers(string projectId, CancellationToken cancellationToken = default) =>
         await GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}", cancellationToken);
 
     /// <summary>
@@ -156,7 +156,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>
     /// <returns><see cref="MemberScopesResponse"/></returns>
-    public async Task<MemberScopesResponse> GetProjectMemberScopes(string projectId, string memberId, CancellationToken cancellationToken = default) =>
+    public async Task<MemberScopesResponse> GetMemberScopes(string projectId, string memberId, CancellationToken cancellationToken = default) =>
         await GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}", cancellationToken);
 
     /// <summary>
@@ -166,7 +166,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="memberId">Id of member</param>
     /// <param name="memberScopeSchema">updates scope options for member<see cref="MemberScopeSchema"/></param>
     /// <returns><see cref="MessageResponse"/></returns>  
-    public async Task<MessageResponse> UpdateProjectMemberScope(string projectId, string memberId, MemberScopeSchema memberScopeSchema, CancellationToken cancellationToken = default) =>
+    public async Task<MessageResponse> UpdateMemberScope(string projectId, string memberId, MemberScopeSchema memberScopeSchema, CancellationToken cancellationToken = default) =>
         await PutAsync<MessageResponse>(
             $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}",
             RequestContentUtil.CreatePayload(memberScopeSchema), cancellationToken);
@@ -177,7 +177,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>   
     //No response expected
-    public async Task RemoveProjectMember(string projectId, string memberId, CancellationToken cancellationToken = default) =>
+    public async Task RemoveMember(string projectId, string memberId, CancellationToken cancellationToken = default) =>
         await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}", cancellationToken);
     #endregion
 
@@ -189,7 +189,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="UsageRequestsSchema">Project usage request options<see cref="UsageRequestsSchema"/>  </param>
     /// <returns><see cref="UsageRequestsResponse"/></returns>
-    public async Task<UsageRequestsResponse> GetProjectUsageRequests(string projectId, UsageRequestsSchema UsageRequestsSchema, CancellationToken cancellationToken = default)
+    public async Task<UsageRequestsResponse> GetUsageRequests(string projectId, UsageRequestsSchema UsageRequestsSchema, CancellationToken cancellationToken = default)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(UsageRequestsSchema);
         return await GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}?{stringedOptions}", cancellationToken);
@@ -201,7 +201,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="requestId">Id of request</param>
     /// <returns><see cref="UsageRequestResponse"/></returns>
-    public async Task<UsageRequestResponse> GetProjectUsageRequest(string projectId, string requestId, CancellationToken cancellationToken = default) =>
+    public async Task<UsageRequestResponse> GetUsageRequest(string projectId, string requestId, CancellationToken cancellationToken = default) =>
         await GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}/{requestId}", cancellationToken);
 
     /// <summary>
@@ -210,7 +210,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="getProjectUsageSummarySchema">Usage summary options<see cref="UsageSummarySchema"/> </param>
     /// <returns><see cref="UsageSummaryResponse"/></returns>
-    public async Task<UsageSummaryResponse> GetProjectUsageSummary(string projectId, UsageSummarySchema getProjectUsageSummarySchema, CancellationToken cancellationToken = default)
+    public async Task<UsageSummaryResponse> GetUsageSummary(string projectId, UsageSummarySchema getProjectUsageSummarySchema, CancellationToken cancellationToken = default)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
         return await GetAsync<UsageSummaryResponse>(
@@ -223,7 +223,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="getProjectUsageFieldsSchema">Project usage request field options<see cref="UsageFieldsSchema"/></param>
     /// <returns><see cref="UsageFieldsResponse"/></returns>
-    public async Task<UsageFieldsResponse> GetProjectUsageFields(string projectId, UsageFieldsSchema getProjectUsageFieldsSchema, CancellationToken cancellationToken = default)
+    public async Task<UsageFieldsResponse> GetUsageFields(string projectId, UsageFieldsSchema getProjectUsageFieldsSchema, CancellationToken cancellationToken = default)
     {
         var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
         return await GetAsync<UsageFieldsResponse>(
@@ -238,7 +238,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="BalancesResponse"/></returns>
-    public async Task<BalancesResponse> GetProjectBalances(string projectId, CancellationToken cancellationToken = default) =>
+    public async Task<BalancesResponse> GetBalances(string projectId, CancellationToken cancellationToken = default) =>
         await GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}", cancellationToken);
 
     /// <summary>
@@ -247,7 +247,7 @@ public class ManageClient(string apiKey, DeepgramClientOptions? deepgramClientOp
     /// <param name="projectId">Id of project</param>
     /// <param name="balanceId">Id of balance</param>
     /// <returns><see cref="BalanceResponse"/></returns>
-    public async Task<BalanceResponse> GetProjectBalance(string projectId, string balanceId, CancellationToken cancellationToken = default) =>
+    public async Task<BalanceResponse> GetBalance(string projectId, string balanceId, CancellationToken cancellationToken = default) =>
         await GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}/{balanceId}", cancellationToken);
     #endregion
 }
