@@ -28,8 +28,4 @@ public sealed class LogProvider
         // Return the logger
         return logger;
     }
-
-
-
-
 }

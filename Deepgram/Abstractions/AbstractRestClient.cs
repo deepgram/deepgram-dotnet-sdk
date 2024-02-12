@@ -136,7 +136,7 @@ public abstract class AbstractRestClient
         {
 #if NETSTANDARD2_0
             var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
-            var response = await _httpClientWrapper.SendAsync(request,cancellationToken);
+            var response = await _httpClientWrapper.SendAsync(request, cancellationToken);
 #else
             var req = new HttpRequestMessage(HttpMethod.Patch, uriSegment) { Content = content };
             var response = await _httpClientWrapper.SendAsync(req, cancellationToken);

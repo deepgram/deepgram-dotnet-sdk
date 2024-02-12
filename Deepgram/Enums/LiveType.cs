@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 namespace Deepgram.Enums;
+
 public enum LiveType
 {
     Metadata,

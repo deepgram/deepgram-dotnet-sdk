@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Net.WebSockets;
 using Deepgram.DeepgramEventArgs;
-using Deepgram.Models.Live.v1;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Live.v1;
+using System.Net.WebSockets;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

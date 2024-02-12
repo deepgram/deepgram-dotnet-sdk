@@ -21,10 +21,7 @@ internal static class RequestContentUtil
     internal static StringContent CreatePayload<T>(T body)
     {
         var serialized = JsonSerializer.Serialize(body, _jsonSerializerOptions);
-        return new(
-                                serialized,
-                               Encoding.UTF8,
-                               Defaults.DEFAULT_CONTENT_TYPE);
+        return new(serialized, Encoding.UTF8, Defaults.DEFAULT_CONTENT_TYPE);
     }
 
 
@@ -37,7 +34,6 @@ internal static class RequestContentUtil
     {
         body.Seek(0, SeekOrigin.Begin);
         HttpContent httpContent = new StreamContent(body);
-        httpContent.Headers.Add("Content-Type", Defaults.DEEPGRAM_CONTENT_TYPE);
         httpContent.Headers.Add("Content-Length", body.Length.ToString());
         return httpContent;
     }
