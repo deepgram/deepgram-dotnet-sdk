@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Extensions;
-using Deepgram.Models.Live.v1;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Live.v1;
 
 namespace Deepgram;
 

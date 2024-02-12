@@ -6,6 +6,7 @@ using Deepgram.Extensions;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Encapsulations;
+
 internal class HttpClientFactory
 {
     public static HttpClientWrapper Create(string apiKey, DeepgramClientOptions deepgramClientOptions)
