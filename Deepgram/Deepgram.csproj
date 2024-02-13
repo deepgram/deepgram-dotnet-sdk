@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>   
   </PropertyGroup>
   
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.sln'">
     <!-- Properties related to NuGet packaging: -->
     <IsPackable>true</IsPackable>
     <Company>Deepgram</Company>
@@ -16,7 +16,28 @@
     <Description>SDK for communicating with the Deepgram APIs </Description>
     <Summary>SDK for communicating with the Deepgram APIs </Summary>
     <Authors>Deepgram .NET SDK Contributors</Authors>
-    <Copyright>2021 Deepgram</Copyright>
+    <Copyright>2021-2024 Deepgram</Copyright>
+    <PackageIcon>dg_logo.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/deepgram-devs/deepgram-dotnet-sdk</RepositoryUrl>
+    <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.DevBuild.sln'">
+    <!-- Properties related to NuGet packaging: -->
+    <IsPackable>true</IsPackable>
+    <Company>Deepgram</Company>
+    <PackageId>Deepgram.Unstable.SDK.Builds</PackageId>
+    <Title>Deepgram - UNSTABLE DEVELOPER BUILDS</Title>
+    <Description>UNSTABLE DEVELOPER BUILDS - Deepgram .NET SDK</Description>
+    <Summary>UNSTABLE DEVELOPER BUILDS - .NET SDK for communicating with the Deepgram APIs</Summary>
+    <Authors>Deepgram .NET SDK Contributors</Authors>
+    <Copyright>2021-2024 Deepgram</Copyright>
     <PackageIcon>dg_logo.png</PackageIcon>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

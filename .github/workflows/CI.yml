@@ -22,7 +22,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore Deepgram.sln
       - name: Run tests
         run: dotnet test Deepgram.sln
   build:
@@ -34,6 +34,6 @@ jobs:
         with:
           dotnet-version: "8.x.x"
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore Deepgram.sln
       - name: Build
         run: dotnet build Deepgram.sln --configuration Release --no-restore

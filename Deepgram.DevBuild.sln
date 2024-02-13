@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram", "Deepgram\Deepgram.csproj", "{1F72D53C-2EF5-4556-A0E6-18D57BF9648B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F72D53C-2EF5-4556-A0E6-18D57BF9648B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F72D53C-2EF5-4556-A0E6-18D57BF9648B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F72D53C-2EF5-4556-A0E6-18D57BF9648B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F72D53C-2EF5-4556-A0E6-18D57BF9648B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED1EF53E-BA86-44FA-B1C0-484B3864E459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED1EF53E-BA86-44FA-B1C0-484B3864E459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED1EF53E-BA86-44FA-B1C0-484B3864E459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED1EF53E-BA86-44FA-B1C0-484B3864E459}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}
+	EndGlobalSection
+EndGlobal
