@@ -30,7 +30,6 @@ public class OnPremClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
-        onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         onPremClient.When(x => x.GetAsync<CredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.GetAsync<CredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}").Returns(expectedResponse);
@@ -58,7 +57,7 @@ public class OnPremClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
-        onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         onPremClient.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.GetAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
 
@@ -84,7 +83,7 @@ public class OnPremClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
-        onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
 
@@ -112,7 +111,7 @@ public class OnPremClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
-        onPremClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         onPremClient.When(x => x.PostAsync<CredentialResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         onPremClient.PostAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>()).Returns(expectedResponse);
 

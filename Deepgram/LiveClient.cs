@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Extensions;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
 
@@ -11,19 +10,36 @@ namespace Deepgram;
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
 public class LiveClient : IDisposable
 {
-    public LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+    public LiveClient(string apiKey = "", DeepgramClientOptions? options = null)
     {
-        _apiKey = apiKey;
-        if (deepgramClientOptions is null)
+        options ??= new DeepgramClientOptions();
+
+        // user provided takes precedence
+        if (string.IsNullOrWhiteSpace(apiKey))
         {
-            _deepgramClientOptions = new DeepgramClientOptions();
+            // then try the environment variable
+            // TODO: log
+            apiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                // TODO: log
+            }
         }
+        if (!options.OnPrem && string.IsNullOrEmpty(apiKey))
+        {
+            // TODO: log
+            throw new ArgumentException("Deepgram API Key is invalid");
+        }
+
+        // housekeeping
+        _deepgramClientOptions = options;
+        _apiKey = apiKey;
     }
     #region Fields
 
     internal ILogger logger => LogProvider.GetLogger(this.GetType().Name);
-    internal string _apiKey;
     internal readonly DeepgramClientOptions _deepgramClientOptions;
+    internal readonly string _apiKey;
     internal ClientWebSocket? _clientWebSocket;
     internal readonly CancellationTokenSource _tokenSource = new();
     internal bool _isDisposed;
@@ -45,18 +61,24 @@ public class LiveClient : IDisposable
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task StartConnectionAsync(LiveSchema options, CancellationToken? cancellationToken = null)
     {
+        // create client
+        _clientWebSocket = new ClientWebSocket();
+
+        // set headers
+        _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_apiKey}");
+        foreach (var header in _deepgramClientOptions.Headers)
+        {
+            _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
+        }
+
+        // cancelation token
         var cancelToken = cancellationToken ?? _tokenSource.Token;
-        _clientWebSocket = new ClientWebSocket()
-           .SetHeaders(_apiKey, _deepgramClientOptions);
 
         try
         {
-            await _clientWebSocket.ConnectAsync(
-                GetUri(options, _deepgramClientOptions),
-                cancelToken).ConfigureAwait(false);
+            await _clientWebSocket.ConnectAsync(GetUri(options, _deepgramClientOptions),cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
-
         }
         catch (Exception ex)
         {
@@ -73,9 +95,6 @@ public class LiveClient : IDisposable
             TaskCreationOptions.LongRunning,
             cancelToken);
     }
-
-
-
 
     /// <summary>
     /// Sends a binary message over the WebSocket connection.
@@ -206,8 +225,6 @@ public class LiveClient : IDisposable
         }
     }
 
-
-
     /// <summary>
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
@@ -262,7 +279,6 @@ public class LiveClient : IDisposable
     }
 
     #region Helpers
-
     /// <summary>
     /// Retrieves the connection state of the WebSocket
     /// </summary>
@@ -272,13 +288,30 @@ public class LiveClient : IDisposable
     internal readonly Channel<MessageToSend> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<MessageToSend>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions? deepgramClientOptions)
+    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions options)
     {
-        var baseUrl = GetBaseUrl(deepgramClientOptions);
+        var baseUrl = GetBaseUrl(options);
         var query = QueryParameterUtil.GetParameters(queryParameters);
-        // format of URI cannot be determined if run like --
-        // return new Uri(new Uri(baseUrl), new Uri($"{Defaults.API_VERSION}/{UriSegments.LISTEN}?{query}"));
-        return new Uri($"{baseUrl}/{deepgramClientOptions.APIVersion}/{UriSegments.LISTEN}?{query}");
+
+        return new Uri($"{baseUrl}/{options.APIVersion}/{UriSegments.LISTEN}?{query}");
+    }
+
+    internal static string GetBaseUrl(DeepgramClientOptions options)
+    {
+        string baseAddress = Defaults.DEFAULT_URI;
+        if (options.BaseAddress is not null)
+        {
+            baseAddress = options.BaseAddress;
+        }
+
+        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
+        Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
+        if (!regex.IsMatch(baseAddress))
+            //if no protocol in the address then https:// is added
+            // TODO: log
+            baseAddress = $"wss://{baseAddress}";
+
+        return baseAddress;
     }
 
     private void ProcessException(string action, Exception ex)
@@ -288,33 +321,10 @@ public class LiveClient : IDisposable
         else
             Log.Exception(logger, action, ex);
         EventResponseReceived?.Invoke(null, new ResponseReceivedEventArgs(new EventResponse() { Error = ex }));
-
     }
-
-
-
-    internal static string GetBaseUrl(DeepgramClientOptions? deepgramClientOptions)
-    {
-        string baseAddress = Defaults.DEFAULT_URI;
-        if (deepgramClientOptions is not null && deepgramClientOptions.BaseAddress is not null)
-        {
-            baseAddress = deepgramClientOptions.BaseAddress;
-        }
-
-
-        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
-        Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
-        if (regex.IsMatch(baseAddress))
-            return regex.Replace(baseAddress, "wss://");
-        else
-            //if no protocol in the address then https:// is added
-            return $"wss://{baseAddress}";
-    }
-
     #endregion
 
     #region Dispose
-
     public void Dispose()
     {
         if (_isDisposed)
@@ -330,6 +340,5 @@ public class LiveClient : IDisposable
         _isDisposed = true;
         GC.SuppressFinalize(this);
     }
-
     #endregion
 }

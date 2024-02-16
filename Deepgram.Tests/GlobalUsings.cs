@@ -6,7 +6,6 @@ global using AutoBogus;
 global using Bogus;
 global using Deepgram.Abstractions;
 global using Deepgram.Constants;
-global using Deepgram.Extensions;
 global using Deepgram.Tests.Fakes;
 global using Deepgram.Utilities;
 global using FluentAssertions;

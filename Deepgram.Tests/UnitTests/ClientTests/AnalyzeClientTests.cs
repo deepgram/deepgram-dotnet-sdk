@@ -32,7 +32,6 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -62,7 +61,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -85,7 +84,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = analyzeSchema.CallBack;
@@ -117,7 +116,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -145,7 +144,7 @@ public class AnalyzeClientTests
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = analyzeSchema.CallBack;
@@ -169,7 +168,7 @@ public class AnalyzeClientTests
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -193,7 +192,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -222,7 +221,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -250,7 +249,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -278,7 +277,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -308,7 +307,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -342,7 +341,7 @@ public class AnalyzeClientTests
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
@@ -375,7 +374,7 @@ public class AnalyzeClientTests
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         var callBack = analyzeSchema.CallBack;
@@ -402,7 +401,7 @@ public class AnalyzeClientTests
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
-        analyzeClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         analyzeSchema.CallBack = null;

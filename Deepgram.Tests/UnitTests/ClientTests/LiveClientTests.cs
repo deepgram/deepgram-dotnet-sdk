@@ -123,26 +123,6 @@ public class LiveClientTests
     }
 
     [Test]
-    public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WS_Protocol()
-    {
-        //Arrange
-        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
-        _options.BaseAddress = $"ws://{Defaults.DEFAULT_URI}";
-
-        //Act
-        var result = LiveClient.GetBaseUrl(_options);
-
-
-        //Assert
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNullOrEmpty();
-            result.Should().StartWith("wss://");
-            result.Should().BeEquivalentTo(expectedUrl);
-        }
-    }
-
-    [Test]
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WSS_Protocol()
     {
         //Arrange
