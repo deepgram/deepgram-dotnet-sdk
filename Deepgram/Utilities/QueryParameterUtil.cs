@@ -36,9 +36,12 @@ internal static class QueryParameterUtil
 
             switch (pValue)
             {
+                case bool boolean:
+                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
+                    break;
                 case IList list:
                     foreach (var value in list)
-                        sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString().ToLower())}&");
+                        sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");        // TODO: removed ToLower(), is ok?
                     break;
                 case DateTime time:
                     sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
@@ -56,7 +59,7 @@ internal static class QueryParameterUtil
                     }
                     break;
                 default:
-                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString().ToLower())}&");
+                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");       // TODO: removed ToLower(), is ok?
                     break;
             }
         }

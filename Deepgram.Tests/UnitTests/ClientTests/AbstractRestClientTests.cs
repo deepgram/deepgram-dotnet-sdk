@@ -29,7 +29,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<ProjectsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
         // Act & Assert
         client.Invoking(y => y.GetAsync<ProjectsResponse>(UriSegments.PROJECTS))
              .Should().ThrowAsync<HttpRequestException>();
@@ -42,7 +42,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<ProjectsResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
         // Act & Assert
         client.Invoking(y => y.GetAsync<ProjectsResponse>(UriSegments.PROJECTS))
              .Should().ThrowAsync<Exception>();
@@ -57,7 +57,7 @@ public class AbstractRestfulClientTests
         var httpContent = Substitute.For<HttpContent>();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert      
         client.Invoking(y => y.PostAsync<SyncResponse>(UriSegments.PROJECTS, httpContent))
@@ -72,10 +72,7 @@ public class AbstractRestfulClientTests
         var response = new AutoFaker<SyncResponse>().Generate();
         var httpContent = Substitute.For<HttpContent>();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
-        var client = new ConcreteRestClient(_apiKey, _clientOptions)
-        {
-            _httpClientWrapper = new HttpClientWrapper(httpClient)
-        };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert      
         client.Invoking(y => y.PostAsync<SyncResponse>(UriSegments.PROJECTS, httpContent))
@@ -90,7 +87,7 @@ public class AbstractRestfulClientTests
         var response = new AutoFaker<SyncResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert  
         client.Invoking(y =>
@@ -105,7 +102,7 @@ public class AbstractRestfulClientTests
         var response = new AutoFaker<SyncResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert      
         client.Invoking(y =>
@@ -121,7 +118,7 @@ public class AbstractRestfulClientTests
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         await client.Invoking(async y => await y.DeleteAsync(UriSegments.PROJECTS))
@@ -135,7 +132,7 @@ public class AbstractRestfulClientTests
         // Arrange    
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         await client.Invoking(async y => await y.DeleteAsync(UriSegments.PROJECTS))
@@ -150,7 +147,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         client.Invoking(y => y.DeleteAsync<MessageResponse>(UriSegments.PROJECTS))
@@ -164,7 +161,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         client.Invoking(y => y.DeleteAsync<MessageResponse>(UriSegments.PROJECTS))
@@ -178,10 +175,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions)
-        {
-            _httpClientWrapper = new HttpClientWrapper(httpClient)
-        };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         //Act & Assert
         client.Invoking(y => y.PatchAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
@@ -195,7 +189,7 @@ public class AbstractRestfulClientTests
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         //Act & Assert
         client.Invoking(y => y.PatchAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
@@ -209,7 +203,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         client.Invoking(y => y.PutAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
@@ -222,7 +216,7 @@ public class AbstractRestfulClientTests
         // Arrange       
         var httpClient = MockHttpClient.CreateHttpClientWithException(new Exception());
 
-        var client = new ConcreteRestClient(_apiKey, _clientOptions) { _httpClientWrapper = new HttpClientWrapper(httpClient) };
+        var client = new ConcreteRestClient(_apiKey, _clientOptions);
         // Act & Assert
         client.Invoking(y => y.PutAsync<MessageResponse>(UriSegments.PROJECTS, new StringContent(string.Empty)))
              .Should().ThrowAsync<Exception>();

@@ -4,14 +4,17 @@
 
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
+using Deepgram.Encapsulations;
 
 namespace Deepgram.Tests.UnitTests.ExtensionsTests;
-public class HttpClientExtensionTests
+
+public class HttpClientTests
 {
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
     DeepgramClientOptions _clientOptions;
     string _apiKey;
+
     [SetUp]
     public void Setup()
     {
@@ -29,7 +32,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -50,7 +53,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -69,7 +72,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -96,7 +99,7 @@ public class HttpClientExtensionTests
 
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -120,7 +123,7 @@ public class HttpClientExtensionTests
         _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
 
         //Act
-        var SUT = httpClient.ConfigureDeepgram(_apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
 
         //Assert 
         using (new AssertionScope())

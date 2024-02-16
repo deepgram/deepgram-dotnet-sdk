@@ -30,7 +30,6 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
 
         manageClient.When(x => x.GetAsync<ProjectsResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<ProjectsResponse>(UriSegments.PROJECTS).Returns(expectedResponse);
@@ -59,7 +58,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<ProjectResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<ProjectResponse>($"{UriSegments.PROJECTS}/{_projectId}").Returns(expectedResponse);
 
@@ -85,7 +84,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PatchAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PatchAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -110,7 +109,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/leave").Returns(expectedResponse);
 
@@ -135,7 +134,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}").Returns(Task.CompletedTask);
 
@@ -157,7 +156,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<KeysResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys").Returns(expectedResponse);
 
@@ -183,7 +182,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<KeyScopeResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(expectedResponse);
 
@@ -212,7 +211,7 @@ public class ManageClientTest
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -242,7 +241,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -272,7 +271,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -296,7 +295,7 @@ public class ManageClientTest
         //Arrange 
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
 
-        var manageClient = new ManageClient(_apiKey, _options) { _httpClientWrapper = new HttpClientWrapper(new HttpClient()) };
+        var manageClient = new ManageClient(_apiKey, _options);
 
         //Act & Assert
         await manageClient.Invoking(y => y.CreateKey(UriSegments.PROJECTS, createKeySchema))
@@ -311,7 +310,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(Task.CompletedTask);
 
@@ -334,7 +333,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<InvitesResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites").Returns(expectedResponse);
 
@@ -360,7 +359,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PostAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -385,7 +384,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}").Returns(Task.CompletedTask);
 
@@ -407,7 +406,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<MembersResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members").Returns(expectedResponse);
 
@@ -434,7 +433,7 @@ public class ManageClientTest
 
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<MemberScopesResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes").Returns(expectedResponse);
 
@@ -461,7 +460,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.PutAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         manageClient.PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>()).Returns(expectedResponse);
 
@@ -486,7 +485,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
         manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}").Returns(Task.CompletedTask);
 
@@ -510,7 +509,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<UsageRequestsResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}").Returns(expectedResponse);
 
@@ -537,7 +536,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<UsageRequestResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}").Returns(expectedResponse);
 
@@ -564,7 +563,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<UsageSummaryResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<UsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}").Returns(expectedResponse);
 
@@ -592,7 +591,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<UsageFieldsResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<UsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}").Returns(expectedResponse);
 
@@ -622,7 +621,7 @@ public class ManageClientTest
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         manageClient.When(x => x.GetAsync<BalancesResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances").Returns(expectedResponse);
 
@@ -646,7 +645,7 @@ public class ManageClientTest
         var expectedResponse = new AutoFaker<BalanceResponse>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        manageClient._httpClientWrapper = new HttpClientWrapper(httpClient);
+        
         var balanceId = new Faker().Random.Guid().ToString();
         manageClient.When(x => x.GetAsync<BalanceResponse>(Arg.Any<string>())).DoNotCallBase();
         manageClient.GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}").Returns(expectedResponse);

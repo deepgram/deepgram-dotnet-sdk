@@ -6,8 +6,15 @@ namespace Deepgram.Constants;
 
 public static class Defaults
 {
+    // Deepgram specific consts
     public const string DEFAULT_URI = "api.deepgram.com";
+    public const string DEEPGRAM_API_KEY = "DEEPGRAM_API_KEY";
+
+    // HTTP specific consts
+    public const string DEFAULT_CONTENT_TYPE = "application/json";
+    public const int DEFAULT_HTTP_TINEOUT_IN_MINUTES = 5;
+
+    // Client Names
     public const string HTTPCLIENT_NAME = "DEEPGRAM_HTTP_CLIENT";
     public const string WSSCLIENT_NAME = "DEEPGRAM_WSS_CLIENT";
-    public const string DEFAULT_CONTENT_TYPE = "application/json";
 }
