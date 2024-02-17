@@ -54,6 +54,7 @@ public record TranscriptionResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.Results;
 
+    // TODO: DYV is this needed???
     /// <summary>
     /// TODO
     /// </summary>

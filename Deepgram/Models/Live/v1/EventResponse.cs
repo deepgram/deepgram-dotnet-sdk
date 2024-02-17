@@ -22,6 +22,11 @@ public class EventResponse
     public UtteranceEndResponse? UtteranceEnd { get; set; }
 
     /// <summary>
+    /// UtterancEnd response from the live transcription service
+    /// </summary>
+    public SpeechStartedResponse? SpeechStarted { get; set; }
+
+    /// <summary>
     /// Error response from the live transcription service
     /// </summary>
     public Exception? Error { get; set; }

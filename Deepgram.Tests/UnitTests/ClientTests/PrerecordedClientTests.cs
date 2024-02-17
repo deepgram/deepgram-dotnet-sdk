@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Encapsulations;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Clients.PreRecorded.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
-public class PrerecordedClientTests
+public class PreRecordedClientTests
 {
     DeepgramClientOptions _options;
     string _apiKey;
@@ -31,7 +31,7 @@ public class PrerecordedClientTests
         var source = new AutoFaker<UrlSource>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
 
         prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
@@ -61,7 +61,7 @@ public class PrerecordedClientTests
         var source = new AutoFaker<UrlSource>().Generate();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -84,7 +84,7 @@ public class PrerecordedClientTests
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -116,7 +116,7 @@ public class PrerecordedClientTests
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -144,7 +144,7 @@ public class PrerecordedClientTests
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -168,7 +168,7 @@ public class PrerecordedClientTests
         var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
@@ -192,7 +192,7 @@ public class PrerecordedClientTests
         var source = GetFakeStream(GetFakeByteArray());
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -221,7 +221,7 @@ public class PrerecordedClientTests
         var source = GetFakeByteArray();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -249,7 +249,7 @@ public class PrerecordedClientTests
         var source = GetFakeStream(GetFakeByteArray());
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -277,7 +277,7 @@ public class PrerecordedClientTests
         var source = GetFakeByteArray();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -307,7 +307,7 @@ public class PrerecordedClientTests
         var source = GetFakeStream(GetFakeByteArray());
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -341,7 +341,7 @@ public class PrerecordedClientTests
         var source = GetFakeByteArray();
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -374,7 +374,7 @@ public class PrerecordedClientTests
         var source = GetFakeStream(GetFakeByteArray());
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
@@ -401,7 +401,7 @@ public class PrerecordedClientTests
         var source = GetFakeByteArray();
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var prerecordedClient = Substitute.For<PrerecordedClient>(_apiKey, _options);
+        var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
         prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
         prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);

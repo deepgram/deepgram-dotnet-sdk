@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram", "Deepgram\Deepgram.csproj", "{B8B59E33-2D73-4A27-8FC6-E464CB28357D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Tests", "Deepgram.Tests\Deepgram.Tests.csproj", "{12C80273-08DD-494C-B06D-DFC6D40B1D95}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\streaming\Streaming.csproj", "{5DD81E37-D575-476B-9D1C-803A093A4E3C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prerecorded", "examples\prerecorded\Prerecorded.csproj", "{70B63CBA-1130-46D1-A022-6CD31C37C60E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8B59E33-2D73-4A27-8FC6-E464CB28357D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8B59E33-2D73-4A27-8FC6-E464CB28357D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8B59E33-2D73-4A27-8FC6-E464CB28357D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8B59E33-2D73-4A27-8FC6-E464CB28357D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD81E37-D575-476B-9D1C-803A093A4E3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD81E37-D575-476B-9D1C-803A093A4E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD81E37-D575-476B-9D1C-803A093A4E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD81E37-D575-476B-9D1C-803A093A4E3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}
+	EndGlobalSection
+EndGlobal

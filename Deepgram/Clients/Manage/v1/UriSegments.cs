@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Constants;
+namespace Deepgram.Clients.Manage.v1;
+
 public static class UriSegments
 {
-
     //using constants instead of inline value(magic strings) make consistence
     //across SDK And Test Projects Simpler and Easier to change
     public const string PROJECTS = "projects";
@@ -17,7 +17,4 @@ public static class UriSegments
     public const string SCOPES = "scopes";
     public const string REQUESTS = "requests";
     public const string LISTEN = "listen";
-    public const string ONPREM = "onprem/distribution/credentials";
-    public const string TRANSCRIPTION = "listen";
-    public const string ANALYZE = "read";
 }

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Encapsulations;
 using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Clients.Analyze.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -34,13 +34,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
 
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeUrl(source, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>());
+        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>());
 
         using (new AssertionScope())
         {
@@ -63,13 +63,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act and Assert
         await analyzeClient.Invoking(y => y.AnalyzeUrl(source, analyzeSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>());
+        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = analyzeSchema.CallBack;
         //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
         analyzeSchema.CallBack = null;
@@ -96,7 +96,7 @@ public class AnalyzeClientTests
         var result = await analyzeClient.AnalyzeUrlCallBack(source, callBackParameter, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -118,13 +118,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeUrlCallBack(source, null, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -146,14 +146,14 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
         var callBackParameter = analyzeSchema.CallBack;
 
         // Act Assert
         await analyzeClient.Invoking(y => y.AnalyzeUrlCallBack(source, callBackParameter, analyzeSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>());
+        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -170,14 +170,14 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
 
 
         // Act Assert
         await analyzeClient.Invoking(y => y.AnalyzeUrlCallBack(source, null, analyzeSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedQuery}", Arg.Any<StringContent>());
+        await analyzeClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedQuery}", Arg.Any<StringContent>());
     }
 
     [Test]
@@ -194,13 +194,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeFile(source, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -223,13 +223,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeFile(source, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<SyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -251,13 +251,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeFileCallBack(source, null, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -279,13 +279,13 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         // Act
         var result = await analyzeClient.AnalyzeFileCallBack(source, null, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
 
         using (new AssertionScope())
         {
@@ -309,7 +309,7 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         var callBack = analyzeSchema.CallBack;
 
@@ -320,7 +320,7 @@ public class AnalyzeClientTests
         var result = await analyzeClient.AnalyzeFileCallBack(source, callBack, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -343,7 +343,7 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
 
         var callBack = analyzeSchema.CallBack;
 
@@ -354,7 +354,7 @@ public class AnalyzeClientTests
         var result = await analyzeClient.AnalyzeFileCallBack(source, callBack, analyzeSchema);
 
         // Assert
-        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>());
+        await analyzeClient.Received().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -376,7 +376,7 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         var callBack = analyzeSchema.CallBack;
 
 
@@ -384,7 +384,7 @@ public class AnalyzeClientTests
         await analyzeClient.Invoking(y => y.AnalyzeFileCallBack(source, callBack, analyzeSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await analyzeClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>());
+        await analyzeClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>());
 
 
     }
@@ -403,14 +403,14 @@ public class AnalyzeClientTests
         var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
         
         analyzeClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        analyzeClient.PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
         analyzeSchema.CallBack = null;
 
         // Act  Assert
         await analyzeClient.Invoking(y => y.AnalyzeFileCallBack(source, null, analyzeSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await analyzeClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.ANALYZE}?{stringedOptions}", Arg.Any<StringContent>());
+        await analyzeClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.READ}?{stringedOptions}", Arg.Any<StringContent>());
     }
 
     private static Stream GetFakeStream(byte[] source)

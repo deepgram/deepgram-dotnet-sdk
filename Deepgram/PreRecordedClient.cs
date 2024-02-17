@@ -2,17 +2,17 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Clients.OnPrem.v1;
+using Deepgram.Clients.PreRecorded.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the OnPrem Client.
+/// Implements the latest supported version of the PreRecorded Client.
 /// </summary>
-public class OnPremClient : Client
+public class PreRecordedClient : Client
 {
-    public OnPremClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public PreRecordedClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

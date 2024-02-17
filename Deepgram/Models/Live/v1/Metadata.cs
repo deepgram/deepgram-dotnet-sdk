@@ -22,7 +22,7 @@ public record MetaData
     /// IReadonlyDictionary of <see cref="ModelInfo"/>
     /// </summary>
     [JsonPropertyName("model_info")]
-    public Dictionary<string, ModelInfo> ModelInfo { get; set; }
+    public ModelInfo? ModelInfo { get; set; }
 
     /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.

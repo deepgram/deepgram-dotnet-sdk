@@ -5,14 +5,14 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.PreRecorded.v1;
 
-namespace Deepgram;
+namespace Deepgram.Clients.PreRecorded.v1;
 
 /// <summary>
-/// Constructor to create a client for the Deepgram Prerecorded API
+/// Implements version 1 of the Analyze Client.
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class PrerecordedClient(string apiKey = "", DeepgramClientOptions? deepgramClientOptions = null)
+public class Client(string apiKey = "", DeepgramClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, deepgramClientOptions)
 
 {

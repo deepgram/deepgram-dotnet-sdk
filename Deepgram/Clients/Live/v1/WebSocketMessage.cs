@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Live.v1;
+namespace Deepgram.Clients.Live.v1;
 
-internal readonly struct MessageToSend(byte[] message, WebSocketMessageType type)
+internal readonly struct WebSocketMessage(byte[] message, WebSocketMessageType type)
 {
     public ArraySegment<byte> Message { get; } = new ArraySegment<byte>(message);
 
