@@ -2,11 +2,12 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Enums;
+using Deepgram.Models.Live.v1;
 
-public enum LiveType
+namespace Deepgram.Clients.Live.v1;
+
+public class ResponseEventArgs(EventResponse response) : EventArgs
 {
-    Metadata,
-    Results,
-    UtteranceEnd
+    public EventResponse Response { get; set; } = response;
 }
+

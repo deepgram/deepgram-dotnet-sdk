@@ -11,7 +11,7 @@ public record SpeechStartedResponse
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.UtteranceEnd;
+    public LiveType? Type { get; set; } = LiveType.SpeechStarted;
 
     /// <summary>
     /// TODO

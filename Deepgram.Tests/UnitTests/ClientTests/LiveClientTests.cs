@@ -2,10 +2,11 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.DeepgramEventArgs;
+using System.Net.WebSockets;
+
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
-using System.Net.WebSockets;
+using Deepgram.Clients.Live.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -35,10 +36,10 @@ public class LiveClientTests
         //Arrange
         var liveTranscriptionResponse = new AutoFaker<TranscriptionResponse>().Generate();
         // ensure the right type is set for testing
-        liveTranscriptionResponse.Type = Enums.LiveType.Results;
+        liveTranscriptionResponse.Type = LiveType.Results;
         var json = JsonSerializer.Serialize(liveTranscriptionResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
-        ResponseReceivedEventArgs? eventArgs = null;
+        ResponseEventArgs? eventArgs = null;
 
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
@@ -59,11 +60,11 @@ public class LiveClientTests
         //Arrange
         var liveMetadataResponse = new AutoFaker<MetadataResponse>().Generate();
         // ensure the right type is set for testing
-        liveMetadataResponse.Type = Enums.LiveType.Metadata;
+        liveMetadataResponse.Type = LiveType.Metadata;
         var json = JsonSerializer.Serialize(liveMetadataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-        ResponseReceivedEventArgs? eventArgs = null;
+        ResponseEventArgs? eventArgs = null;
 
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
@@ -87,7 +88,7 @@ public class LiveClientTests
         var json = JsonSerializer.Serialize(unknownDataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-        ResponseReceivedEventArgs? eventArgs = null;
+        ResponseEventArgs? eventArgs = null;
 
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 

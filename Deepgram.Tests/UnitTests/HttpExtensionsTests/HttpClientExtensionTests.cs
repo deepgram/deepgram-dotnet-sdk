@@ -29,7 +29,7 @@ public class HttpClientTests
     {
         //Arrange 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
         var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
@@ -50,7 +50,7 @@ public class HttpClientTests
         var customBaseAddress = $"https://{_customUrl}";
         _clientOptions.BaseAddress = customBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
-        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
         var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
@@ -69,7 +69,7 @@ public class HttpClientTests
         //Arrange 
         _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
-        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
         var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
@@ -91,7 +91,7 @@ public class HttpClientTests
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         httpClient.BaseAddress = null;
-        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient().Returns(httpClient);
 
         var expectedBaseAddress = $"https://{_customUrl}/v1/";
         var customBaseAddress = $"https://{_customUrl}";
@@ -120,7 +120,7 @@ public class HttpClientTests
         _clientOptions.BaseAddress = customBaseAddress;
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
 
-        _httpClientFactory.CreateClient(Defaults.HTTPCLIENT_NAME).Returns(httpClient);
+        _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
         var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);

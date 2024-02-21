@@ -2,8 +2,12 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+namespace Deepgram.Utilities;
+
 internal static class RequestContentUtil
 {
+    public const string DEFAULT_CONTENT_TYPE = "application/json";
+
     static ILogger logger => LogProvider.GetLogger(nameof(RequestContentUtil));
     static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
@@ -21,7 +25,7 @@ internal static class RequestContentUtil
     internal static StringContent CreatePayload<T>(T body)
     {
         var serialized = JsonSerializer.Serialize(body, _jsonSerializerOptions);
-        return new(serialized, Encoding.UTF8, Defaults.DEFAULT_CONTENT_TYPE);
+        return new(serialized, Encoding.UTF8, DEFAULT_CONTENT_TYPE);
     }
 
 

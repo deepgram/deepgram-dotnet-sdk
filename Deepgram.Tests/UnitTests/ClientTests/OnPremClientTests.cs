@@ -2,10 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Encapsulations;
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Manage.v1;
 using Deepgram.Models.OnPrem.v1;
+using Deepgram.Clients.OnPrem.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

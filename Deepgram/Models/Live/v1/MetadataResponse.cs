@@ -28,7 +28,7 @@ public record MetadataResponse
     /// TODO
     /// </summary>
     [JsonPropertyName("model_info")]
-    public IReadOnlyDictionary<Guid, ModelInfo>? ModelInfo { get; set; }
+    public IReadOnlyDictionary<string, ModelInfo>? ModelInfo { get; set; }
 
     /// <summary>
     /// TODO

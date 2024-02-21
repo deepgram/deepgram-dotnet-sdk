@@ -8,8 +8,11 @@
 	</PropertyGroup>
 	
 	<ItemGroup>	
-		<PackageReference Include="Deepgram.Net.SDK" Version="4.0.0-alpha95" />	
 		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Deepgram\Deepgram.csproj" />
 	</ItemGroup>
 
 

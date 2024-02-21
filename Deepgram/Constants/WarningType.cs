@@ -4,7 +4,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Deepgram.Enums;
+namespace Deepgram.Constants;
 
 [DataContract]
 public enum WarningType

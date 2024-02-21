@@ -246,14 +246,12 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
 
         foreach (var chunk in chunks)
         {
-            deepgramLive.SendData(chunk);
+            deepgramLive.Send(chunk);
             await Task.Delay(50);
         }
-
-        await deepgramLive.FinishAsync();
     }
 
-    private async void HandleEventResponseReceived(object? sender, ResponseReceivedEventArgs e)
+    private async void HandleEventResponseReceived(object? sender, ResponseEventArgs e)
     {
         if (e.Response.Error is not null)
         {
@@ -271,7 +269,7 @@ using (var deepgramLive = deepgramClient.CreateLiveTranscriptionClient())
     }
 
     var options = new LiveTranscriptionOptions() { Punctuate = true, Diarize = true, Encoding = Deepgram.Common.AudioEncoding.Linear16 };
-    await deepgramLive.StartConnectionAsync(options);
+    await deepgramLive.Connect(options);
 
     while (deepgramLive.State() == WebSocketState.Open) { }
 }

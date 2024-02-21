@@ -2,15 +2,17 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Encapsulations;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Clients.Manage.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class AbstractRestfulClientTests
 {
+
+
     DeepgramClientOptions _clientOptions;
     string _apiKey;
 

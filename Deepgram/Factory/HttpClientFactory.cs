@@ -8,7 +8,10 @@ namespace Deepgram.Encapsulations;
 
 internal class HttpClientFactory
 {
-    public static HttpClient Create(string httpId = Defaults.HTTPCLIENT_NAME)
+    public const int DEFAULT_HTTP_TINEOUT_IN_MINUTES = 5;
+    public const string HTTPCLIENT_NAME = "DEEPGRAM_HTTP_CLIENT";
+
+    public static HttpClient Create(string httpId = HTTPCLIENT_NAME)
     {
         var services = new ServiceCollection();
         services.AddHttpClient(httpId)
@@ -17,7 +20,7 @@ internal class HttpClientFactory
         var sp = services.BuildServiceProvider();
 
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient(httpId);
-        client.Timeout = TimeSpan.FromMinutes(Defaults.DEFAULT_HTTP_TINEOUT_IN_MINUTES);
+        client.Timeout = TimeSpan.FromMinutes(DEFAULT_HTTP_TINEOUT_IN_MINUTES);
         return client;
     }
 
