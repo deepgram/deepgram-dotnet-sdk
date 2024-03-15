@@ -8,7 +8,7 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
-            var apiKey = "0b0c71c7f752646e8499ac72a0d72ae3267ca8fa";
+            var apiKey = "REPLACE-WITH-YOUR-API-KEY";
             var deepgramClient = new PreRecordedClient(apiKey);
 
             var response = await deepgramClient.TranscribeUrl(
