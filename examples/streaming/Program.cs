@@ -1,65 +1,3 @@
-/*
-using System.Net.WebSockets;
-using Deepgram.Constants;
-using Deepgram.DeepgramEventArgs;
-using Deepgram.Models;
-
-const string DEEPGRAM_API_KEY = "";
-
-using (var deepgramLive = new LiveClient(DEEPGRAM_API_KEY))
-{
-    deepgramLive.ConnectionOpened += HandleConnectionOpened;
-    deepgramLive.ConnectionClosed += HandleConnectionClosed;
-    deepgramLive.LiveError += HandleConnectionError;
-    deepgramLive.TranscriptReceived += HandleTranscriptReceived;
-
-    // Connection opened so start sending audio.
-    async void HandleConnectionOpened(object? sender, ConnectionOpenEventArgs e)
-    {
-        byte[] buffer;
-
-        using (FileStream fs = File.OpenRead(@"\preamble.wav"))
-        {
-            buffer = new byte[fs.Length];
-            fs.Read(buffer, 0, (int)fs.Length);
-        }
-
-        var chunks = buffer.Chunk(1000);
-
-        foreach (var chunk in chunks)
-        {
-            deepgramLive.Send(chunk);
-            await Task.Delay(50);
-        }
-    }
-
-    void HandleTranscriptReceived(object? sender, TranscriptReceivedEventArgs e)
-    {
-        if (e.Transcript.IsFinal && e.Transcript.Channel.Alternatives.First().Transcript.Length > 0)
-        {
-            var transcript = e.Transcript;
-            Console.WriteLine($"[Speaker: {transcript.Channel.Alternatives.First().Words.First()}] {transcript.Channel.Alternatives.First().Transcript}");
-        }
-    }
-
-    void HandleConnectionClosed(object? sender, ConnectionClosedEventArgs e)
-    {
-        Console.Write("Connection Closed");
-    }
-
-    void HandleConnectionError(object? sender, LiveErrorEventArgs e)
-    {
-        Console.WriteLine(e.Exception.Message);
-    }
-
-    var options = new LiveSchema() { Punctuate = true, Diarize = true, Encoding = AudioEncoding.Linear16 };
-    await deepgramLive.Connect(options);
-
-    while (deepgramLive.State() == WebSocketState.Open) { }
-}
-*/
-
-
 using Deepgram;
 using Deepgram.Constants;
 using Deepgram.Models.Authenticate.v1;
@@ -76,7 +14,7 @@ namespace SampleApp
         static async Task Main(string[] args)
         {
             // Initialize the LiveClient with your API key and options
-            var apiKey = "0b0c71c7f752646e8499ac72a0d72ae3267ca8fa";
+            var apiKey = "REPLACE-WITH-YOUR-API-KEY";
             var options = new DeepgramClientOptions();
             var liveClient = new LiveClient(apiKey, options);
 
