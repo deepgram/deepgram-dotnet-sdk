@@ -30,24 +30,17 @@ public abstract class AbstractRestClient
         _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, apiKey, options);
     }
 
-    // TODO: DYV is this needed? I am actually thinking not
-    // was in HttpClientWrapper class
-    //internal Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
-    //{
-    //    return _httpClient.SendAsync(request, cancellationToken);
-    //}
-
     /// <summary>
     /// GET Rest Request
     /// </summary>
     /// <typeparam name="T">Type of class of response expected</typeparam>
     /// <param name="uriSegment">request uri Endpoint</param>
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationToken cancellationToken = default)
+    public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Get, uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
 
             var response = await _httpClient.SendAsync(req, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -68,11 +61,76 @@ public abstract class AbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content, CancellationToken cancellationToken = default)
+    public virtual async Task<(Dictionary<string, string>, MemoryStream)> PostFileAsync<T>(string uriSegment, HttpContent content, List<string> keys, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Post, uriSegment) { Content = content };
+            var req = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
+            var response = await _httpClient.SendAsync(req, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var result = new Dictionary<string, string>();
+
+            for (int i = 0; i < response.Headers.Count(); i++) 
+            {
+                var key = response.Headers.ElementAt(i).Key.ToLower();
+                var value = response.Headers.GetValues(key).FirstOrDefault() ?? "";
+
+                var index = key.IndexOf("x-dg-");
+                if (index == 0)
+                {
+                    var newKey = key.Substring(5);
+                    if (keys.Contains(newKey))
+                    {
+                        result.Add(newKey, value);
+                        continue;
+                    }
+                }
+                index = key.IndexOf("dg-");
+                if (index == 0)
+                {
+                    var newKey = key.Substring(3);
+                    if (keys.Contains(newKey))
+                    {
+                        result.Add(newKey, value);
+                        continue;
+                    }
+                }
+                if (keys.Contains(key))
+                {
+                    result.Add(key, value);
+                }
+            }
+
+            if (keys.Contains("content-type"))
+            {
+                result.Add("content-type", response.Content.Headers.ContentType?.MediaType ?? "");
+            }
+
+            MemoryStream stream = new MemoryStream();
+            await response.Content.CopyToAsync(stream);
+
+            return (result, stream);
+        }
+        catch (Exception ex)
+        {
+            Log.Exception(_logger, "POST", ex);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Post method 
+    /// </summary>
+    /// <typeparam name="T">Class type of what return type is expected</typeparam>
+    /// <param name="uriSegment">Uri for the api including the query parameters</param> 
+    /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
+    /// <returns>Instance of T</returns>
+    public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    {
+        try
+        {
+            var req = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
             var response = await _httpClient.SendAsync(req, cancellationToken);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -92,11 +150,11 @@ public abstract class AbstractRestClient
     /// Delete Method for use with calls that do not expect a response
     /// </summary>
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-    public virtual async Task DeleteAsync(string uriSegment, CancellationToken cancellationToken = default)
+    public virtual async Task DeleteAsync(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
             var response = await _httpClient.SendAsync(req, cancellationToken);
             response.EnsureSuccessStatusCode();
         }
@@ -113,11 +171,11 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class Type of expected response</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param>      
     /// <returns>Instance  of T or throws Exception</returns>
-    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationToken cancellationToken = default)
+    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Delete, uriSegment);
+            var req = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
             var response = await _httpClient.SendAsync(req, cancellationToken);
             response.EnsureSuccessStatusCode();
             var result = await RequestContentUtil.DeserializeAsync<T>(response);
@@ -137,16 +195,16 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param>  
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default)
+    public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
 #if NETSTANDARD2_0
-            var request = new HttpRequestMessage(new HttpMethod("PATCH"), uriSegment) { Content = content };
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
             var response = await _httpClient.SendAsync(request, cancellationToken);
 #else
-            var req = new HttpRequestMessage(HttpMethod.Patch, uriSegment) { Content = content };
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Patch, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
+            var response = await _httpClient.SendAsync(request, cancellationToken);
 
 #endif
             response.EnsureSuccessStatusCode();
@@ -168,11 +226,11 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api</param>   
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default)
+    public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Put, uriSegment)
+            var req = new HttpRequestMessage(HttpMethod.Put, QueryParameterUtil.AppendQueryParameters(uriSegment, addons))
             {
                 Content = content
             };
