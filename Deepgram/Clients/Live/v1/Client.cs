@@ -63,7 +63,7 @@ public class Client : IDisposable
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Connect(LiveSchema options, CancellationToken? cancellationToken = null)
+    public async Task Connect(LiveSchema options, CancellationToken ? cancellationToken = null, Dictionary<string, string>? addons = null)
     {
         // create client
         _clientWebSocket = new ClientWebSocket();
@@ -82,7 +82,7 @@ public class Client : IDisposable
 
         try
         {
-            await _clientWebSocket.ConnectAsync(GetUri(options, _deepgramClientOptions),cancelToken).ConfigureAwait(false);
+            await _clientWebSocket.ConnectAsync(GetUri(options, _deepgramClientOptions, addons),cancelToken).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
         }
@@ -286,10 +286,10 @@ public class Client : IDisposable
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions options)
+    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions options, Dictionary<string, string>? addons = null)
     {
         var baseUrl = GetBaseUrl(options);
-        var query = QueryParameterUtil.GetParameters(queryParameters);
+        var query = QueryParameterUtil.GetParameters(queryParameters, addons);
 
         return new Uri($"{baseUrl}/{options.APIVersion}/{UriSegments.LISTEN}?{query}");
     }

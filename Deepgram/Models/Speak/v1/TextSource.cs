@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Analyze.v1;
+namespace Deepgram.Models.Speak.v1;
 
-public class UrlSource(string url)
+public class TextSource(string text)
 {
     /// <summary>
-    /// Url of the text to analyze
+    /// Text of the words to speak
     /// </summary>
-    [JsonPropertyName("url")]
-    public string? Url { get; set; } = url;
+    [JsonPropertyName("text")]
+    public string? Text { get; set; } = text;
 }
 

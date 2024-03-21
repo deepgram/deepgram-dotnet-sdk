@@ -19,7 +19,6 @@ public static class MockHttpClient
         };
     }
 
-
     public static HttpClient CreateHttpClientWithException(Exception Exception)
     {
         return new HttpClient(new MockHttpMessageHandlerException(Exception))

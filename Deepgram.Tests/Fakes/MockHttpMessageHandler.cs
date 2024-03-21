@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 namespace Deepgram.Tests.Fakes;
+
 public class MockHttpMessageHandler<T>(T response, HttpStatusCode statusCode) : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -11,5 +12,4 @@ public class MockHttpMessageHandler<T>(T response, HttpStatusCode statusCode) : 
             StatusCode = statusCode,
             Content = new StringContent(JsonSerializer.Serialize(response))
         });
-
 }

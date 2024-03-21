@@ -3,23 +3,47 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections;
+using System.Linq;
 using Deepgram.Models.PreRecorded.v1;
 
 namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
 {
-    internal static string GetParameters<T>(T parameters)
+    internal static string GetParameters<T>(T parameters, Dictionary<string, string>? addons = null)
     {
         if (parameters is null) return string.Empty;
 
         var propertyInfoList = parameters.GetType()
             .GetProperties()
             .Where(v => v.GetValue(parameters) is not null);
-        return UrlEncode(parameters, propertyInfoList);
+
+
+        return UrlEncode(parameters, propertyInfoList, addons);
     }
 
-    private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfoList)
+    internal static string AppendQueryParameters(string uriSegment, Dictionary<string, string>? parameters = null)
+    {
+        if (parameters is null)
+        {
+            return uriSegment;
+        }
+
+        // otherwise build the string
+        var uriBuilder = new UriBuilder(uriSegment);
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+        foreach (var param in parameters)
+        {
+            query[param.Key] = param.Value;
+        }
+
+        uriBuilder.Query = query.ToString();
+
+        return uriBuilder.ToString();
+    }
+
+    private static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo> propertyInfoList, Dictionary<string, string>? addons = null)
     {
         var sb = new StringBuilder();
         foreach (var pInfo in propertyInfoList)
@@ -41,7 +65,7 @@ internal static class QueryParameterUtil
                     break;
                 case IList list:
                     foreach (var value in list)
-                        sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");        // TODO: removed ToLower(), is ok?
+                        sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");
                     break;
                 case DateTime time:
                     sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
@@ -59,10 +83,19 @@ internal static class QueryParameterUtil
                     }
                     break;
                 default:
-                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");       // TODO: removed ToLower(), is ok?
+                    sb.Append($"{name}={HttpUtility.UrlEncode(pValue.ToString())}&");
                     break;
             }
         }
+
+        if (addons != null)
+        {
+            foreach (var kvp in addons)
+            {
+                sb.Append($"{kvp.Key}={HttpUtility.UrlEncode(kvp.Value)}&");
+            }
+        }
+
         return sb.ToString().TrimEnd('&');
     }
 }

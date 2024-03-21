@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\strea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prerecorded", "examples\prerecorded\Prerecorded.csproj", "{70B63CBA-1130-46D1-A022-6CD31C37C60E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speak", "examples\speak\Speak.csproj", "{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70B63CBA-1130-46D1-A022-6CD31C37C60E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
