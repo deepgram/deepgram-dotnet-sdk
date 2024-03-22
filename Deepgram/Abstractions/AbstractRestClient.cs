@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Encapsulations;
+using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Abstractions;
@@ -19,6 +20,11 @@ public abstract class AbstractRestClient
     internal ILogger _logger => LogProvider.GetLogger(this.GetType().Name);
 
     /// <summary>
+    /// Copy of the options for the client
+    /// </summary>
+    internal DeepgramClientOptions _options;
+
+    /// <summary>
     /// Constructor that take the options and a httpClient
     /// </summary>
     /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
@@ -28,6 +34,7 @@ public abstract class AbstractRestClient
         options ??= new DeepgramClientOptions();
         _httpClient = HttpClientFactory.Create();
         _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, apiKey, options);
+        _options = options;
     }
 
     /// <summary>
@@ -36,15 +43,74 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Type of class of response expected</typeparam>
     /// <param name="uriSegment">request uri Endpoint</param>
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
+    Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
 
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            // create request message and add custom query parameters
+            NoopSchema? parameter = null;
+            var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Log.Exception(_logger, "GET", ex);
+            throw;
+        }
+    }
+
+    public virtual async Task<T> GetAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        try
+        {
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            response.EnsureSuccessStatusCode();
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
             return result;
         }
         catch (Exception ex)
@@ -61,56 +127,89 @@ public abstract class AbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
-    public virtual async Task<(Dictionary<string, string>, MemoryStream)> PostFileAsync<T>(string uriSegment, HttpContent content, List<string> keys, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<LocalFileWithMetadata> PostRetrieveLocalFileAsync<R, S, T>(string uriSegment, S? parameter, R? content,
+        List<string>? keys = null, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
+        Dictionary<string, string>? headers = null
+        )
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(content)
+            };
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
 
             var result = new Dictionary<string, string>();
 
-            for (int i = 0; i < response.Headers.Count(); i++) 
+            if (keys != null)
             {
-                var key = response.Headers.ElementAt(i).Key.ToLower();
-                var value = response.Headers.GetValues(key).FirstOrDefault() ?? "";
-
-                var index = key.IndexOf("x-dg-");
-                if (index == 0)
+                for (int i = 0; i < response.Headers.Count(); i++)
                 {
-                    var newKey = key.Substring(5);
-                    if (keys.Contains(newKey))
+                    var key = response.Headers.ElementAt(i).Key.ToLower();
+                    var value = response.Headers.GetValues(key).FirstOrDefault() ?? "";
+
+                    var index = key.IndexOf("x-dg-");
+                    if (index == 0)
                     {
-                        result.Add(newKey, value);
-                        continue;
+                        var newKey = key.Substring(5);
+                        if (keys.Contains(newKey))
+                        {
+                            result.Add(newKey, value);
+                            continue;
+                        }
+                    }
+                    index = key.IndexOf("dg-");
+                    if (index == 0)
+                    {
+                        var newKey = key.Substring(3);
+                        if (keys.Contains(newKey))
+                        {
+                            result.Add(newKey, value);
+                            continue;
+                        }
+                    }
+                    if (keys.Contains(key))
+                    {
+                        result.Add(key, value);
                     }
                 }
-                index = key.IndexOf("dg-");
-                if (index == 0)
-                {
-                    var newKey = key.Substring(3);
-                    if (keys.Contains(newKey))
-                    {
-                        result.Add(newKey, value);
-                        continue;
-                    }
-                }
-                if (keys.Contains(key))
-                {
-                    result.Add(key, value);
-                }
-            }
 
-            if (keys.Contains("content-type"))
-            {
-                result.Add("content-type", response.Content.Headers.ContentType?.MediaType ?? "");
+                if (keys.Contains("content-type"))
+                {
+                    result.Add("content-type", response.Content.Headers.ContentType?.MediaType ?? "");
+                }
             }
 
             MemoryStream stream = new MemoryStream();
             await response.Content.CopyToAsync(stream);
 
-            return (result, stream);
+            return new LocalFileWithMetadata()
+                        {
+                            Metadata = result,
+                            Content = stream,
+                        };
+
         }
         catch (Exception ex)
         {
@@ -126,14 +225,37 @@ public abstract class AbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     /// <param name="content">HttpContent as content for HttpRequestMessage</param>  
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PostAsync<T>(string uriSegment, HttpContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<T> PostAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(parameter)
+            };
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             return result;
         }
@@ -142,49 +264,55 @@ public abstract class AbstractRestClient
             Log.Exception(_logger, "POST", ex);
             throw;
         }
-
     }
 
-
-    /// <summary>
-    /// Delete Method for use with calls that do not expect a response
-    /// </summary>
-    /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-    public virtual async Task DeleteAsync(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<T> PostAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
-            var response = await _httpClient.SendAsync(req, cancellationToken);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            Log.Exception(_logger, "DELETE", ex);
-            throw;
-        }
-    }
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
 
-    /// <summary>
-    /// Delete method that returns the type of response specified
-    /// </summary>
-    /// <typeparam name="T">Class Type of expected response</typeparam>
-    /// <param name="uriSegment">Uri for the api including the query parameters</param>      
-    /// <returns>Instance  of T or throws Exception</returns>
-    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
-    {
-        try
-        {
-            var req = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.AppendQueryParameters(uriSegment, addons));
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Post, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
+            if (typeof(R) == typeof(Stream))
+            {
+                Stream? stream = content as Stream;
+                if (stream == null)
+                {
+                    stream = new MemoryStream();
+                }
+                request.Content = HttpRequestUtil.CreateStreamPayload(stream);
+            }
+            else
+            {
+                request.Content = HttpRequestUtil.CreatePayload(content);
+            }
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "DELETE ASYNC", ex);
+            Log.Exception(_logger, "POST", ex);
             throw;
         }
     }
@@ -195,20 +323,45 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api including the query parameters</param>  
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PatchAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<T> PatchAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         try
         {
-#if NETSTANDARD2_0
-            var request = new HttpRequestMessage(new HttpMethod("PATCH"), QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
-            var response = await _httpClient.SendAsync(request, cancellationToken);
-#else
-            var request = new HttpRequestMessage(HttpMethod.Patch, QueryParameterUtil.AppendQueryParameters(uriSegment, addons)) { Content = content };
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
 
+            // create request message and add custom query parameters
+#if NETSTANDARD2_0
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(parameter)
+            };
+#else
+            var request = new HttpRequestMessage(HttpMethod.Patch, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(parameter)
+            };
 #endif
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
             return result;
 
         }
@@ -226,17 +379,37 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api</param>   
     /// <returns>Instance of T</returns>
-    public virtual async Task<T> PutAsync<T>(string uriSegment, StringContent content, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         try
         {
-            var req = new HttpRequestMessage(HttpMethod.Put, QueryParameterUtil.AppendQueryParameters(uriSegment, addons))
+            // if not defined, use default timeout
+            if (cancellationToken == null)
             {
-                Content = content
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Put, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(parameter)
             };
-            var response = await _httpClient.SendAsync(req, cancellationToken);
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
-            var result = await RequestContentUtil.DeserializeAsync<T>(response);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             return result;
         }
@@ -247,15 +420,116 @@ public abstract class AbstractRestClient
         }
     }
 
+    /// <summary>
+    /// Delete Method for use with calls that do not expect a response
+    /// </summary>
+    /// <param name="uriSegment">Uri for the api including the query parameters</param> 
+    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
+        Dictionary<string, string>? headers = null)
+    {
+        try
+        {
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, new NoopSchema(), addons));
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            response.EnsureSuccessStatusCode();
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Log.Exception(_logger, "DELETE", ex);
+            throw;
+        }
+    }
 
     /// <summary>
-    /// Allow for the setting of a HttpClient timeout, timeout will change for any future calls 
-    /// calls that are currently running will not be affected
+    /// Delete method that returns the type of response specified
     /// </summary>
-    /// <param name="timeout"></param>
-    public void SpecifyTimeOut(TimeSpan timeout)
+    /// <typeparam name="T">Class Type of expected response</typeparam>
+    /// <param name="uriSegment">Uri for the api including the query parameters</param>      
+    /// <returns>Instance  of T or throws Exception</returns>
+    public virtual async Task<T> DeleteAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
+        Dictionary<string, string>? headers = null)
     {
-        _httpClient.Timeout = timeout;
+        try
+        {
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+            var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            response.EnsureSuccessStatusCode();
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Log.Exception(_logger, "DELETE ASYNC", ex);
+            throw;
+        }
+    }
+
+    internal static string GetUri(DeepgramClientOptions options, string path)
+    {
+        var baseUrl = GetBaseUrl(options);
+        return $"{baseUrl}/{options.APIVersion}/{path}";
+    }
+
+    internal static string GetBaseUrl(DeepgramClientOptions options)
+    {
+        string baseAddress = Defaults.DEFAULT_URI;
+        if (options.BaseAddress != null)
+        {
+            baseAddress = options.BaseAddress;
+        }
+
+        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
+        Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
+        if (!regex.IsMatch(baseAddress))
+        {
+            //if no protocol in the address then https:// is added
+            // TODO: log
+            baseAddress = $"https://{baseAddress}";
+        }
+
+        return baseAddress;
     }
 }
 

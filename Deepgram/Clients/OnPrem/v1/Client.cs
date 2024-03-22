@@ -20,8 +20,9 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="CredentialsResponse"/></returns>
-    public async Task<CredentialsResponse> ListCredentials(string projectId, CancellationToken cancellationToken = default) =>
-        await GetAsync<CredentialsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}", cancellationToken);
+    public async Task<CredentialsResponse> ListCredentials(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<CredentialsResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}"), cancellationToken, addons, headers);
 
     /// <summary>
     /// Get credentials for the project that is associated with credential ID
@@ -29,8 +30,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns><see cref="CredentialResponse"/></returns>
-    public async Task<CredentialResponse> GetCredentials(string projectId, string credentialsId, CancellationToken cancellationToken = default) =>
-        await GetAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}", cancellationToken);
+    public async Task<CredentialResponse> GetCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<CredentialResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}"),
+            cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Remove credentials in the project associated with the credentials ID
@@ -38,8 +42,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns><see cref="MessageResponse"/></returns>
-    public async Task<MessageResponse> DeleteCredentials(string projectId, string credentialsId, CancellationToken cancellationToken = default) =>
-        await DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}", cancellationToken);
+    public async Task<MessageResponse> DeleteCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await DeleteAsync<MessageResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}"),
+            cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Create credentials for the associated projects
@@ -47,9 +54,10 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="createOnPremCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
     /// <returns><see cref="CredentialResponse"/></returns>
-    public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema createOnPremCredentialsSchema, CancellationToken cancellationToken = default) =>
-        await PostAsync<CredentialResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}",
-            RequestContentUtil.CreatePayload(createOnPremCredentialsSchema), cancellationToken);
+    public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema credentialsSchema, 
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await PostAsync<CredentialsSchema, CredentialResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}"), credentialsSchema, cancellationToken, addons, headers
+            );
 
 }

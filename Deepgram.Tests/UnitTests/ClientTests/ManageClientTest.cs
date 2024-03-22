@@ -5,6 +5,8 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Clients.Manage.v1;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using NSubstitute;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -25,48 +27,52 @@ public class ManageClientTest
     [Test]
     public async Task GetProjects_Should_Call_GetAsync_Returning_ProjectsResponse()
     {
-        // Arrange
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}");
         var expectedResponse = new AutoFaker<ProjectsResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
 
+        // Mock methods
         manageClient.When(x => x.GetAsync<ProjectsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<ProjectsResponse>(UriSegments.PROJECTS).Returns(expectedResponse);
+        manageClient.GetAsync<ProjectsResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProjects();
 
         // Assert
-        await manageClient.Received().GetAsync<ProjectsResponse>(UriSegments.PROJECTS);
+        await manageClient.Received().GetAsync<ProjectsResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
             result.Should().BeAssignableTo<ProjectsResponse>();
             result.Should().BeEquivalentTo(expectedResponse);
-
         }
     }
 
     [Test]
     public async Task GetProject_Should_Call_GetAsync_Returning_ProjectResponse()
     {
-
-        // Arrange
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}");
         var expectedResponse = new AutoFaker<ProjectResponse>().Generate();
         expectedResponse.ProjectId = _projectId;
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<ProjectResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<ProjectResponse>($"{UriSegments.PROJECTS}/{_projectId}").Returns(expectedResponse);
+        manageClient.GetAsync<ProjectResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetProject(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<ProjectResponse>($"projects/{_projectId}");
+        await manageClient.Received().GetAsync<ProjectResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -78,21 +84,24 @@ public class ManageClientTest
     [Test]
     public async Task UpdateProject_Should_Call_PatchAsync_Returning_MessageResponse()
     {
-        //Arrange 
+        // Input and Output 
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var updateProjectSchema = new AutoFaker<ProjectSchema>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.PatchAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PatchAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.PatchAsync<ProjectSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<ProjectSchema>())).DoNotCallBase();
+        manageClient.PatchAsync<ProjectSchema, MessageResponse>(url, Arg.Any<ProjectSchema>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.UpdateProject(_projectId, updateProjectSchema);
 
         //Assert
-        await manageClient.Received().PatchAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}", Arg.Any<StringContent>());
+        await manageClient.Received().PatchAsync<ProjectSchema, MessageResponse>(url, Arg.Any<ProjectSchema>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -104,20 +113,23 @@ public class ManageClientTest
     [Test]
     public async Task LeaveProject_Should_Call_DeleteAsync_Returning_MessageResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/leave");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/leave").Returns(expectedResponse);
+        manageClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.LeaveProject(_projectId);
 
         //Assert
-        await manageClient.Received().DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/leave");
+        await manageClient.Received().DeleteAsync<MessageResponse>(url);
 
         using (new AssertionScope())
         {
@@ -130,19 +142,23 @@ public class ManageClientTest
     [Test]
     public async Task DeleteProject_Should_Call_DeleteAsync()
     {
-        //Arrange 
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
+        // Input and Output 
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}");
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}").Returns(Task.CompletedTask);
+        // Mock methods
+        manageClient.When(x => x.DeleteAsync< MessageResponse>(Arg.Any<string>())).DoNotCallBase();
+        manageClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         // Act
         await manageClient.DeleteProject(_projectId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}");
+        await manageClient.Received().DeleteAsync<MessageResponse>(url);
     }
 
     #endregion
@@ -151,20 +167,23 @@ public class ManageClientTest
     [Test]
     public async Task GetKeys_Should_Call_GetAsync_Returning_KeysResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys");
         var expectedResponse = new AutoFaker<KeysResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<KeysResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys").Returns(expectedResponse);
+        manageClient.GetAsync<KeysResponse>(url).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.GetKeys(_projectId);
 
         //Assert
-        await manageClient.Received().GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys");
+        await manageClient.Received().GetAsync<KeysResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -176,20 +195,22 @@ public class ManageClientTest
     [Test]
     public async Task GetKey_Should_Call_GetAsync_Returning_KeyResponse()
     {
-        //Arrange 
-        var expectedResponse = new AutoFaker<KeyScopeResponse>().Generate();
+        // Input and Output
         var keyId = new Faker().Random.Guid().ToString();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
+        var expectedResponse = new AutoFaker<KeyScopeResponse>().Generate();
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<KeyScopeResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(expectedResponse);
-
+        manageClient.GetAsync<KeyScopeResponse>(url).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.GetKey(_projectId, keyId);
-        await manageClient.Received().GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
+        await manageClient.Received().GetAsync<KeyScopeResponse>(url);
 
         //Assert
         using (new AssertionScope())
@@ -203,25 +224,26 @@ public class ManageClientTest
     [Test]
     public async Task CreateKey_Should_Call_PostAsync_Returning_KeyResponse_Without_Expiration_TimeToLive_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys");
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
         createKeySchema.ExpirationDate = null;
         createKeySchema.TimeToLiveInSeconds = null;
 
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
-
-
+        // Mock methods
+        manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
+        manageClient.PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>());
 
         using (new AssertionScope())
         {
@@ -234,24 +256,25 @@ public class ManageClientTest
     [Test]
     public async Task CreateKey_Should_Call_PostAsync_Returning_KeyResponse_With_Expiration_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys");
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
         createKeySchema.TimeToLiveInSeconds = null;
+
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
-        
-        manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
 
-
+        // Mock methods
+        manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
+        manageClient.PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>());
 
         using (new AssertionScope())
         {
@@ -264,22 +287,25 @@ public class ManageClientTest
     [Test]
     public async Task CreateKey_Should_Return_KeyResponse_Without_TimeToLive_Set()
     {
-        //Arrange 
+        // Input and Output 
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys");
         var expectedResponse = new AutoFaker<KeyResponse>().Generate();
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
         createKeySchema.ExpirationDate = null;
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.PostAsync<KeyResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
+        manageClient.PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>()).Returns(expectedResponse);
 
         //Act
         var result = await manageClient.CreateKey(_projectId, createKeySchema);
 
         //Assert
-        await manageClient.Received().PostAsync<KeyResponse>($"{UriSegments.PROJECTS}/{_projectId}/keys", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<KeySchema, KeyResponse>(url, Arg.Any<KeySchema>());
 
         using (new AssertionScope())
         {
@@ -292,56 +318,64 @@ public class ManageClientTest
     [Test]
     public async Task CreateKey_Should_Throw_ArgumentException_When_Both_Expiration_And_TimeToLive_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}");
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
 
+        // Fake Client
         var manageClient = new ManageClient(_apiKey, _options);
 
         //Act & Assert
-        await manageClient.Invoking(y => y.CreateKey(UriSegments.PROJECTS, createKeySchema))
+        await manageClient.Invoking(y => y.CreateKey(url, createKeySchema))
              .Should().ThrowAsync<ArgumentException>();
     }
 
     [Test]
     public async Task DeleteKey_Should_Call_DeleteAsync()
     {
-        //Arrange
+        // Input and Output
         var keyId = new Faker().Random.Guid().ToString();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}").Returns(Task.CompletedTask);
+        // Mock methods
+        manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
+        manageClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         // Act
         await manageClient.DeleteKey(_projectId, keyId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/keys/{keyId}");
+        await manageClient.Received().DeleteAsync<MessageResponse>(url);
     }
 
     #endregion
 
     #region ProjectInvites
-
     [Test]
     public async Task GetInvites_Should_Call_GetAsync_Returning_InvitesResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/invites");
         var expectedResponse = new AutoFaker<InvitesResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<InvitesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites").Returns(expectedResponse);
+        manageClient.GetAsync<InvitesResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetInvites(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites");
+        await manageClient.Received().GetAsync<InvitesResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -353,21 +387,24 @@ public class ManageClientTest
     [Test]
     public async Task SendInvite_Should_Call_PostAsync_Returning_MessageResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/invites");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var inviteSchema = new AutoFaker<InviteSchema>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.PostAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.PostAsync<InviteSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<InviteSchema>())).DoNotCallBase();
+        manageClient.PostAsync<InviteSchema, MessageResponse>(url, Arg.Any<InviteSchema>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.SendInvite(_projectId, inviteSchema);
 
         // Assert
-        await manageClient.Received().PostAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/invites", Arg.Any<StringContent>());
+        await manageClient.Received().PostAsync<InviteSchema, MessageResponse>(url, Arg.Any<InviteSchema>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -379,20 +416,24 @@ public class ManageClientTest
     [Test]
     public async Task DeleteInvite_Should_Call_DeleteAsync()
     {
-        //Arrange        
+        // Input and Output
         var email = new Faker().Internet.Email();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/invites/{email}");
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}").Returns(Task.CompletedTask);
+        // Mock methods
+        manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
+        manageClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         // Act
         await manageClient.DeleteInvite(_projectId, email);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/invites/{email}");
+        await manageClient.Received().DeleteAsync<MessageResponse>(url);
 
     }
     #endregion
@@ -401,20 +442,23 @@ public class ManageClientTest
     [Test]
     public async Task GetMembers_Should_Call_GetAsync_Returning_MembersResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/members");
         var expectedResponse = new AutoFaker<MembersResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<MembersResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members").Returns(expectedResponse);
+        manageClient.GetAsync<MembersResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetMembers(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{_projectId}/members");
+        await manageClient.Received().GetAsync<MembersResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -426,22 +470,24 @@ public class ManageClientTest
     [Test]
     public async Task GetMemberScopes_Should_Call_GetAsync_Returning_MemberScopesResponse()
     {
-        //Arrange 
-        var expectedResponse = new AutoFaker<MemberScopesResponse>().Generate();
+        // Input and Output
         var memberId = new Faker().Random.Guid().ToString();
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes");
+        var expectedResponse = new AutoFaker<MemberScopesResponse>().Generate();
+        
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
-
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<MemberScopesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes").Returns(expectedResponse);
+        manageClient.GetAsync<MemberScopesResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetMemberScopes(_projectId, memberId);
 
         // Assert
-        await manageClient.Received().GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes");
+        await manageClient.Received().GetAsync<MemberScopesResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -453,22 +499,25 @@ public class ManageClientTest
     [Test]
     public async Task UpdateMemberScope_Should_Call_PutAsync_Returning_MessageResponse()
     {
-        //Arrange 
+        // Input and Output
+        var memberId = new Faker().Random.Guid().ToString();
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         var memberScopeSchema = new AutoFaker<MemberScopeSchema>().Generate();
-        var memberId = new Faker().Random.Guid().ToString();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.PutAsync<MessageResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        manageClient.PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.PutAsync<MemberScopeSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<MemberScopeSchema>())).DoNotCallBase();
+        manageClient.PutAsync<MemberScopeSchema, MessageResponse>(url, Arg.Any<MemberScopeSchema>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.UpdateMemberScope(_projectId, memberId, memberScopeSchema);
 
         // Assert
-        await manageClient.Received().PutAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}/scopes", Arg.Any<StringContent>());
+        await manageClient.Received().PutAsync<MemberScopeSchema, MessageResponse>(url, Arg.Any<MemberScopeSchema>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -480,20 +529,24 @@ public class ManageClientTest
     [Test]
     public async Task RemoveMember_Should_Call_DeleteAsync()
     {
-        //Arrange         
+        // Input and Output
         var memberId = new Faker().Random.Guid().ToString();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new VoidResponse());
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}");
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.DeleteAsync(Arg.Any<string>())).DoNotCallBase();
-        manageClient.DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}").Returns(Task.CompletedTask);
+        // Mock methods
+        manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
+        manageClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         // Act
         await manageClient.RemoveMember(_projectId, memberId);
 
         // Assert
-        await manageClient.Received().DeleteAsync($"{UriSegments.PROJECTS}/{_projectId}/members/{memberId}");
+        await manageClient.Received().DeleteAsync<MessageResponse>(url);
 
     }
     #endregion
@@ -502,22 +555,24 @@ public class ManageClientTest
     [Test]
     public async Task GetUsageRequests_Should_Call_GetAsync_Returning_UsageRequestsResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/requests");
         var expectedResponse = new AutoFaker<UsageRequestsResponse>().Generate();
         var UsageRequestsSchema = new AutoFaker<UsageRequestsSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(UsageRequestsSchema);
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.GetAsync<UsageRequestsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}").Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.GetAsync<UsageRequestsSchema, UsageRequestsResponse>(Arg.Any<string>(), Arg.Any<UsageRequestsSchema>())).DoNotCallBase();
+        manageClient.GetAsync<UsageRequestsSchema, UsageRequestsResponse>(url, Arg.Any<UsageRequestsSchema>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetUsageRequests(_projectId, UsageRequestsSchema);
 
         // Assert
-        await manageClient.Received().GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests?{stringedOptions}");
+        await manageClient.Received().GetAsync<UsageRequestsSchema, UsageRequestsResponse>(url, Arg.Any<UsageRequestsSchema>());
 
         using (new AssertionScope())
         {
@@ -530,21 +585,24 @@ public class ManageClientTest
     [Test]
     public async Task GetsUsageRequest_Should_Call_GetAsync_Returning_UsageRequestResponse()
     {
-        //Arrange 
+        // Input and Output
         var requestId = new Faker().Random.Guid().ToString();
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}");
         var expectedResponse = new AutoFaker<UsageRequestResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<UsageRequestResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}").Returns(expectedResponse);
+        manageClient.GetAsync<UsageRequestResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetUsageRequest(_projectId, requestId);
 
         // Assert
-        await manageClient.Received().GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{_projectId}/requests/{requestId}");
+        await manageClient.Received().GetAsync<UsageRequestResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -556,22 +614,24 @@ public class ManageClientTest
     [Test]
     public async Task GetsUsageSummary_Should_Call_GetAsync_Returning_UsageSummaryResponse()
     {
-        //Arrange 
+        // Input and Output 
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/usage");
         var expectedResponse = new AutoFaker<UsageSummaryResponse>().Generate();
         var getProjectUsageSummarySchema = new AutoFaker<UsageSummarySchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.GetAsync<UsageSummaryResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<UsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}").Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.GetAsync<UsageSummarySchema, UsageSummaryResponse>(Arg.Any<string>(), Arg.Any<UsageSummarySchema>())).DoNotCallBase();
+        manageClient.GetAsync<UsageSummarySchema, UsageSummaryResponse>(url, Arg.Any<UsageSummarySchema>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetUsageSummary(_projectId, getProjectUsageSummarySchema);
 
         // Assert
-        await manageClient.Received().GetAsync<UsageSummaryResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage?{stringedOptions}");
+        await manageClient.Received().GetAsync<UsageSummarySchema, UsageSummaryResponse>(url, Arg.Any<UsageSummarySchema>());
 
         using (new AssertionScope())
         {
@@ -584,22 +644,24 @@ public class ManageClientTest
     [Test]
     public async Task GetUsageFields_Should_GetAsync_Returning_UsageSummaryResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/usage/fields");
         var expectedResponse = new AutoFaker<UsageFieldsResponse>().Generate();
         var getProjectUsageFieldsSchema = new AutoFaker<UsageFieldsSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        manageClient.When(x => x.GetAsync<UsageFieldsResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<UsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}").Returns(expectedResponse);
+        // Mock methods
+        manageClient.When(x => x.GetAsync<UsageFieldsSchema, UsageFieldsResponse>(Arg.Any<string>(), Arg.Any<UsageFieldsSchema>())).DoNotCallBase();
+        manageClient.GetAsync<UsageFieldsSchema, UsageFieldsResponse>(url, Arg.Any<UsageFieldsSchema>()).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetUsageFields(_projectId, getProjectUsageFieldsSchema);
 
         // Assert
-        await manageClient.Received().GetAsync<UsageFieldsResponse>($"{UriSegments.PROJECTS}/{_projectId}/usage/fields?{stringedOptions}");
+        await manageClient.Received().GetAsync<UsageFieldsSchema, UsageFieldsResponse>(url, Arg.Any<UsageFieldsSchema>());
 
         using (new AssertionScope())
         {
@@ -616,20 +678,23 @@ public class ManageClientTest
     [Test]
     public async Task GetBalances_Should_Call_GetAsync_Returning_BalancesResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/balances");
         var expectedResponse = new AutoFaker<BalancesResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
+        // Mock methods
         manageClient.When(x => x.GetAsync<BalancesResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances").Returns(expectedResponse);
+        manageClient.GetAsync<BalancesResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetBalances(_projectId);
 
         // Assert
-        await manageClient.Received().GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances");
+        await manageClient.Received().GetAsync<BalancesResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -641,20 +706,24 @@ public class ManageClientTest
     [Test]
     public async Task GetBalance_Should_Call_GetAsync_Returning_BalanceResponse()
     {
-        //Arrange 
+        // Input and Output
+        var balanceId = new Faker().Random.Guid().ToString();
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}");
         var expectedResponse = new AutoFaker<BalanceResponse>().Generate();
+
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
         
-        var balanceId = new Faker().Random.Guid().ToString();
+        // Mock methods
         manageClient.When(x => x.GetAsync<BalanceResponse>(Arg.Any<string>())).DoNotCallBase();
-        manageClient.GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}").Returns(expectedResponse);
+        manageClient.GetAsync<BalanceResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await manageClient.GetBalance(_projectId, balanceId);
 
         // Assert
-        await manageClient.Received().GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{_projectId}/balances/{balanceId}");
+        await manageClient.Received().GetAsync<BalanceResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -662,9 +731,5 @@ public class ManageClientTest
             result.Should().BeEquivalentTo(expectedResponse);
         }
     }
-
-
     #endregion
-
-
 }

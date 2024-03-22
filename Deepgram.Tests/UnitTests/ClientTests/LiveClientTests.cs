@@ -28,27 +28,31 @@ public class LiveClientTests
 
     [TearDown]
     public void Teardown()
-    { _liveClient.Dispose(); }
+    {
+        if (_liveClient != null)
+            _liveClient.Dispose();
+    }
 
     [Test]
     public void ProcessDataReceived_Should_Raise_TranscriptReceived_Event_When_Response_Contains_Type_TranscriptionResponse()
     {
-        //Arrange
+        // Input and Output
         var liveTranscriptionResponse = new AutoFaker<TranscriptionResponse>().Generate();
+
         // ensure the right type is set for testing
         liveTranscriptionResponse.Type = LiveType.Results;
         var json = JsonSerializer.Serialize(liveTranscriptionResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+
+        // Eventing
         ResponseEventArgs? eventArgs = null;
-
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
-
 
         //Act
         _liveClient.ProcessDataReceived(_webSocketReceiveResult, memoryStream);
         Task.Delay(5000);
-        //Assert
 
+        //Assert
         eventArgs.Should().NotBeNull();
         eventArgs!.Response.Transcription.Should().NotBeNull();
         eventArgs.Response.Transcription.Should().BeAssignableTo<TranscriptionResponse>();
@@ -57,15 +61,16 @@ public class LiveClientTests
     [Test]
     public void ProcessDataReceived_Should_Raise_MetaDataReceived_Event_When_Response_Contains_Type_MetadataResponse()
     {
-        //Arrange
+        // Input and Output
         var liveMetadataResponse = new AutoFaker<MetadataResponse>().Generate();
+
         // ensure the right type is set for testing
         liveMetadataResponse.Type = LiveType.Metadata;
         var json = JsonSerializer.Serialize(liveMetadataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
+        // Eventing
         ResponseEventArgs? eventArgs = null;
-
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
         //Act
@@ -83,13 +88,13 @@ public class LiveClientTests
     [Test]
     public void ProcessDataReceived_Should_Raise_LiveError_Event_When_Response_Contains_Unknown_Type()
     {
-        //Arrange
+        // Input and Output
         var unknownDataResponse = new Dictionary<string, string>() { { "Wiley", "coyote" } };
         var json = JsonSerializer.Serialize(unknownDataResponse);
         var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
+        // Eventing
         ResponseEventArgs? eventArgs = null;
-
         _liveClient.EventResponseReceived += (sender, args) => eventArgs = args;
 
         //Act
@@ -109,30 +114,27 @@ public class LiveClientTests
     [Test]
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_DeepgramClientOptions_BaseAddress_Contains_No_Protocol()
     {
-        //Arrange
+        // Input and Output
         var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
 
         //Act
         var result = LiveClient.GetBaseUrl(_options);
 
         //Assert
-
         result.Should().NotBeNullOrEmpty();
         result.Should().StartWith("wss://");
         result.Should().BeEquivalentTo(expectedUrl);
-
     }
 
     [Test]
     public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WSS_Protocol()
     {
-        //Arrange
+        // Input and Output
         var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
         _options.BaseAddress = $"wss://{Defaults.DEFAULT_URI}";
 
         //Act
         var result = LiveClient.GetBaseUrl(_options);
-
 
         //Assert
         using (new AssertionScope())
@@ -146,7 +148,7 @@ public class LiveClientTests
     [Test]
     public void GetUri_Should_Return_Correctly_Formatted_Uri()
     {
-        //Arrange
+        // Input and Output
         var liveSchema = new LiveSchema()
         {
             Diarize = true,
@@ -155,8 +157,9 @@ public class LiveClientTests
         var expectedUriStart = $"wss://{Defaults.DEFAULT_URI}/v1";
         var expectedQuery = $"{UriSegments.LISTEN}?diarize=true";
         var expectedCompleteUri = new Uri($"{expectedUriStart}/{expectedQuery}");
+
         //Act
-        var result = LiveClient.GetUri(liveSchema, _options);
+        var result = LiveClient.GetUri(_options, liveSchema);
 
         //Assert
         using (new AssertionScope())
@@ -167,8 +170,6 @@ public class LiveClientTests
             result.ToString().Should().Contain(expectedQuery);
             result.ToString().Should().BeEquivalentTo(expectedCompleteUri.ToString());
         }
-
     }
-
     #endregion
 }

@@ -8,6 +8,7 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
+            // Replace "REPLACE-WITH-YOUR-API-KEY" with your actual Deepgram API key
             var apiKey = "REPLACE-WITH-YOUR-API-KEY";
             var deepgramClient = new PreRecordedClient(apiKey);
 

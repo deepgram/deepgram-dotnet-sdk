@@ -20,16 +20,20 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// Gets projects associated to ApiKey 
     /// </summary>
     /// <returns><see cref="ProjectsResponse"/></returns>
-    public async Task<ProjectsResponse> GetProjects(CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<ProjectsResponse>(UriSegments.PROJECTS, cancellationToken, addons);
+    public async Task<ProjectsResponse> GetProjects(CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<ProjectsResponse>(GetUri(_options, $"{UriSegments.PROJECTS}"), cancellationToken, addons, headers);
 
     /// <summary>
     /// Gets project associated with project Id
     /// </summary>
     /// <param name="projectId">Id of Project</param>
     /// <returns><see cref="ProjectResponse"/></returns>
-    public async Task<ProjectResponse> GetProject(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<ProjectResponse>($"{UriSegments.PROJECTS}/{projectId}", cancellationToken, addons);
+    public async Task<ProjectResponse> GetProject(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<ProjectResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}"), cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Update a project associated with the projectID
@@ -38,27 +42,33 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="updateProjectSchema"><see cref="ProjectSchema"/> for project</param>
     /// <returns><see cref="MessageResponse"/></returns>
     // USES PATCH
-    public async Task<MessageResponse> UpdateProject(string projectId, ProjectSchema updateProjectSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await PatchAsync<MessageResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}",
-            RequestContentUtil.CreatePayload(updateProjectSchema), cancellationToken, addons);
+    public async Task<MessageResponse> UpdateProject(string projectId, ProjectSchema updateProjectSchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await PatchAsync<ProjectSchema, MessageResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}"), updateProjectSchema, cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Deletes a project, no response will be returned
     /// </summary>
     /// <param name="projectId">Id of project</param>
     // No response expected
-    public async Task DeleteProject(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-     await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}", cancellationToken, addons);
+    public async Task<MessageResponse> DeleteProject(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+     await DeleteAsync<MessageResponse>(
+         GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}"), cancellationToken, addons, headers
+         );
 
     /// <summary>
     /// leave project associated with the project Id
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="MessageResponse"/></returns>
-    public async Task<MessageResponse> LeaveProject(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{projectId}/leave", cancellationToken, addons);
-
+    public async Task<MessageResponse> LeaveProject(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await DeleteAsync<MessageResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/leave"), cancellationToken, addons, headers
+            );
     #endregion
 
     #region ProjectKeys
@@ -68,8 +78,10 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="KeysResponse"/></returns>
-    public async Task<KeysResponse> GetKeys(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<KeysResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}", cancellationToken, addons);
+    public async Task<KeysResponse> GetKeys(string projectId, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<KeysResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}"), cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Get details of key associated with the key ID
@@ -77,8 +89,10 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     /// <returns><see cref="KeyScopeResponse"/></returns>
-    public async Task<KeyScopeResponse> GetKey(string projectId, string keyId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<KeyScopeResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}/{keyId}", cancellationToken, addons);
+    public async Task<KeyScopeResponse> GetKey(string projectId, string keyId, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<KeyScopeResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.KEYS}/{keyId}"), cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Create a key in the associated project
@@ -86,18 +100,19 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="createProjectKeySchema"><see cref="KeySchema"/> for the key to be created</param>
     /// <returns><see cref="KeyResponse"/></returns>
-    public async Task<KeyResponse> CreateKey(string projectId, KeySchema createProjectKeySchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<KeyResponse> CreateKey(string projectId, KeySchema createKeySchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         // TODO: think about logging here based on coderabbit feedback
-        if (createProjectKeySchema.ExpirationDate is not null && createProjectKeySchema.TimeToLiveInSeconds is not null)
+        if (createKeySchema.ExpirationDate is not null && createKeySchema.TimeToLiveInSeconds is not null)
         {
-            Log.CreateKeyError(_logger, createProjectKeySchema);
+            Log.CreateKeyError(_logger, createKeySchema);
             throw new ArgumentException("Both ExpirationDate and TimeToLiveInSeconds is set. set either one but not both");
         }
 
-        return await PostAsync<KeyResponse>(
-                     $"{UriSegments.PROJECTS}/{projectId}/keys",
-                     RequestContentUtil.CreatePayload(createProjectKeySchema), cancellationToken, addons);
+        return await PostAsync<KeySchema, KeyResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/keys"), createKeySchema, cancellationToken, addons, headers
+            );
     }
 
 
@@ -107,9 +122,9 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="keyId">Id of key</param>
     // Nothing being returned
-    public async Task DeleteKey(string projectId, string keyId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/keys/{keyId}", cancellationToken, addons);
-
+    public async Task DeleteKey(string projectId, string keyId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await DeleteAsync<MessageResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/keys/{keyId}"), cancellationToken, addons, headers);
     #endregion
 
     #region ProjectInvites
@@ -118,8 +133,9 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="InvitesResponse"/></returns>
-    public async Task<InvitesResponse> GetInvites(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<InvitesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}", cancellationToken, addons);
+    public async Task<InvitesResponse> GetInvites(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<InvitesResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}"), cancellationToken, addons, headers);
 
     /// <summary>
     /// Delete a project invite that has been sent
@@ -127,8 +143,10 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="email">email of the invite to be removed</param>
     //no response expected
-    public async Task DeleteInvite(string projectId, string email, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}/{email}", cancellationToken, addons);
+    public async Task DeleteInvite(string projectId, string email, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await DeleteAsync<MessageResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}/{email}"),
+            cancellationToken, addons, headers);
 
     /// <summary>
     /// Send a invite to the associated project
@@ -136,10 +154,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="inviteSchema"><see cref="InviteSchema"/> for a invite to project</param>
     /// <returns><see cref="MessageResponse"/></returns>
-    public async Task<MessageResponse> SendInvite(string projectId, InviteSchema inviteSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await PostAsync<MessageResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}",
-            RequestContentUtil.CreatePayload(inviteSchema), cancellationToken, addons);
+    public async Task<MessageResponse> SendInvite(string projectId, InviteSchema inviteSchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await PostAsync<InviteSchema, MessageResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}"), inviteSchema, cancellationToken, addons, headers
+            );
     #endregion
 
     #region Members
@@ -148,8 +167,9 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="MembersResponse"/></returns>
-    public async Task<MembersResponse> GetMembers(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<MembersResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}", cancellationToken, addons);
+    public async Task<MembersResponse> GetMembers(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<MembersResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}"), cancellationToken, addons, headers);
 
     /// <summary>
     /// Get the scopes associated with member
@@ -157,8 +177,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>
     /// <returns><see cref="MemberScopesResponse"/></returns>
-    public async Task<MemberScopesResponse> GetMemberScopes(string projectId, string memberId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<MemberScopesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}", cancellationToken, addons);
+    public async Task<MemberScopesResponse> GetMemberScopes(string projectId, string memberId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<MemberScopesResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}"),
+            cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Update the scopes fot the member
@@ -167,10 +190,12 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="memberId">Id of member</param>
     /// <param name="memberScopeSchema">updates scope options for member<see cref="MemberScopeSchema"/></param>
     /// <returns><see cref="MessageResponse"/></returns>  
-    public async Task<MessageResponse> UpdateMemberScope(string projectId, string memberId, MemberScopeSchema memberScopeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await PutAsync<MessageResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}",
-            RequestContentUtil.CreatePayload(memberScopeSchema), cancellationToken, addons);
+    public async Task<MessageResponse> UpdateMemberScope(string projectId, string memberId, MemberScopeSchema memberScopeSchema,
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await PutAsync<MemberScopeSchema, MessageResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}"), memberScopeSchema,
+            cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Remove member from project, there is no response
@@ -178,8 +203,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="memberId">Id of member</param>   
     //No response expected
-    public async Task RemoveMember(string projectId, string memberId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await DeleteAsync($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}", cancellationToken, addons);
+    public async Task RemoveMember(string projectId, string memberId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await DeleteAsync<MessageResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}"),
+            cancellationToken, addons, headers
+            );
     #endregion
 
     #region Usage
@@ -190,10 +218,12 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="UsageRequestsSchema">Project usage request options<see cref="UsageRequestsSchema"/>  </param>
     /// <returns><see cref="UsageRequestsResponse"/></returns>
-    public async Task<UsageRequestsResponse> GetUsageRequests(string projectId, UsageRequestsSchema UsageRequestsSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<UsageRequestsResponse> GetUsageRequests(string projectId, UsageRequestsSchema usageRequestsSchema,
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(UsageRequestsSchema);
-        return await GetAsync<UsageRequestsResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}?{stringedOptions}", cancellationToken, addons);
+        return await GetAsync<UsageRequestsSchema, UsageRequestsResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}"),
+            usageRequestsSchema, cancellationToken, addons, headers
+            );
     }
 
     /// <summary>
@@ -202,45 +232,49 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="requestId">Id of request</param>
     /// <returns><see cref="UsageRequestResponse"/></returns>
-    public async Task<UsageRequestResponse> GetUsageRequest(string projectId, string requestId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<UsageRequestResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}/{requestId}", cancellationToken, addons);
+    public async Task<UsageRequestResponse> GetUsageRequest(string projectId, string requestId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<UsageRequestResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}/{requestId}"),
+            cancellationToken, addons, headers
+            );
 
     /// <summary>
     /// Gets a summary of usage
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageSummarySchema">Usage summary options<see cref="UsageSummarySchema"/> </param>
+    /// <param name="getUsageSummarySchema">Usage summary options<see cref="UsageSummarySchema"/> </param>
     /// <returns><see cref="UsageSummaryResponse"/></returns>
-    public async Task<UsageSummaryResponse> GetUsageSummary(string projectId, UsageSummarySchema getProjectUsageSummarySchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<UsageSummaryResponse> GetUsageSummary(string projectId, UsageSummarySchema usageSummarySchema,
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageSummarySchema);
-        return await GetAsync<UsageSummaryResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}?{stringedOptions}", cancellationToken, addons);
+        return await GetAsync<UsageSummarySchema, UsageSummaryResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}"), usageSummarySchema, cancellationToken, addons, headers
+            );
     }
 
     /// <summary>
     /// Get usage fields 
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="getProjectUsageFieldsSchema">Project usage request field options<see cref="UsageFieldsSchema"/></param>
+    /// <param name="getUsageFieldsSchema">Project usage request field options<see cref="UsageFieldsSchema"/></param>
     /// <returns><see cref="UsageFieldsResponse"/></returns>
-    public async Task<UsageFieldsResponse> GetUsageFields(string projectId, UsageFieldsSchema getProjectUsageFieldsSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<UsageFieldsResponse> GetUsageFields(string projectId, UsageFieldsSchema usageFieldsSchema,
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        var stringedOptions = QueryParameterUtil.GetParameters(getProjectUsageFieldsSchema);
-        return await GetAsync<UsageFieldsResponse>(
-            $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}/fields?{stringedOptions}", cancellationToken, addons);
+        return await GetAsync<UsageFieldsSchema, UsageFieldsResponse>(
+            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}/fields"), usageFieldsSchema, cancellationToken, addons, headers);
     }
     #endregion
 
     #region Balances
-
     /// <summary>
     /// Gets a list of balances
     /// </summary>
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="BalancesResponse"/></returns>
-    public async Task<BalancesResponse> GetBalances(string projectId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<BalancesResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}", cancellationToken, addons);
+    public async Task<BalancesResponse> GetBalances(string projectId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<BalancesResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}"), cancellationToken, addons, headers);
 
     /// <summary>
     /// Get the balance details associated with the balance id
@@ -248,7 +282,8 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="projectId">Id of project</param>
     /// <param name="balanceId">Id of balance</param>
     /// <returns><see cref="BalanceResponse"/></returns>
-    public async Task<BalanceResponse> GetBalance(string projectId, string balanceId, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null) =>
-        await GetAsync<BalanceResponse>($"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}/{balanceId}", cancellationToken, addons);
+    public async Task<BalanceResponse> GetBalance(string projectId, string balanceId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
+        await GetAsync<BalanceResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.BALANCES}/{balanceId}"), cancellationToken, addons, headers);
     #endregion
 }

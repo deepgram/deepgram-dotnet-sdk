@@ -22,25 +22,26 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="source">Url to the file that is to be analyzed <see cref="UrlSource"></param>
     /// <param name="analyzeSchema">Options for the transcription <see cref="AnalyzeSchema"/></param>
     /// <returns><see cref="SyncResponse"/></returns>
-    public async Task<SyncResponse> AnalyzeUrl(UrlSource source, AnalyzeSchema? analyzeSchema, Dictionary<string, string>? addons = null, CancellationToken cancellationToken = default)
+    public async Task<SyncResponse> AnalyzeUrl(UrlSource source, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         VerifyNoCallBack(nameof(AnalyzeUrl), analyzeSchema);
 
-        var stringedOptions = QueryParameterUtil.GetParameters(analyzeSchema, addons);
-        return await PostAsync<SyncResponse>(
-            $"{UriSegments.READ}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(source), cancellationToken);
+        return await PostAsync<UrlSource, AnalyzeSchema, SyncResponse>(
+            GetUri(_options, UriSegments.READ), analyzeSchema, source, cancellationToken, addons, headers
+            );
     }
+
+
     /// <summary>
     /// Analyzes a file using the provided byte array
     /// </summary>
     /// <param name="source">file is the form of a byte[]</param>
     /// <param name="analyzeSchema">Options for the transcription <see cref="AnalyzeSchema"/></param>
     /// <returns><see cref="SyncResponse"/></returns>
-    public async Task<SyncResponse> AnalyzeFile(byte[] source, AnalyzeSchema? analyzeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<SyncResponse> AnalyzeFile(byte[] source, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         MemoryStream stream = new MemoryStream(source);
-        return await AnalyzeFile(stream, analyzeSchema, cancellationToken, addons);
+        return await AnalyzeFile(stream, analyzeSchema, cancellationToken, addons, headers);
     }
 
     /// <summary>
@@ -49,14 +50,13 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="source">file is the form of a stream <see cref="Stream"/></param>
     /// <param name="analyzeSchema">Options for the transcription <see cref="AnalyzeSchema"/></param>
     /// <returns><see cref="SyncResponse"/></returns>
-    public async Task<SyncResponse> AnalyzeFile(Stream source, AnalyzeSchema? analyzeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<SyncResponse> AnalyzeFile(Stream source, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         VerifyNoCallBack(nameof(AnalyzeFile), analyzeSchema);
 
-        var stringedOptions = QueryParameterUtil.GetParameters(analyzeSchema, addons);
-        return await PostAsync<SyncResponse>(
-            $"{UriSegments.READ}?{stringedOptions}",
-            RequestContentUtil.CreateStreamPayload(source), cancellationToken);
+        return await PostAsync<Stream, AnalyzeSchema, SyncResponse>(
+            GetUri(_options, UriSegments.READ), analyzeSchema, source, cancellationToken, addons, headers
+            );
     }
 
     #endregion
@@ -69,18 +69,10 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="callBack">CallBack url</param>    
     /// <param name="analyzeSchema">Options for the transcription<see cref="AnalyzeSchema"></param>
     /// <returns><see cref="AsyncResponse"/></returns>
-    public async Task<AsyncResponse> AnalyzeFileCallBack(byte[] source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<AsyncResponse> AnalyzeFileCallBack(byte[] source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        VerifyOneCallBackSet(nameof(AnalyzeFileCallBack), callBack, analyzeSchema);
-        if (callBack != null)
-            analyzeSchema.CallBack = callBack;
-
-        var stringedOptions = QueryParameterUtil.GetParameters(analyzeSchema, addons);
-        var stream = new MemoryStream();
-        stream.Write(source, 0, source.Length);
-        return await PostAsync<AsyncResponse>(
-            $"{UriSegments.READ}?{stringedOptions}",
-            RequestContentUtil.CreateStreamPayload(stream), cancellationToken);
+        MemoryStream stream = new MemoryStream(source);
+        return await AnalyzeFileCallBack(stream, callBack, analyzeSchema, cancellationToken, addons, headers);
     }
 
     /// <summary>
@@ -90,16 +82,15 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="callBack">CallBack url</param>    
     /// <param name="analyzeSchema">Options for the transcription<see cref="AnalyzeSchema"></param>
     /// <returns><see cref="AsyncResponse"/></returns>
-    public async Task<AsyncResponse> AnalyzeFileCallBack(Stream source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<AsyncResponse> AnalyzeFileCallBack(Stream source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         VerifyOneCallBackSet(nameof(AnalyzeFileCallBack), callBack, analyzeSchema);
         if (callBack != null)
             analyzeSchema.CallBack = callBack;
 
-        var stringedOptions = QueryParameterUtil.GetParameters(analyzeSchema, addons);
-        return await PostAsync<AsyncResponse>(
-            $"{UriSegments.READ}?{stringedOptions}",
-            RequestContentUtil.CreateStreamPayload(source), cancellationToken);
+        return await PostAsync<Stream, AnalyzeSchema, AsyncResponse>(
+            GetUri(_options, UriSegments.READ), analyzeSchema, source, cancellationToken, addons, headers
+            );
     }
 
     /// <summary>
@@ -109,16 +100,15 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="callBack">CallBack url</param>    
     /// <param name="analyzeSchema">Options for the transcription<see cref="AnalyzeSchema"></param>
     /// <returns><see cref="AsyncResponse"/></returns>
-    public async Task<AsyncResponse> AnalyzeUrlCallBack(UrlSource source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<AsyncResponse> AnalyzeUrlCallBack(UrlSource source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         VerifyOneCallBackSet(nameof(AnalyzeUrlCallBack), callBack, analyzeSchema);
         if (callBack != null)
             analyzeSchema.CallBack = callBack;
 
-        var stringedOptions = QueryParameterUtil.GetParameters(analyzeSchema, addons);
-        return await PostAsync<AsyncResponse>(
-            $"{UriSegments.READ}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(source), cancellationToken);
+        return await PostAsync<UrlSource, AnalyzeSchema, AsyncResponse>(
+            GetUri(_options, UriSegments.READ), analyzeSchema, source, cancellationToken, addons, headers
+            );
     }
     #endregion
 

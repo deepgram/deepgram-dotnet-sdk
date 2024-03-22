@@ -20,7 +20,10 @@ internal class HttpClientFactory
         var sp = services.BuildServiceProvider();
 
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient(httpId);
-        client.Timeout = TimeSpan.FromMinutes(DEFAULT_HTTP_TINEOUT_IN_MINUTES);
+
+        // this is ok because we are using CancellationTokenSource with a default DefaultRESTTimeout timeout
+        client.Timeout = Timeout.InfiniteTimeSpan;
+
         return client;
     }
 
@@ -69,9 +72,11 @@ internal class HttpClientFactory
         //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
         Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(baseAddress))
+        {
             //if no protocol in the address then https:// is added
             // TODO: log
             baseAddress = $"https://{baseAddress}";
+        }
 
         // TODO: log
         client.BaseAddress = new Uri(baseAddress);

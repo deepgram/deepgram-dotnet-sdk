@@ -24,21 +24,23 @@ public class OnPremClientTests
     [Test]
     public async Task ListCredentials_Should_Call_GetAsync_Returning_CredentialsResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
         var expectedResponse = new AutoFaker<CredentialsResponse>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
 
+        // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.GetAsync<CredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}").Returns(expectedResponse);
+        onPremClient.GetAsync<CredentialsResponse>(url).Returns(expectedResponse);
 
         // Act
-
         var result = await onPremClient.ListCredentials(_projectId);
 
         // Assert
-        await onPremClient.Received().GetAsync<CredentialsResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
+        await onPremClient.Received().GetAsync<CredentialsResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -50,21 +52,24 @@ public class OnPremClientTests
     [Test]
     public async Task GetCredentials_Should_Call_GetAsync_Returning_CredentialResponse()
     {
-        //Arrange 
-        var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
+        // Input and Output
         var credentialsId = new Faker().Random.Guid().ToString();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
 
+        // Fake client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         
+        // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.GetAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
+        onPremClient.GetAsync<CredentialResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await onPremClient.GetCredentials(_projectId, credentialsId);
 
         // Assert
-        await onPremClient.Received().GetAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        await onPremClient.Received().GetAsync<CredentialResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -76,22 +81,24 @@ public class OnPremClientTests
     [Test]
     public async Task DeleteCredentials_Should_Call_DeleteAsync_Returning_MessageResponse()
     {
-        //Arrange 
-        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        // Input and Output
         var credentialsId = new Faker().Random.Guid().ToString();
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var expectedResponse = new AutoFaker<MessageResponse>().Generate();
+        
+        // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         
+        // Mock methods
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
-        onPremClient.DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}").Returns(expectedResponse);
+        onPremClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
 
         // Act
-
         var result = await onPremClient.DeleteCredentials(_projectId, credentialsId);
 
         // Assert
-        await onPremClient.Received().DeleteAsync<MessageResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        await onPremClient.Received().DeleteAsync<MessageResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -104,22 +111,24 @@ public class OnPremClientTests
     [Test]
     public async Task CreateCredentials_Should_Return_CredentialResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
         var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
         var createOnPremCredentialsSchema = new CredentialsSchema();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
         
-        onPremClient.When(x => x.PostAsync<CredentialResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        onPremClient.PostAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock methods
+        onPremClient.When(x => x.PostAsync<CredentialsSchema, CredentialResponse>(Arg.Any<string>(), Arg.Any<CredentialsSchema>())).DoNotCallBase();
+        onPremClient.PostAsync<CredentialsSchema, CredentialResponse>(url, Arg.Any<CredentialsSchema>()).Returns(expectedResponse);
 
         // Act
-
         var result = await onPremClient.CreateCredentials(_projectId, createOnPremCredentialsSchema);
 
         // Assert
-        await onPremClient.Received().PostAsync<CredentialResponse>($"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}", Arg.Any<StringContent>());
+        await onPremClient.Received().PostAsync<CredentialsSchema, CredentialResponse>(url, Arg.Any<CredentialsSchema>());
 
         using (new AssertionScope())
         {

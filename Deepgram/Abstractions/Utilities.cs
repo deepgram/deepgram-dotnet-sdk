@@ -2,13 +2,13 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Utilities;
+namespace Deepgram.Abstractions;
 
-internal static class RequestContentUtil
+internal static class HttpRequestUtil
 {
     public const string DEFAULT_CONTENT_TYPE = "application/json";
 
-    static ILogger logger => LogProvider.GetLogger(nameof(RequestContentUtil));
+    static ILogger logger => LogProvider.GetLogger(nameof(HttpRequestUtil));
     static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

@@ -4,8 +4,6 @@
 
 using Deepgram.Models.Speak.v1;
 using Deepgram.Models.Authenticate.v1;
-using System.Net.Mime;
-using System;
 
 namespace Deepgram.Clients.Speak.v1;
 
@@ -24,11 +22,11 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="source">file is the form of a stream <see cref="Stream"/></param>
     /// <param name="speakSchema">Options for the transcription <see cref="SpeakSchema"/></param>
     /// <returns><see cref="SyncResponse"/></returns>
-    public async Task<SyncResponse> ToStream(TextSource source, SpeakSchema? speakSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<SyncResponse> ToStream(TextSource source, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        VerifyNoCallBack(nameof(Stream), speakSchema);
+        VerifyNoCallBack(nameof(ToStream), speakSchema);
 
-        var stringedOptions = QueryParameterUtil.GetParameters(speakSchema, addons);
         List<string> keys = new List<string> {
             Constants.ContentType,
             Constants.RequestId,
@@ -39,14 +37,14 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
             Constants.Date,
         };
 
-        var (result, stream) = await PostFileAsync<(Dictionary<string, string>, MemoryStream)>(
-            $"{UriSegments.SPEAK}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(source), keys, cancellationToken);
+        var localFileResult = await PostRetrieveLocalFileAsync<TextSource, SpeakSchema, LocalFileWithMetadata>(
+            GetUri(_options, $"{UriSegments.SPEAK}"), speakSchema, source, keys, cancellationToken, addons, headers
+            );
 
         SyncResponse response = new SyncResponse();
 
         // build up the response object
-        foreach (var item in result)
+        foreach (var item in localFileResult.Metadata)
         {
             var key = item.Key.ToLower();
 
@@ -80,14 +78,16 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
         }
 
         // add stream to response
-        response.Stream = stream;
+        response.Stream = localFileResult.Content;
 
         return response;
     }
 
-    public async Task<SyncResponse> ToFile(TextSource source, string filename, SpeakSchema? speakSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<SyncResponse> ToFile(TextSource source, string filename, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null
+        )
     {
-        var response = await ToStream(source, speakSchema, cancellationToken, addons);
+        var response = await ToStream(source, speakSchema, cancellationToken, addons, headers);
 
         // save the file
         response.Filename = filename;
@@ -111,16 +111,15 @@ public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions 
     /// <param name="callBack">CallBack url</param>    
     /// <param name="speakSchema">Options for the transcription<see cref="SpeakSchema"></param>
     /// <returns><see cref="AsyncResponse"/></returns>
-    public async Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSchema? speakSchema, CancellationToken cancellationToken = default, Dictionary<string, string>? addons = null)
+    public async Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         VerifyOneCallBackSet(nameof(StreamCallBack), callBack, speakSchema);
         if (callBack != null)
             speakSchema.CallBack = callBack;
 
-        var stringedOptions = QueryParameterUtil.GetParameters(speakSchema, addons);
-        return await PostAsync<AsyncResponse>(
-            $"{UriSegments.SPEAK}?{stringedOptions}",
-            RequestContentUtil.CreatePayload(source), cancellationToken);
+        return await PostAsync<TextSource, SpeakSchema, AsyncResponse>(
+            GetUri(_options, $"{UriSegments.SPEAK}"), speakSchema, source, cancellationToken, addons, headers);
     }
     #endregion
 

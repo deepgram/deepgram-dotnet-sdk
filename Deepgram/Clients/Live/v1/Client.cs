@@ -17,7 +17,7 @@ public class Client : IDisposable
     internal readonly DeepgramClientOptions _deepgramClientOptions;
     internal readonly string _apiKey;
     internal ClientWebSocket? _clientWebSocket;
-    internal readonly CancellationTokenSource _tokenSource = new();
+    internal CancellationTokenSource _cancellationTokenSource;
     internal bool _isDisposed;
     #endregion
 
@@ -63,7 +63,7 @@ public class Client : IDisposable
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Connect(LiveSchema options, CancellationToken ? cancellationToken = null, Dictionary<string, string>? addons = null)
+    public async Task Connect(LiveSchema options, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null)
     {
         // create client
         _clientWebSocket = new ClientWebSocket();
@@ -78,11 +78,17 @@ public class Client : IDisposable
         }
 
         // cancelation token
-        var cancelToken = cancellationToken ?? _tokenSource.Token;
+        if (cancellationToken != null)
+        {
+            _cancellationTokenSource = cancellationToken;
+        } else
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
 
         try
         {
-            await _clientWebSocket.ConnectAsync(GetUri(options, _deepgramClientOptions, addons),cancelToken).ConfigureAwait(false);
+            await _clientWebSocket.ConnectAsync(GetUri(_deepgramClientOptions, options, addons), _cancellationTokenSource.Token).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
         }
@@ -93,13 +99,11 @@ public class Client : IDisposable
 
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
             _ => ProcessSendQueue(),
-                TaskCreationOptions.LongRunning,
-                cancelToken);
+                TaskCreationOptions.LongRunning);
 
         void StartReceiverBackgroundThread() => _ = Task.Factory.StartNew(
                 _ => ProcessReceiveQueue(),
-            TaskCreationOptions.LongRunning,
-            cancelToken);
+                TaskCreationOptions.LongRunning);
     }
 
     /// <summary>
@@ -121,7 +125,7 @@ public class Client : IDisposable
         }
     }
 
-    internal async Task ProcessSendQueue(CancellationToken cancellationToken = default)
+    internal async Task ProcessSendQueue()
     {
         if (_isDisposed)
         {
@@ -133,11 +137,11 @@ public class Client : IDisposable
 
         try
         {
-            while (await _sendChannel.Reader.WaitToReadAsync(cancellationToken))
+            while (await _sendChannel.Reader.WaitToReadAsync(_cancellationTokenSource.Token))
             {
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
-                    await _clientWebSocket.SendAsync(message.Message, message.MessageType, true, cancellationToken).ConfigureAwait(false);
+                    await _clientWebSocket.SendAsync(message.Message, message.MessageType, true, _cancellationTokenSource.Token).ConfigureAwait(false);
 
                 }
             }
@@ -148,9 +152,8 @@ public class Client : IDisposable
         }
     }
 
-    internal async Task ProcessReceiveQueue(CancellationToken? cancellationToken = null)
+    internal async Task ProcessReceiveQueue()
     {
-        var cancelToken = cancellationToken ?? _tokenSource.Token;
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
             try
@@ -162,7 +165,7 @@ public class Client : IDisposable
                 {
                     do
                     {
-                        result = await _clientWebSocket.ReceiveAsync(buffer, cancelToken);
+                        result = await _clientWebSocket.ReceiveAsync(buffer, _cancellationTokenSource.Token);
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
                             Log.RequestedSocketClose(logger, result.CloseStatusDescription!);
@@ -240,11 +243,10 @@ public class Client : IDisposable
     public async Task Stop(CancellationToken? cancellationToken = null)
     {
         // send the close message and flush transcription messages
-        var cancelToken = cancellationToken ?? _tokenSource.Token;
         if (_clientWebSocket!.State != WebSocketState.Open)
             return;
 
-        await _clientWebSocket.SendAsync(new ArraySegment<byte>([]), WebSocketMessageType.Binary, true, cancelToken)
+        await _clientWebSocket.SendAsync(new ArraySegment<byte>([]), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
             .ConfigureAwait(false);
 
         // attempt to stop the connection
@@ -262,12 +264,12 @@ public class Client : IDisposable
                     await _clientWebSocket.CloseOutputAsync(
                         WebSocketCloseStatus.NormalClosure,
                         string.Empty,
-                        cancelToken)
+                        _cancellationTokenSource.Token)
                         .ConfigureAwait(false);
                 }
 
                 // Always request cancellation to the local token source, if some function has been called without a token
-                _tokenSource?.Cancel();
+                _cancellationTokenSource.Cancel();
             }
         }
         catch (Exception ex)
@@ -286,18 +288,23 @@ public class Client : IDisposable
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(LiveSchema queryParameters, DeepgramClientOptions options, Dictionary<string, string>? addons = null)
+    internal static Uri GetUri(DeepgramClientOptions options, LiveSchema parameter, Dictionary<string, string>? addons = null)
     {
         var baseUrl = GetBaseUrl(options);
-        var query = QueryParameterUtil.GetParameters(queryParameters, addons);
 
-        return new Uri($"{baseUrl}/{options.APIVersion}/{UriSegments.LISTEN}?{query}");
+        var propertyInfoList = parameter.GetType()
+            .GetProperties()
+            .Where(v => v.GetValue(parameter) is not null);
+
+        var queryString = QueryParameterUtil.UrlEncode(parameter, propertyInfoList, addons);
+
+        return new Uri($"{baseUrl}/{options.APIVersion}/{UriSegments.LISTEN}?{queryString}");
     }
 
     internal static string GetBaseUrl(DeepgramClientOptions options)
     {
         string baseAddress = Defaults.DEFAULT_URI;
-        if (options.BaseAddress is not null)
+        if (options.BaseAddress != null)
         {
             baseAddress = options.BaseAddress;
         }
@@ -305,9 +312,11 @@ public class Client : IDisposable
         //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
         Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(baseAddress))
+        {
             //if no protocol in the address then https:// is added
             // TODO: log
             baseAddress = $"wss://{baseAddress}";
+        }
 
         return baseAddress;
     }
@@ -330,8 +339,11 @@ public class Client : IDisposable
             return;
         }
 
-        _tokenSource.Cancel();
-        _tokenSource.Dispose();
+        if (_cancellationTokenSource != null)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
         _sendChannel?.Writer.Complete();
         _clientWebSocket?.Dispose();
 

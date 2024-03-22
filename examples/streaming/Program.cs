@@ -13,10 +13,9 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
-            // Initialize the LiveClient with your API key and options
+            // Replace "REPLACE-WITH-YOUR-API-KEY" with your actual Deepgram API key
             var apiKey = "REPLACE-WITH-YOUR-API-KEY";
-            var options = new DeepgramClientOptions();
-            var liveClient = new LiveClient(apiKey, options);
+            var liveClient = new LiveClient(apiKey);
 
             // Subscribe to the EventResponseReceived event
             liveClient.EventResponseReceived += (sender, e) =>

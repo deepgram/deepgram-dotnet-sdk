@@ -11,7 +11,7 @@ public class LogProviderTest
     [Test]
     public void SetLogFactory_Should_Set_LoggerFactory()
     {
-        //Arrange 
+        // Input and Output 
         var loggerFactory = Substitute.For<ILoggerFactory>();
 
         //Act
