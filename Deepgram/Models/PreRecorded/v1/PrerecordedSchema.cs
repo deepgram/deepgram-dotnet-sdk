@@ -95,6 +95,14 @@ public class PrerecordedSchema
     public bool? Dictation { get; set; }
 
     /// <summary>
+    /// Encoding allows you to specify the expected encoding of your submitted audio.
+    /// <see href="https://developers.deepgram.com/docs/encoding">
+    /// supported encodings <see cref="AudioEncoding"/>
+    /// </summary>
+    [JsonPropertyName("encoding")]
+    public string? Encoding { get; set; }
+
+    /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.
     /// Extra metadata is limited to 2048 characters per key-value pair.
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
@@ -186,6 +194,14 @@ public class PrerecordedSchema
     /// </summary>
     [JsonPropertyName("replace")]
     public List<string>? Replace { get; set; }
+
+    /// <summary>
+    /// Sample Rate allows you to specify the sample rate of your submitted audio.
+    /// <see href="https://developers.deepgram.com/docs/sample-rate">
+    /// only applies when Encoding has a value
+    /// </summary>
+    [JsonPropertyName("sample_rate")]
+    public int? SampleRate { get; set; }
 
     /// <summary>
     /// Search searches for terms or phrases in submitted audio. 
