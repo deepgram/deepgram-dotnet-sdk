@@ -247,5 +247,8 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("tag")]
         public string[] Tag { get; set; }
+
+        [JsonProperty("vad_events")]
+        public bool VadEvents { get; set; }
     }
 }

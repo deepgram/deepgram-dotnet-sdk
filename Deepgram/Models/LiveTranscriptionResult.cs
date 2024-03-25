@@ -50,5 +50,8 @@ namespace Deepgram.Models
         /// </summary>
         [JsonProperty("tags")]
         public string[] Tags { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
     }
 }
