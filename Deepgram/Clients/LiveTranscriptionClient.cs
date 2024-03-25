@@ -11,6 +11,7 @@ using Deepgram.Models;
 using Deepgram.Utilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Deepgram.Clients
 {
@@ -54,6 +55,11 @@ namespace Deepgram.Clients
         /// Fires when a transcript is received from the Deepgram API
         /// </summary>
         public event EventHandler<TranscriptReceivedEventArgs> TranscriptReceived;
+
+        /// <summary>
+        /// Fires if vad_events enabled and speech start is detected
+        /// </summary>
+        public event EventHandler<SpeechStartedEventArgs> SpeechStarted;
 
         /// <summary>
         /// Retrieves the connection state of the WebSocket
@@ -264,12 +270,32 @@ namespace Deepgram.Clients
                         if (result.MessageType == WebSocketMessageType.Text)
                         {
                             var text = Encoding.UTF8.GetString(ms.ToArray());
+
                             if (text != null)
                             {
-                                var transcript = JsonConvert.DeserializeObject<LiveTranscriptionResult>(text);
-                                if (transcript != null)
+                                //get value of type property
+                                JObject jsonObject = JObject.Parse(text);
+                                string typeValue = jsonObject["type"]?.ToString();
+
+                                switch (typeValue)
                                 {
-                                    TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+                                    case "Results":
+                                        var transcript = JsonConvert.DeserializeObject<LiveTranscriptionResult>(text);
+                                        if (transcript != null)
+                                        {
+                                            TranscriptReceived?.Invoke(null, new TranscriptReceivedEventArgs(transcript));
+                                        }
+                                        break;
+                                    case "SpeechStarted":
+                                        var started = JsonConvert.DeserializeObject<LiveTranscriptionSpeechStarted>(text);
+                                        if (started != null)
+                                        {
+                                            SpeechStarted?.Invoke(null, new SpeechStartedEventArgs(started));
+                                        }
+                                        break;
+                                    default:
+                                        // add more...
+                                        break;
                                 }
                             }
                         }
