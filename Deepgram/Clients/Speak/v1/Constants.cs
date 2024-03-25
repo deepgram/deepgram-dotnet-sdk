@@ -5,7 +5,7 @@
 namespace Deepgram.Clients.Speak.v1;
 
 /// <summary> 
-/// Expected encoding of the submitted streaming audio. 
+/// Headers of interest in the return values from the Deepgram Speak API.
 /// </summary> 
 public static class Constants
 {

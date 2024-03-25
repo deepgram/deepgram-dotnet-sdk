@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.PreRecorded.v1;
 using Deepgram.Clients.PreRecorded.v1;
+using Deepgram.Models.PreRecorded.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -23,25 +23,26 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeUrl_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<SyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = new AutoFaker<UrlSource>().Generate();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-
-        prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
+        prerecordedClient.PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeUrl(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>());
 
         using (new AssertionScope())
         {
@@ -54,50 +55,53 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeUrl_Should_Throw_ArgumentException_If_CallBack_Not_Null()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<SyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = new AutoFaker<UrlSource>().Generate();
+        
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
+        prerecordedClient.PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
 
         // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrl(source, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>());
     }
 
     [Test]
     public async Task TranscribeUrlCallBack_Should_Call_PostAsync_Returning_SyncResponse_With_CallBack_Parameter()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
-        var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
+        
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
-        var callBackParameter = prerecordedSchema.CallBack;
-        //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
-        prerecordedSchema.CallBack = null;
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
+        prerecordedClient.PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
 
+        //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
+        var callBackParameter = prerecordedSchema.CallBack;
+        prerecordedSchema.CallBack = null;
 
         // Act
         var result = await prerecordedClient.TranscribeUrlCallBack(source, callBackParameter, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -109,23 +113,25 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeUrlCallBack_Should_Call_PostAsync_Returning_SyncResponse_With_CallBack_Property()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
+        prerecordedClient.PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeUrlCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.Received().PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -137,71 +143,77 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeUrlCallBack_Should_Throw_ArgumentException_With_CallBack_Property_And_CallBack_Parameter_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>())).DoNotCallBase();
+        prerecordedClient.PostAsync<PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>()).Returns(expectedResponse);
+
         var callBackParameter = prerecordedSchema.CallBack;
 
-        // Act Assert
+        // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrlCallBack(source, callBackParameter, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>());
     }
 
     [Test]
     public async Task TranscribeUrlCallBack_Should_Throw_ArgumentException_With_No_CallBack_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
-        var stringedQuery = QueryParameterUtil.GetParameters(prerecordedSchema);
 
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<StringContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>())).DoNotCallBase();
+        prerecordedClient.PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
 
-
-        // Act Assert
+        // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeUrlCallBack(source, null, prerecordedSchema))
             .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedQuery}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>());
     }
 
     [Test]
     public async Task TranscribeFile_With_Stream_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<SyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
+
+        // Fake Client
         var source = GetFakeStream(GetFakeByteArray());
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
-        
-        prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFile(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -213,24 +225,26 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFile_With_Bytes_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<SyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
         prerecordedSchema.CallBack = null;
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
-        
-        prerecordedClient.When(x => x.PostAsync<SyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFile(source, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<SyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, SyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -242,23 +256,25 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFileCallBack_With_Stream_With_CallBack_Property_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeStream(GetFakeByteArray());
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -270,23 +286,25 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFileCallBack_With_Bytes_With_CallBack_Property_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, null, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
 
         using (new AssertionScope())
         {
@@ -299,29 +317,29 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFileCallBack_With_Stream_With_CallBack_Parameter_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeStream(GetFakeByteArray());
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
-
-        var callBack = prerecordedSchema.CallBack;
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
+        var callBack = prerecordedSchema.CallBack;
         prerecordedSchema.CallBack = null;
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, callBack, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -333,29 +351,29 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFileCallBack_With_Bytes_With_CallBack_Parameter_Should_Call_PostAsync_Returning_SyncResponse()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
 
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
-
-        var callBack = prerecordedSchema.CallBack;
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
 
         //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
+        var callBack = prerecordedSchema.CallBack;
         prerecordedSchema.CallBack = null;
 
         // Act
         var result = await prerecordedClient.TranscribeFileCallBack(source, callBack, prerecordedSchema);
 
         // Assert
-        await prerecordedClient.Received().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>());
+        await prerecordedClient.Received().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -367,51 +385,53 @@ public class PreRecordedClientTests
     [Test]
     public async Task TranscribeFileCallBack_With_Stream_Throw_ArgumentException_With_CallBack_Property_And_CallBack_Parameter_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeStream(GetFakeByteArray());
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
 
+        // Fake Client
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
+        
         var callBack = prerecordedSchema.CallBack;
 
-
-        // Act  Assert
+        // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeFileCallBack(source, callBack, prerecordedSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
-
-
+        await prerecordedClient.DidNotReceive().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
     }
 
     [Test]
     public async Task TranscribeFileCallBack_With_Bytes_Should_Throw_ArgumentException_With_No_CallBack_Set()
     {
-        //Arrange 
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.LISTEN}");
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PrerecordedSchema>().Generate();
-        // prerecordedSchema is not null here as we first need to get the querystring with the callBack included
-        var stringedOptions = QueryParameterUtil.GetParameters(prerecordedSchema);
         var source = GetFakeByteArray();
 
+        // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<PreRecordedClient>(_apiKey, _options);
         
-        prerecordedClient.When(x => x.PostAsync<AsyncResponse>(Arg.Any<string>(), Arg.Any<HttpContent>())).DoNotCallBase();
-        prerecordedClient.PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<HttpContent>()).Returns(expectedResponse);
+        // Mock Methods
+        prerecordedClient.When(x => x.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
+        prerecordedClient.PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
+        
         prerecordedSchema.CallBack = null;
 
-        // Act  Assert
+        // Act and Assert
         await prerecordedClient.Invoking(y => y.TranscribeFileCallBack(source, null, prerecordedSchema))
            .Should().ThrowAsync<ArgumentException>();
 
-        await prerecordedClient.DidNotReceive().PostAsync<AsyncResponse>($"{UriSegments.LISTEN}?{stringedOptions}", Arg.Any<StringContent>());
+        await prerecordedClient.DidNotReceive().PostAsync<Stream, PrerecordedSchema, AsyncResponse>(url, Arg.Any<PrerecordedSchema>(), Arg.Any<Stream>());
     }
 
     private static Stream GetFakeStream(byte[] source)
@@ -422,5 +442,4 @@ public class PreRecordedClientTests
     }
 
     private static byte[] GetFakeByteArray() => new Faker().Random.Bytes(10);
-
 }

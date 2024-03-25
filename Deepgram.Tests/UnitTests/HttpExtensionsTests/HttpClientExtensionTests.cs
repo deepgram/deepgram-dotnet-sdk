@@ -27,7 +27,7 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress()
     {
-        //Arrange 
+        // Input and Output 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient().Returns(httpClient);
 
@@ -45,7 +45,7 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress()
     {
-        //Arrange        
+        // Input and Output        
         var expectedBaseAddress = $"https://{_customUrl}/v1/";
         var customBaseAddress = $"https://{_customUrl}";
         _clientOptions.BaseAddress = customBaseAddress;
@@ -66,7 +66,7 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress_And_Custom_Headers()
     {
-        //Arrange 
+        // Input and Output 
         _clientOptions.Headers = FakeHeaders();
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient().Returns(httpClient);
@@ -86,7 +86,7 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress_And_Custom_Headers()
     {
-        //Arrange       
+        // Input and Output       
         _clientOptions.Headers = FakeHeaders();
 
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
@@ -113,7 +113,7 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Predefined_values()
     {
-        //Arrange       
+        // Input and Output       
         _clientOptions.Headers = FakeHeaders();
         var expectedBaseAddress = $"https://{_customUrl}/v1/";
         var customBaseAddress = $"https://{_customUrl}";

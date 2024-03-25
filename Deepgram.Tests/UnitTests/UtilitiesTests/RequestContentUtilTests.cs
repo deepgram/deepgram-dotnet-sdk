@@ -3,19 +3,21 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Manage.v1;
+using Deepgram.Abstractions;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
-public class RequestContentUtilTests
+
+public class HttpRequestUtilTests
 {
     [Test]
     public void CreatePayload_Should_Return_StringContent()
     {
 
-        //Arrange       
+        // Input and Output       
         var project = new AutoFaker<Project>().Generate();
 
         //Act
-        var result = RequestContentUtil.CreatePayload(project);
+        var result = HttpRequestUtil.CreatePayload(project);
 
         //Assert
         using (new AssertionScope())
@@ -29,12 +31,12 @@ public class RequestContentUtilTests
     [Test]
     public void CreateStreamPayload_Should_Return_HttpContent()
     {
-        //Arrange 
+        // Input and Output 
         var source = System.Text.Encoding.ASCII.GetBytes("Acme Unit Testing");
         var stream = new MemoryStream(source);
 
         //Act
-        var result = RequestContentUtil.CreateStreamPayload(stream);
+        var result = HttpRequestUtil.CreateStreamPayload(stream);
 
         //Assert
         using (new AssertionScope())

@@ -1,6 +1,7 @@
 using Deepgram;
 using Deepgram.Models.Speak.v1;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace SampleApp
 {
