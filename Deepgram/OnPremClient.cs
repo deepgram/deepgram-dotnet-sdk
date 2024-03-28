@@ -12,7 +12,7 @@ namespace Deepgram;
 /// </summary>
 public class OnPremClient : Client
 {
-    public OnPremClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public OnPremClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

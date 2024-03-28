@@ -14,39 +14,18 @@ public class Client : IDisposable
 {
     #region Fields
     internal ILogger logger => LogProvider.GetLogger(this.GetType().Name);
-    internal readonly DeepgramClientOptions _deepgramClientOptions;
-    internal readonly string _apiKey;
+    internal readonly DeepgramWsClientOptions _deepgramClientOptions;
     internal ClientWebSocket? _clientWebSocket;
     internal CancellationTokenSource _cancellationTokenSource;
     internal bool _isDisposed;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
-    /// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-    public Client(string apiKey = "", DeepgramClientOptions? options = null)
+    /// <param name="deepgramClientOptions"><see cref="DeepgramWsClientOptions"/> for HttpClient Configuration</param>
+    public Client(string? apiKey = null, DeepgramWsClientOptions? options = null)
     {
-        options ??= new DeepgramClientOptions();
-
-        // user provided takes precedence
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            // then try the environment variable
-            // TODO: log
-            apiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                // TODO: log
-            }
-        }
-        if (!options.OnPrem && string.IsNullOrEmpty(apiKey))
-        {
-            // TODO: log
-            throw new ArgumentException("Deepgram API Key is invalid");
-        }
-
-        // housekeeping
+        options ??= new DeepgramWsClientOptions(apiKey);
         _deepgramClientOptions = options;
-        _apiKey = apiKey;
     }
 
     #region Subscribe Events
@@ -63,15 +42,22 @@ public class Client : IDisposable
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Connect(LiveSchema options, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null)
+    public async Task Connect(LiveSchema options, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         // create client
         _clientWebSocket = new ClientWebSocket();
 
         // set headers
-        _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_apiKey}");
+        _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_deepgramClientOptions.ApiKey}");
         if (_deepgramClientOptions.Headers is not null) {
             foreach (var header in _deepgramClientOptions.Headers)
+            {
+                _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
+            }
+        }
+        if (headers is not null)
+        {
+            foreach (var header in headers)
             {
                 _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
             }
@@ -88,7 +74,9 @@ public class Client : IDisposable
 
         try
         {
-            await _clientWebSocket.ConnectAsync(GetUri(_deepgramClientOptions, options, addons), _cancellationTokenSource.Token).ConfigureAwait(false);
+            var _uri = GetUri(_deepgramClientOptions, options, addons);
+            Console.WriteLine(_uri); // TODO: logging
+            await _clientWebSocket.ConnectAsync(_uri, _cancellationTokenSource.Token).ConfigureAwait(false);
             StartSenderBackgroundThread();
             StartReceiverBackgroundThread();
         }
@@ -288,37 +276,15 @@ public class Client : IDisposable
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
 
-    internal static Uri GetUri(DeepgramClientOptions options, LiveSchema parameter, Dictionary<string, string>? addons = null)
+    internal static Uri GetUri(DeepgramWsClientOptions options, LiveSchema parameter, Dictionary<string, string>? addons = null)
     {
-        var baseUrl = GetBaseUrl(options);
-
         var propertyInfoList = parameter.GetType()
             .GetProperties()
             .Where(v => v.GetValue(parameter) is not null);
 
         var queryString = QueryParameterUtil.UrlEncode(parameter, propertyInfoList, addons);
 
-        return new Uri($"{baseUrl}/{options.APIVersion}/{UriSegments.LISTEN}?{queryString}");
-    }
-
-    internal static string GetBaseUrl(DeepgramClientOptions options)
-    {
-        string baseAddress = Defaults.DEFAULT_URI;
-        if (options.BaseAddress != null)
-        {
-            baseAddress = options.BaseAddress;
-        }
-
-        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
-        Regex regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
-        if (!regex.IsMatch(baseAddress))
-        {
-            //if no protocol in the address then https:// is added
-            // TODO: log
-            baseAddress = $"wss://{baseAddress}";
-        }
-
-        return baseAddress;
+        return new Uri($"{options.BaseAddress}/{UriSegments.LISTEN}?{queryString}");
     }
 
     private void ProcessException(string action, Exception ex)

@@ -27,32 +27,15 @@ internal class HttpClientFactory
         return client;
     }
 
-    internal static HttpClient ConfigureDeepgram(HttpClient client, string apiKey = "", DeepgramClientOptions? options = null)
+    internal static HttpClient ConfigureDeepgram(HttpClient client, DeepgramHttpClientOptions? options = null)
     {
-        options ??= new DeepgramClientOptions();
-
-        // user provided takes precedence
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            // then try the environment variable
-            // TODO: log
-            apiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                // TODO: log
-            }
-        }
-        if (!options.OnPrem && string.IsNullOrEmpty(apiKey))
-        {
-            // TODO: log
-            throw new ArgumentException("Deepgram API Key is invalid");
-        }
+        options ??= new DeepgramHttpClientOptions();
 
         // headers
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", apiKey);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
 
         if (options.Headers is not null)
             foreach (var header in options.Headers)
@@ -60,26 +43,8 @@ internal class HttpClientFactory
                 client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
 
-        // base url
-        var baseAddress = $"{Defaults.DEFAULT_URI}/{options.APIVersion}/";
-        if (options.BaseAddress is not null)
-        {
-            // TODO: log
-            baseAddress = $"{options.BaseAddress}/{options.APIVersion}/";
-        }
         // TODO: log
-
-        //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
-        Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
-        if (!regex.IsMatch(baseAddress))
-        {
-            //if no protocol in the address then https:// is added
-            // TODO: log
-            baseAddress = $"https://{baseAddress}";
-        }
-
-        // TODO: log
-        client.BaseAddress = new Uri(baseAddress);
+        client.BaseAddress = new Uri(options.BaseAddress);
 
         return client;
     }

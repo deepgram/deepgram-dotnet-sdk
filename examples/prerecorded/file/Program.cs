@@ -2,15 +2,14 @@ using Deepgram;
 using Deepgram.Models.PreRecorded.v1;
 using System.Text.Json;
 
-namespace SampleApp
+namespace PreRecorded
 {
     class Program
     {
         static async Task Main(string[] args)
         {
-            // Replace "REPLACE-WITH-YOUR-API-KEY" with your actual Deepgram API key
-            var apiKey = "REPLACE-WITH-YOUR-API-KEY";
-            var deepgramClient = new PreRecordedClient(apiKey);
+            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+            var deepgramClient = new PreRecordedClient();
 
             var response = await deepgramClient.TranscribeUrl(
                 new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),

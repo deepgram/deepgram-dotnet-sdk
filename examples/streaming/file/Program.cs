@@ -13,16 +13,22 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
-            // Replace "REPLACE-WITH-YOUR-API-KEY" with your actual Deepgram API key
-            var apiKey = "REPLACE-WITH-YOUR-API-KEY";
-            var liveClient = new LiveClient(apiKey);
+            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+            var liveClient = new LiveClient();
 
             // Subscribe to the EventResponseReceived event
             liveClient.EventResponseReceived += (sender, e) =>
             {
                 if (e.Response.Transcription != null)
                 {
-                    Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
+                    if (e.Response.Transcription.Channel.Alternatives[0].Transcript == "")
+                    {
+                        Console.WriteLine("Empty transcription received.");
+                        return;
+                    }
+
+                    // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
+                    Console.WriteLine($"Speaker: {e.Response.Transcription.Channel.Alternatives[0].Transcript}");
                 }
                 else if (e.Response.SpeechStarted != null)
                 {
@@ -54,7 +60,7 @@ namespace SampleApp
             liveClient.Send(audioData);
 
             // Wait for a while to receive responses
-            await Task.Delay(10000);
+            await Task.Delay(45000);
 
             // Stop the connection
             await liveClient.Stop();

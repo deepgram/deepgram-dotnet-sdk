@@ -1,7 +1,6 @@
 using Deepgram;
 using Deepgram.Models.Speak.v1;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace SampleApp
 {
@@ -9,9 +8,8 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
-            // Replace "REPLACE-WITH-YOUR-API-KEY" with your actual Deepgram API key
-            var apiKey = "REPLACE-WITH-YOUR-API-KEY";
-            var deepgramClient = new SpeakClient(apiKey);
+            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+            var deepgramClient = new SpeakClient();
 
             var response = await deepgramClient.ToFile(
                 new TextSource("Hello World!"),
