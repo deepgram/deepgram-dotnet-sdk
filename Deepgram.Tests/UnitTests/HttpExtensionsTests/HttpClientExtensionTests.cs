@@ -12,48 +12,50 @@ public class HttpClientTests
 {
     readonly string _customUrl = "acme.com";
     IHttpClientFactory _httpClientFactory;
-    DeepgramClientOptions _clientOptions;
-    string _apiKey;
 
     [SetUp]
     public void Setup()
     {
         _httpClientFactory = Substitute.For<IHttpClientFactory>();
-        _clientOptions = new DeepgramClientOptions();
-        _apiKey = new Faker().Random.Guid().ToString();
     }
-
 
     [Test]
     public void Should_Return_HttpClient_With_Default_BaseAddress()
     {
         // Input and Output 
+        var _apiKey = new Faker().Random.Guid().ToString();
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey);
+
+        // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
-        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1");
         };
     }
 
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress()
     {
-        // Input and Output        
-        var expectedBaseAddress = $"https://{_customUrl}/v1/";
+        // Input and Output
+        var expectedBaseAddress = $"https://{_customUrl}/v1";
         var customBaseAddress = $"https://{_customUrl}";
-        _clientOptions.BaseAddress = customBaseAddress;
+        var _apiKey = new Faker().Random.Guid().ToString();
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress);
+
+        // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
         _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
-        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -67,18 +69,21 @@ public class HttpClientTests
     public void Should_Return_HttpClient_With_Default_BaseAddress_And_Custom_Headers()
     {
         // Input and Output 
-        _clientOptions.Headers = FakeHeaders();
+        var _apiKey = new Faker().Random.Guid().ToString();
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, null, null, null, FakeHeaders());
+
+        // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
-        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
         {
             SUT.Should().NotBeNull();
-            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1/");
+            SUT.BaseAddress.Should().Be($"https://{Defaults.DEFAULT_URI}/v1");
             SUT.DefaultRequestHeaders.Should().ContainKey(_clientOptions.Headers.First().Key);
         };
     }
@@ -86,20 +91,20 @@ public class HttpClientTests
     [Test]
     public void Should_Return_HttpClient_With_Custom_BaseAddress_And_Custom_Headers()
     {
-        // Input and Output       
-        _clientOptions.Headers = FakeHeaders();
+        // Input and Output
+        var expectedBaseAddress = $"https://{_customUrl}/v1";
+        var customBaseAddress = $"https://{_customUrl}";
+        var _apiKey = new Faker().Random.Guid().ToString();
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, null, FakeHeaders());
 
+        // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
         httpClient.BaseAddress = null;
         _httpClientFactory.CreateClient().Returns(httpClient);
 
-        var expectedBaseAddress = $"https://{_customUrl}/v1/";
-        var customBaseAddress = $"https://{_customUrl}";
-        _clientOptions.BaseAddress = customBaseAddress;
-
 
         //Act
-        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _clientOptions);
 
         //Assert 
         using (new AssertionScope())
@@ -111,19 +116,20 @@ public class HttpClientTests
     }
 
     [Test]
-    public void Should_Return_HttpClient_With_Predefined_values()
+    public void Should_Return_HttpClient_With_Predefined_Values()
     {
-        // Input and Output       
-        _clientOptions.Headers = FakeHeaders();
-        var expectedBaseAddress = $"https://{_customUrl}/v1/";
+        // Input and Output
+        var expectedBaseAddress = $"https://{_customUrl}/v1";
         var customBaseAddress = $"https://{_customUrl}";
-        _clientOptions.BaseAddress = customBaseAddress;
-        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
+        var _apiKey = new Faker().Random.Guid().ToString();
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, null, FakeHeaders());
 
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
         _httpClientFactory.CreateClient().Returns(httpClient);
 
         //Act
-        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _apiKey, _clientOptions);
+        var SUT = HttpClientFactory.ConfigureDeepgram(httpClient, _clientOptions);
 
         //Assert 
         using (new AssertionScope())

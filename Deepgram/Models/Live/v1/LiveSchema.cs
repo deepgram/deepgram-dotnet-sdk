@@ -187,13 +187,13 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/understanding-end-of-speech-detection-while-streaming"/>
     /// </summary>
     [JsonPropertyName("utterance_end_ms")]
-    public int? UtteranceEnd { get; set; }
+    public string? UtteranceEnd { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("vad_events")]
-    public int? VadEvents { get; set; }
+    public bool? VadEvents { get; set; }
 
     /// <summary>
     /// Version of the model to use.

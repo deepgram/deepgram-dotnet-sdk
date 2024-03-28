@@ -9,50 +9,50 @@ public record TranscriptionResponse
     /// TODO
     /// </summary>
     [JsonPropertyName("channel")]
-    public Channel? Channel { get; set; }
+    public Channel Channel { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("channel_index")]
-    public IReadOnlyList<int>? ChannelIndex { get; set; }
+    public IReadOnlyList<int> ChannelIndex { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("duration")]
-    public double? Duration { get; set; }
+    public double Duration { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("is_final")]
-    public bool? IsFinal { get; set; }
+    public bool IsFinal { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("metadata")]
-    public MetaData? MetaData { get; set; }
+    public MetaData MetaData { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("speech_final")]
-    public bool? SpeechFinal { get; set; }
+    public bool SpeechFinal { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("start")]
-    public decimal? Start { get; set; }
+    public decimal Start { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.Results;
+    public LiveType Type { get; set; } = LiveType.Results;
 
     // TODO: DYV is this needed???
     /// <summary>

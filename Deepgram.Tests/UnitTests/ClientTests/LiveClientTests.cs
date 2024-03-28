@@ -12,18 +12,18 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class LiveClientTests
 {
-    DeepgramClientOptions _options;
+    DeepgramWsClientOptions _options;
     WebSocketReceiveResult _webSocketReceiveResult;
     LiveClient _liveClient;
 
     [SetUp]
     public void Setup()
     {
-        var apiKey = new Faker().Random.Guid().ToString();
-        // will set up with base address set to - api.deepgram.com
-        _options = new DeepgramClientOptions();
+        var _apiKey = new Faker().Random.Guid().ToString();
+        _options = new DeepgramWsClientOptions(_apiKey, null, null, true);
+
         _webSocketReceiveResult = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
-        _liveClient = new LiveClient(apiKey, _options);
+        _liveClient = new LiveClient(_apiKey, _options);
     }
 
     [TearDown]
@@ -109,42 +109,7 @@ public class LiveClientTests
         }
     }
 
-
     #region Helpers
-    [Test]
-    public void GetBaseUrl_Should_Return_WSS_Protocol_When_DeepgramClientOptions_BaseAddress_Contains_No_Protocol()
-    {
-        // Input and Output
-        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
-
-        //Act
-        var result = LiveClient.GetBaseUrl(_options);
-
-        //Assert
-        result.Should().NotBeNullOrEmpty();
-        result.Should().StartWith("wss://");
-        result.Should().BeEquivalentTo(expectedUrl);
-    }
-
-    [Test]
-    public void GetBaseUrl_Should_Return_WSS_Protocol_When_BaseAddress_Contains_WSS_Protocol()
-    {
-        // Input and Output
-        var expectedUrl = $"wss://{Defaults.DEFAULT_URI}";
-        _options.BaseAddress = $"wss://{Defaults.DEFAULT_URI}";
-
-        //Act
-        var result = LiveClient.GetBaseUrl(_options);
-
-        //Assert
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNullOrEmpty();
-            result.Should().StartWith("wss://");
-            result.Should().BeEquivalentTo(expectedUrl);
-        }
-    }
-
     [Test]
     public void GetUri_Should_Return_Correctly_Formatted_Uri()
     {
@@ -153,7 +118,6 @@ public class LiveClientTests
         {
             Diarize = true,
         };
-        _options.BaseAddress = Defaults.DEFAULT_URI;
         var expectedUriStart = $"wss://{Defaults.DEFAULT_URI}/v1";
         var expectedQuery = $"{UriSegments.LISTEN}?diarize=true";
         var expectedCompleteUri = new Uri($"{expectedUriStart}/{expectedQuery}");

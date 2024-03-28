@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,18 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Deepgram\Deepgram.csproj" />
+    <ProjectReference Include="..\..\..\Deepgram.Microphone\Deepgram.Microphone.csproj" />
+    <ProjectReference Include="..\..\..\Deepgram\Deepgram.csproj" />
+    <ProjectReference Include="..\..\..\Deepgram\Microphone\Microphone.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <Using Include="Deepgram" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="preamble.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-
+ 
 </Project>

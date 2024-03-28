@@ -6,7 +6,12 @@ namespace Deepgram.Constants;
 
 public static class Defaults
 {
-    // Deepgram specific consts
+    // Default URI for the Deepgram API
     public const string DEFAULT_URI = "api.deepgram.com";
+
+    // Current supported API version
+    public const string DEFAULT_API_VERSION = "v1";
+
+    // Default API key environment variable
     public const string DEEPGRAM_API_KEY = "DEEPGRAM_API_KEY";
 }
