@@ -22,6 +22,6 @@ public record SpeechStartedResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("last_word_end")]
+    [JsonPropertyName("timestamp")]
     public decimal? Timestamp { get; set; }
 }

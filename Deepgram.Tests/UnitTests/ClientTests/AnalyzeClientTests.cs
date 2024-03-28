@@ -10,14 +10,14 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class AnalyzeClientTests
 {
-    DeepgramClientOptions _options;
+    DeepgramHttpClientOptions _options;
     string _apiKey;
 
     [SetUp]
     public void Setup()
     {
-        _options = new DeepgramClientOptions();
         _apiKey = new Faker().Random.Guid().ToString();
+        _options = new DeepgramHttpClientOptions(_apiKey, null, null, true);
     }
 
     [Test]
