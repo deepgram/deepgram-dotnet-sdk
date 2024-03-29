@@ -11,8 +11,8 @@ namespace Deepgram.Clients.Analyze.v1;
 /// Implements version 1 of the Analyze Client.
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
-/// <param name="deepgramClientOptions"><see cref="DeepgramClientOptions"/> for HttpClient Configuration</param>
-public class Client(string apiKey, DeepgramClientOptions? deepgramClientOptions = null)
+/// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
+public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null)
     : AbstractRestClient(apiKey, deepgramClientOptions)
 {
     #region NoneCallBacks

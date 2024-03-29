@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram", "Deepgram\Deepgr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Tests", "Deepgram.Tests\Deepgram.Tests.csproj", "{12C80273-08DD-494C-B06D-DFC6D40B1D95}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Microphone", "Deepgram.Microphone\Deepgram.Microphone.csproj", "{C8E58048-EC70-4549-AC67-F68C1D4FA4D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12C80273-08DD-494C-B06D-DFC6D40B1D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8E58048-EC70-4549-AC67-F68C1D4FA4D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8E58048-EC70-4549-AC67-F68C1D4FA4D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8E58048-EC70-4549-AC67-F68C1D4FA4D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8E58048-EC70-4549-AC67-F68C1D4FA4D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

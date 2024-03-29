@@ -12,7 +12,7 @@ namespace Deepgram;
 /// </summary>
 public class PreRecordedClient : Client
 {
-    public PreRecordedClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public PreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

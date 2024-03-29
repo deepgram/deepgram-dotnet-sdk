@@ -12,7 +12,7 @@ namespace Deepgram;
 /// </summary>
 public class SpeakClient : Client
 {
-    public SpeakClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public SpeakClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

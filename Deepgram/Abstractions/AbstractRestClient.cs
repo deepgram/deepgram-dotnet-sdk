@@ -22,18 +22,18 @@ public abstract class AbstractRestClient
     /// <summary>
     /// Copy of the options for the client
     /// </summary>
-    internal DeepgramClientOptions _options;
+    internal DeepgramHttpClientOptions _options;
 
     /// <summary>
     /// Constructor that take the options and a httpClient
     /// </summary>
     /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
 
-    internal AbstractRestClient(string apiKey = "", DeepgramClientOptions? options = null)
+    internal AbstractRestClient(string? apiKey = null, DeepgramHttpClientOptions? options = null)
     {
-        options ??= new DeepgramClientOptions();
+        options ??= new DeepgramHttpClientOptions(apiKey);
         _httpClient = HttpClientFactory.Create();
-        _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, apiKey, options);
+        _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, options);
         _options = options;
     }
 
@@ -506,30 +506,9 @@ public abstract class AbstractRestClient
         }
     }
 
-    internal static string GetUri(DeepgramClientOptions options, string path)
+    internal static string GetUri(DeepgramHttpClientOptions options, string path)
     {
-        var baseUrl = GetBaseUrl(options);
-        return $"{baseUrl}/{options.APIVersion}/{path}";
-    }
-
-    internal static string GetBaseUrl(DeepgramClientOptions options)
-    {
-        string baseAddress = Defaults.DEFAULT_URI;
-        if (options.BaseAddress != null)
-        {
-            baseAddress = options.BaseAddress;
-        }
-
-        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
-        Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
-        if (!regex.IsMatch(baseAddress))
-        {
-            //if no protocol in the address then https:// is added
-            // TODO: log
-            baseAddress = $"https://{baseAddress}";
-        }
-
-        return baseAddress;
+        return $"{options.BaseAddress}/{path}";
     }
 }
 

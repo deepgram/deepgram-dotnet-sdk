@@ -6,7 +6,7 @@ using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Tests.Fakes;
 
-public class ConcreteRestClient(string apiKey, DeepgramClientOptions? deepgramClientOptions)
+public class ConcreteRestClient(string apiKey, DeepgramHttpClientOptions? deepgramClientOptions)
     : AbstractRestClient(apiKey, deepgramClientOptions)
 {
 }

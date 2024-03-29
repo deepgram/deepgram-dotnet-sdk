@@ -12,7 +12,7 @@ namespace Deepgram;
 /// </summary>
 public class AnalyzeClient : Client
 {
-    public AnalyzeClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public AnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

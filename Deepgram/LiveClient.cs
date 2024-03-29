@@ -12,7 +12,7 @@ namespace Deepgram;
 /// </summary>
 public class LiveClient : Client
 {
-    public LiveClient(string apiKey, DeepgramClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public LiveClient(string apiKey = "", DeepgramWsClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
     {
     }
 }

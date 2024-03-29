@@ -12,15 +12,15 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class ManageClientTest
 {
-    DeepgramClientOptions _options;
+    DeepgramHttpClientOptions _options;
     string _projectId;
     string _apiKey;
     [SetUp]
     public void Setup()
     {
-        _options = new DeepgramClientOptions();
-        _projectId = new Faker().Random.Guid().ToString();
         _apiKey = new Faker().Random.Guid().ToString();
+        _options = new DeepgramHttpClientOptions(_apiKey, null, null, true);
+        _projectId = new Faker().Random.Guid().ToString();
     }
 
     #region Projects

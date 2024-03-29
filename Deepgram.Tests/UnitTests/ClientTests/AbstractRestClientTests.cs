@@ -11,18 +11,15 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class AbstractRestfulClientTests
 {
-
-
-    DeepgramClientOptions _clientOptions;
+    DeepgramHttpClientOptions _clientOptions;
     string _apiKey;
 
     [SetUp]
     public void Setup()
     {
-        _clientOptions = new DeepgramClientOptions();
         _apiKey = new Faker().Random.Guid().ToString();
+        _clientOptions = new DeepgramHttpClientOptions(_apiKey, null, null, true);
     }
-
 
     [Test]
     public void GetAsync_Should_Throws_HttpRequestException_On_UnsuccessfulResponse()
@@ -151,7 +148,6 @@ public class AbstractRestfulClientTests
         await client.Invoking(async y => await y.DeleteAsync<MessageResponse>($"{Defaults.DEFAULT_URI}/{UriSegments.PROJECTS}"))
              .Should().ThrowAsync<Exception>();
     }
-
 
     [Test]
     public void DeleteAsync_TResponse_Should_Throws_HttpRequestException_On_UnsuccessfulResponse()
