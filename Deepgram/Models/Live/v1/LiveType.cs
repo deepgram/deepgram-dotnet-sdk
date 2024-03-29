@@ -6,8 +6,12 @@ namespace Deepgram.Models.Live.v1;
 
 public enum LiveType
 {
+    Open,
     Metadata,
     Results,
     UtteranceEnd,
     SpeechStarted,
+    Close,
+    Unhandled,
+    Error,
 }
