@@ -27,6 +27,11 @@ namespace Deepgram.Interfaces
         /// Fires when a transcript is received from the Deepgram API
         /// </summary>
         event EventHandler<TranscriptReceivedEventArgs> TranscriptReceived;
+        
+        /// <summary>
+        /// Fires if vad_events set to true and speech detected
+        /// </summary>
+        event EventHandler<SpeechStartedEventArgs> SpeechStarted;
 
         /// <summary>
         /// Retrieves the connection state of the WebSocket
