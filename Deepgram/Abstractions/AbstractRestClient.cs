@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Encapsulations;
-using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Abstractions;

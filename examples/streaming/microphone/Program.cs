@@ -14,35 +14,16 @@ namespace SampleApp
             var liveClient = new LiveClient();
 
             // Subscribe to the EventResponseReceived event
-            liveClient.EventResponseReceived += (sender, e) =>
+            liveClient._resultsReceived += (sender, e) =>
             {
-                if (e.Response.Transcription != null)
+                if (e.Channel.Alternatives[0].Transcript == "")
                 {
-                    if (e.Response.Transcription.Channel.Alternatives[0].Transcript == "")
-                    {
-                        Console.WriteLine("Empty transcription received.");
-                        return;
-                    }
+                    Console.WriteLine("Empty transcription received.");
+                    return;
+                }
 
-                    // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
-                    Console.WriteLine($"Speaker: {e.Response.Transcription.Channel.Alternatives[0].Transcript}");
-                }
-                else if (e.Response.SpeechStarted != null)
-                {
-                    Console.WriteLine("SpeechStarted received: " + JsonSerializer.Serialize(e.Response.SpeechStarted));
-                }
-                else if (e.Response.UtteranceEnd != null)
-                {
-                    Console.WriteLine("UtteranceEnd received: " + JsonSerializer.Serialize(e.Response.UtteranceEnd));
-                }
-                else if (e.Response.MetaData != null)
-                {
-                    Console.WriteLine("Metadata received: " + JsonSerializer.Serialize(e.Response.MetaData));
-                }
-                else if (e.Response.Error != null)
-                {
-                    Console.WriteLine("Error: " + JsonSerializer.Serialize(e.Response.Error.Message));
-                }
+                // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
+                Console.WriteLine($"Speaker: {e.Channel.Alternatives[0].Transcript}");
             };
 
             // Start the connection
@@ -61,7 +42,9 @@ namespace SampleApp
             var microphone = new Microphone(liveClient.Send);
             microphone.Start();
 
-            Thread.Sleep(3600000);
+            // Wait for the user to press a key
+            Console.WriteLine("Press any key to stop the microphone streaming...");
+            Console.ReadKey();
 
             // Stop the connection
             await liveClient.Stop();

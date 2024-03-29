@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 namespace Deepgram.Models.Live.v1;
-public record TranscriptionResponse
+public record ResultResponse
 {
     /// <summary>
     /// TODO
