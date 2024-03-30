@@ -14,11 +14,6 @@ public abstract class AbstractRestClient
     internal HttpClient _httpClient;
 
     /// <summary>
-    /// get the logger of category type of _clientName
-    /// </summary>
-    internal ILogger _logger => LogProvider.GetLogger(this.GetType().Name);
-
-    /// <summary>
     /// Copy of the options for the client
     /// </summary>
     internal DeepgramHttpClientOptions _options;
@@ -28,12 +23,20 @@ public abstract class AbstractRestClient
     /// </summary>
     /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
 
-    internal AbstractRestClient(string? apiKey = null, DeepgramHttpClientOptions? options = null)
+    internal AbstractRestClient(string? apiKey = null, DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        Log.Verbose("AbstractRestClient", "ENTER");
+
         options ??= new DeepgramHttpClientOptions(apiKey);
-        _httpClient = HttpClientFactory.Create();
+        _httpClient = HttpClientFactory.Create(httpId);
         _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, options);
         _options = options;
+
+        Log.Debug("AbstractRestClient", $"APIVersion: {options.APIVersion}");
+        Log.Debug("AbstractRestClient", $"BaseAddress: {options.BaseAddress}");
+        Log.Debug("AbstractRestClient", $"KeepAlive: {options.KeepAlive}");
+        Log.Debug("AbstractRestClient", $"options: {options.OnPrem}");
+        Log.Verbose("AbstractRestClient", "LEAVE");
     }
 
     /// <summary>
@@ -45,11 +48,16 @@ public abstract class AbstractRestClient
     public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
     Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("GetAsync<T>", "ENTER");
+        Log.Debug("GetAsync<T>", $"uriSegment: {uriSegment}");
+        Log.Debug("GetAsync<T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("GetAsync", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -63,20 +71,25 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("GetAsync<T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("GetAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
+            Log.Debug("GetAsync<T>", "Succeeded");
+            Log.Verbose("GetAsync<T>", "LEAVE");
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "GET", ex);
+            Log.Error("GetAsync<T>", $"Exception: {ex}");
+            Log.Verbose("GetAsync<T>", "LEAVE");
             throw;
         }
     }
@@ -84,11 +97,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> GetAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("GetAsync<S, T>", "ENTER");
+        Log.Debug("GetAsync<S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("GetAsync<S, T>", $"parameter: {parameter}");
+        Log.Debug("GetAsync<S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("GetAsync<S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -101,20 +120,26 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("GetAsync<S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("GetAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("GetAsync<S, T>", "Succeeded");
+            Log.Verbose("GetAsync<S, T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "GET", ex);
+            Log.Error("GetAsync<S, T>", $"Exception: {ex}");
+            Log.Verbose("GetAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -131,11 +156,18 @@ public abstract class AbstractRestClient
         Dictionary<string, string>? headers = null
         )
     {
+        Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "ENTER");
+        Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"parameter: {parameter}");
+        Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"keys: {keys}");
+        Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("PostRetrieveLocalFileAsync<R, S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -151,11 +183,13 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
 
@@ -203,6 +237,9 @@ public abstract class AbstractRestClient
             MemoryStream stream = new MemoryStream();
             await response.Content.CopyToAsync(stream);
 
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Succeeded");
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
+
             return new LocalFileWithMetadata()
                         {
                             Metadata = result,
@@ -212,7 +249,8 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "POST", ex);
+            Log.Error("PostRetrieveLocalFileAsync<R, S, T>", $"Exception: {ex}");
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
             throw;
         }
     }
@@ -227,11 +265,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PostAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PostAsync<S, T>", "ENTER");
+        Log.Debug("PostAsync<S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PostAsync<S, T>", $"parameter: {parameter}");
+        Log.Debug("PostAsync<S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("PostAsync<S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -247,20 +291,26 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("PostAsync<S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("PostAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("PostAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Verbose("PostAsync<S, T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "POST", ex);
+            Log.Error("PostAsync<S, T>", $"Exception: {ex}");
+            Log.Verbose("PostAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -268,11 +318,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PostAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PostAsync<R, S, T>", "ENTER");
+        Log.Debug("PostAsync<R, S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PostAsync<R, S, T>", $"parameter: {parameter}");
+        Log.Debug("PostAsync<R, S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("PostAsync<R, S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -298,20 +354,26 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("PostAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("PostAsync<R, S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("PostAsync<R, S, T>", $"Succeeded. Result: {result}");
+            Log.Verbose("PostAsync<R, S, T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "POST", ex);
+            Log.Error("PostAsync<R, S, T>", $"Exception: {ex}");
+            Log.Verbose("PostAsync<R, S, T>", "LEAVE");
             throw;
         }
     }
@@ -325,11 +387,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PatchAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PatchAsync<S, T>", "ENTER");
+        Log.Debug("PatchAsync<S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PatchAsync<S, T>", $"parameter: {parameter}");
+        Log.Debug("PatchAsync<S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("PatchAsync<S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -352,21 +420,27 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("PatchAsync<S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("PatchAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("PatchAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Verbose("PatchAsync<S, T>", "LEAVE");
 
             return result;
 
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "PATCH", ex);
+            Log.Error("PatchAsync<S, T>", $"Exception: {ex}");
+            Log.Verbose("PatchAsync<S, T>", "LEAVE");
             throw;
         }
 
@@ -381,11 +455,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PutAsync<S, T>", "ENTER");
+        Log.Debug("PutAsync<S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PutAsync<S, T>", $"parameter: {parameter}");
+        Log.Debug("PutAsync<S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("PutAsync<S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -401,20 +481,30 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    var tmp = header.Key.ToLower();
+                    if ( !(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")) )
+                    {
+                        Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}={header.Value}");
+                    }
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("PutAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Verbose("PutAsync<S, T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "PUT", ex);
+            Log.Error("PutAsync<S, T>", $"Exception: {ex}");
+            Log.Verbose("PutAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -423,14 +513,19 @@ public abstract class AbstractRestClient
     /// Delete Method for use with calls that do not expect a response
     /// </summary>
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
-        Dictionary<string, string>? headers = null)
+    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("DeleteAsync<T>", "ENTER");
+        Log.Debug("DeleteAsync<T>", $"uriSegment: {uriSegment}");
+        Log.Debug("DeleteAsync<T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("DeleteAsync<T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -443,20 +538,26 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("DeleteAsync<T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("DeleteAsync<T>", $"Succeeded. Result: {result}");
+            Log.Verbose("DeleteAsync<T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "DELETE", ex);
+            Log.Error("DeleteAsync<T>", $"Exception: {ex}");
+            Log.Verbose("DeleteAsync<T>", "LEAVE");
             throw;
         }
     }
@@ -470,11 +571,17 @@ public abstract class AbstractRestClient
     public virtual async Task<T> DeleteAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("DeleteAsync<S, T>", "ENTER");
+        Log.Debug("DeleteAsync<S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("DeleteAsync<S, T>", $"parameter: {parameter}");
+        Log.Debug("DeleteAsync<S, T>", $"addons: {addons}");
+
         try
         {
             // if not defined, use default timeout
             if (cancellationToken == null)
             {
+                Log.Information("DeleteAsync<S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
                 cancellationToken = new CancellationTokenSource();
                 cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
             }
@@ -487,20 +594,26 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
+                    Log.Debug("DeleteAsync<S, T>", $"Add Header {header.Key}={header.Value}");
                     request.Headers.Add(header.Key, header.Value);
                 }
             }
 
             // do the request
+            Log.Verbose("DeleteAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
             response.EnsureSuccessStatusCode();
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("DeleteAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Verbose("DeleteAsync<S, T>", "LEAVE");
 
             return result;
         }
         catch (Exception ex)
         {
-            Log.Exception(_logger, "DELETE ASYNC", ex);
+            Log.Error("DeleteAsync<S, T>", $"Exception: {ex}");
+            Log.Verbose("DeleteAsync<S, T>", "LEAVE");
             throw;
         }
     }

@@ -23,7 +23,7 @@
 //        _options = new DeepgramWsClientOptions(_apiKey, null, null, true);
 
 //        _webSocketReceiveResult = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
-//        _liveClient = new LiveClient(_apiKey, _options);
+//        _liveClient = new LiveClient(_apiKey, _options, null);
 //    }
 
 //    [TearDown]

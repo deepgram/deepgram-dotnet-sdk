@@ -33,7 +33,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
 
         // Mock methods
         manageClient.When(x => x.GetAsync<ProjectsResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -62,7 +62,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<ProjectResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -91,7 +91,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.PatchAsync<ProjectSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<ProjectSchema>())).DoNotCallBase();
@@ -119,7 +119,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -148,7 +148,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.DeleteAsync< MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -173,7 +173,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<KeysResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -202,7 +202,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<KeyScopeResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -233,7 +233,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
@@ -264,7 +264,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
 
         // Mock methods
         manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
@@ -295,7 +295,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.PostAsync<KeySchema, KeyResponse>(Arg.Any<string>(), Arg.Any<KeySchema>())).DoNotCallBase();
@@ -323,7 +323,7 @@ public class ManageClientTest
         var createKeySchema = new AutoFaker<KeySchema>().Generate();
 
         // Fake Client
-        var manageClient = new ManageClient(_apiKey, _options);
+        var manageClient = new ManageClient(_apiKey, _options, null);
 
         //Act & Assert
         await manageClient.Invoking(y => y.CreateKey(url, createKeySchema))
@@ -340,7 +340,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -365,7 +365,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<InvitesResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -394,7 +394,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.PostAsync<InviteSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<InviteSchema>())).DoNotCallBase();
@@ -423,7 +423,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -448,7 +448,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<MembersResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -477,7 +477,7 @@ public class ManageClientTest
         
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<MemberScopesResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -507,7 +507,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.PutAsync<MemberScopeSchema, MessageResponse>(Arg.Any<string>(), Arg.Any<MemberScopeSchema>())).DoNotCallBase();
@@ -536,7 +536,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -562,7 +562,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<UsageRequestsSchema, UsageRequestsResponse>(Arg.Any<string>(), Arg.Any<UsageRequestsSchema>())).DoNotCallBase();
@@ -592,7 +592,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<UsageRequestResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -621,7 +621,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<UsageSummarySchema, UsageSummaryResponse>(Arg.Any<string>(), Arg.Any<UsageSummarySchema>())).DoNotCallBase();
@@ -651,7 +651,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<UsageFieldsSchema, UsageFieldsResponse>(Arg.Any<string>(), Arg.Any<UsageFieldsSchema>())).DoNotCallBase();
@@ -684,7 +684,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<BalancesResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -713,7 +713,7 @@ public class ManageClientTest
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var manageClient = Substitute.For<ManageClient>(_apiKey, _options);
+        var manageClient = Substitute.For<ManageClient>(_apiKey, _options, null);
         
         // Mock methods
         manageClient.When(x => x.GetAsync<BalanceResponse>(Arg.Any<string>())).DoNotCallBase();

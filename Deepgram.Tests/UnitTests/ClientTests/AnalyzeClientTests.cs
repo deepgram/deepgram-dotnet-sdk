@@ -32,7 +32,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
 
         // Mock methods
         analyzeClient.When(x => x.PostAsync<UrlSource, AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
@@ -63,7 +63,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
@@ -88,7 +88,7 @@ public class AnalyzeClientTests
         
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<UrlSource, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
@@ -122,7 +122,7 @@ public class AnalyzeClientTests
         
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<UrlSource, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
@@ -152,7 +152,7 @@ public class AnalyzeClientTests
         
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
@@ -178,7 +178,7 @@ public class AnalyzeClientTests
         
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
@@ -203,7 +203,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -234,7 +234,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -264,7 +264,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -294,7 +294,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -325,7 +325,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -359,7 +359,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -393,7 +393,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -419,7 +419,7 @@ public class AnalyzeClientTests
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
         
         // Mock methods
         analyzeClient.When(x => x.PostAsync<Stream, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<Stream>())).DoNotCallBase();

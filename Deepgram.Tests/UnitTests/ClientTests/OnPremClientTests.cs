@@ -30,7 +30,7 @@ public class OnPremClientTests
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
+        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
 
         // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -59,7 +59,7 @@ public class OnPremClientTests
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
+        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -88,7 +88,7 @@ public class OnPremClientTests
         
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
+        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -118,7 +118,7 @@ public class OnPremClientTests
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options);
+        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.PostAsync<CredentialsSchema, CredentialResponse>(Arg.Any<string>(), Arg.Any<CredentialsSchema>())).DoNotCallBase();

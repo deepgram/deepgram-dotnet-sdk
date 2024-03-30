@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.PreRecorded.v1;
 
@@ -12,8 +13,8 @@ namespace Deepgram.Clients.PreRecorded.v1;
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions)
+public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
 
 {
     #region NoneCallBacks
@@ -26,12 +27,22 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     public async Task<SyncResponse> TranscribeUrl(UrlSource source, PrerecordedSchema? prerecordedSchema,
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PreRecordedClient.TranscribeUrl", "ENTER");
+        Log.Information("TranscribeUrl", $"source: {source}");
+        Log.Information("TranscribeUrl", $"prerecordedSchema: {prerecordedSchema}");
+
         VerifyNoCallBack(nameof(TranscribeUrl), prerecordedSchema);
 
-        return await PostAsync<UrlSource, PrerecordedSchema, SyncResponse>(
-            GetUri(_options, $"{UriSegments.LISTEN}"), prerecordedSchema, source, cancellationToken, addons, headers
-            );
+        var uri = GetUri(_options, $"{UriSegments.LISTEN}");
+        var result = await PostAsync<UrlSource, PrerecordedSchema, SyncResponse>( uri, prerecordedSchema, source, cancellationToken, addons, headers);
+
+        Log.Information("TranscribeUrl", $"{uri} Succeeded");
+        Log.Debug("TranscribeUrl", $"result: {result}");
+        Log.Verbose("PreRecordedClient.TranscribeUrl", "LEAVE");
+
+        return result;
     }
+
     /// <summary>
     /// Transcribes a file using the provided byte array
     /// </summary>
@@ -53,11 +64,20 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <returns><see cref="SyncResponse"/></returns>
     public async Task<SyncResponse> TranscribeFile(Stream source, PrerecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PreRecordedClient.TranscribeFile", "ENTER");
+        Log.Information("TranscribeFile", $"source: {source}");
+        Log.Information("TranscribeFile", $"prerecordedSchema: {prerecordedSchema}");
+
         VerifyNoCallBack(nameof(TranscribeFile), prerecordedSchema);
 
-        return await PostAsync<Stream, PrerecordedSchema, SyncResponse>(
-            GetUri(_options, $"{UriSegments.LISTEN}"), prerecordedSchema, source, cancellationToken, addons, headers
-            );
+        var uri = GetUri(_options, $"{UriSegments.LISTEN}");
+        var result = await PostAsync<Stream, PrerecordedSchema, SyncResponse>(uri, prerecordedSchema, source, cancellationToken, addons, headers);
+
+        Log.Information("TranscribeFile", $"{uri} Succeeded");
+        Log.Debug("TranscribeFile", $"result: {result}");
+        Log.Verbose("PreRecordedClient.TranscribeFile", "LEAVE");
+
+        return result;
     }
 
     #endregion
@@ -85,13 +105,23 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <returns><see cref="AsyncResponse"/></returns>
     public async Task<AsyncResponse> TranscribeFileCallBack(Stream source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PreRecordedClient.TranscribeFileCallBack", "ENTER");
+        Log.Information("TranscribeFileCallBack", $"source: {source}");
+        Log.Information("TranscribeFileCallBack", $"callBack: {callBack}");
+        Log.Information("TranscribeFileCallBack", $"prerecordedSchema: {prerecordedSchema}");
+
         VerifyOneCallBackSet(nameof(TranscribeFileCallBack), callBack, prerecordedSchema);
         if (callBack != null)
             prerecordedSchema.CallBack = callBack;
 
-        return await PostAsync<Stream, PrerecordedSchema, AsyncResponse>(
-            GetUri(_options, $"{UriSegments.LISTEN}"), prerecordedSchema, source, cancellationToken, addons, headers
-            );
+        var uri = GetUri(_options, $"{UriSegments.LISTEN}");
+        var result = await PostAsync<Stream, PrerecordedSchema, AsyncResponse>(uri, prerecordedSchema, source, cancellationToken, addons, headers);
+
+        Log.Information("TranscribeFileCallBack", $"{uri} Succeeded");
+        Log.Debug("TranscribeFileCallBack", $"result: {result}");
+        Log.Verbose("PreRecordedClient.TranscribeFileCallBack", "LEAVE");
+
+        return result;
     }
 
     /// <summary>
@@ -103,39 +133,57 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <returns><see cref="AsyncResponse"/></returns>
     public async Task<AsyncResponse> TranscribeUrlCallBack(UrlSource source, string? callBack, PrerecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("PreRecordedClient.TranscribeUrlCallBack", "ENTER");
+        Log.Information("TranscribeUrlCallBack", $"source: {source}");
+        Log.Information("TranscribeUrlCallBack", $"callBack: {callBack}");
+        Log.Information("TranscribeUrlCallBack", $"prerecordedSchema: {prerecordedSchema}");
+
         VerifyOneCallBackSet(nameof(TranscribeUrlCallBack), callBack, prerecordedSchema);
 
         if (callBack != null)
             prerecordedSchema.CallBack = callBack;
 
-        return await PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(
-            GetUri(_options, $"{UriSegments.LISTEN}"), prerecordedSchema, source, cancellationToken, addons, headers
-            );
+        var uri = GetUri(_options, $"{UriSegments.LISTEN}");
+        var result = await PostAsync<UrlSource, PrerecordedSchema, AsyncResponse>(uri, prerecordedSchema, source, cancellationToken, addons, headers);
+
+        Log.Information("TranscribeUrlCallBack", $"{uri} Succeeded");
+        Log.Debug("TranscribeUrlCallBack", $"result: {result}");
+        Log.Verbose("PreRecordedClient.TranscribeUrlCallBack", "LEAVE");
+
+        return result;
     }
     #endregion
 
     #region CallbackChecks
     private void VerifyNoCallBack(string method, PrerecordedSchema? prerecordedSchema)
     {
+        Log.Debug("VerifyNoCallBack", $"method: {method}");
+
         if (prerecordedSchema != null && prerecordedSchema.CallBack != null)
-            throw new ArgumentException($"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(TranscribeFileCallBack)} or {nameof(TranscribeUrlCallBack)}");
+        {
+            var exStr = $"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(TranscribeFileCallBack)} or {nameof(TranscribeUrlCallBack)}";
+            Log.Error("VerifyNoCallBack", $"Exception: {exStr}");
+            throw new ArgumentException(exStr);
+        }
     }
 
-    private void VerifyOneCallBackSet(string callingMethod, string? callBack, PrerecordedSchema? prerecordedSchema)
+    private void VerifyOneCallBackSet(string method, string? callBack, PrerecordedSchema? prerecordedSchema)
     {
+        Log.Debug("VerifyOneCallBackSet", $"method: {method}");
 
         if (prerecordedSchema.CallBack == null && callBack == null)
-        { //check if no CallBack set in either callBack parameter or PrerecordedSchema
-            var ex = new ArgumentException($"Either provide a CallBack url or set PrerecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrl)} or {nameof(TranscribeFile)}");
-            Log.Exception(_logger, $"While calling {callingMethod} no callback set", ex);
-            throw ex;
+        {
+            //check if no CallBack set in either callBack parameter or AnalyzeSchema
+            var exStr = $"Either provide a CallBack url or set PreRecordedSchema.CallBack.  If no CallBack needed either {nameof(TranscribeUrl)} or {nameof(TranscribeFile)}";
+            Log.Error("VerifyNoCallBack", $"Exception: {exStr}");
+            throw new ArgumentException(exStr);
         }
         else if (!string.IsNullOrEmpty(prerecordedSchema.CallBack) && !string.IsNullOrEmpty(callBack))
         {
-            //check that only one CallBack is set in either callBack parameter or PrerecordedSchema
-            var ex = new ArgumentException("CallBack should be set in either the CallBack parameter or PrerecordedSchema.CallBack not in both.");
-            Log.Exception(_logger, $"While calling {callingMethod}, callback set in both parameter and property", ex);
-            throw ex;
+            //check that only one CallBack is set in either callBack parameter or AnalyzeSchema
+            var exStr = "CallBack should be set in either the CallBack parameter or PreRecordedSchema.CallBack not in both.";
+            Log.Error("VerifyNoCallBack", $"Exceptions: {exStr}");
+            throw new ArgumentException(exStr);
         }
     }
     #endregion    

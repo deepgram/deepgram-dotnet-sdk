@@ -12,7 +12,8 @@ namespace Deepgram;
 /// </summary>
 public class ManageClient : Client
 {
-    public ManageClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)
+    public ManageClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
+        string? httpId = null) : base(apiKey, deepgramClientOptions, httpId)
     {
     }
 }

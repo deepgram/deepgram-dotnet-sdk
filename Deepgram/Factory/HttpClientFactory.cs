@@ -11,8 +11,11 @@ internal class HttpClientFactory
     public const int DEFAULT_HTTP_TINEOUT_IN_MINUTES = 5;
     public const string HTTPCLIENT_NAME = "DEEPGRAM_HTTP_CLIENT";
 
-    public static HttpClient Create(string httpId = HTTPCLIENT_NAME)
+    public static HttpClient Create(string? httpId = null)
     {
+        if (string.IsNullOrWhiteSpace(httpId))
+            httpId = HTTPCLIENT_NAME;
+
         var services = new ServiceCollection();
         services.AddHttpClient(httpId)
             .AddTransientHttpErrorPolicy(policyBuilder =>

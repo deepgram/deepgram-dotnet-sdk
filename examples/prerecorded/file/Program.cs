@@ -1,6 +1,11 @@
-using Deepgram;
-using Deepgram.Models.PreRecorded.v1;
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
 using System.Text.Json;
+
+using Deepgram.Logger;
+using Deepgram.Models.PreRecorded.v1;
 
 namespace PreRecorded
 {
@@ -8,6 +13,12 @@ namespace PreRecorded
     {
         static async Task Main(string[] args)
         {
+            // Initialize Library with default logging
+            // Normal logging is "Info" level
+            Library.Initialize();
+            // OR very chatty logging
+            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new PreRecordedClient();
 
@@ -21,6 +32,9 @@ namespace PreRecorded
             //Console.WriteLine(response);
             Console.WriteLine(JsonSerializer.Serialize(response));
             Console.ReadKey();
+
+            // Teardown Library
+            Library.Terminate();
         }
     }
 }

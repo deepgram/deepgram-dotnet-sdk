@@ -1,9 +1,10 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Speak.v1;
 using Deepgram.Models.Authenticate.v1;
+using System;
 
 namespace Deepgram.Clients.Speak.v1;
 
@@ -12,8 +13,8 @@ namespace Deepgram.Clients.Speak.v1;
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions)
+public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
 {
     #region NoneCallBacks
     /// <summary>
@@ -25,6 +26,10 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     public async Task<SyncResponse> ToStream(TextSource source, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("SpeakClient.ToStream", "ENTER");
+        Log.Information("ToStream", $"source: {source}");
+        Log.Information("ToStream", $"analyzeSchema: {speakSchema}");
+
         VerifyNoCallBack(nameof(ToStream), speakSchema);
 
         List<string> keys = new List<string> {
@@ -37,8 +42,9 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
             Constants.Date,
         };
 
+        var uri = GetUri(_options, $"{UriSegments.SPEAK}");
         var localFileResult = await PostRetrieveLocalFileAsync<TextSource, SpeakSchema, LocalFileWithMetadata>(
-            GetUri(_options, $"{UriSegments.SPEAK}"), speakSchema, source, keys, cancellationToken, addons, headers
+            uri, speakSchema, source, keys, cancellationToken, addons, headers
             );
 
         SyncResponse response = new SyncResponse();
@@ -77,6 +83,10 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
             }
         }
 
+        Log.Information("ToStream", $"{uri} Succeeded");
+        Log.Debug("ToStream", $"response: {response}");
+        Log.Verbose("Client.ToStream", "LEAVE");
+
         // add stream to response
         response.Stream = localFileResult.Content;
 
@@ -87,6 +97,10 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null
         )
     {
+        Log.Verbose("Client.ToFile", "ENTER");
+        Log.Information("ToFile", $"source: {source}");
+        Log.Information("ToFile", $"filename: {filename}");
+
         var response = await ToStream(source, speakSchema, cancellationToken, addons, headers);
 
         // save the file
@@ -98,6 +112,8 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
 
         // clear the stream
         response.Stream = null;
+
+        Log.Verbose("Client.ToFile", "LEAVE");
 
         return response;
     }
@@ -114,38 +130,56 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     public async Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
+        Log.Verbose("SpeakClient.StreamCallBack", "ENTER");
+        Log.Information("StreamCallBack", $"source: {source}");
+        Log.Information("StreamCallBack", $"callBack: {callBack}");
+        Log.Information("StreamCallBack", $"speakSchema: {speakSchema}");
+
         VerifyOneCallBackSet(nameof(StreamCallBack), callBack, speakSchema);
         if (callBack != null)
             speakSchema.CallBack = callBack;
 
-        return await PostAsync<TextSource, SpeakSchema, AsyncResponse>(
-            GetUri(_options, $"{UriSegments.SPEAK}"), speakSchema, source, cancellationToken, addons, headers);
+        var uri = GetUri(_options, $"{UriSegments.SPEAK}");
+        var result = await PostAsync<TextSource, SpeakSchema, AsyncResponse>(uri, speakSchema, source, cancellationToken, addons, headers);
+
+        Log.Information("StreamCallBack", $"{uri} Succeeded");
+        Log.Debug("StreamCallBack", $"result: {result}");
+        Log.Verbose("Client.StreamCallBack", "LEAVE");
+
+        return result;
     }
     #endregion
 
     #region CallbackChecks
     private void VerifyNoCallBack(string method, SpeakSchema? speakSchema)
     {
-        // TODO: think about logging here based on coderabbit feedback
+        Log.Debug("VerifyNoCallBack", $"method: {method}");
+
         if (speakSchema != null && speakSchema.CallBack != null)
-            throw new ArgumentException($"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(StreamCallBack)}");
+        {
+            var exStr = $"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(StreamCallBack)}";
+            Log.Error("VerifyNoCallBack", $"Exception: {exStr}");
+            throw new ArgumentException(exStr);
+        }
     }
 
-    private void VerifyOneCallBackSet(string callingMethod, string? callBack, SpeakSchema? speakSchema)
+    private void VerifyOneCallBackSet(string method, string? callBack, SpeakSchema? speakSchema)
     {
-        // TODO: think about logging here based on coderabbit feedback
+        Log.Debug("VerifyOneCallBackSet", $"method: {method}");
+
         if (speakSchema.CallBack == null && callBack == null)
-        { //check if no CallBack set in either callBack parameter or SpeakSchema
-            var ex = new ArgumentException($"Either provide a CallBack url or set SpeakSchema.CallBack. If no CallBack needed either {nameof(Stream)}");
-            Log.Exception(_logger, $"While calling {callingMethod} no callback set", ex);
-            throw ex;
+        {
+            //check if no CallBack set in either callBack parameter or AnalyzeSchema
+            var exStr = $"Either provide a CallBack url or set SpeakSchema.CallBack. Use {nameof(ToStream)}";
+            Log.Error("VerifyNoCallBack", $"Exception: {exStr}");
+            throw new ArgumentException(exStr);
         }
         else if (!string.IsNullOrEmpty(speakSchema.CallBack) && !string.IsNullOrEmpty(callBack))
         {
-            //check that only one CallBack is set in either callBack parameter or SpeakSchema
-            var ex = new ArgumentException("CallBack should be set in either the CallBack parameter or SpeakSchema.CallBack not in both.");
-            Log.Exception(_logger, $"While calling {callingMethod}, callback set in both parameter and property", ex);
-            throw ex;
+            //check that only one CallBack is set in either callBack parameter or AnalyzeSchema
+            var exStr = "CallBack should be set in either the CallBack parameter or SpeakSchema.CallBack not in both.";
+            Log.Error("VerifyNoCallBack", $"Exceptions: {exStr}");
+            throw new ArgumentException(exStr);
         }
     }
     #endregion 
