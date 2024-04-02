@@ -10,7 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Deepgram.Microphone\Deepgram.Microphone.csproj" />
     <ProjectReference Include="..\..\..\Deepgram\Deepgram.csproj" />
-    <ProjectReference Include="..\..\..\Deepgram\Microphone\Microphone.csproj" />
   </ItemGroup>
   
   <ItemGroup>

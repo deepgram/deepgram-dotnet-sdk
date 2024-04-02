@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.OnPrem.v1;
 
@@ -12,8 +13,8 @@ namespace Deepgram.Clients.OnPrem.v1;
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions)
+public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
 {
     /// <summary>
     /// get a list of credentials associated with project
@@ -21,8 +22,20 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <param name="projectId">Id of project</param>
     /// <returns><see cref="CredentialsResponse"/></returns>
     public async Task<CredentialsResponse> ListCredentials(string projectId, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
-        await GetAsync<CredentialsResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}"), cancellationToken, addons, headers);
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("OnPremClient.ListCredentials", "ENTER");
+        Log.Debug("ListCredentials", $"projectId: {projectId}");
+
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}");
+        var result = await GetAsync<CredentialsResponse>(uri, cancellationToken, addons, headers);
+
+        Log.Information("ListCredentials", $"{uri} Succeeded");
+        Log.Debug("ListCredentials", $"result: {result}");
+        Log.Verbose("OnPremClient.ListCredentials", "LEAVE");
+
+        return result;
+    }
 
     /// <summary>
     /// Get credentials for the project that is associated with credential ID
@@ -31,10 +44,21 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns><see cref="CredentialResponse"/></returns>
     public async Task<CredentialResponse> GetCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
-        await GetAsync<CredentialResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}"),
-            cancellationToken, addons, headers
-            );
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("OnPremClient.GetCredentials", "ENTER");
+        Log.Debug("GetCredentials", $"projectId: {projectId}");
+        Log.Debug("GetCredentials", $"credentialsId: {credentialsId}");
+
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var result = await GetAsync<CredentialResponse>(uri, cancellationToken, addons, headers);
+
+        Log.Information("GetCredentials", $"{uri} Succeeded");
+        Log.Debug("GetCredentials", $"result: {result}");
+        Log.Verbose("OnPremClient.GetCredentials", "LEAVE");
+
+        return result;
+    }
 
     /// <summary>
     /// Remove credentials in the project associated with the credentials ID
@@ -43,10 +67,21 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <param name="credentialsId">Id of credentials</param>
     /// <returns><see cref="MessageResponse"/></returns>
     public async Task<MessageResponse> DeleteCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
-        await DeleteAsync<MessageResponse>(GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}"),
-            cancellationToken, addons, headers
-            );
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("OnPremClient.DeleteCredentials", "ENTER");
+        Log.Debug("DeleteCredentials", $"projectId: {projectId}");
+        Log.Debug("DeleteCredentials", $"credentialsId: {credentialsId}");
+
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var result = await DeleteAsync<MessageResponse>(uri, cancellationToken, addons, headers);
+
+        Log.Information("DeleteCredentials", $"{uri} Succeeded");
+        Log.Debug("DeleteCredentials", $"result: {result}");
+        Log.Verbose("OnPremClient.DeleteCredentials", "LEAVE");
+
+        return result;
+    }
 
     /// <summary>
     /// Create credentials for the associated projects
@@ -55,9 +90,19 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     /// <param name="createOnPremCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
     /// <returns><see cref="CredentialResponse"/></returns>
     public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema credentialsSchema, 
-        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null) =>
-        await PostAsync<CredentialsSchema, CredentialResponse>(
-            GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}"), credentialsSchema, cancellationToken, addons, headers
-            );
+        CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("OnPremClient.CreateCredentials", "ENTER");
+        Log.Debug("CreateCredentials", $"projectId: {projectId}");
+        Log.Debug("CreateCredentials", $"credentialsSchema: {credentialsSchema}");
 
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}");
+        var result = await PostAsync<CredentialsSchema, CredentialResponse>(uri, credentialsSchema, cancellationToken, addons, headers);
+
+        Log.Information("CreateCredentials", $"{uri} Succeeded");
+        Log.Debug("CreateCredentials", $"result: {result}");
+        Log.Verbose("OnPremClient.CreateCredentials", "LEAVE");
+
+        return result;
+    }
 }

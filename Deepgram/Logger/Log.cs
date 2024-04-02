@@ -1,53 +1,99 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Manage.v1;
+using Serilog;
 
 namespace Deepgram.Logger;
-internal static partial class Log
+
+public sealed class Log
 {
-    [LoggerMessage(
-        EventId = 0002,
-        Level = LogLevel.Error,
-        Message = "`{requestType}` threw exception ")]
-    internal static partial void Exception(this ILogger logger, string requestType, Exception ex);
+    private static Serilog.ILogger? instance = null;
 
-    [LoggerMessage(
-        EventId = 0005,
-        Level = LogLevel.Information,
-        Message = "Whilst creating RestClient there was no ApiKey ")]
-    internal static partial void ApiKeyNotPresent(this ILogger logger);
+    // Prevent instantiation
+    static Log()
+    {
+        // Do nothing
+    }
+    
+    /// <summary>
+    /// Initializes the logger with the specified log level and filename.
+    /// </summary>
+    public static Serilog.ILogger Initialize(LogLevel level = LogLevel.Information, string? filename = "log.txt")
+    {
+        if (filename != null)
+        {
+            instance = new LoggerConfiguration()
+                .MinimumLevel.Is((Serilog.Events.LogEventLevel) level)
+                .WriteTo.Console()
+                .WriteTo.File(filename)
+                .CreateLogger();
+            return instance;
+        }
+        instance = new LoggerConfiguration()
+            .MinimumLevel.Is((Serilog.Events.LogEventLevel)level)
+            .WriteTo.Console()
+            .CreateLogger();
+        return instance;
+    }
 
+    /// <summary>
+    /// Gets the logger instance
+    /// </summary>
+    public static Serilog.ILogger GetLogger()
+    {
+        if (instance == null)
+        {
+            return Initialize();
+        }
+        return instance;
+    }
 
-    [LoggerMessage(
-        EventId = 0006,
-        Level = LogLevel.Warning,
-        Message = "Trying to send message when the socket is `{state}`. Ack for this message will fail shortly.")]
-    internal static partial void LiveSendWarning(this ILogger logger, WebSocketState state);
+    /// <summary>
+    /// Logs a verbose message
+    /// </summary>
+    public static void Verbose(string identifier, string trace)
+    {
+        GetLogger().Verbose($"{identifier}: {trace}");
+    }
 
+    /// <summary>
+    /// Logs a debug message
+    /// </summary>
+    public static void Debug(string identifier, string trace)
+    {
+        GetLogger().Debug($"{identifier}: {trace}");
+    }
 
-    [LoggerMessage(
-       EventId = 0009,
-       Level = LogLevel.Error,
-       Message = "Unable to perform `{action}` Socket disposed")]
-    internal static partial void SocketDisposed(this ILogger logger, string action, Exception ex);
+    /// <summary>
+    /// Logs an information message
+    /// </summary>
+    public static void Information(string identifier, string trace)
+    {
+        GetLogger().Information($"{identifier}: {trace}");
+    }
 
-    [LoggerMessage(
-  EventId = 0014,
-  Level = LogLevel.Error,
-  Message = "Closing WebSocket")]
-    internal static partial void ClosingSocket(this ILogger logger);
+    /// <summary>
+    /// Logs an warning message
+    /// </summary>
+    public static void Warning(string identifier, string trace)
+    {
+        GetLogger().Warning($"{identifier}: {trace}");
+    }
 
-    [LoggerMessage(
-      EventId = 0016,
-      Level = LogLevel.Information,
-      Message = "WebSocket is being closed : `{closeStatusDescription}`")]
-    internal static partial void RequestedSocketClose(this ILogger logger, string closeStatusDescription);
+    /// <summary>
+    /// Logs an error message
+    /// </summary>
+    public static void Error(string identifier, string trace)
+    {
+        GetLogger().Error($"{identifier}: {trace}");
+    }
 
-    [LoggerMessage(
-    EventId = 0018,
-    Level = LogLevel.Error,
-    Message = "Error creating project key both ExpirationDate and TimeToLiveInSeconds are set: `{createProjectKeySchema}`")]
-    internal static partial void CreateKeyError(this ILogger logger, KeySchema createProjectKeySchema);
+    /// <summary>
+    /// Logs an fatal message
+    /// </summary>
+    public static void Fatal(string identifier, string trace)
+    {
+        GetLogger().Fatal($"{identifier}: {trace}");
+    }
 }

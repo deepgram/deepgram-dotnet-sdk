@@ -11,6 +11,9 @@ namespace Deepgram.Utilities;
 
 internal static class QueryParameterUtil
 {
+    /// <summary>
+    /// Formats a URL with the specified parameters
+    /// </summary>
     public static string FormatURL<S>(string uriSegment, S? parameter, Dictionary<string, string>? addons = null)
     {
         //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
@@ -42,6 +45,9 @@ internal static class QueryParameterUtil
         return uriBuilder.Uri.ToString().TrimEnd('/');
     }
 
+    /// <summary>
+    /// Encodes the specified parameters into a URL
+    /// </summary>
     internal static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo>? propertyInfoList, Dictionary<string, string>? addons = null)
     {
         var sb = new StringBuilder();

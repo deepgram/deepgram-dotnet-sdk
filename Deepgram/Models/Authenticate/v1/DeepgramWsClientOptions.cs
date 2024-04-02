@@ -7,10 +7,73 @@ namespace Deepgram.Models.Authenticate.v1;
 /// <summary>
 /// Configuration for the Deepgram client
 /// </summary>
-public class DeepgramWsClientOptions : DeepgramClientOptions
+public class DeepgramWsClientOptions
 {
+    /*****************************/
+    // General Options
+    /*****************************/
+    /// <summary>
+    /// Deepgram API KEY
+    /// </summary>
+    public string ApiKey { get; set; }
+
+    /// <summary>
+    /// BaseAddress of the server :defaults to api.deepgram.com
+    /// no need to attach the protocol it will be added internally
+    /// </summary>
+    public string BaseAddress { get; set; } = Defaults.DEFAULT_URI;
+
+    /// <summary>
+    /// Api endpoint version
+    /// </summary>
+    public string APIVersion { get; set; } = Defaults.DEFAULT_API_VERSION;
+
+    /// <summary>
+    /// Global headers to always be added to the request
+    /// </summary>
+    public Dictionary<string, string> Headers { get; set; }
+
+    /*****************************/
+    // Prerecorded
+    /*****************************/
+
+    /*****************************/
+    // Live
+    /*****************************/
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public bool KeepAlive { get; set; } = false;
+
+    /*****************************/
+    // OnPrem
+    /*****************************/
+    /// <summary>
+    /// Enable when using OnPrem mode
+    /// </summary>
+    public bool OnPrem { get; set; } = false;
+
+    /*****************************/
+    // Manage
+    /*****************************/
+
+    /*****************************/
+    // Analyze
+    /*****************************/
+
+    /*****************************/
+    // Constructor
+    /*****************************/
     public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? headers = null, string? apiVersion = null)
     {
+        Log.Verbose("DeepgramWsClientOptions", "ENTER");
+        Log.Debug("DeepgramWsClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
+        Log.Debug("DeepgramWsClientOptions", baseAddress == null ? "BaseAddress is null" : "BaseAddress provided");
+        Log.Debug("DeepgramWsClientOptions", keepAlive == null ? "KeepAlive is null" : "KeepAlive provided");
+        Log.Debug("DeepgramWsClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
+        Log.Debug("DeepgramWsClientOptions", headers == null ? "Headers is null" : "Headers provided");
+        Log.Debug("DeepgramWsClientOptions", apiVersion == null ? "API Version is null" : "API Version provided");
+
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         KeepAlive = keepAlive ?? false;
@@ -18,51 +81,61 @@ public class DeepgramWsClientOptions : DeepgramClientOptions
         Headers = headers ?? new Dictionary<string, string>();
         APIVersion = apiVersion ?? Defaults.DEFAULT_API_VERSION;
 
+        Log.Information("DeepgramWsClientOptions", $"KeepAlive: {KeepAlive}");
+        Log.Information("DeepgramWsClientOptions", $"OnPrem: {OnPrem}");
+        Log.Information("DeepgramWsClientOptions", $"APIVersion: {APIVersion}");
+
         // user provided takes precedence
         if (string.IsNullOrWhiteSpace(ApiKey))
         {
             // then try the environment variable
-            // TODO: log
+            Log.Debug("DeepgramWsClientOptions", "API KEY is not set");
             ApiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
-            if (string.IsNullOrEmpty(ApiKey))
+            if (!string.IsNullOrEmpty(ApiKey))
             {
-                // TODO: log
+                Log.Information("DeepgramWsClientOptions", "API KEY set from environment variable");
+            } else {
+                Log.Warning("DeepgramWsClientOptions", "API KEY environment variable not set");
             }
         }
         if (!OnPrem && string.IsNullOrEmpty(ApiKey))
         {
-            // TODO: log
-            throw new ArgumentException("Deepgram API Key is invalid");
+            var exStr = "Deepgram API Key is invalid";
+            Log.Error("DeepgramWsClientOptions", exStr);
+            throw new ArgumentException(exStr);
         }
 
         // base url
+        Log.Debug("DeepgramWsClientOptions", $"REST BaseAddress: {BaseAddress}");
+
         Regex regex = new Regex(@"\b(\/v[0-9]+)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(BaseAddress))
         {
-            //Console.WriteLine($"WS BaseAddress: {BaseAddress}"); // TODO: logging
+            Log.Information("DeepgramWsClientOptions", $"REST BaseAddress does not contain API version: {BaseAddress}");
             BaseAddress = $"{BaseAddress}/{APIVersion}";
+            Log.Debug("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         }
-        // TODO: log
 
-        //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
+        //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
         regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
         if (regex.IsMatch(BaseAddress))
         {
-            // if protocol https/http is in the address, remove it
-            //Console.WriteLine($"WS BaseAddress (Remove https/http): {BaseAddress}"); // TODO: logging
+            Log.Information("DeepgramWsClientOptions", $"BaseAddress contains HTTP(s) protocol. Remove: {BaseAddress}");
             BaseAddress = BaseAddress.Substring(BaseAddress.IndexOf("/") + 2);
+            Log.Debug("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         }
 
         //checks for ws:// wss:// ws wss - wss:// is include to ensure it is all stripped out and correctly formatted
         regex = new Regex(@"\b(ws:\/\/|wss:\/\/|ws|wss)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(BaseAddress))
         {
-            // if no protocol in the address then https:// is added
-            //Console.WriteLine($"WS BaseAddress (Add wss/ws): {BaseAddress}"); // TODO: logging
+            Log.Information("DeepgramWsClientOptions", $"BaseAddress does not contain protocol: {BaseAddress}");
             BaseAddress = $"wss://{BaseAddress}";
+            Log.Debug("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         }
-
         BaseAddress = BaseAddress.TrimEnd('/');
-        //Console.WriteLine($"WS BaseAddress (Final): {BaseAddress}"); // TODO: logging
+
+        Log.Information("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
+        Log.Verbose("DeepgramWsClientOptions", "LEAVE");
     }
 }

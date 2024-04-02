@@ -1,11 +1,9 @@
-using Deepgram;
-using Deepgram.Constants;
-using Deepgram.Models.Authenticate.v1;
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
 using Deepgram.Models.Live.v1;
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
+using Deepgram.Logger;
 
 namespace SampleApp
 {
@@ -13,6 +11,12 @@ namespace SampleApp
     {
         static async Task Main(string[] args)
         {
+            // Initialize Library with default logging
+            // Normal logging is "Info" level
+            Library.Initialize();
+            // OR very chatty logging
+            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var liveClient = new LiveClient();
 
@@ -21,48 +25,19 @@ namespace SampleApp
             {
                 if (e.Channel.Alternatives[0].Transcript == "")
                 {
-                    Console.WriteLine("Empty transcription received.");
                     return;
                 }
 
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
                 Console.WriteLine($"Speaker: {e.Channel.Alternatives[0].Transcript}");
             };
-            //liveClient.EventResponseReceived += (sender, e) =>
-            //{
-            //    if (e.Response.Transcription != null)
-            //    {
-            //        if (e.Response.Transcription.Channel.Alternatives[0].Transcript == "")
-            //        {
-            //            Console.WriteLine("Empty transcription received.");
-            //            return;
-            //        }
-
-            //        // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
-            //        Console.WriteLine($"Speaker: {e.Response.Transcription.Channel.Alternatives[0].Transcript}");
-            //    }
-            //    else if (e.Response.SpeechStarted != null)
-            //    {
-            //        Console.WriteLine("SpeechStarted received: " + JsonSerializer.Serialize(e.Response.SpeechStarted));
-            //    }
-            //    else if (e.Response.UtteranceEnd != null)
-            //    {
-            //        Console.WriteLine("UtteranceEnd received: " + JsonSerializer.Serialize(e.Response.UtteranceEnd));
-            //    }
-            //    else if (e.Response.MetaData != null)
-            //    {
-            //        Console.WriteLine("Metadata received: " + JsonSerializer.Serialize(e.Response.MetaData));
-            //    }
-            //    else if (e.Response.Error != null)
-            //    {
-            //        Console.WriteLine("Error: " + JsonSerializer.Serialize(e.Response.Error.Message));
-            //    }
-            //};
 
             // Start the connection
             var liveSchema = new LiveSchema()
             {
                 Model = "nova-2",
+                Punctuate = true,
+                SmartFormat = true,
             };
             await liveClient.Connect(liveSchema);
 
@@ -78,6 +53,9 @@ namespace SampleApp
 
             // Dispose the client
             liveClient.Dispose();
+
+            // Teardown Library
+            Library.Terminate();
         }
     }
 }

@@ -33,7 +33,7 @@ public class SpeakClientTests
 
     //    // Fake Client
     //    var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-    //    var speakClient = Substitute.For<SpeakClient>(_apiKey, _options);
+    //    var speakClient = Substitute.For<SpeakClient>(_apiKey, _options, null);
 
     //    // Mock Methods
     //    speakClient.When(x => x.PostRetrieveLocalFileAsync<TextSource, SpeakSchema, LocalFileWithMetadata>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
@@ -63,7 +63,7 @@ public class SpeakClientTests
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options);
+        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options, null);
         
         // Mock Methods
         speakClient.When(x => x.PostAsync<TextSource, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
@@ -93,7 +93,7 @@ public class SpeakClientTests
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options);
+        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options, null);
         
         // Mock Methods
         speakClient.When(x => x.PostAsync<TextSource, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
@@ -127,7 +127,7 @@ public class SpeakClientTests
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options);
+        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options, null);
         
         // Mock Methods
         speakClient.When(x => x.PostAsync<Stream, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<Stream>())).DoNotCallBase();
@@ -152,7 +152,7 @@ public class SpeakClientTests
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options);
+        var speakClient = Substitute.For<SpeakClient>(_apiKey, _options, null);
         
         // Mock Methods
         speakClient.When(x => x.PostAsync<Stream, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<Stream>())).DoNotCallBase();

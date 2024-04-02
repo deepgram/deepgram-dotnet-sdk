@@ -60,8 +60,6 @@ public class Microphone
             _device_index = PortAudio.DefaultInputDevice;
             if (_device_index == PortAudio.NoDevice)
             {
-                // TODO: logging
-                Console.WriteLine("No default input device found");
                 return false;
             }
         }
@@ -100,15 +98,12 @@ public class Microphone
         // Check if the input is null
         if (input == IntPtr.Zero)
         {
-            // TODO: logging
-            Console.WriteLine("Input is null");
             return StreamCallbackResult.Continue;
         }
 
         // Check if the exit token is set
         if (_exitToken != null && _exitToken.IsCancellationRequested)
         {
-            Console.WriteLine("Exiting!");
             return StreamCallbackResult.Abort;
         }
 
@@ -117,7 +112,6 @@ public class Microphone
 
         if (_isMuted)
         {
-            Console.WriteLine("Muted!");
             buf = new byte[buf.Length];
         }
         else
@@ -126,7 +120,6 @@ public class Microphone
         }
 
         // Push the data to the callback
-        Console.WriteLine("Sending buffer!");
         _push_callback(buf);
 
         return StreamCallbackResult.Continue;
@@ -136,11 +129,9 @@ public class Microphone
     {
         if (_stream != null)
         {
-            // TODO: logging
             return;
         }
 
-        // TODO: logging
         _isMuted = true;
     }
 
@@ -148,11 +139,9 @@ public class Microphone
     {
         if (_stream != null)
         {
-            // TODO: logging
             return;
         }
 
-        // TODO: logging
         _isMuted = false;
     }
 
@@ -161,7 +150,6 @@ public class Microphone
         // Check if we have a stream
         if (_stream == null)
         {
-            // TODO: logging
             return;
         }
 

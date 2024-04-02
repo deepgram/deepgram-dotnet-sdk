@@ -4,11 +4,13 @@
 
 namespace Deepgram.Abstractions;
 
+/// <summary>
+/// Helper funcitons for HttpRequests
+/// </summary>
 internal static class HttpRequestUtil
 {
     public const string DEFAULT_CONTENT_TYPE = "application/json";
 
-    static ILogger logger => LogProvider.GetLogger(nameof(HttpRequestUtil));
     static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
