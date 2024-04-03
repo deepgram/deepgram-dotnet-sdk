@@ -2,9 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Diagnostics.Tracing;
-using System.Net.WebSockets;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
 
@@ -19,7 +16,7 @@ public class Client : Attribute, IDisposable
     private readonly DeepgramWsClientOptions _deepgramClientOptions;
 
     private ClientWebSocket? _clientWebSocket;
-    private CancellationTokenSource _cancellationTokenSource;
+    private CancellationTokenSource? _cancellationTokenSource;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -396,7 +393,6 @@ public class Client : Attribute, IDisposable
             switch (val)
             {         
                 case LiveType.Open:
-                    //var openResponse = new ResponseEvent<OpenResponse>(data.Deserialize<OpenResponse>());
                     var openResponse = data.Deserialize<OpenResponse>();
                     if (_openReceived == null)
                     {
@@ -412,11 +408,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking OpenResponse. event: {openResponse}");
-                    _openReceived.Invoke(null, openResponse);
-                    //InvokeResponseReceived(_openReceived, openResponse);
+                    InvokeParallel(_openReceived, openResponse);
                     break;
                 case LiveType.Results:
-                    //var eventResponse = new ResponseEvent<ResultResponse>(data.Deserialize<ResultResponse>());
                     var resultResponse = data.Deserialize<ResultResponse>();
                     if (_resultsReceived == null)
                     {
@@ -424,7 +418,7 @@ public class Client : Attribute, IDisposable
                         Log.Verbose("ProcessDataReceived", "LEAVE");
                         return;
                     }
-                    if ( resultResponse == null)
+                    if (resultResponse == null)
                     {
                         Log.Warning("ProcessDataReceived", "ResultResponse is invalid");
                         Log.Verbose("ProcessDataReceived", "LEAVE");
@@ -432,11 +426,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking ResultsResponse. event: {resultResponse}");
-                    _resultsReceived.Invoke(null, resultResponse);
-                    //InvokeResponseReceived(_resultsReceived, eventResponse);
+                    InvokeParallel(_resultsReceived, resultResponse);
                     break;
                 case LiveType.Metadata:
-                    //var metadataResponse = new ResponseEvent<MetadataResponse>(data.Deserialize<MetadataResponse>());
                     var metadataResponse = data.Deserialize<MetadataResponse>();
                     if (_metadataReceived == null)
                     {
@@ -452,11 +444,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking MetadataResponse. event: {metadataResponse}");
-                    _metadataReceived.Invoke(null, metadataResponse);
-                    //InvokeResponseReceived(_metadataReceived, metadataResponse);
+                    InvokeParallel(_metadataReceived, metadataResponse);
                     break;
                 case LiveType.UtteranceEnd:
-                    //var utteranceEndResponse = new ResponseEvent<UtteranceEndResponse>(data.Deserialize<UtteranceEndResponse>());
                     var utteranceEndResponse = data.Deserialize<UtteranceEndResponse>();
                     if (_utteranceEndReceived == null)
                     {
@@ -472,11 +462,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
-                    _utteranceEndReceived.Invoke(null, utteranceEndResponse);
-                    //InvokeResponseReceived(_utteranceEndReceived, utteranceEndResponse);
+                    InvokeParallel(_utteranceEndReceived, utteranceEndResponse);
                     break;
                 case LiveType.SpeechStarted:
-                    //var speechStartedResponse = new ResponseEvent<SpeechStartedResponse>(data.Deserialize<SpeechStartedResponse>());
                     var speechStartedResponse = data.Deserialize<SpeechStartedResponse>();
                     if (_speechStartedReceived == null)
                     {
@@ -492,11 +480,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
-                    _speechStartedReceived.Invoke(null, speechStartedResponse);
-                    //InvokeResponseReceived(_speechStartedReceived, speechStartedResponse);
+                    InvokeParallel(_speechStartedReceived, speechStartedResponse);
                     break;
                 case LiveType.Close:
-                    //var closeResponse = new ResponseEvent<CloseResponse>(data.Deserialize<CloseResponse>());
                     var closeResponse = data.Deserialize<CloseResponse>();
                     if (_closeReceived == null)
                     {
@@ -512,11 +498,9 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking CloseResponse. event: {closeResponse}");
-                    _closeReceived.Invoke(null, closeResponse);
-                    //InvokeResponseReceived(_closeReceived, closeResponse);
+                    InvokeParallel(_closeReceived, closeResponse);
                     break;
                 case LiveType.Error:
-                    //var errorResponse = new ResponseEvent<ErrorResponse>(data.Deserialize<ErrorResponse>());
                     var errorResponse = data.Deserialize<ErrorResponse>();
                     if (_errorReceived == null)
                     {
@@ -532,8 +516,7 @@ public class Client : Attribute, IDisposable
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking ErrorResponse. event: {errorResponse}");
-                    _errorReceived.Invoke(null, errorResponse);
-                    //InvokeResponseReceived(_errorReceived, errorResponse);
+                    InvokeParallel(_errorReceived, errorResponse);
                     break;
                 default:
                     if (_unhandledReceived == null)
@@ -543,14 +526,12 @@ public class Client : Attribute, IDisposable
                         return;
                     }
 
-                    //var unhandledResponse = new ResponseEvent<UnhandledResponse>(data.Deserialize<UnhandledResponse>());
                     var unhandledResponse = new UnhandledResponse();
                     unhandledResponse.Type = LiveType.Unhandled;
                     unhandledResponse.Raw = response;
 
                     Log.Debug("ProcessDataReceived", $"Invoking UnhandledResponse. event: {unhandledResponse}");
-                    _unhandledReceived.Invoke(null, unhandledResponse);
-                    //InvokeResponseReceived(_unhandledReceived, unhandledResponse);
+                    InvokeParallel(_unhandledReceived, unhandledResponse);
                     break;
             }
 
@@ -627,12 +608,18 @@ public class Client : Attribute, IDisposable
             // Always request cancellation to the local token source, if some function has been called without a token
             if (cancellationToken != null)
             {
-                Log.Debug("Stop", "Cancelling provided cancellation token...");
+                Log.Debug("Stop", "Cancelling provided token...");
                 cancellationToken.Cancel();
             }
 
             Log.Debug("Stop", "Disposing WebSocket connection...");
-            _cancellationTokenSource.Cancel();
+            if (_cancellationTokenSource != null)
+            {
+                Log.Debug("Stop", "Cancelling native token...");
+                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("Stop", "LEAVE");
@@ -684,6 +671,28 @@ public class Client : Attribute, IDisposable
 
         return new Uri($"{options.BaseAddress}/{UriSegments.LISTEN}?{queryString}");
     }
+
+    internal void InvokeParallel<T>(EventHandler<T> eventHandler, T e)
+    {
+        if (eventHandler != null)
+        {
+            try
+            {
+                Parallel.ForEach(
+                    eventHandler.GetInvocationList().Cast<EventHandler<T>>(),
+                    (handler) =>
+                        handler(null, e));
+            }
+            catch (AggregateException ae)
+            {
+                Log.Error("InvokeParallel", $"AggregateException occurred in one or more event handlers: {ae}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("InvokeParallel", $"Exception occurred in event handler: {ex}");
+            }
+        }
+    }
     #endregion
 
     #region Dispose
@@ -704,6 +713,7 @@ public class Client : Attribute, IDisposable
                 _cancellationTokenSource.Cancel();
             }
             _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
         }
 
         if (_sendChannel != null)
@@ -711,19 +721,13 @@ public class Client : Attribute, IDisposable
             _sendChannel.Writer.Complete();
         }
 
-        _clientWebSocket.Dispose();
+        if (_clientWebSocket != null)
+        {
+            _clientWebSocket.Dispose();
+            _clientWebSocket = null;
+        }
+
         GC.SuppressFinalize(this);
     }
-
-    //internal void InvokeResponseReceived<T>(EventHandler<T> eventHandler, ResponseEvent<T> e)
-    //{
-    //    if (eventHandler != null)
-    //    {
-    //        Parallel.ForEach(
-    //            eventHandler.GetInvocationList().Cast<EventHandler>(),
-    //            (handler) =>
-    //                handler(null, e));
-    //    }
-    //}
     #endregion
 }

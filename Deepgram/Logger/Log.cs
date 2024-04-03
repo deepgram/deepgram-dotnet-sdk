@@ -25,14 +25,14 @@ public sealed class Log
         {
             instance = new LoggerConfiguration()
                 .MinimumLevel.Is((Serilog.Events.LogEventLevel) level)
-                .WriteTo.Console()
-                .WriteTo.File(filename)
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
+                .WriteTo.File(filename, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
                 .CreateLogger();
             return instance;
         }
         instance = new LoggerConfiguration()
             .MinimumLevel.Is((Serilog.Events.LogEventLevel)level)
-            .WriteTo.Console()
+            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
             .CreateLogger();
         return instance;
     }
