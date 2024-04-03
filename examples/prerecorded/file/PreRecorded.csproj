@@ -19,4 +19,10 @@
 	  <Using Include="Deepgram" />
     </ItemGroup>
 
+	<ItemGroup>
+		<None Update="Bueller-Life-moves-pretty-fast.wav">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 </Project>

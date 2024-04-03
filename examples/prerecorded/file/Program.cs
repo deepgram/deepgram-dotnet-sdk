@@ -22,14 +22,22 @@ namespace PreRecorded
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new PreRecordedClient();
 
-            var response = await deepgramClient.TranscribeUrl(
-                new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
+            // check to see if the file exists
+            if (!File.Exists(@"Bueller-Life-moves-pretty-fast.wav"))
+            {
+                Console.WriteLine("Error: File 'Bueller-Life-moves-pretty-fast.wav' not found.");
+                return;
+            }
+
+            var audioData = File.ReadAllBytes(@"Bueller-Life-moves-pretty-fast.wav");
+            var response = await deepgramClient.TranscribeFile(
+                audioData,
                 new PrerecordedSchema()
                 {
                     Model = "nova-2",
+                    Punctuate = true,
                 });
 
-            //Console.WriteLine(response);
             Console.WriteLine(JsonSerializer.Serialize(response));
             Console.ReadKey();
 
