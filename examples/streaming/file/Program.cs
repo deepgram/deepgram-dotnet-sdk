@@ -21,16 +21,16 @@ namespace SampleApp
             var liveClient = new LiveClient();
 
             // Subscribe to the EventResponseReceived event
-            liveClient._resultsReceived += (sender, e) =>
+            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
                 if (e.Channel.Alternatives[0].Transcript == "")
                 {
                     return;
                 }
 
-                // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Response.Transcription));
-                Console.WriteLine($"Speaker: {e.Channel.Alternatives[0].Transcript}");
-            };
+                // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
+                Console.WriteLine($"\n\n\n----> Speaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
+            }));
 
             // Start the connection
             var liveSchema = new LiveSchema()
