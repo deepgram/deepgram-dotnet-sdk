@@ -32,15 +32,15 @@ namespace SampleApp
             //var liveClient = new LiveClienkt("set your DEEPGRAM_API_KEY here");
 
             // Subscribe to the EventResponseReceived event
-            liveClient._openReceived += (sender, e) =>
+            liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._metadataReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<MetadataResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received: {JsonSerializer.Serialize(e)}");
-            };
-            liveClient._resultsReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
                 if (e.Channel.Alternatives[0].Transcript == "")
                 {
@@ -48,28 +48,28 @@ namespace SampleApp
                 }
 
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
-                Console.WriteLine($"\n\n\nSpeaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
-            };
-            liveClient._speechStartedReceived += (sender, e) =>
+                Console.WriteLine($"\n\n\n----> Speaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
+            }));
+            liveClient.Subscribe(new EventHandler<SpeechStartedResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._utteranceEndReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<UtteranceEndResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._closeReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._unhandledReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<UnhandledResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received. Raw: {e.Raw}");
-            };
-            liveClient._errorReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received. Error: {e.Message}");
-            };
+                Console.WriteLine($"----> { e.Type} received. Error: {e.Message}");
+            }));
 
             // my own cancellation token
             //var cancellationToken = new CancellationTokenSource();

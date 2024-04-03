@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Threading;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
 
@@ -17,6 +18,7 @@ public class Client : Attribute, IDisposable
 
     private ClientWebSocket? _clientWebSocket;
     private CancellationTokenSource? _cancellationTokenSource;
+    private readonly Mutex _mutex = new Mutex();
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -35,18 +37,18 @@ public class Client : Attribute, IDisposable
         Log.Verbose("LiveClient", "LEAVE");
     }
 
-    #region Subscribe Events
+    #region Event Handlers
     /// <summary>
     /// Fires when an event is received from the Deepgram API
     /// </summary>
-    public event EventHandler<OpenResponse>? _openReceived;
-    public event EventHandler<MetadataResponse>? _metadataReceived;
-    public event EventHandler<ResultResponse>? _resultsReceived;
-    public event EventHandler<UtteranceEndResponse>? _utteranceEndReceived;
-    public event EventHandler<SpeechStartedResponse>? _speechStartedReceived;
-    public event EventHandler<CloseResponse>? _closeReceived;
-    public event EventHandler<UnhandledResponse>? _unhandledReceived;
-    public event EventHandler<ErrorResponse>? _errorReceived;
+    private event EventHandler<OpenResponse>? _openReceived;
+    private event EventHandler<MetadataResponse>? _metadataReceived;
+    private event EventHandler<ResultResponse>? _resultsReceived;
+    private event EventHandler<UtteranceEndResponse>? _utteranceEndReceived;
+    private event EventHandler<SpeechStartedResponse>? _speechStartedReceived;
+    private event EventHandler<CloseResponse>? _closeReceived;
+    private event EventHandler<UnhandledResponse>? _unhandledReceived;
+    private event EventHandler<ErrorResponse>? _errorReceived;
     #endregion
 
     /// <summary>
@@ -161,36 +163,111 @@ public class Client : Attribute, IDisposable
         Log.Verbose("LiveClient.Connect", "LEAVE");
     }
 
-    //// TODO: convienence method for subscribing to events
-    //public void On<T>(T e, EventHandler<T> eventHandler) {
-    //    switch (e)
-    //       {
-    //        case OpenResponse open:
-    //            OpenReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case MetadataResponse metadata:
-    //            MetadataReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case ResultResponse result:
-    //            ResultsReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case UtteranceEndResponse utteranceEnd:
-    //            UtteranceEndReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case SpeechStartedResponse speechStarted:
-    //            SpeechStartedReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case CloseResponse close:
-    //            CloseReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case UnhandledResponse unhandled:
-    //            UnhandledReceived += (sender, e) => eventHandler;
-    //            break;
-    //        case ErrorResponse error:
-    //            ErrorReceived += (sender, e) => eventHandler;
-    //            break;
-    //    }
-    //}
+    #region Subscribe Event
+    /// <summary>
+    /// Subscribe to an Open event from the Deepgram API
+    /// </summary>
+    /// <param name="eventHandler"></param>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<OpenResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _openReceived += (sender, e) => eventHandler(sender, e);
+        }
+       
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a Metadata event from the Deepgram API
+    /// </summary>
+    /// <param name="eventHandler"></param>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<MetadataResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _metadataReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a Results event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<ResultResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _resultsReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to an UtteranceEnd event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<UtteranceEndResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _utteranceEndReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a SpeechStarted event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<SpeechStartedResponse> eventHandler)
+    {
+        _speechStartedReceived += (sender, e) => eventHandler(sender, e);
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a Close event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<CloseResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _closeReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to an Unhandled event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<UnhandledResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _unhandledReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to an Error event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public bool Subscribe(EventHandler<ErrorResponse> eventHandler)
+    {
+        lock (_mutex)
+        {
+            _errorReceived += (sender, e) => eventHandler(sender, e);
+        }
+        return true;
+    }
+    #endregion
 
     /// <summary>
     /// Sends a binary message over the WebSocket connection.

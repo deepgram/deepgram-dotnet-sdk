@@ -7,13 +7,7 @@ set -o xtrace
 
 rm -rf ./.vs
 rm -rf ./dist
-rm -rf ./Deepgram/obj
-rm -rf ./Deepgram/bin
 
-# Deepgram.Tests
-rm -rf ./Deepgram.Tests/bin
-rm -rf ./Deepgram.Tests/obj
-
-# Deepgram.Microphone
-rm -rf ./Deepgram.Microphone/bin
-rm -rf ./Deepgram.Microphone/obj
+# delete all compile actifacts
+find ./ -type d -iname obj -print0 | xargs -0 rm -rf
+find ./ -type d -iname bin -print0 | xargs -0 rm -rf
