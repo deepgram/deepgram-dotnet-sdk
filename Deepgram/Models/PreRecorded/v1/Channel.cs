@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 namespace Deepgram.Models.PreRecorded.v1;
+
 public record Channel
 {
     /// <summary>

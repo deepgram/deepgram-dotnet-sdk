@@ -19,6 +19,12 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
+            // JSON options
+            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
+            {
+                WriteIndented = true
+            };
+
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -28,48 +34,41 @@ namespace SampleApp
                 Console.WriteLine("No projects found.");
                 return;
             }
+            Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
 
-            Console.WriteLine(JsonSerializer.Serialize(response));
+            var projectId = "";
+            foreach (var project in response.Projects)
+            {
+                Console.WriteLine($"Using Project ID: {project.ProjectId}");
+                projectId = project.ProjectId;
+                break;
+            }
 
-            //var projectId = "";
-            //foreach (var project in response.Projects)
-            //{
-            //    Console.WriteLine($"Project ID: {project.ProjectId}");
-            //    projectId = project.ProjectId;
-            //    break;
-            //}
+            var balanacesResponse = deepgramClient.GetBalances(projectId);
+            if (balanacesResponse == null)
+            {
+                Console.WriteLine("\n\nNo balance found.\n\n");
+                return;
+            }
+            Console.WriteLine($"\n\n{JsonSerializer.Serialize(balanacesResponse, options)}\n\n");
 
-            //var balanacesResponse = deepgramClient.GetBalances(projectId);
-            //if (balanacesResponse == null || balanacesResponse.Balances == null)
-            //{
-            //    Console.WriteLine("No balance found.");
-            //    return;
-            //}
+            string balanceId = "";
+            foreach (var balance in balanacesResponse.Result.Balances)
+            {
+                Console.WriteLine($"Using Balance ID: {balance.BalanceId}");
+                balanceId = balance.BalanceId;
+                break;
+            }
 
-            //Console.WriteLine("\n\nBalances:");
-            //Console.WriteLine(JsonSerializer.Serialize(balanacesResponse));
-            //Console.WriteLine("\n\n");
+            var balanceResponse = deepgramClient.GetBalance(projectId, balanceId);
+            if (balanceResponse == null)
+            {
+                Console.WriteLine("\n\nNo balance found.\n\n");
+                return;
+            }
+            Console.WriteLine($"\n\n{JsonSerializer.Serialize(balanceResponse, options)}\n\n");
 
-            //string balanceId = "";
-            //foreach (var balance in balanacesResponse.Balances)
-            //{
-            //    Console.WriteLine($"Balance ID: {balance.BalanceId}");
-            //    balanceId = balance.BalanceId;
-            //    break;
-            //}
-
-            //var balanaceResponse = deepgramClient.GetBalance(projectId, balanceId);
-            //if (balanaceResponse == null)
-            //{
-            //    Console.WriteLine("No balance found.");
-            //    return;
-            //}
-
-            //Console.WriteLine("\n\nBalances:");
-            //Console.WriteLine(JsonSerializer.Serialize(balanacesResponse));
-            //Console.WriteLine("\n\n");
-
-            Console.WriteLine("Press any key to exit.");
+            Console.WriteLine("\n\nPress any key to exit.");
             Console.ReadKey();
 
             // Teardown Library
