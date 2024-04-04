@@ -59,7 +59,7 @@ public class Client : Attribute, IDisposable
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Connect(LiveSchema options, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
+    public async Task Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
         Log.Verbose("LiveClient.Connect", "ENTER");
@@ -72,7 +72,14 @@ public class Client : Attribute, IDisposable
             // client has already connected
             var exStr = "Client has already been initialized";
             Log.Error("Connect", exStr);
+            Log.Verbose("LiveClient.Connect", "LEAVE");
             throw new InvalidOperationException(exStr);
+        }
+
+        if (cancelToken == null)
+        {
+            Log.Information("Connect", "Using default connect cancellation token");
+            cancelToken = new CancellationTokenSource(Constants.DefaultConnectTimeout);
         }
 
         // create client
@@ -104,16 +111,8 @@ public class Client : Attribute, IDisposable
             }
         }
 
-        // cancelation token
-        if (cancellationToken != null)
-        {
-            Log.Information("Connect", "Using provided cancellation token");
-            _cancellationTokenSource = cancellationToken;
-        } else
-        {
-            Log.Information("Connect", "Using default cancellation token");
-            _cancellationTokenSource = new CancellationTokenSource();
-        }
+        // internal cancelation token for internal threads
+        _cancellationTokenSource = new CancellationTokenSource();
 
         try
         {
@@ -121,7 +120,7 @@ public class Client : Attribute, IDisposable
             Log.Debug("Connect", $"uri: {_uri}");
 
             Log.Debug("Connect", "Connecting to Deepgram API...");
-            await _clientWebSocket.ConnectAsync(_uri, _cancellationTokenSource.Token).ConfigureAwait(false);
+            await _clientWebSocket.ConnectAsync(_uri, cancelToken.Token).ConfigureAwait(false);
 
             Log.Debug("Connect", "Starting Sender Thread...");
             StartSenderBackgroundThread();
@@ -145,10 +144,20 @@ public class Client : Attribute, IDisposable
             }
 
             Log.Debug("Connect", "Connect Succeeded");
+            Log.Verbose("LiveClient.Connect", "LEAVE");
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log.Debug("Connect", "Connect cancelled.");
+            Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("LiveClient.Connect", "LEAVE");
         }
         catch (Exception ex)
         {
-            Log.Error("Connect", $"Excepton: {ex}");
+            Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Connect", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.Connect", "LEAVE");
+            throw;
         }
 
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
@@ -162,8 +171,6 @@ public class Client : Attribute, IDisposable
         void StartKeepAliveBackgroundThread() => _ = Task.Factory.StartNew(
                 _ => ProcessKeepAlive(),
                 TaskCreationOptions.LongRunning);
-
-        Log.Verbose("LiveClient.Connect", "LEAVE");
     }
 
     #region Subscribe Event
@@ -327,13 +334,14 @@ public class Client : Attribute, IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error("EnqueueSendMessage", $"Excepton: {ex}");
+            Log.Error("EnqueueSendMessage", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("EnqueueSendMessage", $"Excepton: {ex}");
         }
     }
 
     internal async Task ProcessSendQueue()
     {
-        Log.Verbose("ProcessSendQueue", "ENTER");
+        Log.Verbose("LiveClient.ProcessSendQueue", "ENTER");
 
         if (_clientWebSocket == null)
         {
@@ -348,6 +356,12 @@ public class Client : Attribute, IDisposable
         {
             while (await _sendChannel.Reader.WaitToReadAsync(_cancellationTokenSource.Token))
             {
+                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    Log.Information("ProcessSendQueue", "KeepAliveThread cancelled");
+                    break;
+                }
+
                 Log.Verbose("ProcessSendQueue", "Reading message of queue...");
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
@@ -361,28 +375,26 @@ public class Client : Attribute, IDisposable
                 }
             }
 
-            Log.Verbose("ProcessSendQueue", "Succeeded");
-            Log.Verbose("ProcessSendQueue", "LEAVE");
-            return;
+            Log.Verbose("ProcessSendQueue", "Exit");
+            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
         }
         catch (OperationCanceledException ex)
         {
-            Log.Debug("ProcessSendQueue", $"SendThread cancelled.");
+            Log.Debug("ProcessSendQueue", "SendThread cancelled.");
             Log.Verbose("ProcessSendQueue", $"SendThread cancelled. Info: {ex}");
+            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
         }
         catch (Exception ex)
         {
-            Log.Error("ProcessSendQueue", $"Excepton: {ex}");
-            Log.Verbose("ProcessSendQueue", "LEAVE");
-            throw;
+            Log.Error("ProcessSendQueue", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("ProcessSendQueue", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
         }
-
-        Log.Verbose("ProcessSendQueue", "LEAVE");
     }
 
     internal async void ProcessKeepAlive()
     {
-        Log.Verbose("ProcessKeepAlive", "ENTER");
+        Log.Verbose("LiveClient.ProcessKeepAlive", "ENTER");
 
         try
         {
@@ -406,28 +418,26 @@ public class Client : Attribute, IDisposable
                 }
             }
 
-            Log.Verbose("ProcessKeepAlive", "Exiting");
-            Log.Verbose("ProcessKeepAlive", "LEAVE");
-            return;
+            Log.Verbose("ProcessKeepAlive", "Exit");
+            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
-            Log.Debug("ProcessKeepAlive", $"KeepAliveThread cancelled.");
+            Log.Debug("ProcessKeepAlive", "KeepAliveThread cancelled.");
             Log.Verbose("ProcessKeepAlive", $"KeepAliveThread cancelled. Info: {ex}");
+            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
         }
         catch (Exception ex)
         {
-            Log.Error("ProcessKeepAlive", $"Excepton: {ex}");
-            Log.Verbose("ProcessKeepAlive", "LEAVE");
-            throw;
+            Log.Error("ProcessKeepAlive", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("ProcessKeepAlive", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
         }
-
-        Log.Verbose("ProcessKeepAlive", "LEAVE");
     }
 
     internal async Task ProcessReceiveQueue()
     {
-        Log.Verbose("ProcessReceiveQueue", "ENTER");
+        Log.Verbose("LiveClient.ProcessReceiveQueue", "ENTER");
 
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
@@ -436,7 +446,9 @@ public class Client : Attribute, IDisposable
                 if (_cancellationTokenSource.Token.IsCancellationRequested)
                 {
                     Log.Information("ProcessReceiveQueue", "ReceiveThread cancelled");
-                    break;
+                    await Stop();
+                    Log.Verbose("ProcessReceiveQueue", "LEAVE");
+                    return;
                 }
 
                 var buffer = new ArraySegment<byte>(new byte[Constants.BufferSize]);
@@ -456,50 +468,46 @@ public class Client : Attribute, IDisposable
                             );
                     } while (!result.EndOfMessage);
 
-                    if (result.MessageType == WebSocketMessageType.Close)
+                    if (result.MessageType != WebSocketMessageType.Close)
                     {
-                        Log.Information("ProcessReceiveQueue", "Received Close message");
-                        break;
+                        Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
+                        ProcessDataReceived(result, ms);
                     }
-
-                    Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
-                    ProcessDataReceived(result, ms);
                 }
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    Log.Information("ProcessReceiveQueue", "Received WebSocket Close");
+                    Log.Information("ProcessReceiveQueue", "Received WebSocket Close. Trigger cancel...");
                     await Stop();
-                    break;
+                    Log.Verbose("ProcessReceiveQueue", "LEAVE");
+                    return;
                 }
             }
             catch (TaskCanceledException ex)
             {
-                Log.Debug("ProcessReceiveQueue", $"ReceiveThread cancelled.");
+                Log.Debug("ProcessReceiveQueue", "ReceiveThread cancelled.");
                 Log.Verbose("ProcessReceiveQueue", $"ReceiveThread cancelled. Info: {ex}");
+                Log.Verbose("LiveClient.ProcessReceiveQueue", "LEAVE");
             }
             catch (Exception ex)
             {
-                Log.Error("ProcessReceiveQueue", $"Excepton: {ex}");
-                Log.Verbose("ProcessReceiveQueue", "LEAVE");
-                throw;
+                Log.Error("ProcessReceiveQueue", $"{ex.GetType()} thrown {ex.Message}");
+                Log.Verbose("ProcessReceiveQueue", $"Excepton: {ex}");
+                Log.Verbose("LiveClient.ProcessReceiveQueue", "LEAVE");
             }
         }
-
-        Log.Verbose("ProcessReceiveQueue", "Succeeded");
-        Log.Verbose("ProcessReceiveQueue", "LEAVE");
     }
 
     internal void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
     {
-        Log.Verbose("ProcessDataReceived", "ENTER");
+        Log.Verbose("LiveClient.ProcessDataReceived", "ENTER");
 
         ms.Seek(0, SeekOrigin.Begin);
 
         if (result.MessageType != WebSocketMessageType.Text)
         {
             Log.Warning("ProcessDataReceived", "Received a text message. This is not supported.");
-            Log.Verbose("ProcessDataReceived", "LEAVE");
+            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
             return;
         }
 
@@ -507,7 +515,7 @@ public class Client : Attribute, IDisposable
         if (response == null)
         {
             Log.Warning("ProcessDataReceived", "Response is null");
-            Log.Verbose("ProcessDataReceived", "LEAVE");
+            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
             return;
         }
 
@@ -664,110 +672,110 @@ public class Client : Attribute, IDisposable
             }
 
             Log.Debug("ProcessDataReceived", "Succeeded");
-            Log.Verbose("ProcessDataReceived", "LEAVE");
-            return;
+            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
         }
         catch (JsonException ex)
         {
-            Log.Error("ProcessDataReceived", $"JsonException: {ex}");
+            Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
         }
         catch (Exception ex)
         {
-            Log.Error("ProcessDataReceived", $"Excepton: {ex}");
+            Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
         }
-
-        Log.Verbose("ProcessDataReceived", "LEAVE");
     }
 
     /// <summary>
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Stop(CancellationTokenSource? cancellationToken = null)
+    public async Task Stop(CancellationTokenSource? cancelToken = null)
     {
-        Log.Verbose("Stop", "ENTER");
-
-        var cancelToken = _cancellationTokenSource.Token;
-        if (cancellationToken != null)
-        {
-            Log.Verbose("Stop", "Using provided cancellation token");
-            cancelToken = cancellationToken.Token;
-        } 
+        Log.Verbose("LiveClient.Stop", "ENTER");
 
         // client is already disposed
         if (_clientWebSocket == null)
         {
-            Log.Warning("Stop", "Client has already been disposed");
-            Log.Verbose("Stop", "LEAVE");
+            Log.Information("Stop", "Client has already been disposed");
+            Log.Verbose("LiveClient.Stop", "LEAVE");
             return;
         }
 
-        // send the close message and flush transcription message
-        try {
-            if (_clientWebSocket!.State == WebSocketState.Open)
-            {
-                Log.Debug("Stop", "Sending Close message...");
+        if (cancelToken == null)
+        {
+            Log.Information("Stop", "Using default disconnect cancellation token");
+            cancelToken = new CancellationTokenSource(Constants.DefaultConnectTimeout);
+        }
 
-                // send a close to Deepgram
-                lock (_mutexSend)
-                {
-                    _clientWebSocket.SendAsync(new ArraySegment<byte>([]), WebSocketMessageType.Binary, true, cancelToken)
-                        .ConfigureAwait(false);
-                }
-
-                // send a CloseResponse event
-                if (_closeReceived != null)
-                {
-                    Log.Debug("Stop", "Sending CloseResponse event...");
-                    var data = new CloseResponse();
-                    data.Type = LiveType.Close;
-                    _closeReceived.Invoke(null, data);
-                }
-            }
-
-            // attempt to stop the connection
-            if (_clientWebSocket!.State != WebSocketState.Closed)
-            {
-                Log.Debug("Stop", "Closing WebSocket connection...");
-                await _clientWebSocket.CloseOutputAsync(
-                    WebSocketCloseStatus.NormalClosure,
-                    string.Empty,
-                    cancelToken)
-                    .ConfigureAwait(false);
-            }
-
-            // Always request cancellation to the local token source, if some function has been called without a token
-            if (cancellationToken != null)
-            {
-                Log.Debug("Stop", "Cancelling provided token...");
-                cancellationToken.Cancel();
-            }
-
-            Log.Debug("Stop", "Disposing WebSocket connection...");
+        try
+        {
+            // cancel the internal token to stop all threads
             if (_cancellationTokenSource != null)
             {
                 Log.Debug("Stop", "Cancelling native token...");
                 _cancellationTokenSource.Cancel();
+            }
+
+            // if websocket is open, send a close message
+            if (_clientWebSocket!.State == WebSocketState.Open)
+            {
+                Log.Debug("Stop", "Sending Close message...");
+                // send a close to Deepgram
+                lock (_mutexSend)
+                {
+                    _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, cancelToken.Token)
+                        .ConfigureAwait(false);
+                }
+            }
+
+            // send a CloseResponse event
+            if (_closeReceived != null)
+            {
+                Log.Debug("Stop", "Sending CloseResponse event...");
+                var data = new CloseResponse();
+                data.Type = LiveType.Close;
+                InvokeParallel(_closeReceived, data);
+            }
+
+            // attempt to stop the connection
+            if (_clientWebSocket!.State != WebSocketState.Closed && _clientWebSocket!.State != WebSocketState.Aborted)
+            {
+                Log.Debug("Stop", "Closing WebSocket connection...");
+                await _clientWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancelToken.Token)
+                    .ConfigureAwait(false);
+            }
+
+            // clean up internal token
+            if (_cancellationTokenSource != null)
+            {
+                Log.Debug("Stop", "Disposing internal token...");
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = null;
             }
 
+            // release the socket
+            Log.Debug("Stop", "Disposing WebSocket socket...");
+            _clientWebSocket = null;
+
             Log.Debug("Stop", "Succeeded");
-            Log.Verbose("Stop", "LEAVE");
-            return;
+            Log.Verbose("LiveClient.Stop", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
-            Log.Debug("Stop", $"Stop cancelled.");
+            Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
+            Log.Verbose("LiveClient.Stop", "LEAVE");
         }
         catch (Exception ex)
         {
-            Log.Error("Stop", $"Excepton: {ex}");
+            Log.Error("Stop", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Stop", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.Stop", "LEAVE");
+            throw;
         }
-
-        _clientWebSocket = null;
-        Log.Verbose("Stop", "LEAVE");
     }
 
     #region Helpers

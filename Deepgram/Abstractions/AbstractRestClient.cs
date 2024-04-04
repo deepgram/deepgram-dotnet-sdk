@@ -47,7 +47,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> GetAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
     Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("GetAsync<T>", "ENTER");
+        Log.Verbose("AbstractRestClient.GetAsync<T>", "ENTER");
         Log.Debug("GetAsync<T>", $"uriSegment: {uriSegment}");
         Log.Debug("GetAsync<T>", $"addons: {addons}");
 
@@ -82,13 +82,21 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<T>", "Succeeded");
-            Log.Verbose("GetAsync<T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.GetAsync<T>", "LEAVE");
             return result;
+        }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("GetAsync<T>", "Task was cancelled.");
+            Log.Verbose("GetAsync<T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.GetAsync<T>", "LEAVE");
+            throw;
         }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<T>", $"Exception: {ex}");
-            Log.Verbose("GetAsync<T>", "LEAVE");
+            Log.Error("GetAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("GetAsync<T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.GetAsync<T>", "LEAVE");
             throw;
         }
     }
@@ -96,7 +104,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> GetAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("GetAsync<S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.GetAsync<S, T>", "ENTER");
         Log.Debug("GetAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("GetAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("GetAsync<S, T>", $"addons: {addons}");
@@ -131,14 +139,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<S, T>", "Succeeded");
-            Log.Verbose("GetAsync<S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.GetAsync<S, T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("GetAsync<S, T>", "Task was cancelled.");
+            Log.Verbose("GetAsync<S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.GetAsync<S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<S, T>", $"Exception: {ex}");
-            Log.Verbose("GetAsync<S, T>", "LEAVE");
+            Log.Error("GetAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("GetAsync<S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.GetAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -155,7 +171,7 @@ public abstract class AbstractRestClient
         Dictionary<string, string>? headers = null
         )
     {
-        Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "ENTER");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"parameter: {parameter}");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"keys: {keys}");
@@ -237,7 +253,7 @@ public abstract class AbstractRestClient
             await response.Content.CopyToAsync(stream);
 
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Succeeded");
-            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
 
             return new LocalFileWithMetadata()
                         {
@@ -246,10 +262,18 @@ public abstract class AbstractRestClient
                         };
 
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PostRetrieveLocalFileAsync<R, S, T>", "Task was cancelled.");
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("PostRetrieveLocalFileAsync<R, S, T>", $"Exception: {ex}");
-            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
+            Log.Error("PostRetrieveLocalFileAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
             throw;
         }
     }
@@ -264,7 +288,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PostAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PostAsync<S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.PostAsync<S, T>", "ENTER");
         Log.Debug("PostAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PostAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PostAsync<S, T>", $"addons: {addons}");
@@ -302,14 +326,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<S, T>", $"Succeeded. Result: {result}");
-            Log.Verbose("PostAsync<S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PostAsync<S, T>", "Task was cancelled.");
+            Log.Verbose("PostAsync<S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<S, T>", $"Exception: {ex}");
-            Log.Verbose("PostAsync<S, T>", "LEAVE");
+            Log.Error("PostAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PostAsync<S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -317,7 +349,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PostAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PostAsync<R, S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "ENTER");
         Log.Debug("PostAsync<R, S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PostAsync<R, S, T>", $"parameter: {parameter}");
         Log.Debug("PostAsync<R, S, T>", $"addons: {addons}");
@@ -365,14 +397,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<R, S, T>", $"Succeeded. Result: {result}");
-            Log.Verbose("PostAsync<R, S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PostAsync<R, S, T>", "Task was cancelled.");
+            Log.Verbose("PostAsync<R, S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<R, S, T>", $"Exception: {ex}");
-            Log.Verbose("PostAsync<R, S, T>", "LEAVE");
+            Log.Error("PostAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PostAsync<R, S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
             throw;
         }
     }
@@ -386,7 +426,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PatchAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PatchAsync<S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "ENTER");
         Log.Debug("PatchAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PatchAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PatchAsync<S, T>", $"addons: {addons}");
@@ -431,18 +471,25 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PatchAsync<S, T>", $"Succeeded. Result: {result}");
-            Log.Verbose("PatchAsync<S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
 
             return result;
 
         }
-        catch (Exception ex)
+        catch (OperationCanceledException ex)
         {
-            Log.Error("PatchAsync<S, T>", $"Exception: {ex}");
-            Log.Verbose("PatchAsync<S, T>", "LEAVE");
+            Log.Information("PatchAsync<S, T>", "Task was cancelled.");
+            Log.Verbose("PatchAsync<S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
             throw;
         }
-
+        catch (Exception ex)
+        {
+            Log.Error("PatchAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PatchAsync<S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
+            throw;
+        }
     }
 
     /// <summary>
@@ -454,7 +501,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PutAsync<S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.PutAsync<S, T>", "ENTER");
         Log.Debug("PutAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PutAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PutAsync<S, T>", $"addons: {addons}");
@@ -496,14 +543,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PutAsync<S, T>", $"Succeeded. Result: {result}");
-            Log.Verbose("PutAsync<S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PutAsync<S, T>", "Task was cancelled.");
+            Log.Verbose("PutAsync<S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("PutAsync<S, T>", $"Exception: {ex}");
-            Log.Verbose("PutAsync<S, T>", "LEAVE");
+            Log.Error("PutAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PutAsync<S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
             throw;
         }
     }
@@ -515,7 +570,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("DeleteAsync<T>", "ENTER");
+        Log.Verbose("AbstractRestClient.DeleteAsync<T>", "ENTER");
         Log.Debug("DeleteAsync<T>", $"uriSegment: {uriSegment}");
         Log.Debug("DeleteAsync<T>", $"addons: {addons}");
 
@@ -549,14 +604,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("DeleteAsync<T>", $"Succeeded. Result: {result}");
-            Log.Verbose("DeleteAsync<T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("DeleteAsync<T>", "Task was cancelled.");
+            Log.Verbose("DeleteAsync<T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<T>", $"Exception: {ex}");
-            Log.Verbose("DeleteAsync<T>", "LEAVE");
+            Log.Error("DeleteAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("DeleteAsync<T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
             throw;
         }
     }
@@ -570,7 +633,7 @@ public abstract class AbstractRestClient
     public virtual async Task<T> DeleteAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("DeleteAsync<S, T>", "ENTER");
+        Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "ENTER");
         Log.Debug("DeleteAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("DeleteAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("DeleteAsync<S, T>", $"addons: {addons}");
@@ -605,14 +668,22 @@ public abstract class AbstractRestClient
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("DeleteAsync<S, T>", $"Succeeded. Result: {result}");
-            Log.Verbose("DeleteAsync<S, T>", "LEAVE");
+            Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
 
             return result;
         }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("DeleteAsync<S, T>", "Task was cancelled.");
+            Log.Verbose("DeleteAsync<S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
+            throw;
+        }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<S, T>", $"Exception: {ex}");
-            Log.Verbose("DeleteAsync<S, T>", "LEAVE");
+            Log.Error("DeleteAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("DeleteAsync<S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
             throw;
         }
     }

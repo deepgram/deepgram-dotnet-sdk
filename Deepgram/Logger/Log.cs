@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Serilog;
+using Serilog.Events;
 
 namespace Deepgram.Logger;
 
@@ -21,17 +22,25 @@ public sealed class Log
     /// </summary>
     public static Serilog.ILogger Initialize(LogLevel level = LogLevel.Information, string? filename = "log.txt")
     {
+        if (level == LogLevel.Disable)
+        {
+            instance = new LoggerConfiguration()
+                .MinimumLevel.Is(((LogEventLevel)1 + (int)LogEventLevel.Fatal))
+                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
+                .CreateLogger();
+            return instance;
+        }
         if (filename != null)
         {
             instance = new LoggerConfiguration()
-                .MinimumLevel.Is((Serilog.Events.LogEventLevel) level)
+                .MinimumLevel.Is((LogEventLevel) level)
                 .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
                 .WriteTo.File(filename, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
                 .CreateLogger();
             return instance;
         }
         instance = new LoggerConfiguration()
-            .MinimumLevel.Is((Serilog.Events.LogEventLevel)level)
+            .MinimumLevel.Is((LogEventLevel)level)
             .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level}] {Message}{NewLine}{Exception}")
             .CreateLogger();
         return instance;

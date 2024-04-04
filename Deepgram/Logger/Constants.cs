@@ -44,4 +44,9 @@ public enum LogLevel
     /// occurs.
     /// </summary>
     Fatal = Serilog.Events.LogEventLevel.Fatal,
+
+    /// <summary>
+    /// Disable logging... Do so at your own peril.
+    /// </summary>
+    Disable = Serilog.Events.LogEventLevel.Fatal + 1
 }
