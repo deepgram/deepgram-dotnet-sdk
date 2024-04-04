@@ -7,67 +7,67 @@ namespace Deepgram.Models.Analyze.v1;
 public class AnalyzeSchema
 {
     /// <summary>
-    /// TODO
+    /// Callback URL to provide if you would like your submitted text to be processed.
     /// </summary>
     [JsonPropertyName("callback")]
     public string? CallBack { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enable a callback method
     /// </summary>
     [JsonPropertyName("callback_method")]
     public string? CallbackMethod { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Define custom intents.
     /// </summary>
     [JsonPropertyName("custom_intent")]
     public List<string>? CustomIntent { get; set; }
 
     /// <summary>
-    /// TODO
+    /// When strict, the model will only return intents submitted using the custom_intent param. When extended, the model will return its own detected intents in addition to those submitted using the custom_intent param. Default: extended
     /// </summary>
     [JsonPropertyName("custom_intent_mode")]
     public string? CustomIntentMode { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Define custom topics.
     /// </summary>
     [JsonPropertyName("custom_topic")]
     public List<string>? CustomTopic { get; set; }
 
     /// <summary>
-    /// TODO
+    /// When strict, the model will only return topics submitted using the custom_topic param. When extended, the model will return its own detected topics in addition to those submitted using the custom_topic param. Default: extended
     /// </summary>
     [JsonPropertyName("custom_topic_mode")]
     public string? CustomTopicMode { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Recognizes speaker intent throughout an entire input text. Returns a list of text segments and the intents found within each segment
     /// </summary>
     [JsonPropertyName("intents")]
     public bool? Intents { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Required: en. The language of your input text. (Only English language is supported at this time)
     /// </summary>
     [JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Recognizes the sentiment of the entire input text and detects a shift in sentiment throughout. Returns a list of text segments and the sentiment found within each segment.
     /// </summary>
     [JsonPropertyName("sentiment")]
     public bool? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Provides a brief summary of the input text.
     /// </summary>
     [JsonPropertyName("summarize")]
     public bool? Summarize { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Detects topics throughout an entire input text. Returns a list of text segments and the topics found within each segment.
     /// </summary>
     [JsonPropertyName("topics")]
     public bool? Topics { get; set; }

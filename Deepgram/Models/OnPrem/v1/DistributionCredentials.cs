@@ -7,31 +7,31 @@ namespace Deepgram.Models.OnPrem.v1;
 public record DistributionCredentials
 {
     /// <summary>
-    /// TODO
+    /// Distribution credentials ID
     /// </summary>
     [JsonPropertyName("distribution_credentials_id")]
     public string? DistributionCredentialsId { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Provider name
     /// </summary>
     [JsonPropertyName("provider")]
     public string? Provider { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Comment
     /// </summary>
     [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Scopes of the credentials
     /// </summary>
     [JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Created date/time
     /// </summary>
     [JsonPropertyName("created")]
     public DateTime? Created { get; set; }

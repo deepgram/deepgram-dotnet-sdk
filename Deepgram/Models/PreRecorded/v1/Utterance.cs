@@ -31,13 +31,13 @@ public record Utterance
     public string? Id { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment of the word: positive, negative, neutral.
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score of the word.
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }

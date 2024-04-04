@@ -7,7 +7,7 @@ namespace Deepgram.Models.Live.v1;
 public record CloseResponse
 {
     /// <summary>
-    /// TODO
+    /// Close event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

@@ -351,7 +351,8 @@ public class Client : Attribute, IDisposable
                 Log.Verbose("ProcessSendQueue", "Reading message of queue...");
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
-                    Log.Verbose("ProcessSendQueue", $"Sending message..."); // TODO: dump this message
+                    // TODO: Add logging for message capturing for possible playback
+                    Log.Verbose("ProcessSendQueue", "Sending message...");
                     lock (_mutexSend)
                     {
                         _clientWebSocket.SendAsync(message.Message, message.MessageType, true, _cancellationTokenSource.Token)

@@ -7,13 +7,13 @@ namespace Deepgram.Models.OnPrem.v1;
 public record CredentialResponse
 {
     /// <summary>
-    /// TODO
+    /// Member information
     /// </summary>
     [JsonPropertyName("member")]
     public Member? Member { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Distribution credentials
     /// </summary>
     [JsonPropertyName("distribution_credentials")]
     public DistributionCredentials? DistributionCredentials { get; set; }

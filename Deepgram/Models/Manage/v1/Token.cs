@@ -7,13 +7,13 @@ namespace Deepgram.Models.Manage.v1;
 public record Token
 {
     /// <summary>
-    /// TODO
+    /// Input tokens
     /// </summary>
     [JsonPropertyName("in")]
     public int? In { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Output tokens
     /// </summary>
     [JsonPropertyName("out")]
     public int? Out { get; set; }

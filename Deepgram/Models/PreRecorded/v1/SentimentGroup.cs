@@ -7,13 +7,13 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record SentimentGroup
 {
     /// <summary>
-    /// TODO
+    /// Segments of the audio
     /// </summary>
     [JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment of the segment
     /// </summary>
     [JsonPropertyName("average")]
     public Average? Average { get; set; }

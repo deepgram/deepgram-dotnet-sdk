@@ -33,7 +33,7 @@ public record Metadata
     public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Intents information.
     /// </summary>
     [JsonPropertyName("intents_info")]
     public IntentsInfo? IntentsInfo { get; set; }
@@ -45,7 +45,7 @@ public record Metadata
     public Dictionary<string, ModelInfo>? ModelInfo { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Models used to process the submitted audio.
     /// </summary>
     [JsonPropertyName("models")]
     public List<string>? Models { get; set; }
@@ -57,7 +57,7 @@ public record Metadata
     public string? RequestId { get; set; }
 
     /// <summary>
-    /// TODO.
+    /// Sentiment information.
     /// </summary>
     [JsonPropertyName("sentiment_info")]
     public SentimentInfo? SentimentInfo { get; set; }
@@ -69,13 +69,13 @@ public record Metadata
     public string? Sha256 { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Summary information.
     /// </summary>
     [JsonPropertyName("summary_info")]
     public SummaryInfo? SummaryInfo { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Topics information.
     /// </summary>
     [JsonPropertyName("topics_info")]
     public TopicsInfo? TopicsInfo { get; set; }

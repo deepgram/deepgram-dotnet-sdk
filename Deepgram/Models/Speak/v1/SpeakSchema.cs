@@ -14,7 +14,7 @@ public class SpeakSchema
     public string? Model { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Bit Rate allows you to specify the bit rate of your desired audio.
     /// </summary>
     [JsonPropertyName("bit_rate")]
     public string? BitRate { get; set; }
@@ -28,7 +28,7 @@ public class SpeakSchema
     public string? CallBack { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Audio container format
     /// </summary>
     [JsonPropertyName("container")]
     public string? Container { get; set; }

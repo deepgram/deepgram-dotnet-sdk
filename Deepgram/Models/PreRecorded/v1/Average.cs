@@ -7,13 +7,13 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record Average
 {
     /// <summary>
-    /// TODO
+    /// Sentiment: positive, negative, neutral
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score of the audio segment, ranging from -1 (negative sentiment) to 1 (positive sentiment), with 0 indicating neutral sentiment.
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }

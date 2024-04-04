@@ -7,13 +7,13 @@ namespace Deepgram.Models.Live.v1;
 public record Average
 {
     /// <summary>
-    /// TODO
+    /// Sentiment: Positive, Negative, or Neutral.
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score.
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }

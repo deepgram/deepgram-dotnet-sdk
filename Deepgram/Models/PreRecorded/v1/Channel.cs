@@ -20,7 +20,7 @@ public record Channel
     public string? DetectedLanguage { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Language confidence score for the dominant language identified in the channel.
     /// </summary>
     [JsonPropertyName("language_confidence")]
     public double? LanguageConfidence { get; set; }

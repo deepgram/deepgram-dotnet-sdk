@@ -7,20 +7,20 @@ namespace Deepgram.Models.Live.v1;
 public record SpeechStartedResponse
 {
     /// <summary>
-    /// TODO
+    /// SpeechStarted event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.SpeechStarted;
 
     /// <summary>
-    /// TODO
+    /// Channel index information
     /// </summary>
     [JsonPropertyName("channel_index")]
     public int[]? Channel { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Timestamp of the event.
     /// </summary>
     [JsonPropertyName("timestamp")]
     public decimal? Timestamp { get; set; }

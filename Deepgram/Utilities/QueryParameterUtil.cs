@@ -19,8 +19,7 @@ internal static class QueryParameterUtil
         //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
         Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(uriSegment))
-            //if no protocol in the address then https:// is added
-            // TODO: log
+            Log.Information("FormatURL", "uriSegment is missing a protocol. Adding https://");
             uriSegment = $"https://{uriSegment}";
 
         // schema to be used to build the query string

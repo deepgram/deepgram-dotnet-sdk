@@ -31,13 +31,13 @@ public record Paragraph
     public decimal? End { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment of the paragraph
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score of the paragraph
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }

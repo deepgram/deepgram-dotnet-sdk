@@ -7,43 +7,43 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record Segment
 {
     /// <summary>
-    /// TODO
+    /// The translated text
     /// </summary>
     [JsonPropertyName("text")]
     public string? Text { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Start time of the segment in seconds
     /// </summary>
     [JsonPropertyName("start_word")]
     public int? StartWord { get; set; }
 
     /// <summary>
-    /// TODO
+    /// End time of the segment in seconds
     /// </summary>
     [JsonPropertyName("end_word")]
     public int? EndWord { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment: positive, negative, neutral
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Topics discovered in the segment
     /// </summary>
     [JsonPropertyName("topics")]
     public IReadOnlyList<Topic>? Topics { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Intents discovered in the segment
     /// </summary>
     [JsonPropertyName("intents")]
     public IReadOnlyList<Intent>? Intents { get; set; }

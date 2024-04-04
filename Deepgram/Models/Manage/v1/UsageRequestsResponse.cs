@@ -7,19 +7,19 @@ namespace Deepgram.Models.Manage.v1;
 public record UsageRequestsResponse
 {
     /// <summary>
-    /// TODO
+    /// Page number
     /// </summary>
     [JsonPropertyName("page")]
     public int? Page { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Results per page
     /// </summary>
     [JsonPropertyName("limit")]
     public int? Limit { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Requests response/result
     /// </summary>
     [JsonPropertyName("requests")]
     public IReadOnlyList<UsageRequest>? Requests { get; set; }

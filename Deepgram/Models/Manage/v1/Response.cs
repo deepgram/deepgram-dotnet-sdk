@@ -13,19 +13,19 @@ public record Response
     public Details? Details { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Return code
     /// </summary>
     [JsonPropertyName("code")]
     public int? Code { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is Completed
     /// </summary>
     [JsonPropertyName("completed")]
     public string? Completed { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Token details <see cref="TokenDetails"/>
     /// </summary>
     [JsonPropertyName("token_details")]
     public List<TokenDetails>? TokenDetails { get; set; }

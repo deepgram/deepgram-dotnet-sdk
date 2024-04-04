@@ -7,25 +7,25 @@ namespace Deepgram.Models.Manage.v1;
 public record Model
 {
     /// <summary>
-    /// TODO
+    /// Model name
     /// </summary>
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model language
     /// </summary>
     [JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model version
     /// </summary>
     [JsonPropertyName("version")]
     public string? Version { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model ID
     /// </summary>
     [JsonPropertyName("model_id")]
     public string? ModelId { get; set; }

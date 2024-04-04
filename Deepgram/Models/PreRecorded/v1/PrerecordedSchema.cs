@@ -41,13 +41,13 @@ public class PrerecordedSchema
     public string? CustomIntentMode { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Custom Topic allows you to specify a custom topic for your submitted audio.
     /// </summary>
     [JsonPropertyName("custom_topic")]
     public List<string>? CustomTopic { get; set; }
 
     /// <summary>
-    /// TODO
+    /// When strict, the model will only return topics submitted using the custom_topic param. When extended, the model will return its own detected topics in addition to those submitted using the custom_topic param. Default: extended
     /// </summary>
     [JsonPropertyName("custom_topic_mode")]
     public string? CustomTopicMode { get; set; }
@@ -67,7 +67,7 @@ public class PrerecordedSchema
     public bool? DetectLanguage { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Identify and extract key topics.
     /// </summary>
     [JsonPropertyName("detect_topics")]
     public bool? DetectTopics { get; set; }
@@ -118,7 +118,7 @@ public class PrerecordedSchema
     public bool? FillerWords { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enables intent detection
     /// </summary>
     [JsonPropertyName("intents")]
     public bool? Intents { get; set; }
@@ -139,7 +139,7 @@ public class PrerecordedSchema
     public string? Language { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg.
     /// </summary>
     [JsonPropertyName("measurements")]
     public bool? Measurements { get; set; }
@@ -159,7 +159,7 @@ public class PrerecordedSchema
     public bool? MultiChannel { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enable paragraph detection
     /// </summary>
     [JsonPropertyName("paragraphs")]
     public bool? Paragraphs { get; set; }
@@ -212,7 +212,7 @@ public class PrerecordedSchema
     public List<string>? Search { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enables sentiment analysis
     /// </summary>
     [JsonPropertyName("sentiment")]
     public bool? Sentiment { get; set; }
@@ -225,7 +225,7 @@ public class PrerecordedSchema
     public bool? SmartFormat { get; set; }
 
     ///// <summary>
-    ///// TODO
+    ///// Enables summarization
     ///// </summary>
     [JsonPropertyName("summarize")]
     public string? Summarize { get; set; }
@@ -240,19 +240,19 @@ public class PrerecordedSchema
     public List<string>? Tag { get; set; }
 
     ///// <summary>
-    ///// TODO
+    ///// Enables topic detection
     ///// </summary>
     [JsonPropertyName("topics")]
     public bool? Topics { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Length of time in seconds used to split utterances.
     /// </summary>
     [JsonPropertyName("utt_split")]
     public double? UttSplit { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enable utterance segmentation
     /// </summary>
     [JsonPropertyName("utterances")]
     public bool? Utterances { get; set; }

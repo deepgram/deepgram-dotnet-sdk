@@ -7,7 +7,7 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record TopicGroup
 {
     /// <summary>
-    /// TODO
+    /// Topic segments
     /// </summary>
     [JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }

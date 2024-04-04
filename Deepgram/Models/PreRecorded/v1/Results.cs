@@ -13,13 +13,13 @@ public record Results
     public IReadOnlyList<Channel>? Channels { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Intent Group <see cref="IntentGroup"/>
     /// </summary>
     [JsonPropertyName("intents")]
     public IntentGroup? Intents { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment Group <see cref="SentimentGroup"/>
     /// </summary>
     [JsonPropertyName("sentiments")]
     public SentimentGroup? Sentiments { get; set; }
@@ -31,7 +31,7 @@ public record Results
     public Summary? Summary { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Topic Group <see cref="TopicGroup"/>
     /// </summary>
     [JsonPropertyName("topics")]
     public TopicGroup? Topics { get; set; }

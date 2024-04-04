@@ -25,7 +25,7 @@ public record ErrorResponse
     public string? Variant { get; set; } = "";
 
     /// <summary>
-    /// TODO
+    /// Error event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
