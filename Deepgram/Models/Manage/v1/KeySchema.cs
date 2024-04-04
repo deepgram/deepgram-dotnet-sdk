@@ -4,20 +4,20 @@
 
 namespace Deepgram.Models.Manage.v1;
 
-public class KeySchema(string comment, List<string> scopes)
+public class KeySchema
 {
 
     /// <summary>
     /// Comment to describe key
     /// </summary>
     [JsonPropertyName("comment")]
-    public string? Comment { get; set; } = comment;
+    public string? Comment { get; set; }
 
     /// <summary>
     /// Scopes of the key
     /// </summary>
     [JsonPropertyName("scopes")]
-    public List<string>? Scopes { get; set; } = scopes;
+    public List<string>? Scopes { get; set; }
 
     /// <summary>
     /// Tag names for key

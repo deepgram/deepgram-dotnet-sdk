@@ -22,7 +22,7 @@ public record Details
     /// Number of audio files processed in the request.
     /// </summary>
     [JsonPropertyName("total_audio")]
-    public int? TotalAudio { get; set; }
+    public double? TotalAudio { get; set; }
 
     /// <summary>
     /// Number of channels in the audio associated with the request.

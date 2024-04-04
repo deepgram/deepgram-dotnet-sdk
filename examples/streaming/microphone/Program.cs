@@ -42,7 +42,7 @@ namespace SampleApp
             }));
             liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
-                if (e.Channel.Alternatives[0].Transcript == "")
+                if (e.Channel.Alternatives[0].Transcript.Trim() == "")
                 {
                     return;
                 }

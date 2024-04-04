@@ -22,8 +22,8 @@ public record UsageFieldsResponse
     /// ReadOnlyList of <see cref="RequestMethod"/>
     /// </summary>
     [JsonPropertyName("processing_methods")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public IReadOnlyList<RequestMethod>? ProcessingMethods { get; set; }
+    //[JsonConverter(typeof(JsonStringEnumConverter))]
+    public IReadOnlyList<string>? ProcessingMethods { get; set; }
 
     /// <summary>
     /// ReadOnlyList of included languages

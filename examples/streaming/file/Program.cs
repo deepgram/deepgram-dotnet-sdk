@@ -29,7 +29,7 @@ namespace SampleApp
                 }
 
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
-                Console.WriteLine($"\n\n\n----> Speaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
+                Console.WriteLine($"\n\n\nSpeaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
             }));
 
             // Start the connection
