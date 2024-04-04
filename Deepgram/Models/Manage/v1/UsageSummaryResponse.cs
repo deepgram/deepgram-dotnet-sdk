@@ -9,24 +9,28 @@ public record UsageSummaryResponse
     /// <summary>
     /// Start date for included requests.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public DateTime? Start { get; set; }
 
     /// <summary>
     /// End date for included requests.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public DateTime? End { get; set; }
 
     /// <summary>
     /// Resolution of the usage <see cref="v1.Resolution"/>
     /// </summary>
-    [JsonPropertyName("resolution")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("resolution")]
     public Resolution? Resolution { get; set; }
 
     /// <summary>
     /// Result summaries <see cref="UsageSummary"/>
     /// </summary>
-    [JsonPropertyName("results")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("results")]
     public IReadOnlyList<Result>? Results { get; set; }
 }

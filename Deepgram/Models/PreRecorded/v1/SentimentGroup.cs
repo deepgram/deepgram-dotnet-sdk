@@ -9,13 +9,15 @@ public record SentimentGroup
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("segments")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("average")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("average")]
     public Average? Average { get; set; }
 }
 

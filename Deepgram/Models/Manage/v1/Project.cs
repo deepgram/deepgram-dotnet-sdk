@@ -9,18 +9,21 @@ public record Project
     /// <summary>
     /// Unique identifier of the Deepgram project
     /// </summary>
-    [JsonPropertyName("project_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("project_id")]
     public string? ProjectId { get; set; }
 
     /// <summary>
     /// Name of the Deepgram project
     /// </summary>
-    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
     /// Name of the company
     /// </summary>
-    [JsonPropertyName("company")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("company")]
     public string? Company { get; set; }
 }

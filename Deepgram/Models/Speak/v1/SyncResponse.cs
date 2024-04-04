@@ -9,43 +9,50 @@ public record SyncResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("content_type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("content_type")]
     public string? ContentType { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("request_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("model_uuid")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("model_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model_name")]
     public string? ModelName { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("characters")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("characters")]
     public int? Characters { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("transfer_encoding")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("transfer_encoding")]
     public string? TransferEncoding { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("date")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("date")]
     public DateTime? Date { get; set; }
 
     /// <summary>

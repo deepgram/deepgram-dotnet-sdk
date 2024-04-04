@@ -9,25 +9,29 @@ public record Model
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("language")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("version")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("version")]
     public string? Version { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("model_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model_id")]
     public string? ModelId { get; set; }
 }
 

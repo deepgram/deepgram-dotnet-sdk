@@ -9,7 +9,8 @@ public class UrlSource(string url)
     /// <summary>
     /// Url of the text to analyze
     /// </summary>
-    [JsonPropertyName("url")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("url")]
     public string? Url { get; set; } = url;
 }
 

@@ -9,18 +9,21 @@ public record UsageRequestsResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("page")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("page")]
     public int? Page { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("limit")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("limit")]
     public int? Limit { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("requests")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("requests")]
     public IReadOnlyList<UsageRequest>? Requests { get; set; }
 }

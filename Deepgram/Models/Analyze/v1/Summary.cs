@@ -9,7 +9,8 @@ public record Summary
     /// <summary>
     /// Summary of a section of the transcript
     /// </summary>
-    [JsonPropertyName("text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("text")]
     public string? Text { get; set; }
 }
 

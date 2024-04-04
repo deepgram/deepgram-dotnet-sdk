@@ -9,6 +9,7 @@ public record MessageResponse
     /// <summary>
     /// A message denoting the success of the operation
     /// </summary>
-    [JsonPropertyName("message")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("message")]
     public string? Message { get; set; }
 }

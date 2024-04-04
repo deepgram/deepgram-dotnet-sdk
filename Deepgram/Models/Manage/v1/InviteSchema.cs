@@ -9,12 +9,14 @@ public class InviteSchema
     /// <summary>
     /// email of the person being invited
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
     /// scopes to add for the invited person
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 

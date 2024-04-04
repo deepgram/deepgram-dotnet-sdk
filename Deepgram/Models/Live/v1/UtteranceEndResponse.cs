@@ -9,19 +9,22 @@ public record UtteranceEndResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.UtteranceEnd;
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("channel_index")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channel_index")]
     public int[]? Channel { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("last_word_end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("last_word_end")]
     public decimal? LastWordEnd { get; set; }
 }

@@ -9,31 +9,36 @@ public record Sentence
     /// <summary>
     /// Text transcript of the sentence.
     /// </summary>
-    [JsonPropertyName("text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("text")]
     public string? Text { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the sentence starts.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the sentence ends.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment_score")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 }
 

@@ -9,55 +9,64 @@ public record MetadataResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("channels")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channels")]
     public int? Channels { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("created")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("duration")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("duration")]
     public double? Duration { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("model_info")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model_info")]
     public IReadOnlyDictionary<string, ModelInfo>? ModelInfo { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("models")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("models")]
     public IReadOnlyList<string>? Models { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("request_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sha256")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sha256")]
     public string? Sha256 { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("transaction_key")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("transaction_key")]
     public string? TransactionKey { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.Metadata;
 
@@ -66,6 +75,7 @@ public record MetadataResponse
     /// Extra metadata is limited to 2048 characters per key-value pair.
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
-    [JsonPropertyName("extra")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("extra")]
     public Dictionary<string, string>? Extra { get; set; }
 }

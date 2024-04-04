@@ -9,12 +9,14 @@ public record Member
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("member_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("member_id")]
     public string? MemberId { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("email")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("email")]
     public string? Email { get; set; }
 }

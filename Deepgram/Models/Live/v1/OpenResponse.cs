@@ -9,7 +9,8 @@ public record OpenResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.Open;
 }

@@ -9,34 +9,39 @@ public record Alternative
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this transcript.
     /// </summary>
-    [JsonPropertyName("confidence")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="Entity"/> objects.
     /// </summary>
     /// <remark>Only used when the detect entities feature is enabled on the request</remark>
-    [JsonPropertyName("entities")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("entities")]
     public IReadOnlyList<Entity>? Entities { get; set; }
 
     /// <summary>
     /// ReadOnly List of <see cref="ParagraphGroup"/> containing  separated transcript and <see cref="Paragraph"/> objects.
     /// </summary>
     /// <remark>Only used when the paragraph feature is enabled on the request</remark>
-    [JsonPropertyName("paragraphs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("paragraphs")]
     public ParagraphGroup? Paragraphs { get; set; }
 
     /// <summary>
     /// ReadOnly List of <see cref="Summary "/> objects.
     /// </summary>
     /// <remark>Only used when the summarize feature is enabled on the request</remark>
-    [JsonPropertyName("summaries")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("summaries")]
     public IReadOnlyList<SummaryObsolete>? Summaries { get; set; }
 
     /// <summary>
     /// Single-string transcript containing what the model hears in this channel of audio.
     /// </summary>
-    [JsonPropertyName("transcript")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("transcript")]
     public string? Transcript { get; set; }
 
 
@@ -44,12 +49,14 @@ public record Alternative
     /// ReadOnlyList of <see cref="Translation"/> objects.
     /// </summary>
     /// <remark>Only used when the translation feature is enabled on the request</remark>
-    [JsonPropertyName("translations")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("translations")]
     public IReadOnlyList<Translation>? Translations { get; set; }
 
     /// <summary>
     /// ReadOnly List of <see cref="Word"/> objects.
     /// </summary>
-    [JsonPropertyName("words")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("words")]
     public IReadOnlyList<Word>? Words { get; set; }
 }

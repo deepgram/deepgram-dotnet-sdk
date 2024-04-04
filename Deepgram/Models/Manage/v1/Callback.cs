@@ -9,18 +9,21 @@ public record Callback
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("attempts")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("attempts")]
     public int? Attempts { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("code")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("code")]
     public int? Code { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("completed")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("completed")]
     public string? Completed { get; set; }
 }

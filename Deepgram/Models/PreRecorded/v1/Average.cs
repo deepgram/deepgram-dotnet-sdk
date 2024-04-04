@@ -9,12 +9,14 @@ public record Average
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment_score")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 }

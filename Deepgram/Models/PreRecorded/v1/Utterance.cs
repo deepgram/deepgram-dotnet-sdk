@@ -9,55 +9,64 @@ public record Utterance
     /// <summary>
     /// Audio channel to which the utterance belongs.
     /// </summary>
-    [JsonPropertyName("channel")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channel")]
     public int? Channel { get; set; }
 
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this word.
     /// </summary>
-    [JsonPropertyName("confidence")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word ends.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// Unique identifier of the utterance
     /// </summary>
-    [JsonPropertyName("id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("id")]
     public string? Id { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("sentiment_score")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 
     /// <summary>
     /// Integer indicating the speaker who is saying the word being processed.
     /// </summary>
-    [JsonPropertyName("speaker")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("speaker")]
     public int? Speaker { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word starts.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>
     /// Transcript for the audio segment being processed.
     /// </summary>
-    [JsonPropertyName("transcript")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("transcript")]
     public string? Transcript { get; set; }
 
     /// <summary>
@@ -65,7 +74,8 @@ public record Utterance
     /// and end time(in seconds) from the beginning of the audio stream, and a confidence value.
     /// <see cref="Word"/>
     /// </summary>
-    [JsonPropertyName("words")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("words")]
     public List<Word>? Words { get; set; }
 }
 

@@ -9,31 +9,36 @@ public record UsageFieldsResponse
     /// <summary>
     /// ReadOnlyList of included tags.
     /// </summary>
-    [JsonPropertyName("tags")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("tags")]
     public IReadOnlyList<string>? Tags { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="UsageModel"/>
     /// </summary>
-    [JsonPropertyName("models")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("models")]
     public IReadOnlyList<Model>? Models { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="RequestMethod"/>
     /// </summary>
+    /// [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("processing_methods")]
-    //[JsonConverter(typeof(JsonStringEnumConverter))]
     public IReadOnlyList<string>? ProcessingMethods { get; set; }
 
     /// <summary>
     /// ReadOnlyList of included languages
     /// </summary>
-    [JsonPropertyName("languages")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("languages")]
     public IReadOnlyList<string>? Languages { get; set; }
 
     /// <summary>
     /// ReadOnlyList of included features
     /// </summary>
-    [JsonPropertyName("features")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("features")]
     public IReadOnlyList<string>? Features { get; set; }
 }

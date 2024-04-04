@@ -9,18 +9,21 @@ public record ModelInfo
     /// <summary>
     /// Architecture of the model
     /// </summary>
-    [JsonPropertyName("arch")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("arch")]
     public string Arch { get; set; }
 
     /// <summary>
     /// Name of the model
     /// </summary>
-    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("name")]
     public string Name { get; set; }
 
     /// <summary>
     /// Version of the model
     /// </summary>
-    [JsonPropertyName("version")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("version")]
     public string Version { get; set; }
 }

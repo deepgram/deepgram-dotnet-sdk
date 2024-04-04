@@ -9,12 +9,14 @@ public class ProjectSchema
     /// <summary>
     /// Name of Project
     /// </summary>
-    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
     /// Company who project belongs to 
     /// </summary>
-    [JsonPropertyName("company")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("company")]
     public string? Company { get; set; }
 }

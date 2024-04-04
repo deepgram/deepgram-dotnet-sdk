@@ -10,6 +10,7 @@ public record IntentGroup
     /// <see href="https://developers.deepgram.com/reference/audio-intelligence-apis#intent-recognition"/>
     /// <see cref="IntentSegment"/>
     /// </summary>
-    [JsonPropertyName("segments")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }
 }

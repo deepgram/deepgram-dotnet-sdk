@@ -9,12 +9,14 @@ public record Token
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("in")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("in")]
     public int? In { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("out")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("out")]
     public int? Out { get; set; }
 }

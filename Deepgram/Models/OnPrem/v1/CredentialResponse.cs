@@ -9,12 +9,14 @@ public record CredentialResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("member")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("member")]
     public Member? Member { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("distribution_credentials")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("distribution_credentials")]
     public DistributionCredentials? DistributionCredentials { get; set; }
 }

@@ -9,6 +9,7 @@ public record MembersResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("members")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("members")]
     public IReadOnlyList<Member>? Members { get; set; }
 }

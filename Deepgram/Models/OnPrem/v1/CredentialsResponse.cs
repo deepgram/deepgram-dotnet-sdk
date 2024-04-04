@@ -9,6 +9,7 @@ public record CredentialsResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("distribution_credentials")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("distribution_credentials")]
     public IReadOnlyList<CredentialResponse>? DistributionCredentials { get; set; }
 }

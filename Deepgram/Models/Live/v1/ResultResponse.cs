@@ -8,49 +8,57 @@ public record ResultResponse
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("channel")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channel")]
     public Channel Channel { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("channel_index")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channel_index")]
     public IReadOnlyList<int> ChannelIndex { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("duration")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("duration")]
     public double Duration { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("is_final")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("is_final")]
     public bool IsFinal { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("metadata")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("metadata")]
     public MetaData MetaData { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("speech_final")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("speech_final")]
     public bool SpeechFinal { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public decimal Start { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType Type { get; set; } = LiveType.Results;
 

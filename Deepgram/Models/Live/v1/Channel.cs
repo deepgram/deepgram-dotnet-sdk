@@ -9,6 +9,7 @@ public record Channel
     /// <summary>
     /// ReadOnlyList of <see cref="Alternative"/> objects.
     /// </summary>
-    [JsonPropertyName("alternatives")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("alternatives")]
     public IReadOnlyList<Alternative> Alternatives { get; set; }
 }

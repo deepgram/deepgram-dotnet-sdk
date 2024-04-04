@@ -9,24 +9,28 @@ public record Response
     /// <summary>
     /// Details of the request <see cref="Detail"/>
     /// </summary>
-    [JsonPropertyName("details")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("details")]
     public Details? Details { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("code")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("code")]
     public int? Code { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("completed")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("completed")]
     public string? Completed { get; set; }
 
     /// <summary>
     /// TODO
     /// </summary>
-    [JsonPropertyName("token_details")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("token_details")]
     public List<TokenDetails>? TokenDetails { get; set; }
 }

@@ -9,6 +9,7 @@ public record BalancesResponse
     /// <summary>
     /// ReadOnlyList of project balances <see cref="BalanceResponse"/>
     /// </summary>
-    [JsonPropertyName("balances")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("balances")]
     public IReadOnlyList<BalanceResponse>? Balances { get; set; }
 }
