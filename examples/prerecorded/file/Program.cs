@@ -44,6 +44,7 @@ namespace PreRecorded
                 });
 
             Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
+            Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
 
             // Teardown Library

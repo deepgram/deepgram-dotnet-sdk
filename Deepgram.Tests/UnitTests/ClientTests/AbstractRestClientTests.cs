@@ -18,7 +18,10 @@ public class AbstractRestfulClientTests
     public void Setup()
     {
         _apiKey = new Faker().Random.Guid().ToString();
-        _clientOptions = new DeepgramHttpClientOptions(_apiKey, null, null, true);
+        _clientOptions = new DeepgramHttpClientOptions(_apiKey)
+        {
+            OnPrem = true,
+        };
     }
 
     [Test]

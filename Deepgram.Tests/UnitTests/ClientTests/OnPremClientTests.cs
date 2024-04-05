@@ -17,7 +17,10 @@ public class OnPremClientTests
     public void Setup()
     {
         _apiKey = new Faker().Random.Guid().ToString();
-        _options = new DeepgramHttpClientOptions(_apiKey, null, null, true);
+        _options = new DeepgramHttpClientOptions(_apiKey)
+        {
+            OnPrem = true,
+        };
         _projectId = new Faker().Random.Guid().ToString();
     }
 

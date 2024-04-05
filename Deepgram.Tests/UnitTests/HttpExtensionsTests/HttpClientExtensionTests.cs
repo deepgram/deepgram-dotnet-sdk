@@ -70,7 +70,7 @@ public class HttpClientTests
     {
         // Input and Output 
         var _apiKey = new Faker().Random.Guid().ToString();
-        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, null, null, null, FakeHeaders());
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, null, null, FakeHeaders());
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
@@ -95,7 +95,7 @@ public class HttpClientTests
         var expectedBaseAddress = $"https://{_customUrl}/v1";
         var customBaseAddress = $"https://{_customUrl}";
         var _apiKey = new Faker().Random.Guid().ToString();
-        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, null, FakeHeaders());
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, FakeHeaders());
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK);
@@ -122,7 +122,7 @@ public class HttpClientTests
         var expectedBaseAddress = $"https://{_customUrl}/v1";
         var customBaseAddress = $"https://{_customUrl}";
         var _apiKey = new Faker().Random.Guid().ToString();
-        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, null, FakeHeaders());
+        var _clientOptions = new DeepgramHttpClientOptions(_apiKey, customBaseAddress, null, FakeHeaders());
 
         // Fake Clients
         var httpClient = MockHttpClient.CreateHttpClientWithResult(new MessageResponse(), HttpStatusCode.OK, expectedBaseAddress);
