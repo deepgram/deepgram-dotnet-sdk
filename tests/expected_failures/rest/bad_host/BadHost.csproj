@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Deepgram\Deepgram.csproj" />
+    <ProjectReference Include="..\..\..\..\Deepgram\Deepgram.csproj" />
   </ItemGroup>
   
   <ItemGroup>

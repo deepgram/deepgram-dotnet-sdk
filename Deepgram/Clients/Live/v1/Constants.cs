@@ -11,5 +11,8 @@ public static class Constants
 {
     // WS buffer size
     public const int BufferSize = 1024 * 16;
+
+    // Default timeout for connect/disconnect
+    public const int DefaultConnectTimeout = 5000;
 }
 

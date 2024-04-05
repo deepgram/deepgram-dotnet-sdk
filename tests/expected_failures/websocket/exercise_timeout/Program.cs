@@ -12,9 +12,9 @@ namespace SampleApp
         static async Task Main(string[] args)
         {
             // Normal logging is "Info" level
-            Library.Initialize();
+            //Library.Initialize();
             // OR very chatty logging
-            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var liveClient = new LiveClient();

@@ -18,9 +18,9 @@ namespace SampleApp
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            //Deepgram.Library.Initialize();
+            Deepgram.Library.Initialize();
             // OR very chatty logging
-            Deepgram.Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            //Deepgram.Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
             Deepgram.Microphone.Library.Initialize();
 
             Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
@@ -34,7 +34,7 @@ namespace SampleApp
             // Subscribe to the EventResponseReceived event
             liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
             {
-                Console.WriteLine($"----> {e.Type} received");
+                Console.WriteLine($"\n\n----> {e.Type} received");
             }));
             liveClient.Subscribe(new EventHandler<MetadataResponse>((sender, e) =>
             {
@@ -48,7 +48,7 @@ namespace SampleApp
                 }
 
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
-                Console.WriteLine($"\n\n\n----> Speaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
+                Console.WriteLine($"----> Speaker: {e.Channel.Alternatives[0].Transcript}");
             }));
             liveClient.Subscribe(new EventHandler<SpeechStartedResponse>((sender, e) =>
             {
@@ -71,9 +71,6 @@ namespace SampleApp
                 Console.WriteLine($"----> { e.Type} received. Error: {e.Message}");
             }));
 
-            // my own cancellation token
-            //var cancellationToken = new CancellationTokenSource();
-
             // Start the connection
             var liveSchema = new LiveSchema()
             {
@@ -86,7 +83,6 @@ namespace SampleApp
                 UtteranceEnd = "1000",
                 VadEvents = true,
             };
-            //await liveClient.Connect(liveSchema, cancellationToken);
             await liveClient.Connect(liveSchema);
 
             // Microphone streaming
@@ -96,13 +92,8 @@ namespace SampleApp
             // Wait for the user to press a key
             Console.ReadKey();
 
-            Console.WriteLine("Stopping the microphone streaming...");
+            // Stop the microphone
             microphone.Stop();
-
-            //// START: test an external cancellation
-            //cancellationToken.Cancel();
-            //Thread.Sleep(10000);    // wait 10 seconds to cancel externally
-            //// END: test an external cancellation
 
             // Stop the connection
             await liveClient.Stop();
