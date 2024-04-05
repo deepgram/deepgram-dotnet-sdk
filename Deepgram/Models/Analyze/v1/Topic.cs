@@ -9,13 +9,15 @@ public record Topic
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this topic.
     /// </summary>
-    [JsonPropertyName("confidence")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 
     /// <summary>
     /// The discover topic.
     /// </summary>
-    [JsonPropertyName("topic")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("topic")]
     public string Text;
 }
 

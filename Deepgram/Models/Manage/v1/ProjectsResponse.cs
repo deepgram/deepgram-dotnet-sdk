@@ -9,6 +9,7 @@ public record ProjectsResponse
     /// <summary>
     /// List of Projects
     /// </summary>
-    [JsonPropertyName("projects")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("projects")]
     public IReadOnlyList<ProjectResponse>? Projects { get; set; }
 }

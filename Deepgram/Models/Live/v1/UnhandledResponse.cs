@@ -9,13 +9,15 @@ public record UnhandledResponse
     /// <summary>
     /// Raw JSON
     /// </summary>
-    [JsonPropertyName("raw")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("raw")]
     public string? Raw { get; set; } = "";
 
     /// <summary>
     /// Unhandled event type.
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.Unhandled;
 }

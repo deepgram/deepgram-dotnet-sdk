@@ -9,6 +9,7 @@ public record KeysResponse
     /// <summary>
     /// List of Deepgram api keys
     /// </summary>
-    [JsonPropertyName("api_keys")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("api_keys")]
     public IReadOnlyList<KeyScopeResponse>? ApiKeys { get; set; }
 }

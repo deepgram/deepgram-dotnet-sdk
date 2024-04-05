@@ -10,7 +10,8 @@ public record AsyncResponse
     /// Id of transcription request returned when
     /// a CallBack has been supplied in request
     /// </summary>
-    [JsonPropertyName("request_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 }
 

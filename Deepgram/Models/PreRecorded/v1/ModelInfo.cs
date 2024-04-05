@@ -9,18 +9,21 @@ public record ModelInfo
     /// <summary>
     /// Architecture of the model, indicating the underlying technology or framework used.
     /// </summary>
-    [JsonPropertyName("arch")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("arch")]
     public string? Arch { get; set; }
 
     /// <summary>
     /// Model name
     /// </summary>
-    [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
     /// Model version
     /// </summary>
-    [JsonPropertyName("version")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("version")]
     public string? Version { get; set; }
 }

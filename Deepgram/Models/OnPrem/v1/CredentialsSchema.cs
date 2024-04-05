@@ -9,18 +9,21 @@ public class CredentialsSchema
     /// <summary>
     /// comment to credentials
     /// </summary>
-    [JsonPropertyName("comment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
     /// scopes of credentials
     /// </summary>
-    [JsonPropertyName("scopes")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scopes")]
     public List<string>? Scopes { get; set; }
 
     /// <summary>
     /// provider
     /// </summary>
-    [JsonPropertyName("provider")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("provider")]
     public string? Provider { get; set; }
 }

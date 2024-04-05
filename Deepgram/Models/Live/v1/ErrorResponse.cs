@@ -9,25 +9,29 @@ public record ErrorResponse
     /// <summary>
     /// Error Description
     /// </summary>
-    [JsonPropertyName("description")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("description")]
     public string? Description { get; set; } = "";
 
     /// <summary>
     /// Error Message
     /// </summary>
-    [JsonPropertyName("message")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("message")]
     public string? Message { get; set; } = "";
 
     /// <summary>
     /// Error Variant
     /// </summary>
-    [JsonPropertyName("variant")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("variant")]
     public string? Variant { get; set; } = "";
 
     /// <summary>
     /// Error event type.
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.Error;
 }

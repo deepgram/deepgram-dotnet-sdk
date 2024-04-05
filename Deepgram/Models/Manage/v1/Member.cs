@@ -9,31 +9,36 @@ public record Member
     /// <summary>
     /// Unique identifier of member
     /// </summary>
-    [JsonPropertyName("member_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("member_id")]
     public string? MemberId { get; set; }
 
     /// <summary>
     /// First name of member
     /// </summary>
-    [JsonPropertyName("first_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("first_name")]
     public string? FirstName { get; set; }
 
     /// <summary>
     /// Last name of member
     /// </summary>
-    [JsonPropertyName("last_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("last_name")]
     public string? LastName { get; set; }
 
 
     /// <summary>
     /// Email address of member
     /// </summary>
-    [JsonPropertyName("email")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
     /// Scopes of the key
     /// </summary>
-    [JsonPropertyName("scopes")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scopes")]
     public List<string>? Scopes { get; set; }
 }

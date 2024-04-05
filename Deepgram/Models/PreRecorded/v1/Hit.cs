@@ -9,25 +9,29 @@ public record Hit
     /// <summary>
     /// Value between 0 and 1 that indicates the model's relative confidence in this hit.
     /// </summary>
-    [JsonPropertyName("confidence")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the hit ends.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// Transcript that corresponds to the time between start and end.
     /// </summary>
-    [JsonPropertyName("snippet")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("snippet")]
     public string? Snippet { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the hit occurs.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public decimal? Start { get; set; }
 }

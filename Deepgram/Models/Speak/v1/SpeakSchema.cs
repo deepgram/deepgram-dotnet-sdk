@@ -10,13 +10,15 @@ public class SpeakSchema
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
-    [JsonPropertyName("model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
     /// Bit Rate allows you to specify the bit rate of your desired audio.
     /// </summary>
-    [JsonPropertyName("bit_rate")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("bit_rate")]
     public string? BitRate { get; set; }
 
     /// <summary>
@@ -24,13 +26,15 @@ public class SpeakSchema
     /// <see href="https://developers.deepgram.com/docs/callback">
     /// default is nulls
     /// </summary>
-    [JsonPropertyName("callback")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("callback")]
     public string? CallBack { get; set; }
 
     /// <summary>
     /// Audio container format
     /// </summary>
-    [JsonPropertyName("container")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("container")]
     public string? Container { get; set; }
 
     /// <summary>
@@ -38,7 +42,8 @@ public class SpeakSchema
     /// <see href="https://developers.deepgram.com/docs/encoding">
     /// supported encodings <see cref="AudioEncoding"/>
     /// </summary>
-    [JsonPropertyName("encoding")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("encoding")]
     public string? Encoding { get; set; }
 
     /// <summary>
@@ -46,6 +51,7 @@ public class SpeakSchema
     /// <see href="https://developers.deepgram.com/docs/sample-rate">
     /// only applies when Encoding has a values
     /// </summary>
-    [JsonPropertyName("sample_rate")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sample_rate")]
     public string? SampleRate { get; set; }
 }

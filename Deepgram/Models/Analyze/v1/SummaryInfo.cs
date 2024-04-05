@@ -9,18 +9,21 @@ public record SummaryInfo
     /// <summary>
     /// Input tokens used in the model.
     /// </summary>
-    [JsonPropertyName("input_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("input_tokens")]
     public int? InputTokens { get; set; }
 
     /// <summary>
     /// Model UUID.
     /// </summary>
-    [JsonPropertyName("model_uuid")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
     /// Output tokens used in the model.
     /// </summary>
-    [JsonPropertyName("output_tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }
 }

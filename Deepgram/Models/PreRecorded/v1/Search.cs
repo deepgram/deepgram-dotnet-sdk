@@ -9,13 +9,15 @@ public record Search
     /// <summary>
     /// Term for which Deepgram is searching.
     /// </summary>
-    [JsonPropertyName("query")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("query")]
     public string? Query { get; set; }
 
     /// <summary>
     /// ReadonlyList of <see cref="Hit"/>
     /// </summary>
-    [JsonPropertyName("hits")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("hits")]
     public IReadOnlyList<Hit>? Hits { get; set; }
 }
 

@@ -9,30 +9,35 @@ public record DistributionCredentials
     /// <summary>
     /// Distribution credentials ID
     /// </summary>
-    [JsonPropertyName("distribution_credentials_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("distribution_credentials_id")]
     public string? DistributionCredentialsId { get; set; }
 
     /// <summary>
     /// Provider name
     /// </summary>
-    [JsonPropertyName("provider")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("provider")]
     public string? Provider { get; set; }
 
     /// <summary>
     /// Comment
     /// </summary>
-    [JsonPropertyName("comment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
     /// Scopes of the credentials
     /// </summary>
-    [JsonPropertyName("scopes")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
     /// <summary>
     /// Created date/time
     /// </summary>
-    [JsonPropertyName("created")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 }

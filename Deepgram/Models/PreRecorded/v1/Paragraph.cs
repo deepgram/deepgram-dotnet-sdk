@@ -9,37 +9,43 @@ public record Paragraph
     /// <summary>
     /// ReadOnly of Sentence objects.
     /// </summary>
-    [JsonPropertyName("sentences")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentences")]
     public IReadOnlyList<Sentence>? Sentences { get; set; }
 
     /// <summary>
     /// Number of words in the paragraph
     /// </summary>
-    [JsonPropertyName("num_words")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("num_words")]
     internal int? NumWords { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph starts.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph ends.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// Sentiment of the paragraph
     /// </summary>
-    [JsonPropertyName("sentiment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// Sentiment score of the paragraph
     /// </summary>
-    [JsonPropertyName("sentiment_score")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 }
 

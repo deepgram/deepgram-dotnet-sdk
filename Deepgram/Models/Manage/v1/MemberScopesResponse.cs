@@ -9,6 +9,7 @@ public record MemberScopesResponse
     /// <summary>
     /// Project scopes associated with member
     /// </summary>
-    [JsonPropertyName("scopes")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 }

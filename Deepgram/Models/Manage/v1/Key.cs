@@ -9,31 +9,36 @@ public record Key
     /// <summary>
     /// Unique identifier of the Deepgram API key
     /// </summary>
-    [JsonPropertyName("api_key_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("api_key_id")]
     public string? ApiKeyId { get; set; }
 
     /// <summary>
     /// Comment for the Deepgram API key
     /// </summary>
-    [JsonPropertyName("comment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
     /// Scope of the Deepgram API key
     /// </summary>
-    [JsonPropertyName("scopes")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
     /// <summary>
     /// Creation date of the Deepgram API key
     /// </summary>
-    [JsonPropertyName("created")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>
     /// Tags for the Deepgram API key
     /// </summary>
-    [JsonPropertyName("tags")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("tags")]
     public IReadOnlyList<string>? Tags { get; set; }
 }
 

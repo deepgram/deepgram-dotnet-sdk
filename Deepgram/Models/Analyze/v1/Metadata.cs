@@ -9,42 +9,49 @@ public record Metadata
     /// <summary>
     /// Unique identifier for the submitted audio and derived data returned.
     /// </summary>
-    [JsonPropertyName("request_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
     /// Timestamp that indicates when the audio was submitted.
     /// </summary>
-    [JsonPropertyName("created")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>
     /// Language detected
     /// </summary>
-    [JsonPropertyName("language")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
     /// Intents information
     /// </summary>
-    [JsonPropertyName("intents_info")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("intents_info")]
     public IntentsInfo? IntentsInfo { get; set; }
 
     /// <summary>
     /// Sentiment information
     /// </summary>
-    [JsonPropertyName("sentiment_info")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_info")]
     public SentimentInfo? SentimentInfo { get; set; }
 
     /// <summary>
     /// Summary information
     /// </summary>
-    [JsonPropertyName("summary_info")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("summary_info")]
     public SummaryInfo? SummaryInfo { get; set; }
 
     /// <summary>
     /// Topics information
     /// </summary>
-    [JsonPropertyName("topics_info")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("topics_info")]
     public TopicsInfo? TopicsInfo { get; set; }
 }

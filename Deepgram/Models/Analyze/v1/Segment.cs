@@ -9,42 +9,49 @@ public record Segment
     /// <summary>
     /// Transcribed text
     /// </summary>
-    [JsonPropertyName("text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("text")]
     public string? Text { get; set; }
 
     /// <summary>
     /// Timestamp of the start of the segment
     /// </summary>
-    [JsonPropertyName("start_word")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start_word")]
     public int? StartWord { get; set; }
 
     /// <summary>
     /// Timestamp of the end of the segment
     /// </summary>
-    [JsonPropertyName("end_word")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end_word")]
     public int? EndWord { get; set; }
 
     /// <summary>
     /// Sentiment: positive, negative, neutral
     /// </summary>
-    [JsonPropertyName("sentiment")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// Sentiment score
     /// </summary>
-    [JsonPropertyName("sentiment_score")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 
     /// <summary>
     /// Topics list
     /// </summary>
-    [JsonPropertyName("topics")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("topics")]
     public IReadOnlyList<Topic>? Topics { get; set; }
 
     /// <summary>
     /// Summary of the text
     /// </summary>
-    [JsonPropertyName("intents")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("intents")]
     public IReadOnlyList<Intent>? Intents { get; set; }
 }

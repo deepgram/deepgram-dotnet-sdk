@@ -9,25 +9,29 @@ public record Results
     /// <summary>
     /// Intents <see cref="IntentGroup"/>
     /// </summary>
-    [JsonPropertyName("intents")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("intents")]
     public IntentGroup? Intents { get; set; }
 
     /// <summary>
     /// Sentiments <see cref="SentimentGroup"/>
     /// </summary>
-    [JsonPropertyName("sentiments")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiments")]
     public SentimentGroup? Sentiments { get; set; }
 
     /// <summary>
     /// Transcription Summary <see cref="TranscriptionSummary"/>
     /// </summary>
-    [JsonPropertyName("summary")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("summary")]
     public Summary? Summary { get; set; }
 
     /// <summary>
     /// Summary of the topics <see cref="TopicGroup"/>
     /// </summary>
-    [JsonPropertyName("topics")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("topics")]
     public TopicGroup? Topics { get; set; }
 }
 

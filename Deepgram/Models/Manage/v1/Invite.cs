@@ -9,12 +9,14 @@ public record Invite
     /// <summary>
     /// Email for invite.
     /// </summary>
-    [JsonPropertyName("email")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
     /// Scope for invite.
     /// </summary>
-    [JsonPropertyName("scope")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("scope")]
     public string? Scope { get; set; }
 }

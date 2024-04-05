@@ -9,7 +9,8 @@ public class TextSource(string text)
     /// <summary>
     /// Text of the words to speak
     /// </summary>
-    [JsonPropertyName("text")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("text")]
     public string? Text { get; set; } = text;
 }
 

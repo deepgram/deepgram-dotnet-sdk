@@ -9,6 +9,7 @@ public record InvitesResponse
     /// <summary>
     /// ReadOnlyList of project invites <see cref="Invite"/>
     /// </summary>
-    [JsonPropertyName("invites")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("invites")]
     public IReadOnlyList<Invite>? Invites { get; set; }
 }

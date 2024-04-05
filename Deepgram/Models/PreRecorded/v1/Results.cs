@@ -9,37 +9,43 @@ public record Results
     /// <summary>
     /// ReadOnlyList of <see cref="Channel"/>
     /// </summary>
-    [JsonPropertyName("channels")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channels")]
     public IReadOnlyList<Channel>? Channels { get; set; }
 
     /// <summary>
     /// Intent Group <see cref="IntentGroup"/>
     /// </summary>
-    [JsonPropertyName("intents")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("intents")]
     public IntentGroup? Intents { get; set; }
 
     /// <summary>
     /// Sentiment Group <see cref="SentimentGroup"/>
     /// </summary>
-    [JsonPropertyName("sentiments")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("sentiments")]
     public SentimentGroup? Sentiments { get; set; }
 
     /// <summary>
     /// Transcription Summary <see cref="TranscriptionSummary"/>
     /// </summary>
-    [JsonPropertyName("summary")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("summary")]
     public Summary? Summary { get; set; }
 
     /// <summary>
     /// Topic Group <see cref="TopicGroup"/>
     /// </summary>
-    [JsonPropertyName("topics")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("topics")]
     public TopicGroup? Topics { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="Utterance"/>
     /// </summary>
-    [JsonPropertyName("utterances")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("utterances")]
     public IReadOnlyList<Utterance>? Utterances { get; set; }
 }
 

@@ -9,7 +9,8 @@ public record TopicGroup
     /// <summary>
     /// Topics of the text segment.
     /// </summary>
-    [JsonPropertyName("segments")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }
 }
 

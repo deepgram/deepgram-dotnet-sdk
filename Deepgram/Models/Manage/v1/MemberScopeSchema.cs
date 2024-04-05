@@ -9,6 +9,7 @@ public class MemberScopeSchema
     /// <summary>
     /// Scope to add for member
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 }

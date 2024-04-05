@@ -9,37 +9,43 @@ public record Result
     /// <summary>
     /// Start date for included requests.
     /// </summary>
-    [JsonPropertyName("start")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start")]
     public DateTime? StartDateTime { get; set; }
 
     /// <summary>
     /// End date for included requests.
     /// </summary>
-    [JsonPropertyName("end")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end")]
     public DateTime? EndDateTime { get; set; }
 
     /// <summary>
     /// Length of time (in hours) of audio submitted in included requests.
     /// </summary>
-    [JsonPropertyName("hours")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("hours")]
     public double? Hours { get; set; }
 
     /// <summary>
     /// Length of time (in hours) of audio processed in included requests.
     /// </summary>
-    [JsonPropertyName("total_hours")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("total_hours")]
     public double? TotalHours { get; set; }
 
     /// <summary>
     /// Number of included requests.
     /// </summary>
-    [JsonPropertyName("requests")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("requests")]
     public int? Requests { get; set; }
 
     /// <summary>
     /// Token information
     /// </summary>
-    [JsonPropertyName("tokens")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("tokens")]
     public Token? Tokens { get; set; }
 }
 

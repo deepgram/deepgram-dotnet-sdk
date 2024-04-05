@@ -10,30 +10,35 @@ public record Entity
     /// This is the type of the entity
     /// </summary>
     /// <remarks>e.g. DATE, PER, ORG, etc.</remarks>
-    [JsonPropertyName("label")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("label")]
     public string? Label { get; set; }
 
     /// <summary>
     /// This is the value of the detected entity.
     /// </summary>
-    [JsonPropertyName("value")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("value")]
     public string? Value { get; set; }
 
     /// <summary>
     /// Starting index of the entities words within the transcript.
     /// </summary>
-    [JsonPropertyName("start_word")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("start_word")]
     public int? StartWord { get; set; }
 
     /// <summary>
     /// Ending index of the entities words within the transcript.
     /// </summary>
-    [JsonPropertyName("end_word")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("end_word")]
     public int? EndWord { get; set; }
 
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this detected entity.
     /// </summary>
-    [JsonPropertyName("confidence")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 }

@@ -9,24 +9,28 @@ public record TokenDetails
     /// <summary>
     /// Feature name
     /// </summary>
-    [JsonPropertyName("feature")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("feature")]
     public string? Feature { get; set; }
 
     /// <summary>
     /// Input tokens
     /// </summary>
-    [JsonPropertyName("input")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("input")]
     public int? Input { get; set; }
 
     /// <summary>
     /// Output tokens
     /// </summary>
-    [JsonPropertyName("output")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("output")]
     public int? Output { get; set; }
 
     /// <summary>
     /// Model name
     /// </summary>
-    [JsonPropertyName("model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("model")]
     public string? Model { get; set; }
 }

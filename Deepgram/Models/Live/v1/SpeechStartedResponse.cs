@@ -9,19 +9,22 @@ public record SpeechStartedResponse
     /// <summary>
     /// SpeechStarted event type.
     /// </summary>
-    [JsonPropertyName("type")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public LiveType? Type { get; set; } = LiveType.SpeechStarted;
 
     /// <summary>
     /// Channel index information
     /// </summary>
-    [JsonPropertyName("channel_index")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("channel_index")]
     public int[]? Channel { get; set; }
 
     /// <summary>
     /// Timestamp of the event.
     /// </summary>
-    [JsonPropertyName("timestamp")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("timestamp")]
     public decimal? Timestamp { get; set; }
 }
