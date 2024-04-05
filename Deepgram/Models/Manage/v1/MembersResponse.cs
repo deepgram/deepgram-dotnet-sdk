@@ -7,7 +7,7 @@ namespace Deepgram.Models.Manage.v1;
 public record MembersResponse
 {
     /// <summary>
-    /// TODO
+    /// Members response/result
     /// </summary>
     [JsonPropertyName("members")]
     public IReadOnlyList<Member>? Members { get; set; }

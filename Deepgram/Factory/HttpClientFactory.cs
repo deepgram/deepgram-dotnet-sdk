@@ -17,7 +17,7 @@ internal class HttpClientFactory
             httpId = HTTPCLIENT_NAME;
 
         var services = new ServiceCollection();
-        services.AddHttpClient(httpId)
+        services.AddHttpClient(httpId ?? HTTPCLIENT_NAME)
             .AddTransientHttpErrorPolicy(policyBuilder =>
             policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
         var sp = services.BuildServiceProvider();
@@ -46,7 +46,6 @@ internal class HttpClientFactory
                 client.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
 
-        // TODO: log
         client.BaseAddress = new Uri(options.BaseAddress);
 
         return client;

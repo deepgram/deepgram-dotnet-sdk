@@ -13,7 +13,7 @@ public record Config
     public int? Alternatives { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Callback information associated with the request.
     /// </summary>
     [JsonPropertyName("callback")]
     public string? Callback { get; set; }

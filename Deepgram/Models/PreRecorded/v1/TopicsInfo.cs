@@ -7,19 +7,19 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record TopicsInfo
 {
     /// <summary>
-    /// TODO
+    /// Input tokens used
     /// </summary>
     [JsonPropertyName("input_tokens")]
     public int? InputTokens { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model UUID
     /// </summary>
     [JsonPropertyName("model_uuid")]
     public string? ModelUuid { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Output tokens used
     /// </summary>
     [JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }

@@ -7,19 +7,19 @@ namespace Deepgram.Models.PreRecorded.v1;
 public record ModelInfo
 {
     /// <summary>
-    /// TODO
+    /// Architecture of the model, indicating the underlying technology or framework used.
     /// </summary>
     [JsonPropertyName("arch")]
     public string? Arch { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model name
     /// </summary>
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model version
     /// </summary>
     [JsonPropertyName("version")]
     public string? Version { get; set; }

@@ -7,19 +7,19 @@ namespace Deepgram.Models.Manage.v1;
 public record Callback
 {
     /// <summary>
-    /// TODO
+    /// Attempt number.
     /// </summary>
     [JsonPropertyName("attempts")]
     public int? Attempts { get; set; }
 
     /// <summary>
-    /// TODO
+    /// HTTP status code returned by the callback, indicating the result of the callback execution.
     /// </summary>
     [JsonPropertyName("code")]
     public int? Code { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is Completed
     /// </summary>
     [JsonPropertyName("completed")]
     public string? Completed { get; set; }

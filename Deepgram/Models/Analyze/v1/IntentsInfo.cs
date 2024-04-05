@@ -7,19 +7,19 @@ namespace Deepgram.Models.Analyze.v1;
 public record IntentsInfo
 {
     /// <summary>
-    /// TODO
+    /// Input tokens used in the model.
     /// </summary>
     [JsonPropertyName("input_tokens")]
     public int? InputTokens { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model UUID.
     /// </summary>
     [JsonPropertyName("model_uuid")]
     public string? ModelUuid { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Output tokens used in the model.
     /// </summary>
     [JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }

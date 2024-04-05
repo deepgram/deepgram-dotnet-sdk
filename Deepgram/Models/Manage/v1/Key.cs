@@ -19,19 +19,19 @@ public record Key
     public string? Comment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Scope of the Deepgram API key
     /// </summary>
     [JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Creation date of the Deepgram API key
     /// </summary>
     [JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Tags for the Deepgram API key
     /// </summary>
     [JsonPropertyName("tags")]
     public IReadOnlyList<string>? Tags { get; set; }

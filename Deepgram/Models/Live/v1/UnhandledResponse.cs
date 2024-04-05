@@ -13,7 +13,7 @@ public record UnhandledResponse
     public string? Raw { get; set; } = "";
 
     /// <summary>
-    /// TODO
+    /// Unhandled event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

@@ -7,7 +7,7 @@ namespace Deepgram.Models.Live.v1;
 public record OpenResponse
 {
     /// <summary>
-    /// TODO
+    /// Open event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

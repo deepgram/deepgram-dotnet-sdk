@@ -190,7 +190,7 @@ public class LiveSchema
     public string? UtteranceEnd { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Enables voice activity detection (VAD) events
     /// </summary>
     [JsonPropertyName("vad_events")]
     public bool? VadEvents { get; set; }

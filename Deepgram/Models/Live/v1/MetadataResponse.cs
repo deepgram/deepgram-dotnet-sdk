@@ -7,55 +7,55 @@ namespace Deepgram.Models.Live.v1;
 public record MetadataResponse
 {
     /// <summary>
-    /// TODO
+    /// Channel count
     /// </summary>
     [JsonPropertyName("channels")]
     public int? Channels { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Created date/time
     /// </summary>
     [JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Duration of the audio
     /// </summary>
     [JsonPropertyName("duration")]
     public double? Duration { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model Information
     /// </summary>
     [JsonPropertyName("model_info")]
     public IReadOnlyDictionary<string, ModelInfo>? ModelInfo { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Models used containing UUIDs
     /// </summary>
     [JsonPropertyName("models")]
     public IReadOnlyList<string>? Models { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Request ID is a unique identifier for the request. It is useful for troubleshooting and support.
     /// </summary>
     [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sha256 information
     /// </summary>
     [JsonPropertyName("sha256")]
     public string? Sha256 { get; set; }
 
     /// <summary>
-    /// TODO
+    /// (Obsolete?) his field is only present if the request was made with a transaction key.
     /// </summary>
     [JsonPropertyName("transaction_key")]
     public string? TransactionKey { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Metadata event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

@@ -31,7 +31,7 @@ public record UsageRequest
     public string? Path { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Accessor of the request.
     /// </summary>
     [JsonPropertyName("accessor")]
     public string? Accessor { get; set; }

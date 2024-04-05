@@ -7,13 +7,13 @@ namespace Deepgram.Models.Manage.v1;
 public record Invite
 {
     /// <summary>
-    /// TODO
+    /// Email for invite.
     /// </summary>
     [JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Scope for invite.
     /// </summary>
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }

@@ -7,13 +7,13 @@ namespace Deepgram.Models.OnPrem.v1;
 public record Member
 {
     /// <summary>
-    /// TODO
+    /// Member ID
     /// </summary>
     [JsonPropertyName("member_id")]
     public string? MemberId { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Email of the member
     /// </summary>
     [JsonPropertyName("email")]
     public string? Email { get; set; }

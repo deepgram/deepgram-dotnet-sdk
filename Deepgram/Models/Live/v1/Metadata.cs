@@ -7,13 +7,13 @@ namespace Deepgram.Models.Live.v1;
 public record MetaData
 {
     /// <summary>
-    /// TODO
+    /// The request ID is a unique identifier for the request. It is useful for troubleshooting and support.
     /// </summary>
     [JsonPropertyName("request_id")]
     public string RequestId { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model UUID
     /// </summary>
     [JsonPropertyName("model_uuid")]
     public string ModelUUID { get; set; }

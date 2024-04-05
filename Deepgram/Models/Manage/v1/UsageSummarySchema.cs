@@ -88,13 +88,13 @@ public class UsageSummarySchema
     public bool? Numerals { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Number Feature being used
     /// </summary>
     [JsonPropertyName("numbers")]
     public bool? Numbers { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Paragraphs Feature being used
     /// </summary>
     [JsonPropertyName("paragraphs")]
     public bool? Paragraphs { get; set; }
@@ -130,7 +130,7 @@ public class UsageSummarySchema
     public bool? Search { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Sentiment Feature being used
     /// </summary>
     [JsonPropertyName("sentiment")]
     public bool? Sentiment { get; set; }
@@ -143,7 +143,7 @@ public class UsageSummarySchema
 
 
     /// <summary>
-    /// TODO
+    /// Is the SmartFormat Feature being used
     /// </summary>
     [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
@@ -155,7 +155,7 @@ public class UsageSummarySchema
     public DateTime? Start { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Summarize Feature being used
     /// </summary>
     [JsonPropertyName("summarize")]
     public bool? Summarize { get; set; }
@@ -167,7 +167,7 @@ public class UsageSummarySchema
     public List<string>? Tag { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Translate Feature being used
     /// </summary>
     [JsonPropertyName("translate")]
     public bool? translate { get; set; }
@@ -179,7 +179,7 @@ public class UsageSummarySchema
     public bool? Utterances { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the Utterance Split Feature being used
     /// </summary>
     [JsonPropertyName("utt_split")]
     public bool? UttSplit { get; set; }

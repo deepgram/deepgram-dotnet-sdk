@@ -7,7 +7,7 @@ namespace Deepgram.Models.Analyze.v1;
 public record TopicGroup
 {
     /// <summary>
-    /// TODO
+    /// Topics of the text segment.
     /// </summary>
     [JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }

@@ -7,13 +7,13 @@ namespace Deepgram.Models.Analyze.v1;
 public record Results
 {
     /// <summary>
-    /// TODO
+    /// Intents <see cref="IntentGroup"/>
     /// </summary>
     [JsonPropertyName("intents")]
     public IntentGroup? Intents { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiments <see cref="SentimentGroup"/>
     /// </summary>
     [JsonPropertyName("sentiments")]
     public SentimentGroup? Sentiments { get; set; }
@@ -25,7 +25,7 @@ public record Results
     public Summary? Summary { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Summary of the topics <see cref="TopicGroup"/>
     /// </summary>
     [JsonPropertyName("topics")]
     public TopicGroup? Topics { get; set; }

@@ -25,25 +25,25 @@ public record Metadata
     public string? Language { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Intents information
     /// </summary>
     [JsonPropertyName("intents_info")]
     public IntentsInfo? IntentsInfo { get; set; }
 
     /// <summary>
-    /// TODO.
+    /// Sentiment information
     /// </summary>
     [JsonPropertyName("sentiment_info")]
     public SentimentInfo? SentimentInfo { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Summary information
     /// </summary>
     [JsonPropertyName("summary_info")]
     public SummaryInfo? SummaryInfo { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Topics information
     /// </summary>
     [JsonPropertyName("topics_info")]
     public TopicsInfo? TopicsInfo { get; set; }

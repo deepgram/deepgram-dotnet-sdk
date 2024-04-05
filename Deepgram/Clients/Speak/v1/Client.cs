@@ -78,7 +78,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
                     response.Date = DateTime.Parse(item.Value);
                     break;
                 default:
-                    // TODO log this
+                    Log.Error("ToStream", $"Unknown metadata key: {key}");  
                     break;
             }
         }

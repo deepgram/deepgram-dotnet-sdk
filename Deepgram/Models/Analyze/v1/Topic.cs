@@ -13,7 +13,7 @@ public record Topic
     public double? Confidence { get; set; }
 
     /// <summary>
-    /// TODO
+    /// The discover topic.
     /// </summary>
     [JsonPropertyName("topic")]
     public string Text;

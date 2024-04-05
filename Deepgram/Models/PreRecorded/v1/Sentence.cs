@@ -25,13 +25,13 @@ public record Sentence
     public decimal? End { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment of the sentence: positive, negative, neutral.
     /// </summary>
     [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Sentiment score of the sentence.
     /// </summary>
     [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }

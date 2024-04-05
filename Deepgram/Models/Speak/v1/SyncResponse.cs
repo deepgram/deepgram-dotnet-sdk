@@ -7,43 +7,43 @@ namespace Deepgram.Models.Speak.v1;
 public record SyncResponse
 {
     /// <summary>
-    /// TODO
+    /// Content type of the audio file
     /// </summary>
     [JsonPropertyName("content_type")]
     public string? ContentType { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Request ID for support purposes
     /// </summary>
     [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model UUID
     /// </summary>
     [JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Model name
     /// </summary>
     [JsonPropertyName("model_name")]
     public string? ModelName { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Character count
     /// </summary>
     [JsonPropertyName("characters")]
     public int? Characters { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Encoding of the audio file
     /// </summary>
     [JsonPropertyName("transfer_encoding")]
     public string? TransferEncoding { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Date/time of the audio file
     /// </summary>
     [JsonPropertyName("date")]
     public DateTime? Date { get; set; }

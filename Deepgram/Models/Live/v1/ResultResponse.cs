@@ -6,49 +6,49 @@ namespace Deepgram.Models.Live.v1;
 public record ResultResponse
 {
     /// <summary>
-    /// TODO
+    /// Contains the channel information.
     /// </summary>
     [JsonPropertyName("channel")]
     public Channel Channel { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Channel index.
     /// </summary>
     [JsonPropertyName("channel_index")]
     public IReadOnlyList<int> ChannelIndex { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Duration of the result.
     /// </summary>
     [JsonPropertyName("duration")]
     public double Duration { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the result final.
     /// </summary>
     [JsonPropertyName("is_final")]
     public bool IsFinal { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Metadata information.
     /// </summary>
     [JsonPropertyName("metadata")]
     public MetaData MetaData { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Is the result a partial result.
     /// </summary>
     [JsonPropertyName("speech_final")]
     public bool SpeechFinal { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Start time of the result.
     /// </summary>
     [JsonPropertyName("start")]
     public decimal Start { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Result event type.
     /// </summary>
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -56,7 +56,7 @@ public record ResultResponse
 
     // TODO: DYV is this needed???
     /// <summary>
-    /// TODO
+    /// Error information.
     /// </summary>
     public Exception? Error { get; set; }
 }
