@@ -38,14 +38,6 @@ public class DeepgramHttpClientOptions
     /*****************************/
 
     /*****************************/
-    // Live
-    /*****************************/
-    /// <summary>
-    /// Enable sending KeepAlives for Streaming
-    /// </summary>
-    public bool KeepAlive { get; set; } = false;
-
-    /*****************************/
     // OnPrem
     /*****************************/
     /// <summary>
@@ -62,26 +54,25 @@ public class DeepgramHttpClientOptions
     /*****************************/
 
     /*****************************/
+    // Speak
+    /*****************************/
+
+    /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? headers = null, string? apiVersion = null)
+    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("DeepgramHttpClientOptions", "ENTER");
         Log.Debug("DeepgramHttpClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
         Log.Debug("DeepgramHttpClientOptions", baseAddress == null ? "BaseAddress is null" : "BaseAddress provided");
-        Log.Debug("DeepgramHttpClientOptions", keepAlive == null ? "KeepAlive is null" : "KeepAlive provided");
         Log.Debug("DeepgramHttpClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramHttpClientOptions", headers == null ? "Headers is null" : "Headers provided");
-        Log.Debug("DeepgramHttpClientOptions", apiVersion == null ? "API Version is null" : "API Version provided");
 
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
-        KeepAlive = keepAlive ?? false;
         OnPrem = onPrem ?? false;
         Headers = headers ?? new Dictionary<string, string>();
-        APIVersion = apiVersion ?? Defaults.DEFAULT_API_VERSION;
 
-        Log.Information("DeepgramHttpClientOptions", $"KeepAlive: {KeepAlive}");
         Log.Information("DeepgramHttpClientOptions", $"OnPrem: {OnPrem}");
         Log.Information("DeepgramHttpClientOptions", $"APIVersion: {APIVersion}");
 

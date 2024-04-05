@@ -34,10 +34,6 @@ public class DeepgramWsClientOptions
     public Dictionary<string, string> Headers { get; set; }
 
     /*****************************/
-    // Prerecorded
-    /*****************************/
-
-    /*****************************/
     // Live
     /*****************************/
     /// <summary>
@@ -54,17 +50,13 @@ public class DeepgramWsClientOptions
     public bool OnPrem { get; set; } = false;
 
     /*****************************/
-    // Manage
-    /*****************************/
-
-    /*****************************/
-    // Analyze
+    // Speak
     /*****************************/
 
     /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? headers = null, string? apiVersion = null)
+    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("DeepgramWsClientOptions", "ENTER");
         Log.Debug("DeepgramWsClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
@@ -72,14 +64,12 @@ public class DeepgramWsClientOptions
         Log.Debug("DeepgramWsClientOptions", keepAlive == null ? "KeepAlive is null" : "KeepAlive provided");
         Log.Debug("DeepgramWsClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramWsClientOptions", headers == null ? "Headers is null" : "Headers provided");
-        Log.Debug("DeepgramWsClientOptions", apiVersion == null ? "API Version is null" : "API Version provided");
 
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         KeepAlive = keepAlive ?? false;
         OnPrem = onPrem ?? false;
         Headers = headers ?? new Dictionary<string, string>();
-        APIVersion = apiVersion ?? Defaults.DEFAULT_API_VERSION;
 
         Log.Information("DeepgramWsClientOptions", $"KeepAlive: {KeepAlive}");
         Log.Information("DeepgramWsClientOptions", $"OnPrem: {OnPrem}");

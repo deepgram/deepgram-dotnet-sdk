@@ -34,7 +34,6 @@ public abstract class AbstractRestClient
 
         Log.Debug("AbstractRestClient", $"APIVersion: {options.APIVersion}");
         Log.Debug("AbstractRestClient", $"BaseAddress: {options.BaseAddress}");
-        Log.Debug("AbstractRestClient", $"KeepAlive: {options.KeepAlive}");
         Log.Debug("AbstractRestClient", $"options: {options.OnPrem}");
         Log.Verbose("AbstractRestClient", "LEAVE");
     }
