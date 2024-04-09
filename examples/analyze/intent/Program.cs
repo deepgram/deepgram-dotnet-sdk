@@ -5,6 +5,7 @@
 using System.Text.Json;
 
 using Deepgram.Models.Analyze.v1;
+using Deepgram.Logger;
 
 namespace PreRecorded
 {
@@ -14,7 +15,9 @@ namespace PreRecorded
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            Library.Initialize();
+            // Library.Initialize();
+            // OR to set logging level
+            Library.Initialize(LogLevel.Debug);
 
             // JSON options
             JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
@@ -32,6 +35,10 @@ namespace PreRecorded
                 return;
             }
 
+            // increase timeout to 60 seconds
+            CancellationTokenSource cancelToken = new CancellationTokenSource();
+            cancelToken.CancelAfter(TimeSpan.FromSeconds(120));
+
             var audioData = File.ReadAllBytes(@"conversation.txt");
             var response = await deepgramClient.AnalyzeFile(
                 audioData,
@@ -39,7 +46,8 @@ namespace PreRecorded
                 {
                     Language = "en",
                     Intents = true,
-                });
+                },
+                cancelToken);
 
             Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
             Console.ReadKey();

@@ -10,49 +10,49 @@ public record ResultResponse
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("channel")]
-    public Channel Channel { get; set; }
+    public Channel? Channel { get; set; }
 
     /// <summary>
     /// Channel index.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("channel_index")]
-    public IReadOnlyList<int> ChannelIndex { get; set; }
+    public IReadOnlyList<int>? ChannelIndex { get; set; }
 
     /// <summary>
     /// Duration of the result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("duration")]
-    public double Duration { get; set; }
+    public decimal? Duration { get; set; }
 
     /// <summary>
     /// Is the result final.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("is_final")]
-    public bool IsFinal { get; set; }
+    public bool? IsFinal { get; set; }
 
     /// <summary>
     /// Metadata information.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("metadata")]
-    public MetaData MetaData { get; set; }
+    public MetaData? MetaData { get; set; }
 
     /// <summary>
     /// Is the result a partial result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("speech_final")]
-    public bool SpeechFinal { get; set; }
+    public bool? SpeechFinal { get; set; }
 
     /// <summary>
     /// Start time of the result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("start")]
-    public decimal Start { get; set; }
+    public decimal? Start { get; set; }
 
     /// <summary>
     /// Result event type.
@@ -60,7 +60,7 @@ public record ResultResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType Type { get; set; } = LiveType.Results;
+    public LiveType? Type { get; set; } = LiveType.Results;
 
     // TODO: DYV is this needed???
     /// <summary>

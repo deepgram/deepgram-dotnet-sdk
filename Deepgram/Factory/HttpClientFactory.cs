@@ -13,8 +13,10 @@ internal class HttpClientFactory
 
     public static HttpClient Create(string? httpId = null)
     {
-        if (string.IsNullOrWhiteSpace(httpId))
+        if (string.IsNullOrEmpty(httpId))
             httpId = HTTPCLIENT_NAME;
+
+        Log.Information("HttpClientFactory.Create", $"HttpClient ID: {httpId}");
 
         var services = new ServiceCollection();
         services.AddHttpClient(httpId ?? HTTPCLIENT_NAME)

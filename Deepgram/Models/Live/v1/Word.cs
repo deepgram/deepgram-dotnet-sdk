@@ -11,28 +11,28 @@ public record Word
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("word")]
-    public string HeardWord { get; set; }
+    public string? HeardWord { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word starts.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("start")]
-    public decimal Start { get; set; }
+    public decimal? Start { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the spoken word ends.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("end")]
-    public decimal End { get; set; }
+    public decimal? End { get; set; }
 
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this word.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("confidence")]
-    public double Confidence { get; set; }
+    public double? Confidence { get; set; }
 
     /// <summary>
     /// Punctuated version of the word
