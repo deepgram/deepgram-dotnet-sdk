@@ -12,6 +12,6 @@ public static class Constants
     // For Speak Headers
     public const int OneSecond = 1000;
     public const int OneMinute = 60 * OneSecond;
-    public const int DefaultRESTTimeout = 5 * OneMinute;
+    public const int DefaultRESTTimeout = 30 * OneSecond;
 }
 

@@ -707,7 +707,7 @@ public class Client : Attribute, IDisposable
         if (cancelToken == null)
         {
             Log.Information("Stop", "Using default disconnect cancellation token");
-            cancelToken = new CancellationTokenSource(Constants.DefaultConnectTimeout);
+            cancelToken = new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
         }
 
         try
