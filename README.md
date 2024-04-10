@@ -14,6 +14,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
   - [Live Audio Transcription Quickstart](#live-audio-transcription-quickstart)
 - [Example Code](#example-code)
 - [Logging](#logging)
+- [Backwards Compatability](#backwards-compatibility)
 - [Development and Contributing](#development-and-contributing)
 - [Getting Help](#getting-help)
 - [Backwards Compatability](#backwards-compatibility)
