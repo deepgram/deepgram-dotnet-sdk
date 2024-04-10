@@ -11,21 +11,21 @@ public record MetaData
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("request_id")]
-    public string RequestId { get; set; }
+    public string? RequestId { get; set; }
 
     /// <summary>
     /// Model UUID
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("model_uuid")]
-    public string ModelUUID { get; set; }
+    public string? ModelUUID { get; set; }
 
     /// <summary>
     /// IReadonlyDictionary of <see cref="ModelInfo"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("model_info")]
-    public ModelInfo ModelInfo { get; set; }
+    public ModelInfo? ModelInfo { get; set; }
 
     /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.

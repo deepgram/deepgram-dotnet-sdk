@@ -11,18 +11,18 @@ public record Alternative
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("transcript")]
-    public string Transcript { get; set; }
+    public string? Transcript { get; set; }
     /// <summary>
     /// Value between 0 and 1 indicating the model's relative confidence in this transcript.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("confidence")]
-    public double Confidence { get; set; }
+    public double? Confidence { get; set; }
 
     /// <summary>
     /// ReadOnly List of <see cref="Word"/> objects.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("words")]
-    public IReadOnlyList<Word> Words { get; set; }
+    public IReadOnlyList<Word>? Words { get; set; }
 }

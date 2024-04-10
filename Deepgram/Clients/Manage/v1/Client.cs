@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 
@@ -69,7 +68,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.UpdateProject", "ENTER");
         Log.Information("UpdateProject", $"projectId: {projectId}");
-        Log.Information("UpdateProject", $"updateProjectSchema: {updateProjectSchema}");
+        Log.Information("UpdateProject", $"updateProjectSchema:\n{JsonSerializer.Serialize(updateProjectSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}");
         var result = await PatchAsync<ProjectSchema, MessageResponse>(uri, updateProjectSchema, cancellationToken, addons, headers);
@@ -181,7 +180,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.CreateKey", "ENTER");
         Log.Information("CreateKey", $"projectId: {projectId}");
-        Log.Information("CreateKey", $"keySchema: {keySchema}");
+        Log.Information("CreateKey", $"keySchema:\n{JsonSerializer.Serialize(keySchema, JsonSerializeOptions.DefaultOptions)}");
 
         if (keySchema.ExpirationDate is not null && keySchema.TimeToLiveInSeconds is not null)
         {
@@ -280,7 +279,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.SendInvite", "ENTER");
         Log.Information("SendInvite", $"projectId: {projectId}");
-        Log.Information("SendInvite", $"inviteSchema: {inviteSchema}");
+        Log.Information("SendInvite", $"inviteSchema:\n{JsonSerializer.Serialize(inviteSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.INVITES}");
         var result = await PostAsync<InviteSchema, MessageResponse>(uri, inviteSchema, cancellationToken, addons, headers);
@@ -351,7 +350,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Log.Verbose("ManageClient.UpdateMemberScope", "ENTER");
         Log.Information("UpdateMemberScope", $"projectId: {projectId}");
         Log.Information("UpdateMemberScope", $"memberId: {memberId}");
-        Log.Information("UpdateMemberScope", $"projectId: {scopeSchema}");
+        Log.Information("UpdateMemberScope", $"scopeSchema:\n{JsonSerializer.Serialize(scopeSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}");
         var result = await PutAsync<MemberScopeSchema, MessageResponse>(uri,scopeSchema, cancellationToken, addons, headers);
@@ -400,7 +399,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.GetUsageRequests", "ENTER");
         Log.Information("GetUsageRequests", $"projectId: {projectId}");
-        Log.Information("GetUsageRequests", $"usageRequestsSchema: {usageRequestsSchema}");
+        Log.Information("GetUsageRequests", $"usageRequestsSchema:\n{JsonSerializer.Serialize(usageRequestsSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.REQUESTS}");
         var result = await GetAsync<UsageRequestsSchema, UsageRequestsResponse>(uri, usageRequestsSchema, cancellationToken, addons, headers);
@@ -446,7 +445,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.GetUsageSummary", "ENTER");
         Log.Information("GetUsageSummary", $"projectId: {projectId}");
-        Log.Information("GetUsageSummary", $"summarySchema: {summarySchema}");
+        Log.Information("GetUsageSummary", $"summarySchema:\n{JsonSerializer.Serialize(summarySchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}");
         var result = await GetAsync<UsageSummarySchema, UsageSummaryResponse>(uri, summarySchema, cancellationToken, addons, headers);
@@ -469,7 +468,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("ManageClient.GetUsageFields", "ENTER");
         Log.Information("GetUsageFields", $"projectId: {projectId}");
-        Log.Information("GetUsageFields", $"summarySchema: {fieldsSchema}");
+        Log.Information("GetUsageFields", $"summarySchema:\n{JsonSerializer.Serialize(fieldsSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.USAGE}/fields");
         var result = await GetAsync<UsageFieldsSchema, UsageFieldsResponse>(uri, fieldsSchema, cancellationToken, addons, headers);

@@ -11,19 +11,19 @@ public record ModelInfo
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("arch")]
-    public string Arch { get; set; }
+    public string? Arch { get; set; }
 
     /// <summary>
     /// Name of the model
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// Version of the model
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("version")]
-    public string Version { get; set; }
+    public string? Version { get; set; }
 }

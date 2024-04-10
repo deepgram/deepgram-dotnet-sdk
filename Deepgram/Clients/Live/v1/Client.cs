@@ -63,7 +63,7 @@ public class Client : Attribute, IDisposable
         Dictionary<string, string>? headers = null)
     {
         Log.Verbose("LiveClient.Connect", "ENTER");
-        Log.Information("Connect", $"options: {options}");
+        Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
         Log.Debug("Connect", $"addons: {addons}");
 
         // check if the client is disposed

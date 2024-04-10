@@ -106,7 +106,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.GetAsync<S, T>", "ENTER");
         Log.Debug("GetAsync<S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("GetAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("GetAsync<S, T>", $"addons: {addons}");
 
         try
@@ -173,7 +172,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "ENTER");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"parameter: {parameter}");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"keys: {keys}");
         Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"addons: {addons}");
 
@@ -290,7 +288,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.PostAsync<S, T>", "ENTER");
         Log.Debug("PostAsync<S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("PostAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PostAsync<S, T>", $"addons: {addons}");
 
         try
@@ -350,8 +347,7 @@ public abstract class AbstractRestClient
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "ENTER");
-        Log.Debug("PostAsync<R, S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("PostAsync<R, S, T>", $"parameter: {parameter}");
+        Log.Debug("PostAsync<S, T>", $"uriSegment: {uriSegment}");
         Log.Debug("PostAsync<R, S, T>", $"addons: {addons}");
 
         try
@@ -428,7 +424,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "ENTER");
         Log.Debug("PatchAsync<S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("PatchAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PatchAsync<S, T>", $"addons: {addons}");
 
         try
@@ -503,7 +498,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.PutAsync<S, T>", "ENTER");
         Log.Debug("PutAsync<S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("PutAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("PutAsync<S, T>", $"addons: {addons}");
 
         try
@@ -635,7 +629,6 @@ public abstract class AbstractRestClient
     {
         Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "ENTER");
         Log.Debug("DeleteAsync<S, T>", $"uriSegment: {uriSegment}");
-        Log.Debug("DeleteAsync<S, T>", $"parameter: {parameter}");
         Log.Debug("DeleteAsync<S, T>", $"addons: {addons}");
 
         try

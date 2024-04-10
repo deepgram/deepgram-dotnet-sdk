@@ -27,7 +27,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("AnalyzeClient.AnalyzeUrl", "ENTER");
         Log.Information("AnalyzeUrl", $"source: {source}");
-        Log.Information("AnalyzeUrl", $"analyzeSchema: {analyzeSchema}");
+        Log.Information("AnalyzeUrl", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyNoCallBack(nameof(AnalyzeUrl), analyzeSchema);
 
@@ -66,7 +66,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("AnalyzeClient.AnalyzeFile", "ENTER");
         Log.Information("AnalyzeFile", $"source: {source}");
-        Log.Information("AnalyzeFile", $"analyzeSchema: {analyzeSchema}");
+        Log.Information("AnalyzeFile", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyNoCallBack(nameof(AnalyzeFile), analyzeSchema);
 
@@ -109,7 +109,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Log.Verbose("AnalyzeClient.AnalyzeFileCallBack", "ENTER");
         Log.Information("AnalyzeFileCallBack", $"source: {source}");
         Log.Information("AnalyzeFileCallBack", $"callBack: {callBack}");
-        Log.Information("AnalyzeFileCallBack", $"analyzeSchema: {analyzeSchema}");
+        Log.Information("AnalyzeFileCallBack", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyOneCallBackSet(nameof(AnalyzeFileCallBack), callBack, analyzeSchema);
         if (callBack != null)
@@ -139,7 +139,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Log.Verbose("AnalyzeClient.AnalyzeUrlCallBack", "ENTER");
         Log.Information("AnalyzeUrlCallBack", $"source: {source}");
         Log.Information("AnalyzeUrlCallBack", $"callBack: {callBack}");
-        Log.Information("AnalyzeUrlCallBack", $"analyzeSchema: {analyzeSchema}");
+        Log.Information("AnalyzeUrlCallBack", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyOneCallBackSet(nameof(AnalyzeUrlCallBack), callBack, analyzeSchema);
         if (callBack != null)

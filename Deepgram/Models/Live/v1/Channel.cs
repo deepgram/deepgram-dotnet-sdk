@@ -11,5 +11,5 @@ public record Channel
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("alternatives")]
-    public IReadOnlyList<Alternative> Alternatives { get; set; }
+    public IReadOnlyList<Alternative>? Alternatives { get; set; }
 }
