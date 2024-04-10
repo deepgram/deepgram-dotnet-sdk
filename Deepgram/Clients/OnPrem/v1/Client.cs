@@ -94,7 +94,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("OnPremClient.CreateCredentials", "ENTER");
         Log.Debug("CreateCredentials", $"projectId: {projectId}");
-        Log.Debug("CreateCredentials", $"credentialsSchema: {credentialsSchema}");
+        Log.Debug("CreateCredentials", $"credentialsSchema:\n{JsonSerializer.Serialize(credentialsSchema, JsonSerializeOptions.DefaultOptions)}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.ONPREM}");
         var result = await PostAsync<CredentialsSchema, CredentialResponse>(uri, credentialsSchema, cancellationToken, addons, headers);

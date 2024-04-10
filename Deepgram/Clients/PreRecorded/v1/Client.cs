@@ -29,7 +29,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("PreRecordedClient.TranscribeUrl", "ENTER");
         Log.Information("TranscribeUrl", $"source: {source}");
-        Log.Information("TranscribeUrl", $"prerecordedSchema: {prerecordedSchema}");
+        Log.Information("TranscribeUrl", $"prerecordedSchema:\n{JsonSerializer.Serialize(prerecordedSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyNoCallBack(nameof(TranscribeUrl), prerecordedSchema);
 
@@ -66,7 +66,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     {
         Log.Verbose("PreRecordedClient.TranscribeFile", "ENTER");
         Log.Information("TranscribeFile", $"source: {source}");
-        Log.Information("TranscribeFile", $"prerecordedSchema: {prerecordedSchema}");
+        Log.Information("TranscribeFile", $"prerecordedSchema:\n{JsonSerializer.Serialize(prerecordedSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyNoCallBack(nameof(TranscribeFile), prerecordedSchema);
 
@@ -108,7 +108,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Log.Verbose("PreRecordedClient.TranscribeFileCallBack", "ENTER");
         Log.Information("TranscribeFileCallBack", $"source: {source}");
         Log.Information("TranscribeFileCallBack", $"callBack: {callBack}");
-        Log.Information("TranscribeFileCallBack", $"prerecordedSchema: {prerecordedSchema}");
+        Log.Information("TranscribeFileCallBack", $"prerecordedSchema:\n{JsonSerializer.Serialize(prerecordedSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyOneCallBackSet(nameof(TranscribeFileCallBack), callBack, prerecordedSchema);
         if (callBack != null)
@@ -136,7 +136,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
         Log.Verbose("PreRecordedClient.TranscribeUrlCallBack", "ENTER");
         Log.Information("TranscribeUrlCallBack", $"source: {source}");
         Log.Information("TranscribeUrlCallBack", $"callBack: {callBack}");
-        Log.Information("TranscribeUrlCallBack", $"prerecordedSchema: {prerecordedSchema}");
+        Log.Information("TranscribeUrlCallBack", $"prerecordedSchema:\n{JsonSerializer.Serialize(prerecordedSchema, JsonSerializeOptions.DefaultOptions)}");
 
         VerifyOneCallBackSet(nameof(TranscribeUrlCallBack), callBack, prerecordedSchema);
 

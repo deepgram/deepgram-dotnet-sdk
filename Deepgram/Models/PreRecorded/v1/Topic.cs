@@ -18,6 +18,6 @@ public record Topic
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("topic")]
-    public string Text;
+    public string? Text;
 }
 

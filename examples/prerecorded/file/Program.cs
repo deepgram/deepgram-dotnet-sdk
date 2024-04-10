@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text.Json;
+
 using Deepgram.Logger;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.PreRecorded.v1;
 
 namespace PreRecorded
@@ -14,9 +16,9 @@ namespace PreRecorded
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            Library.Initialize();
+            //Library.Initialize();
             // OR very chatty logging
-            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // JSON options
             JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
@@ -25,6 +27,8 @@ namespace PreRecorded
             };
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+            //DeepgramHttpClientOptions dgOptions = new DeepgramHttpClientOptions(null, "38.104.135.210");
+            //var deepgramClient = new PreRecordedClient("", dgOptions);
             var deepgramClient = new PreRecordedClient();
 
             // check to see if the file exists
@@ -34,6 +38,10 @@ namespace PreRecorded
                 return;
             }
 
+            // increase timeout to a very large value
+            CancellationTokenSource cancelToken = new CancellationTokenSource();
+            cancelToken.CancelAfter(3600000);
+
             var audioData = File.ReadAllBytes(@"Bueller-Life-moves-pretty-fast.wav");
             var response = await deepgramClient.TranscribeFile(
                 audioData,
@@ -41,7 +49,8 @@ namespace PreRecorded
                 {
                     Model = "nova-2",
                     Punctuate = true,
-                });
+                },
+                cancelToken);
 
             Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
             Console.WriteLine("Press any key to exit...");

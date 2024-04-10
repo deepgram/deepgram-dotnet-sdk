@@ -139,6 +139,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TriggerCancel", "tests\expe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExerciseTimeout", "tests\expected_failures\websocket\exercise_timeout\ExerciseTimeout.csproj", "{8C5A02D8-E18B-4060-A567-A4AACC49B2F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{5DFC6330-8303-4045-B186-32B396391D31}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\streaming\http\Streaming.csproj", "{61B42F6B-521C-4A07-B592-54975F4AE2E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -261,6 +265,10 @@ Global
 		{8C5A02D8-E18B-4060-A567-A4AACC49B2F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C5A02D8-E18B-4060-A567-A4AACC49B2F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C5A02D8-E18B-4060-A567-A4AACC49B2F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61B42F6B-521C-4A07-B592-54975F4AE2E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61B42F6B-521C-4A07-B592-54975F4AE2E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61B42F6B-521C-4A07-B592-54975F4AE2E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61B42F6B-521C-4A07-B592-54975F4AE2E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -329,6 +337,8 @@ Global
 		{DF383769-5F1F-4692-854F-2E923F3D0F09} = {D100AACD-E5FB-45E5-980B-B19C091440B2}
 		{F736604C-A245-411E-BECE-028FBD98166E} = {80E7546A-4CED-4644-8900-983422CDE73C}
 		{8C5A02D8-E18B-4060-A567-A4AACC49B2F6} = {3AC17A9C-30BB-4298-8E5A-4FAE73189821}
+		{5DFC6330-8303-4045-B186-32B396391D31} = {132EEE99-6194-477A-9416-D7EF173C17FD}
+		{61B42F6B-521C-4A07-B592-54975F4AE2E6} = {5DFC6330-8303-4045-B186-32B396391D31}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}
