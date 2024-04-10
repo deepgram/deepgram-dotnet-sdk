@@ -16,6 +16,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
 - [Logging](#logging)
 - [Development and Contributing](#development-and-contributing)
 - [Getting Help](#getting-help)
+- [Backwards Compatability](#backwards-compatibility)
 
 # Documentation
 
@@ -209,6 +210,10 @@ To increase the logging output/verbosity for debug or troubleshooting purposes, 
 ```csharp
 Library.Initialize(LogLevel.Debug);
 ```
+
+# Backwards Compatibility
+
+Older SDK versions will receive Priority 1 (P1) bug support only. Security issues, both in our code and dependencies, are promptly addressed. Significant bugs without clear workarounds are also given priority attention.
 
 # Development and Contributing
 
