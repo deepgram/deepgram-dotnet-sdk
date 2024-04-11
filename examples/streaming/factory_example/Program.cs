@@ -25,11 +25,8 @@ namespace SampleApp
 
             Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
-            var liveClient = new LiveClient("", options);
-            // OR
-            //var liveClient = new LiveClienkt("set your DEEPGRAM_API_KEY here");
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var liveClient = ClientFactory.CreateLiveClient();
 
             // Subscribe to the EventResponseReceived event
             liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>

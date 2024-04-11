@@ -2,17 +2,17 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Threading;
+
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
+using Deepgram.Clients.Interfaces.v1;
 
 namespace Deepgram.Clients.Live.v1;
 
 /// <summary>
 /// Implements version 1 of the Live Client.
 /// </summary>
-public class Client : Attribute, IDisposable
+public class Client : IDisposable, ILiveClient
 {
     #region Fields
     private readonly DeepgramWsClientOptions _deepgramClientOptions;
