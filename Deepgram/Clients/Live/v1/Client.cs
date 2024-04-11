@@ -15,7 +15,7 @@ namespace Deepgram.Clients.Live.v1;
 public class Client : IDisposable, ILiveClient
 {
     #region Fields
-    private readonly DeepgramWsClientOptions _deepgramClientOptions;
+    private readonly IDeepgramClientOptions _deepgramClientOptions;
 
     private ClientWebSocket? _clientWebSocket;
     private CancellationTokenSource? _cancellationTokenSource;
@@ -25,8 +25,8 @@ public class Client : IDisposable, ILiveClient
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
-    /// <param name="deepgramClientOptions"><see cref="DeepgramWsClientOptions"/> for HttpClient Configuration</param>
-    public Client(string? apiKey = null, DeepgramWsClientOptions? options = null)
+    /// <param name="deepgramClientOptions"><see cref="IDeepgramClientOptions"/> for HttpClient Configuration</param>
+    public Client(string? apiKey = null, IDeepgramClientOptions? options = null)
     {
         Log.Verbose("LiveClient", "ENTER");
 
@@ -800,7 +800,7 @@ public class Client : IDisposable, ILiveClient
     /// <summary>
     /// Get the URI for the WebSocket connection
     /// </summary> 
-    internal static Uri GetUri(DeepgramWsClientOptions options, LiveSchema parameter, Dictionary<string, string>? addons = null)
+    internal static Uri GetUri(IDeepgramClientOptions options, LiveSchema parameter, Dictionary<string, string>? addons = null)
     {
         var propertyInfoList = parameter.GetType()
             .GetProperties()

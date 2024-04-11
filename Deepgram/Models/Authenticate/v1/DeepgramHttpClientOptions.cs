@@ -7,7 +7,7 @@ namespace Deepgram.Models.Authenticate.v1;
 /// <summary>
 /// Configuration for the Deepgram client
 /// </summary>
-public class DeepgramHttpClientOptions
+public class DeepgramHttpClientOptions : IDeepgramClientOptions
 {
     /*****************************/
     // General Options
@@ -36,6 +36,11 @@ public class DeepgramHttpClientOptions
     /*****************************/
     // Prerecorded
     /*****************************/
+
+    /*****************************/
+    // Live
+    /*****************************/
+    public bool KeepAlive { get; }
 
     /*****************************/
     // OnPrem
@@ -68,6 +73,7 @@ public class DeepgramHttpClientOptions
         Log.Debug("DeepgramHttpClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramHttpClientOptions", headers == null ? "Headers is null" : "Headers provided");
 
+        KeepAlive = false;
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         OnPrem = onPrem ?? false;

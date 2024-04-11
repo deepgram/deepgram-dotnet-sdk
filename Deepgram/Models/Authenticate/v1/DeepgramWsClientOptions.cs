@@ -7,7 +7,7 @@ namespace Deepgram.Models.Authenticate.v1;
 /// <summary>
 /// Configuration for the Deepgram client
 /// </summary>
-public class DeepgramWsClientOptions
+public class DeepgramWsClientOptions : IDeepgramClientOptions
 {
     /*****************************/
     // General Options

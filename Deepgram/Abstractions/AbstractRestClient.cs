@@ -16,18 +16,21 @@ public abstract class AbstractRestClient
     /// <summary>
     /// Copy of the options for the client
     /// </summary>
-    internal DeepgramHttpClientOptions _options;
+    internal IDeepgramClientOptions _options;
 
     /// <summary>
     /// Constructor that take the options and a httpClient
     /// </summary>
     /// <param name="deepgramClientOptions"><see cref="_deepgramClientOptions"/>Options for the Deepgram client</param>
 
-    internal AbstractRestClient(string? apiKey = null, DeepgramHttpClientOptions? options = null, string? httpId = null)
+    internal AbstractRestClient(string? apiKey = null, IDeepgramClientOptions? options = null, string? httpId = null)
     {
         Log.Verbose("AbstractRestClient", "ENTER");
 
-        options ??= new DeepgramHttpClientOptions(apiKey);
+        if (options == null)
+        {
+            options = (IDeepgramClientOptions) new DeepgramHttpClientOptions(apiKey);
+        }
         _httpClient = HttpClientFactory.Create(httpId);
         _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, options);
         _options = options;
@@ -681,7 +684,7 @@ public abstract class AbstractRestClient
         }
     }
 
-    internal static string GetUri(DeepgramHttpClientOptions options, string path)
+    internal static string GetUri(IDeepgramClientOptions options, string path)
     {
         return $"{options.BaseAddress}/{path}";
     }
