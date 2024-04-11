@@ -32,7 +32,7 @@ internal class HttpClientFactory
         return client;
     }
 
-    internal static HttpClient ConfigureDeepgram(HttpClient client, DeepgramHttpClientOptions? options = null)
+    internal static HttpClient ConfigureDeepgram(HttpClient client, IDeepgramClientOptions? options = null)
     {
         options ??= new DeepgramHttpClientOptions();
 

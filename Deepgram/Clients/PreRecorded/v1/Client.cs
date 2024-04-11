@@ -13,7 +13,7 @@ namespace Deepgram.Clients.PreRecorded.v1;
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
+public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
     : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IPreRecordedClient
 
 {
