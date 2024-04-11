@@ -4,6 +4,7 @@
 
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
+using Deepgram.Clients.Interfaces.v1;
 
 namespace Deepgram.Clients.Manage.v1;
 
@@ -13,7 +14,7 @@ namespace Deepgram.Clients.Manage.v1;
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
 public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IManageClient
 {
     #region Projects
     /// <summary>

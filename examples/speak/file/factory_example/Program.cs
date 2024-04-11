@@ -6,6 +6,7 @@ using System.Text.Json;
 
 using Deepgram;
 using Deepgram.Models.Speak.v1;
+using Deepgram.Logger;
 
 namespace SampleApp
 {
@@ -16,6 +17,8 @@ namespace SampleApp
             // Initialize Library with default logging
             // Normal logging is "Info" level
             Library.Initialize();
+            // OR very chatty logging
+            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // JSON options
             JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
@@ -23,11 +26,11 @@ namespace SampleApp
                 WriteIndented = true
             };
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new SpeakClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = ClientFactory.CreateSpeakClient();
 
             var response = await deepgramClient.ToFile(
-                new TextSource("How much wood could a woodchuck chuck? If a woodchuck could chuck wood? As much wood as a woodchuck could chuck, if a woodchuck could chuck wood."),
+                new TextSource("Hello World!"),
                 "test.mp3",
                 new SpeakSchema()
                 {

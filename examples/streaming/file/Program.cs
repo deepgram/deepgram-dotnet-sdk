@@ -51,9 +51,6 @@ namespace SampleApp
             // Stop the connection
             await liveClient.Stop();
 
-            // Dispose the client
-            liveClient.Dispose();
-
             // Teardown Library
             Library.Terminate();
         }

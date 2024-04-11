@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System;
 using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Clients.Interfaces.v1;
 
 namespace Deepgram.Clients.Analyze.v1;
 
@@ -14,7 +14,7 @@ namespace Deepgram.Clients.Analyze.v1;
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
 public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IAnalyzeClient
 {
     #region NoneCallBacks
     /// <summary>

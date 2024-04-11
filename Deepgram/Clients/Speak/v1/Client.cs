@@ -4,7 +4,7 @@
 
 using Deepgram.Models.Speak.v1;
 using Deepgram.Models.Authenticate.v1;
-using System;
+using Deepgram.Clients.Interfaces.v1;
 
 namespace Deepgram.Clients.Speak.v1;
 
@@ -14,7 +14,7 @@ namespace Deepgram.Clients.Speak.v1;
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
 public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramClientOptions = null, string? httpId = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions, httpId)
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId), ISpeakClient
 {
     #region NoneCallBacks
     /// <summary>
@@ -94,8 +94,7 @@ public class Client(string? apiKey = null, DeepgramHttpClientOptions? deepgramCl
     }
 
     public async Task<SyncResponse> ToFile(TextSource source, string filename, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null
-        )
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("Client.ToFile", "ENTER");
         Log.Information("ToFile", $"filename: {filename}");
