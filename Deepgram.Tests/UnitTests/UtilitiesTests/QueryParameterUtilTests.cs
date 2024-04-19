@@ -13,7 +13,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_EmptyString_When_Parameters_Is_Null()
     {
         // Input and Output
-        PrerecordedSchema? para = null;
+        PreRecordedSchema? para = null;
         var expected = $"https://{Defaults.DEFAULT_URI}";
 
         //Act
@@ -27,7 +27,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_String_Parameter()
     {
         // Input and Output
-        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
+        var prerecordedOptions = new AutoFaker<PreRecordedSchema>().Generate();
         var expectedModel = HttpUtility.UrlEncode(prerecordedOptions.Model)!;
         var expected = $"{nameof(prerecordedOptions.Model).ToLower()}={expectedModel}";
         //Act
@@ -42,7 +42,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_Respecting_CallBack_Casing()
     {
         // Input and Output
-        var prerecordedOptions = new AutoFaker<PrerecordedSchema>().Generate();
+        var prerecordedOptions = new AutoFaker<PreRecordedSchema>().Generate();
         prerecordedOptions.CallBack = "https://Signed23.com";
         var expected = $"{nameof(prerecordedOptions.CallBack).ToLower()}={HttpUtility.UrlEncode("https://Signed23.com")}";
         //Act
@@ -57,7 +57,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
     {
         // Input and Output 
-        var obj = new PrerecordedSchema() { Alternatives = 1 };
+        var obj = new PreRecordedSchema() { Alternatives = 1 };
         var expected = $"alternatives={obj.Alternatives}";
 
         //Act
@@ -72,7 +72,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_Array_Parameter()
     {
         // Input and Output
-        var prerecordedOptions = new PrerecordedSchema
+        var prerecordedOptions = new PreRecordedSchema
         {
             Keywords = ["test", "acme"]
         };
@@ -89,7 +89,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_Dictonary_Parameter()
     {
         // Input and Output
-        var prerecordedOptions = new PrerecordedSchema()
+        var prerecordedOptions = new PreRecordedSchema()
         {
             Extra = new Dictionary<string, string>
             {
@@ -111,7 +111,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_Decimal_Parameter()
     {
         // Input and Output
-        var prerecordedOptions = new PrerecordedSchema() { UttSplit = 2.3 };
+        var prerecordedOptions = new PreRecordedSchema() { UttSplit = 2.3 };
         var expected = $"utt_split={HttpUtility.UrlEncode(prerecordedOptions.UttSplit.ToString())}";
 
         //Act
@@ -128,7 +128,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
     {
         // Input and Output 
-        var obj = new PrerecordedSchema() { Paragraphs = true };
+        var obj = new PreRecordedSchema() { Paragraphs = true };
         var expected = $"{nameof(obj.Paragraphs).ToLower()}=true";
         //Act
         var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
@@ -164,7 +164,7 @@ public class QueryParameterUtilTests
         var expected = HttpUtility.UrlEncode(signedCallBackUrl);
 
         //Act
-        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, new PrerecordedSchema() { CallBack = signedCallBackUrl, Diarize = true });
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, new PreRecordedSchema() { CallBack = signedCallBackUrl, Diarize = true });
 
         //Assert
         result.Should().NotBeNull();
@@ -175,7 +175,7 @@ public class QueryParameterUtilTests
     public void GetParameters_Should_Return_Empty_String_When_Parameter_Has_No_Values()
     {
         //Act
-        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, new PrerecordedSchema());
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, new PreRecordedSchema());
 
         //Assert
         result.Should().NotBeNull();

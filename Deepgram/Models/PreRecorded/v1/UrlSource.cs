@@ -10,7 +10,15 @@ public class UrlSource(string url)
     /// Url of the file to transcribe
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("url")]
+    [JsonPropertyName("url")]
     public string? Url { get; set; } = url;
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }
 

@@ -19,12 +19,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -54,7 +48,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // send invite
@@ -65,7 +59,7 @@ namespace SampleApp
             };
 
             var createResp = await deepgramClient.SendInvite(myId, createInvite);
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(createResp, options)}\n\n");
+            Console.WriteLine($"\n\n{createResp}\n\n");
 
             // list invites
             listResp = await deepgramClient.GetInvites(myId);
@@ -75,12 +69,12 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // delete invite
             var delResp = await deepgramClient.DeleteInvite(myId, "spam@spam.com");
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+            Console.WriteLine($"\n\n{listResp}\n\n");
 
             // list invites
             listResp = await deepgramClient.GetInvites(myId);
@@ -90,7 +84,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // Leave commented out unless you are running this from a secondary account

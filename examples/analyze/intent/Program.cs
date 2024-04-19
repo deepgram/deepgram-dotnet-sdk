@@ -15,15 +15,9 @@ namespace PreRecorded
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            Library.Initialize();
+            //Library.Initialize();
             // OR to set logging level
-            //Library.Initialize(LogLevel.Debug);
-
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
+            Library.Initialize(LogLevel.Debug);
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new AnalyzeClient();
@@ -49,7 +43,7 @@ namespace PreRecorded
                 },
                 cancelToken);
 
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

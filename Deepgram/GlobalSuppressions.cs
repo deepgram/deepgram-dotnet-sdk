@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.OnPrem.v1.CredentialsResponse")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.OnPrem.v1.CredentialResponse")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PreRecorded.v1.AsyncResponse")]
-[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PreRecorded.v1.PrerecordedSchema")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PreRecorded.v1.PreRecordedSchema")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "type", Target = "~T:Deepgram.Models.PreRecorded.v1.SyncResponse")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'.", Justification = "<Pending>", Scope = "member", Target = "~M:Deepgram.Utilities.UserAgentUtil.GetInfo~System.String")]
 [assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "namespace", Target = "~N:Deepgram")]

@@ -10,7 +10,7 @@ public record Topic
     /// Value between 0 and 1 indicating the model's relative confidence in this topic.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("confidence")]
+	[JsonPropertyName("confidence_score")]
     public double? Confidence { get; set; }
 
     /// <summary>
@@ -18,6 +18,14 @@ public record Topic
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("topic")]
-    public string? Text;
+    public string? Text { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }
 

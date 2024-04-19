@@ -16,23 +16,17 @@ namespace PreRecorded
             // Normal logging is "Info" level
             Library.Initialize();
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new PreRecordedClient();
 
             var response = await deepgramClient.TranscribeUrl(
-                new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-                new PrerecordedSchema()
+                new UrlSource("https://dpgr.am/bueller.wav"),
+                new PreRecordedSchema()
                 {
                     Model = "nova-2",
                 });
 
-            Console.WriteLine(JsonSerializer.Serialize(response, options));
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

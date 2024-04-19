@@ -21,12 +21,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -46,7 +40,7 @@ namespace SampleApp
                 myName = project.Name;
                 break;
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(projectResp, options)}\n\n");
+            Console.WriteLine($"\n\n{projectResp}\n\n");
 
             // list members
             string memberId = null;
@@ -57,7 +51,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
 
                 foreach (var member in listResp.Members)
                 {
@@ -83,7 +77,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nNo scopes found\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(memberResp, options)}\n\n");
+            Console.WriteLine($"\n\n{memberResp}\n\n");
 
             // update scope
             var scopeUpdate = new MemberScopeSchema()
@@ -91,7 +85,7 @@ namespace SampleApp
                 Scope = "admin"
             };
             var updateResp = await deepgramClient.UpdateMemberScope(myId, memberId, scopeUpdate);
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(updateResp, options)}\n\n");
+            Console.WriteLine($"\n\n{updateResp}\n\n");
 
             // get member scope
             memberResp = await deepgramClient.GetMemberScopes(myId, memberId);
@@ -100,7 +94,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nNo scopes found\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(memberResp, options)}\n\n");
+            Console.WriteLine($"\n\n{memberResp}\n\n");
 
             // update scope
             scopeUpdate = new MemberScopeSchema()
@@ -108,7 +102,7 @@ namespace SampleApp
                 Scope = "member",
             };
             updateResp = await deepgramClient.UpdateMemberScope(myId, memberId, scopeUpdate);
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(updateResp, options)}\n\n");
+            Console.WriteLine($"\n\n{updateResp}\n\n");
 
             // get member scope
             memberResp = await deepgramClient.GetMemberScopes(myId, memberId);
@@ -117,7 +111,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nNo scopes found\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(memberResp, options)}\n\n");
+            Console.WriteLine($"\n\n{memberResp}\n\n");
 
 
             Console.WriteLine("\n\nPress any key to exit.");

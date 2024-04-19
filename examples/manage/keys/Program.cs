@@ -19,12 +19,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -54,7 +48,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // create key
@@ -74,7 +68,7 @@ namespace SampleApp
             else
             {
                 myKeyId = createResp.ApiKeyId;
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(createResp, options)}\n\n");
+                Console.WriteLine($"\n\n{createResp}\n\n");
             }
 
             // list keys
@@ -85,7 +79,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // get key
@@ -97,7 +91,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(getResp, options)}\n\n");
+                Console.WriteLine($"\n\n{getResp}\n\n");
             }
 
             // delete key
@@ -109,7 +103,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(deleteResp, options)}\n\n");
+                Console.WriteLine($"\n\n{deleteResp}\n\n");
             }
 
             // list keys
@@ -120,7 +114,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
 

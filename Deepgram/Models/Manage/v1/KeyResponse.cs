@@ -6,5 +6,12 @@ namespace Deepgram.Models.Manage.v1;
 
 public record KeyResponse : Key
 {
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }
 

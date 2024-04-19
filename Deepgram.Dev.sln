@@ -163,6 +163,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\speak\f
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\streaming\factory_example\Factory.csproj", "{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "throw_exception", "throw_exception", "{02746530-6811-4F1B-8851-544C89CA66DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThrowException", "tests\expected_failures\rest\throw_exception\ThrowException.csproj", "{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -309,6 +313,10 @@ Global
 		{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -389,6 +397,8 @@ Global
 		{CB254D55-5C90-4EAF-8EE7-5C9C284317E7} = {6DFDB911-5172-44F0-A3F1-98C301D7B26F}
 		{3DD86C52-7EF9-4F96-B057-58DFA30CCD27} = {C5428CBF-4741-46E6-A721-AF00716CBAA8}
 		{2A876DE1-0D84-4FF5-BE82-7C393B6697B7} = {2B3AF9D0-879A-4B8A-A6EC-0C95F36A1DC5}
+		{02746530-6811-4F1B-8851-544C89CA66DA} = {7FA977F3-415E-4681-B316-5C273DF3A1C6}
+		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37} = {02746530-6811-4F1B-8851-544C89CA66DA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}

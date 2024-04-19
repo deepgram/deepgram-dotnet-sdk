@@ -20,7 +20,7 @@ Official .NET SDK for [Deepgram](https://www.deepgram.com/). Power your apps wit
   - [Remote File](#remote-file) 
     - [UrlSource](#urlsource)
   - [Local files](#local-files)    
-    - [PrerecordedSchema](#prerecordedschema)
+    - [PreRecordedSchema](#prerecordedschema)
   - [CallBackAsync Methods](#callbackasync-methods) 
   - [Live Audio](#live-audio)
     - [LiveSchema](#liveSchema)
@@ -158,12 +158,12 @@ To quickly get started with examples for prerecorded and streaming, run the file
 # Transcription
 
 ## Remote File
-> for available options see PrerecordedSchema
+> for available options see PreRecordedSchema
 ```csharp
 var client = new PrerecordedClient(apiKey);
 var response = await client.TranscribeUrlAsync(
     new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-    new PrerecordedSchema()
+    new PreRecordedSchema()
     {
         Punctuate = true
     });
@@ -182,7 +182,7 @@ var response = await client.TranscribeUrlAsync(
 var client = new PrerecordedClient(apiKey);
 var response = await client.TranscribeFileAsync(
     stream,
-     new PrerecordedSchema()
+     new PreRecordedSchema()
     {
         Punctuate = true
     });
@@ -190,10 +190,10 @@ var response = await client.TranscribeFileAsync(
 
 ### CallBackAsync Methods
 >TranscibeFileCallBackAsync and TranscibeUrlCallBackAsync are the methods to use if you want to use a CallBack url
->you can either pass the the CallBack in the method or by setting  the CallBack proeprty in the PrerecordedSchema, but NOT in both
+>you can either pass the the CallBack in the method or by setting  the CallBack proeprty in the PreRecordedSchema, but NOT in both
 
 
-#### PrerecordedSchema
+#### PreRecordedSchema
 also see [TranscribeSchema] which prerecored Schema is derived from for more options
 
 | Property          | Value Type |                                                      reason for                                    |
