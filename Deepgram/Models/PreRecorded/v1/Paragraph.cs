@@ -53,7 +53,7 @@ public record Paragraph
     /// </summary>
     public override string ToString()
     {
-        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
     }
 }
 
