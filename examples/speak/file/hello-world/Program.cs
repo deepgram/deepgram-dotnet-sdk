@@ -16,15 +16,9 @@ namespace SampleApp
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            Library.Initialize();
+            //Library.Initialize();
             // OR very chatty logging
-            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
-
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
+            Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new SpeakClient();
@@ -38,7 +32,7 @@ namespace SampleApp
                 });
 
             //Console.WriteLine(response);
-            Console.WriteLine(JsonSerializer.Serialize(response, options));
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

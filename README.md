@@ -78,12 +78,12 @@ var deepgramClient = new PreRecordedClient();
 
 var response = await deepgramClient.TranscribeUrl(
   new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-  new PrerecordedSchema()
+  new PreRecordedSchema()
   {
     Model = "nova-2",
   });
 
-Console.WriteLine(JsonSerializer.Serialize(response, options));
+Console.WriteLine(response);
 ```
 
 ## Live Audio Transcription Quickstart

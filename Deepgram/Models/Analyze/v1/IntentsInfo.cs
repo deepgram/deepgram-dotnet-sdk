@@ -26,6 +26,14 @@ public record IntentsInfo
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }
 
 

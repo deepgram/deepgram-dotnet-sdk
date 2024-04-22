@@ -12,4 +12,12 @@ public record InvitesResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("invites")]
     public IReadOnlyList<Invite>? Invites { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }

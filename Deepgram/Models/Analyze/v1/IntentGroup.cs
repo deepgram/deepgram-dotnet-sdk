@@ -13,4 +13,12 @@ public record IntentGroup
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("segments")]
     public IReadOnlyList<Segment>? Segments { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }

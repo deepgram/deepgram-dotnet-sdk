@@ -28,7 +28,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     {
         Log.Verbose("SpeakClient.ToStream", "ENTER");
         Log.Information("ToStream", $"source: {source}");
-        Log.Information("ToStream", $"analyzeSchema:\n{JsonSerializer.Serialize(speakSchema, JsonSerializeOptions.DefaultOptions)}");
+        Log.Information("ToStream", $"analyzeSchema:\n{speakSchema}");
 
         VerifyNoCallBack(nameof(ToStream), speakSchema);
 
@@ -131,7 +131,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Verbose("SpeakClient.StreamCallBack", "ENTER");
         Log.Information("StreamCallBack", $"source: {source}");
         Log.Information("StreamCallBack", $"callBack: {callBack}");
-        Log.Information("StreamCallBack", $"speakSchema:\n{JsonSerializer.Serialize(speakSchema, JsonSerializeOptions.DefaultOptions)}");
+        Log.Information("StreamCallBack", $"speakSchema:\n{speakSchema}");
 
         VerifyOneCallBackSet(nameof(StreamCallBack), callBack, speakSchema);
         if (callBack != null)

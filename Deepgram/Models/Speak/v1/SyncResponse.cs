@@ -64,4 +64,12 @@ public record SyncResponse
     /// The filename of the audio file
     /// </summary>
     public string? Filename { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }

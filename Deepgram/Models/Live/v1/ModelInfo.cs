@@ -26,4 +26,12 @@ public record ModelInfo
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("version")]
     public string? Version { get; set; }
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }

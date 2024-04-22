@@ -5,6 +5,8 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Exceptions.v1;
+
 using Deepgram.Clients.Manage.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
@@ -127,14 +129,14 @@ public class AbstractRestfulClientTests
     public async Task Delete_Should_Throws_HttpRequestException_On_Response_Containing_Error()
     {
         // Input and Output  
-        var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
+        var httpClient = MockHttpClient.CreateHttpClientWithException(new DeepgramException());
 
         // Fake Clients
         var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         await client.Invoking(async y => await y.DeleteAsync<MessageResponse>($"{Defaults.DEFAULT_URI}/{UriSegments.PROJECTS}"))
-             .Should().ThrowAsync<HttpRequestException>();
+             .Should().ThrowAsync<DeepgramException>();
     }
 
     //Test for the delete calls that do not return a value

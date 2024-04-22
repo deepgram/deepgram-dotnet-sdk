@@ -4,6 +4,7 @@
 
 using System.Text.Json;
 
+using Deepgram.Logger;
 using Deepgram.Models.Analyze.v1;
 
 namespace PreRecorded
@@ -15,12 +16,8 @@ namespace PreRecorded
             // Initialize Library with default logging
             // Normal logging is "Info" level
             Library.Initialize();
-
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
+            // OR very chatty logging
+            //Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new AnalyzeClient();
@@ -41,7 +38,7 @@ namespace PreRecorded
                     Topics = true,
                 });
 
-            Console.WriteLine(JsonSerializer.Serialize(response, options));
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

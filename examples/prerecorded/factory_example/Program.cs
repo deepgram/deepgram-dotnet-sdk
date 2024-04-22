@@ -20,12 +20,6 @@ namespace PreRecorded
             // OR very chatty logging
             Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
             var deepgramClient = ClientFactory.CreatePreRecordedClient();
 
@@ -43,14 +37,14 @@ namespace PreRecorded
             var audioData = File.ReadAllBytes(@"Bueller-Life-moves-pretty-fast.wav");
             var response = await deepgramClient.TranscribeFile(
                 audioData,
-                new PrerecordedSchema()
+                new PreRecordedSchema()
                 {
                     Model = "nova-2",
                     Punctuate = true,
                 },
                 cancelToken);
 
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
+            Console.WriteLine($"\n\n{response}\n\n");
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
 

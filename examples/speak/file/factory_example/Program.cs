@@ -20,12 +20,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
             var deepgramClient = ClientFactory.CreateSpeakClient();
 
@@ -38,7 +32,7 @@ namespace SampleApp
                 });
 
             //Console.WriteLine(response);
-            Console.WriteLine(JsonSerializer.Serialize(response, options));
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

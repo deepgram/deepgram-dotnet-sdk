@@ -21,12 +21,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -50,11 +44,11 @@ namespace SampleApp
                 myId = project.ProjectId;
                 myName = project.Name;
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+            Console.WriteLine($"\n\n{listResp}\n\n");
 
             // get project
             var getResp = await deepgramClient.GetProject(myId);
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(getResp, options)}\n\n");
+            Console.WriteLine($"\n\n{getResp}\n\n");
 
             // update project
             var updateOptions = new ProjectSchema()
@@ -68,7 +62,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nUpdateProject failed.\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(updateResp, options)}\n\n");
+            Console.WriteLine($"\n\n{updateResp}\n\n");
 
             // get project
             getResp = await deepgramClient.GetProject(myId);
@@ -77,7 +71,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nGetProject failed.\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(getResp, options)}\n\n");
+            Console.WriteLine($"\n\n{getResp}\n\n");
 
             // update project
             updateOptions = new ProjectSchema()
@@ -90,7 +84,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nUpdateProject failed.\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(updateResp, options)}\n\n");
+            Console.WriteLine($"\n\n{updateResp}\n\n");
 
             // get project
             getResp = await deepgramClient.GetProject(myId);
@@ -99,7 +93,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nGetProject failed.\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(getResp, options)}\n\n");
+            Console.WriteLine($"\n\n{getResp}\n\n");
 
             // delete project
             if (myDeleteId == null)
@@ -118,7 +112,7 @@ namespace SampleApp
                 Console.WriteLine("\n\nDeleteProject failed.\n\n");
                 Environment.Exit(1);
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(respDelete, options)}\n\n");
+            Console.WriteLine($"\n\n{respDelete}\n\n");
 
             Console.WriteLine("\n\nPress any key to exit.");
             Console.ReadKey();

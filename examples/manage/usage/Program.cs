@@ -19,12 +19,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -44,7 +38,7 @@ namespace SampleApp
                 myName = project.Name;
                 break;
             }
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(projectResp, options)}\n\n");
+            Console.WriteLine($"\n\n{projectResp}\n\n");
 
             // list requests
             string requestId = null;
@@ -56,7 +50,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
 
                 foreach (var request in listResp.Requests)
                 {
@@ -74,7 +68,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(reqResp, options)}\n\n");
+                Console.WriteLine($"\n\n{reqResp}\n\n");
             }
 
             // get fields
@@ -87,7 +81,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(fieldsResp, options)}\n\n");
+                Console.WriteLine($"\n\n{fieldsResp}\n\n");
             }
 
             // list usage
@@ -99,7 +93,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(summaryResp, options)}\n\n");
+                Console.WriteLine($"\n\n{summaryResp}\n\n");
             }
 
 

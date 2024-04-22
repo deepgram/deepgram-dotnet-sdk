@@ -4,6 +4,7 @@
 
 using Deepgram.Encapsulations;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
 
 namespace Deepgram.Abstractions;
 
@@ -81,7 +82,14 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("GetAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("GetAsync<T>", response, resultStr);
+            }
+
+            Log.Verbose("GetAsync<T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<T>", "Succeeded");
@@ -137,7 +145,14 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("GetAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("GetAsync<S, T>", response, resultStr);
+            }
+
+            Log.Verbose("GetAsync<S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<S, T>", "Succeeded");
@@ -207,7 +222,11 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PostRetrieveLocalFileAsync<R, S, T>", response, response.Content.ReadAsStringAsync().Result);
+            }
 
             var result = new Dictionary<string, string>();
 
@@ -322,10 +341,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("PostAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PostAsync<S, T>", response, resultStr);
+            }
+
+            Log.Verbose("PostAsync<S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("PostAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Debug("PostAsync<S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
 
             return result;
@@ -392,10 +418,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("PostAsync<R, S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PostAsync<R, S, T>", response, resultStr);
+            }
+
+            Log.Verbose("PostAsync<R, S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("PostAsync<R, S, T>", $"Succeeded. Result: {result}");
+            Log.Debug("PostAsync<R, S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
 
             return result;
@@ -465,10 +498,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("PatchAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PatchAsync<S, T>", response, resultStr);
+            }
+
+            Log.Verbose("PatchAsync<S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("PatchAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Debug("PatchAsync<S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
 
             return result;
@@ -536,10 +576,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PutAsync<S, T>", response, resultStr);
+            }
+
+            Log.Verbose("PutAsync<S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("PutAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Debug("PutAsync<S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
 
             return result;
@@ -597,10 +644,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("DeleteAsync<T>", response, resultStr);
+            }
+
+            Log.Verbose("DeleteAsync<T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("DeleteAsync<T>", $"Succeeded. Result: {result}");
+            Log.Debug("DeleteAsync<T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
 
             return result;
@@ -660,10 +714,17 @@ public abstract class AbstractRestClient
             // do the request
             Log.Verbose("DeleteAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
-            response.EnsureSuccessStatusCode();
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("DeleteAsync<S, T>", response, resultStr);
+            }
+
+            Log.Verbose("DeleteAsync<S, T>", $"Response:\n{resultStr}");
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
-            Log.Debug("DeleteAsync<S, T>", $"Succeeded. Result: {result}");
+            Log.Debug("DeleteAsync<S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
 
             return result;
@@ -682,6 +743,35 @@ public abstract class AbstractRestClient
             Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
             throw;
         }
+    }
+
+    private static async Task ThrowException(string module, HttpResponseMessage response, string errMsg)
+    {
+        if (errMsg == null || errMsg.Length == 0)
+        {
+            Log.Verbose(module, $"HTTP/REST Exception thrown");
+            response.EnsureSuccessStatusCode(); // this throws the exception
+        }
+
+        Log.Verbose(module, $"Deepgram Exception: {errMsg}");
+        DeepgramRESTException? resException = null;
+        try
+        {
+            resException = await HttpRequestUtil.DeserializeAsync<DeepgramRESTException>(response);
+        }
+        catch (Exception ex)
+        {
+            Log.Verbose(module, $"DeserializeAsync Error Exception: {ex}");
+        }
+
+        if (resException != null)
+        {
+            Log.Verbose(module, "DeepgramRESTException thrown");
+            throw resException;
+        }
+
+        Log.Verbose(module, $"Deepgram Generic Exception thrown");
+        throw new DeepgramException(errMsg);
     }
 
     internal static string GetUri(IDeepgramClientOptions options, string path)

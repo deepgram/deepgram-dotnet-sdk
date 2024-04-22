@@ -10,7 +10,15 @@ public class TextSource(string text)
     /// Text of the words to speak
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("text")]
+    [JsonPropertyName("text")]
     public string? Text { get; set; } = text;
+
+    /// <summary>
+    /// Override ToString method to serialize the object
+    /// </summary>
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+    }
 }
 

@@ -19,12 +19,6 @@ namespace PreRecorded
             // OR to set logging level
             //Library.Initialize(LogLevel.Debug);
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
             var deepgramClient = ClientFactory.CreateAnalyzeClient();
 
@@ -49,7 +43,7 @@ namespace PreRecorded
                 },
                 cancelToken);
 
-            Console.WriteLine($"\n\n{JsonSerializer.Serialize(response, options)}\n\n");
+            Console.WriteLine(response);
             Console.ReadKey();
 
             // Teardown Library

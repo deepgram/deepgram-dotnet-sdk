@@ -66,7 +66,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     {
         Log.Verbose("AnalyzeClient.AnalyzeFile", "ENTER");
         Log.Information("AnalyzeFile", $"source: {source}");
-        Log.Information("AnalyzeFile", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
+        Log.Information("AnalyzeFile", $"analyzeSchema:\n{analyzeSchema}");
 
         VerifyNoCallBack(nameof(AnalyzeFile), analyzeSchema);
 
@@ -109,7 +109,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Verbose("AnalyzeClient.AnalyzeFileCallBack", "ENTER");
         Log.Information("AnalyzeFileCallBack", $"source: {source}");
         Log.Information("AnalyzeFileCallBack", $"callBack: {callBack}");
-        Log.Information("AnalyzeFileCallBack", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
+        Log.Information("AnalyzeFileCallBack", $"analyzeSchema:\n{analyzeSchema}");
 
         VerifyOneCallBackSet(nameof(AnalyzeFileCallBack), callBack, analyzeSchema);
         if (callBack != null)

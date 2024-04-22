@@ -21,12 +21,6 @@ namespace SampleApp
             // OR very chatty logging
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // JSON options
-            JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-            {
-                WriteIndented = true
-            };
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var deepgramClient = new ManageClient();
 
@@ -55,7 +49,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
 
                 foreach (var member in listResp.Result.Members)
                 {
@@ -85,7 +79,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             // List members
@@ -96,7 +90,7 @@ namespace SampleApp
             }
             else
             {
-                Console.WriteLine($"\n\n{JsonSerializer.Serialize(listResp, options)}\n\n");
+                Console.WriteLine($"\n\n{listResp}\n\n");
             }
 
             Console.WriteLine("\n\nPress any key to exit.");
