@@ -108,6 +108,4 @@ public sealed class Log
     {
         GetLogger().Fatal($"{identifier}: {trace}");
     }
-
-    
 }
