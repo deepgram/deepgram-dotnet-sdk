@@ -16,7 +16,10 @@ public sealed class Log
     {
         // Do nothing
     }
-    
+    public static void Initialize(ILogger logger)
+    {
+        instance = logger;
+    }
     /// <summary>
     /// Initializes the logger with the specified log level and filename.
     /// </summary>
@@ -105,4 +108,6 @@ public sealed class Log
     {
         GetLogger().Fatal($"{identifier}: {trace}");
     }
+
+    
 }
