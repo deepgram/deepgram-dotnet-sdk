@@ -16,7 +16,18 @@ public sealed class Log
     {
         // Do nothing
     }
-    
+    public static void Initialize(ILogger logger)
+    {
+        if (logger == null) throw new ArgumentNullException(nameof(logger));
+        if (instance != null)
+        {
+            Log.Warning("Logger", "Attempt to re-initialize logger ignored.");
+            return;
+        }
+        
+        instance = logger;
+        Log.Information("Logger", "Logger initialized.");
+    }
     /// <summary>
     /// Initializes the logger with the specified log level and filename.
     /// </summary>
