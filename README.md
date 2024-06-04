@@ -162,6 +162,10 @@ There are examples for **every** API call in this SDK. You can find all of these
 
 These examples provide:
 
+- Text to Speech:
+    - Factory - [examples/speak/](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speak/file/factory_example/Program.cs)
+    - Asynchronous - [example/speak/](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speak/file/hello-world/Program.cs)
+
 - Analyze Text:
 
     - Intent Recognition - [examples/analyze/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/analyze/intent/Program.cs)
