@@ -18,7 +18,7 @@ public record Key
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("key")]
-    public string? Key { get; set; }
+    public string? SecretKey { get; set; }
 
     /// <summary>
     /// Comment for the Deepgram API key
