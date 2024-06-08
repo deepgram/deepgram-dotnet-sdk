@@ -14,6 +14,13 @@ public record Key
     public string? ApiKeyId { get; set; }
 
     /// <summary>
+    /// Deepgram secret key
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("key")]
+    public string? Key { get; set; }
+
+    /// <summary>
     /// Comment for the Deepgram API key
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
