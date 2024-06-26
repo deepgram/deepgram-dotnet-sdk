@@ -4,22 +4,17 @@
 
 namespace Deepgram.Models.Speak.v1;
 
-public record AsyncResponse
+/// <summary>
+// *********** WARNING ***********
+// This class provides the AsyncResponse implementation for the Deepgram API
+//
+// Deprecated: This class is deprecated. Use the namespace `Deepgram.Models.Speak.v1.REST` package instead.
+// This will be removed in a future release.
+//
+// This class frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Models.Speak.v1.REST.AsyncResponse instead", false)]
+public record AsyncResponse : REST.AsyncResponse
 {
-    /// <summary>
-    /// Id of transcription request returned when
-    /// a CallBack has been supplied in request
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("request_id")]
-    public string? RequestId { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }
-

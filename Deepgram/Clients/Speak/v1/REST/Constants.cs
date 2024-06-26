@@ -2,19 +2,11 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Clients.Speak.v1;
+namespace Deepgram.Clients.Speak.v1.REST;
 
-/// <summary>
-// *********** WARNING ***********
-// This package provides Constants for the Speak Client for the Deepgram API
-//
-// Deprecated: This class is deprecated. Use the namespace `Deepgram.Clients.Speak.v1.REST` instead.
-// This will be removed in a future release.
-//
-// This class is frozen and no new functionality will be added.
-// *********** WARNING ***********
-/// </summary>
-[Obsolete("Please use Deepgram.Clients.Speak.v1.REST.Constants instead", false)]
+/// <summary> 
+/// Headers of interest in the return values from the Deepgram Speak API.
+/// </summary> 
 public static class Constants
 {
     // For Speak Headers
