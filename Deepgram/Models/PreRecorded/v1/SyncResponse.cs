@@ -1,30 +1,22 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using REST = Deepgram.Models.Listen.v1.REST;
+
 namespace Deepgram.Models.PreRecorded.v1;
 
-public record SyncResponse
+/// <summary>
+// *********** WARNING ***********
+// This class provides the SyncResponse implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.REST` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.REST instead", false)]
+public record SyncResponse : REST.SyncResponse
 {
-    /// <summary>
-    /// Metadata of response <see cref="Metadata"/>
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("metadata")]
-    public Metadata? Metadata { get; set; }
-
-    /// <summary>
-    /// Results of Response <see cref="v1.Results"/>
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("results")]
-    public Results? Results { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

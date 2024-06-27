@@ -4,9 +4,17 @@
 
 namespace Deepgram.Clients.Live.v1;
 
-/// <summary> 
-/// Headers of interest in the return values from the Deepgram Speak API.
-/// </summary> 
+/// <summary>
+// *********** WARNING ***********
+// This class provides the Constants implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.WebSocket` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.WebSocket instead", false)]
 public static class Constants
 {
     // WS buffer size

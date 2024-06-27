@@ -38,9 +38,19 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     /*****************************/
 
     /*****************************/
-    // Live
+    // Live (These aren't used in this class)
     /*****************************/
     public bool KeepAlive { get; }
+    public decimal AutoFlushReplyDelta { get; }
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectMessage()
+    {
+        // This is only a WebSocket capability
+        return false;
+    }
 
     /*****************************/
     // OnPrem
