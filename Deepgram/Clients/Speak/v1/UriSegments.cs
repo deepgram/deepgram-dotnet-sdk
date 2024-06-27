@@ -4,6 +4,17 @@
 
 namespace Deepgram.Clients.Speak.v1;
 
+/// <summary>
+// *********** WARNING ***********
+// This package provides UriSegments for the Speak Client for the Deepgram API
+//
+// Deprecated: This class is deprecated. Use the namespace `Deepgram.Clients.Speak.v1.REST` instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.Speak.v1.REST.UriSegments instead", false)]
 public static class UriSegments
 {
     //using constants instead of inline value(magic strings) make consistence

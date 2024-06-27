@@ -4,21 +4,18 @@
 
 namespace Deepgram.Models.Speak.v1;
 
-public class TextSource(string text)
+/// <summary>
+// *********** WARNING ***********
+// This class provides the TextSource implementation for the Deepgram API
+//
+// Deprecated: This class is deprecated. Use the namespace `Deepgram.Models.Speak.v1.REST` package instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Models.Speak.v1.REST.TextSource instead", false)]
+public class TextSource(string text) : REST.TextSource(text)
 {
-    /// <summary>
-    /// Text of the words to speak
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("text")]
-    public string? Text { get; set; } = text;
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }
 

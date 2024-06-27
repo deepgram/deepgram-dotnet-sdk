@@ -358,7 +358,7 @@ public class Client : IDisposable, ILiveClient
             {
                 if (_cancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    Log.Information("ProcessSendQueue", "KeepAliveThread cancelled");
+                    Log.Information("ProcessSendQueue", "ProcessSendQueue cancelled");
                     break;
                 }
 

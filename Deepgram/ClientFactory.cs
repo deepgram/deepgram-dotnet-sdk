@@ -69,14 +69,41 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new SpeakClient
+    // *********** WARNING ***********
+    // This function creates a Speak Client for the Deepgram API
+    //
+    // Deprecated: This function is deprecated. Use the `CreateSpeakRESTClient` function instead.
+    // This will be removed in a future release.
+    //
+    // This class is frozen and no new functionality will be added.
+    // *********** WARNING ***********
+    /// </summary>
+    [Obsolete("Please use CreateSpeakRESTClient instead", false)]
+    public static ISpeakClient CreateSpeakClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new SpeakClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Create a new SpeakRESTClient
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static ISpeakClient CreateSpeakClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static ISpeakRESTClient CreateSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
-        return new SpeakClient(apiKey, options, httpId);
+        return new SpeakRESTClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Create a new AnalyzeClient
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new SpeakWebSocketClient(apiKey, options);
     }
 }
