@@ -133,6 +133,12 @@ public class LiveSchema
 	[JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
+    /// <summary>
+    /// Enables No Delay
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("no_delay")]
+    public bool? NoDelay { get; set; }
 
     /// <summary>
     /// Profanity Filter looks for recognized profanity and converts it to the nearest recognized 
