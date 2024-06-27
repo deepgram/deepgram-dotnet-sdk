@@ -4,6 +4,17 @@
 
 namespace Deepgram.Clients.OnPrem.v1;
 
+/// <summary>
+// *********** WARNING ***********
+// This class provides the UriSegments implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.SelfHosted.v1` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.SelfHosted.v1.UriSegments instead", false)]
 public static class UriSegments
 {
     //using constants instead of inline value(magic strings) make consistence
