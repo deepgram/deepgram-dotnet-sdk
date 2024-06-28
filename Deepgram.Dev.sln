@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Tests", "Deepgram.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speak", "examples\speak\file\hello-world\Speak.csproj", "{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\streaming\file\Streaming.csproj", "{FD8507CC-EECF-4750-81AF-3CF8E536C007}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\speech-to-text\websocket\file\Streaming.csproj", "{FD8507CC-EECF-4750-81AF-3CF8E536C007}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deepgram.Microphone", "Deepgram.Microphone\Deepgram.Microphone.csproj", "{1D9621D6-8925-44DF-AE89-1381BF4514E4}"
 EndProject
@@ -17,9 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{C6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "speak", "speak", "{E2E3000D-FBBA-450E-A4E0-3542B38ADAFD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prerecorded", "prerecorded", "{77ACBABB-CF6B-4929-957C-480E29646DFD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rest", "rest", "{77ACBABB-CF6B-4929-957C-480E29646DFD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "streaming", "streaming", "{132EEE99-6194-477A-9416-D7EF173C17FD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "websocket", "websocket", "{132EEE99-6194-477A-9416-D7EF173C17FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "file", "file", "{5E75479B-B84A-4386-9D3E-69CFB30B24C6}"
 EndProject
@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hello-world", "hello-world"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "url", "url", "{0414D1CF-79FB-4C5B-BF2B-88C3C1AA4C32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\streaming\microphone\Streaming.csproj", "{74335799-3B43-432C-ACD9-FBF2AB32A64A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\speech-to-text\websocket\microphone\Streaming.csproj", "{74335799-3B43-432C-ACD9-FBF2AB32A64A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9D2B336D-17F9-41D5-A4E5-F3EDA7F496A5}"
 EndProject
@@ -55,17 +55,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topic", "topic", "{B1D51F16
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sentiment", "sentiment", "{B95CE5C6-977C-42A2-848A-5C6C99496F8A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\file\PreRecorded.csproj", "{9C720D12-AF17-40D7-8F92-7D96077BC7FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\file\PreRecorded.csproj", "{9C720D12-AF17-40D7-8F92-7D96077BC7FB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\intent\PreRecorded.csproj", "{172FAC5E-32F0-4377-A92F-CFACDB294561}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\intent\PreRecorded.csproj", "{172FAC5E-32F0-4377-A92F-CFACDB294561}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\sentiment\PreRecorded.csproj", "{ABBF01EA-1015-4C16-A68C-F30A3904799B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\sentiment\PreRecorded.csproj", "{ABBF01EA-1015-4C16-A68C-F30A3904799B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\summary\PreRecorded.csproj", "{27C58ED4-DB4E-4A38-8D0E-D14854FE1814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\summary\PreRecorded.csproj", "{27C58ED4-DB4E-4A38-8D0E-D14854FE1814}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\topic\PreRecorded.csproj", "{C80145E0-5E37-4FA6-83FD-C9264876CAAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\topic\PreRecorded.csproj", "{C80145E0-5E37-4FA6-83FD-C9264876CAAF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\prerecorded\url\PreRecorded.csproj", "{1E5D1117-C170-4E6A-BC41-F7F8F46F2C59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PreRecorded", "examples\speech-to-text\rest\url\PreRecorded.csproj", "{1E5D1117-C170-4E6A-BC41-F7F8F46F2C59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyze", "analyze", "{83D6D1F7-97E1-4E35-A0AA-E3ED5977EA72}"
 EndProject
@@ -141,7 +141,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExerciseTimeout", "tests\ex
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "http", "http", "{5DFC6330-8303-4045-B186-32B396391D31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\streaming\http\Streaming.csproj", "{61B42F6B-521C-4A07-B592-54975F4AE2E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\speech-to-text\websocket\http\Streaming.csproj", "{61B42F6B-521C-4A07-B592-54975F4AE2E6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "factory_example", "factory_example", "{ACF6E046-747E-440D-BF10-B1E308BF8D60}"
 EndProject
@@ -157,15 +157,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\analyze
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\manage\factory_example\Factory.csproj", "{92C795B8-9002-447E-BFE5-B227D1BA3B22}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\prerecorded\factory_example\Factory.csproj", "{CB254D55-5C90-4EAF-8EE7-5C9C284317E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\speech-to-text\rest\factory_example\Factory.csproj", "{CB254D55-5C90-4EAF-8EE7-5C9C284317E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\speak\file\factory_example\Factory.csproj", "{3DD86C52-7EF9-4F96-B057-58DFA30CCD27}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\streaming\factory_example\Factory.csproj", "{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Factory", "examples\speech-to-text\websocket\factory_example\Factory.csproj", "{2A876DE1-0D84-4FF5-BE82-7C393B6697B7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "throw_exception", "throw_exception", "{02746530-6811-4F1B-8851-544C89CA66DA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThrowException", "tests\expected_failures\rest\throw_exception\ThrowException.csproj", "{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "speech-to-text", "speech-to-text", "{5EEA8D9D-0C0D-4EE3-93B1-F0133C629478}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "microphone-new", "microphone-new", "{B5F4EE7B-BA3B-4EC8-ABED-283489CDFADF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Streaming", "examples\speech-to-text\websocket\microphone-new\Streaming.csproj", "{273667D9-8EDE-4B99-A162-DB0CF5930FC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -317,6 +323,10 @@ Global
 		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{273667D9-8EDE-4B99-A162-DB0CF5930FC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{273667D9-8EDE-4B99-A162-DB0CF5930FC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{273667D9-8EDE-4B99-A162-DB0CF5930FC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{273667D9-8EDE-4B99-A162-DB0CF5930FC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -325,8 +335,8 @@ Global
 		{C3AA63DB-4555-4BEF-B2DD-89A3B19A265B} = {AE6FFA55-DD91-4BC1-AFDF-96F64B5221CD}
 		{FD8507CC-EECF-4750-81AF-3CF8E536C007} = {5E75479B-B84A-4386-9D3E-69CFB30B24C6}
 		{E2E3000D-FBBA-450E-A4E0-3542B38ADAFD} = {C673DFD1-528A-4BAE-94E6-02EF058AC363}
-		{77ACBABB-CF6B-4929-957C-480E29646DFD} = {C673DFD1-528A-4BAE-94E6-02EF058AC363}
-		{132EEE99-6194-477A-9416-D7EF173C17FD} = {C673DFD1-528A-4BAE-94E6-02EF058AC363}
+		{77ACBABB-CF6B-4929-957C-480E29646DFD} = {5EEA8D9D-0C0D-4EE3-93B1-F0133C629478}
+		{132EEE99-6194-477A-9416-D7EF173C17FD} = {5EEA8D9D-0C0D-4EE3-93B1-F0133C629478}
 		{5E75479B-B84A-4386-9D3E-69CFB30B24C6} = {132EEE99-6194-477A-9416-D7EF173C17FD}
 		{4D6C28C1-4D3F-4CFC-AF76-A389F6B00EC2} = {132EEE99-6194-477A-9416-D7EF173C17FD}
 		{50BA802D-603E-4BD2-9A3E-AFDABC3AF43C} = {E2E3000D-FBBA-450E-A4E0-3542B38ADAFD}
@@ -399,6 +409,9 @@ Global
 		{2A876DE1-0D84-4FF5-BE82-7C393B6697B7} = {2B3AF9D0-879A-4B8A-A6EC-0C95F36A1DC5}
 		{02746530-6811-4F1B-8851-544C89CA66DA} = {7FA977F3-415E-4681-B316-5C273DF3A1C6}
 		{B98F6A00-292E-431F-8B11-0CFCA5FD1E37} = {02746530-6811-4F1B-8851-544C89CA66DA}
+		{5EEA8D9D-0C0D-4EE3-93B1-F0133C629478} = {C673DFD1-528A-4BAE-94E6-02EF058AC363}
+		{B5F4EE7B-BA3B-4EC8-ABED-283489CDFADF} = {132EEE99-6194-477A-9416-D7EF173C17FD}
+		{273667D9-8EDE-4B99-A162-DB0CF5930FC3} = {B5F4EE7B-BA3B-4EC8-ABED-283489CDFADF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}
