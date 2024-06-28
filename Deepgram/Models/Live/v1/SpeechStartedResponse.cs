@@ -2,37 +2,21 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using WS = Deepgram.Models.Listen.v1.WebSocket;
+
 namespace Deepgram.Models.Live.v1;
 
-public record SpeechStartedResponse
+/// <summary>
+// *********** WARNING ***********
+// This class provides the SpeechStartedResponse implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.WebSocket` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.WebSocket instead", false)]
+public record SpeechStartedResponse : WS.SpeechStartedResponse
 {
-    /// <summary>
-    /// SpeechStarted event type.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.SpeechStarted;
-
-    /// <summary>
-    /// Channel index information
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel_index")]
-    public int[]? Channel { get; set; }
-
-    /// <summary>
-    /// Timestamp of the event.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("timestamp")]
-    public decimal? Timestamp { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

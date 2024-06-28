@@ -4,13 +4,20 @@
 
 using Deepgram.Clients.Live.v1;
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Live.v1;
 
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the Live Client.
+// *********** WARNING ***********
+// This class provides the LiveClient implementation
+//
+// Deprecated: This class is deprecated. Use the `ListenWebSocketClient` class instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use ListenWebSocketClient instead", false)]
 public class LiveClient : Client
 {
     public LiveClient(string apiKey = "", DeepgramWsClientOptions? deepgramClientOptions = null) : base(apiKey, deepgramClientOptions)

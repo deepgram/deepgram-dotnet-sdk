@@ -1,36 +1,22 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using WS = Deepgram.Models.Listen.v1.WebSocket;
+
 namespace Deepgram.Models.Live.v1;
 
-public record Alternative
+/// <summary>
+// *********** WARNING ***********
+// This class provides the Alternatives implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.WebSocket` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.WebSocket instead", false)]
+public record Alternative : WS.Alternative
 {
-    /// <summary>
-    /// Single-string transcript containing what the model hears in this channel of audio.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("transcript")]
-    public string? Transcript { get; set; }
-    /// <summary>
-    /// Value between 0 and 1 indicating the model's relative confidence in this transcript.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("confidence")]
-    public double? Confidence { get; set; }
-
-    /// <summary>
-    /// ReadOnly List of <see cref="Word"/> objects.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("words")]
-    public IReadOnlyList<Word>? Words { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

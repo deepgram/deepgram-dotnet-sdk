@@ -42,6 +42,19 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     /// </summary>
     public bool KeepAlive { get; set; } = false;
 
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public decimal AutoFlushReplyDelta { get; set; } = 0;
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectMessage()
+    {
+        return AutoFlushReplyDelta > 0;
+    }
+
     /*****************************/
     // OnPrem
     /*****************************/
@@ -73,6 +86,7 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
         APIVersion = Environment.GetEnvironmentVariable("DEEPGRAM_API_VERSION") ?? Defaults.DEFAULT_API_VERSION;
         var onPrem = Environment.GetEnvironmentVariable("DEEPGRAM_ON_PREM") ?? "";
         var keepAlive = Environment.GetEnvironmentVariable("DEEPGRAM_KEEP_ALIVE") ?? "";
+        var autoFlushReplyDelta = Environment.GetEnvironmentVariable("DEEPGRAM_WEBSOCKET_AUTO_FLUSH") ?? "";
 
         Headers = new Dictionary<string, string>();
         for (int x = 0; x < 20; x++)
@@ -91,6 +105,7 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
 
         OnPrem = onPrem.ToLower() == "true";
         KeepAlive = keepAlive.ToLower() == "true";
+        AutoFlushReplyDelta = Convert.ToDecimal(autoFlushReplyDelta);
     }
 
 }

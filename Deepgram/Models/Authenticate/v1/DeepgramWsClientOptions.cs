@@ -41,6 +41,19 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     /// </summary>
     public bool KeepAlive { get; set; } = false;
 
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public decimal AutoFlushReplyDelta { get; set; } = 0;
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectMessage()
+    {
+        return AutoFlushReplyDelta > 0;
+    }
+
     /*****************************/
     // OnPrem
     /*****************************/
