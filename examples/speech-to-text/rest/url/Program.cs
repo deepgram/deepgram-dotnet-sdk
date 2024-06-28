@@ -2,8 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
 using Deepgram.Models.PreRecorded.v1;
 
 namespace PreRecorded

@@ -7,8 +7,16 @@ using Deepgram.Models.Live.v1;
 namespace Deepgram.Clients.Interfaces.v1;
 
 /// <summary>
-/// Implements version 1 of the Live Client.
+// *********** WARNING ***********
+// This is the ILiveClient interface
+//
+// Deprecated: This class is deprecated. Use the `IListenWebSocketClient` function instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use IListenWebSocketClient instead", false)]
 public interface ILiveClient : IListenWebSocketClient
 {
     #region Subscribe Event

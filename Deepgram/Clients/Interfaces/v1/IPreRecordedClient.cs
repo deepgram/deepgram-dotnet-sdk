@@ -7,10 +7,16 @@ using Deepgram.Models.PreRecorded.v1;
 namespace Deepgram.Clients.Interfaces.v1;
 
 /// <summary>
-/// Implements version 1 of the Analyze Client.
+// *********** WARNING ***********
+// This is the IPreRecordedClient interface
+//
+// Deprecated: This class is deprecated. Use the `IListenRESTClient` function instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
-/// <param name="apiKey">Required DeepgramApiKey</param>
-/// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
+[Obsolete("Please use IListenRESTClient instead", false)]
 public interface IPreRecordedClient : IListenRESTClient
 {
 }

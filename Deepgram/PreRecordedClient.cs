@@ -8,8 +8,15 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the PreRecorded Client.
-/// </summary>
+// *********** WARNING ***********
+// This class provides the PreRecordedClient implementation
+//
+// Deprecated: This class is deprecated. Use the `ListenRESTClient` class instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
+[Obsolete("Please use ListenRESTClient instead", false)]
 public class PreRecordedClient : Client
 {
     public PreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,

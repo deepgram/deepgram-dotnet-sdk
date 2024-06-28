@@ -14,8 +14,16 @@ using System;
 namespace Deepgram.Clients.Live.v1;
 
 /// <summary>
-/// Implements version 1 of the Live Client.
+// *********** WARNING ***********
+// This class provides the Live Client implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.WebSocket` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.WebSocket.Client instead", false)]
 public class Client : WS.Client, ILiveClient
 {
     #region Fields

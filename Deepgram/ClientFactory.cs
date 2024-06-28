@@ -22,11 +22,16 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new LiveClient
+    // *********** WARNING ***********
+    // This function creates a LiveClient for the Deepgram API
+    //
+    // Deprecated: This function is deprecated. Use the `CreateListenWebSocketClient` function instead.
+    // This will be removed in a future release.
+    //
+    // This class is frozen and no new functionality will be added.
+    // *********** WARNING ***********
     /// </summary>
-    /// <param name="apiKey"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
+    [Obsolete("Please use CreateListenWebSocketClient instead", false)]
     public static ILiveClient CreateLiveClient(string apiKey = "", DeepgramWsClientOptions? options = null)
     {
         return new LiveClient(apiKey, options);
@@ -68,12 +73,16 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new PreRecordedClient
+    // *********** WARNING ***********
+    // This function creates a PreRecordedClient for the Deepgram API
+    //
+    // Deprecated: This function is deprecated. Use the `CreateListenRESTClient` function instead.
+    // This will be removed in a future release.
+    //
+    // This class is frozen and no new functionality will be added.
+    // *********** WARNING ***********
     /// </summary>
-    /// <param name="apiKey"></param>
-    /// <param name="options"></param>
-    /// <param name="httpId"></param>
-    /// <returns></returns>
+    [Obsolete("Please use CreateListenRESTClient instead", false)]
     public static IPreRecordedClient CreatePreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new PreRecordedClient(apiKey, options, httpId);

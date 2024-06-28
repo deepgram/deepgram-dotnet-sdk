@@ -9,10 +9,16 @@ using REST = Deepgram.Clients.Listen.v1.REST;
 namespace Deepgram.Clients.PreRecorded.v1;
 
 /// <summary>
-/// Implements version 1 of the Analyze Client.
+// *********** WARNING ***********
+// This class provides the PreRecorded Client implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Clients.Listen.v1.REST` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
-/// <param name="apiKey">Required DeepgramApiKey</param>
-/// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
+[Obsolete("Please use Deepgram.Clients.Listen.v1.REST.Client instead", false)]
 public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
     : REST.Client(apiKey, deepgramClientOptions, httpId), IPreRecordedClient
 {
