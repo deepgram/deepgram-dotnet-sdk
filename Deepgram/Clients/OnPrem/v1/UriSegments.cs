@@ -5,6 +5,7 @@
 namespace Deepgram.Clients.OnPrem.v1;
 
 /// <summary>
+/// <remarks>
 // *********** WARNING ***********
 // This class provides the UriSegments implementation
 //
@@ -13,7 +14,7 @@ namespace Deepgram.Clients.OnPrem.v1;
 //
 // This package is frozen and no new functionality will be added.
 // *********** WARNING ***********
-/// </summary>
+/// </remarks>
 [Obsolete("Please use Deepgram.Clients.SelfHosted.v1.UriSegments instead", false)]
 public static class UriSegments
 {
