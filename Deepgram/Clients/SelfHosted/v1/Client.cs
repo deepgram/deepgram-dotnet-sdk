@@ -9,7 +9,7 @@ using Deepgram.Clients.Interfaces.v1;
 namespace Deepgram.Clients.SelfHosted.v1;
 
 /// <summary>
-/// Implements version 1 of the OnPrem Client.
+/// Implements version 1 of the SelfHosted Client.
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
@@ -24,7 +24,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<CredentialsResponse> ListCredentials(string projectId, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("OnPremClient.ListCredentials", "ENTER");
+        Log.Verbose("SelfHostedClient.ListCredentials", "ENTER");
         Log.Debug("ListCredentials", $"projectId: {projectId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.SELF_HOSTED}");
@@ -32,7 +32,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("ListCredentials", $"{uri} Succeeded");
         Log.Debug("ListCredentials", $"result: {result}");
-        Log.Verbose("OnPremClient.ListCredentials", "LEAVE");
+        Log.Verbose("SelfHostedClient.ListCredentials", "LEAVE");
 
         return result;
     }
@@ -46,7 +46,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<CredentialResponse> GetCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("OnPremClient.GetCredentials", "ENTER");
+        Log.Verbose("SelfHostedClient.GetCredentials", "ENTER");
         Log.Debug("GetCredentials", $"projectId: {projectId}");
         Log.Debug("GetCredentials", $"credentialsId: {credentialsId}");
 
@@ -55,7 +55,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("GetCredentials", $"{uri} Succeeded");
         Log.Debug("GetCredentials", $"result: {result}");
-        Log.Verbose("OnPremClient.GetCredentials", "LEAVE");
+        Log.Verbose("SelfHostedClient.GetCredentials", "LEAVE");
 
         return result;
     }
@@ -69,7 +69,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<MessageResponse> DeleteCredentials(string projectId, string credentialsId, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("OnPremClient.DeleteCredentials", "ENTER");
+        Log.Verbose("SelfHostedClient.DeleteCredentials", "ENTER");
         Log.Debug("DeleteCredentials", $"projectId: {projectId}");
         Log.Debug("DeleteCredentials", $"credentialsId: {credentialsId}");
 
@@ -78,7 +78,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("DeleteCredentials", $"{uri} Succeeded");
         Log.Debug("DeleteCredentials", $"result: {result}");
-        Log.Verbose("OnPremClient.DeleteCredentials", "LEAVE");
+        Log.Verbose("SelfHostedClient.DeleteCredentials", "LEAVE");
 
         return result;
     }
@@ -87,12 +87,12 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// Create credentials for the associated projects
     /// </summary>
     /// <param name="projectId">Id of project</param>
-    /// <param name="createOnPremCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
+    /// <param name="createSelfHostedCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
     /// <returns><see cref="CredentialResponse"/></returns>
     public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema credentialsSchema, 
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("OnPremClient.CreateCredentials", "ENTER");
+        Log.Verbose("SelfHostedClient.CreateCredentials", "ENTER");
         Log.Debug("CreateCredentials", $"projectId: {projectId}");
         Log.Debug("CreateCredentials", $"credentialsSchema:\n{credentialsSchema}");
 
@@ -101,7 +101,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("CreateCredentials", $"{uri} Succeeded");
         Log.Debug("CreateCredentials", $"result: {result}");
-        Log.Verbose("OnPremClient.CreateCredentials", "LEAVE");
+        Log.Verbose("SelfHostedClient.CreateCredentials", "LEAVE");
 
         return result;
     }
