@@ -20,8 +20,11 @@ public class Client : IDisposable, IListenWebSocketClient
     private ClientWebSocket? _clientWebSocket;
     private CancellationTokenSource? _cancellationTokenSource;
 
+    private DateTime? _lastReceived = null;
+
     private readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     private readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -138,7 +141,7 @@ public class Client : IDisposable, IListenWebSocketClient
             if (_deepgramClientOptions.AutoFlushReplyDelta > 0)
             {
                 Log.Debug("Connect", "Starting AutoFlush Thread...");
-                //StartKeepAliveBackgroundThread();
+                StartAutoFlushBackgroundThread();
             }
 
             // send a OpenResponse event
@@ -178,6 +181,10 @@ public class Client : IDisposable, IListenWebSocketClient
         void StartKeepAliveBackgroundThread() => _ = Task.Factory.StartNew(
                 _ => ProcessKeepAlive(),
                 TaskCreationOptions.LongRunning);
+
+        void StartAutoFlushBackgroundThread() => _ = Task.Factory.StartNew(
+                _ => ProcessAutoFlush(),
+                TaskCreationOptions.LongRunning);
     }
 
     #region Subscribe Event
@@ -192,7 +199,7 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             _openReceived += (sender, e) => eventHandler(sender, e);
         }
-       
+
         return true;
     }
 
@@ -292,6 +299,7 @@ public class Client : IDisposable, IListenWebSocketClient
     /// </summary>
     public void SendKeepAlive()
     {
+        Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
         byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"KeepAlive\"}");
         SendMessageImmediately(data);
     }
@@ -301,6 +309,7 @@ public class Client : IDisposable, IListenWebSocketClient
     /// </summary>
     public void SendFinalize()
     {
+        Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"Finalize\"}");
         SendMessageImmediately(data);
     }
@@ -423,7 +432,7 @@ public class Client : IDisposable, IListenWebSocketClient
 
         try
         {
-            while(true)
+            while (true)
             {
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
                 await Task.Delay(5000, _cancellationTokenSource.Token);
@@ -434,13 +443,7 @@ public class Client : IDisposable, IListenWebSocketClient
                     break;
                 }
 
-                Log.Debug("ProcessKeepAlive", "Sending KeepAlive");
-                byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"KeepAlive\"}");
-                lock (_mutexSend)
-                {
-                    _clientWebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
-                        .ConfigureAwait(false);
-                }
+                SendKeepAlive();
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
@@ -457,6 +460,63 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Error("ProcessKeepAlive", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessKeepAlive", $"Excepton: {ex}");
             Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
+        }
+    }
+
+
+    internal async void ProcessAutoFlush()
+    {
+        Log.Verbose("LiveClient.ProcessAutoFlush", "ENTER");
+
+        var diffTicks = TimeSpan.FromMilliseconds((double)_deepgramClientOptions.AutoFlushReplyDelta);
+
+        try
+        {
+            while (true)
+            {
+                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancellationTokenSource.Token);
+
+                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
+                    break;
+                }
+
+                lock (_mutexLastDatagram)
+                {
+                    if (_lastReceived == null)
+                    {
+                        Log.Debug("ProcessAutoFlush", "No datagram received. Skipping...");
+                        continue;
+                    }
+
+                    var deltaTicks = DateTime.Now - _lastReceived;
+                    if (deltaTicks < diffTicks)
+                    {
+                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
+                        continue;
+                    }
+
+                    SendFinalize();
+                    _lastReceived = null;
+                }
+            }
+
+            Log.Verbose("ProcessAutoFlush", "Exit");
+            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
+        }
+        catch (TaskCanceledException ex)
+        {
+            Log.Debug("ProcessAutoFlush", "KeepAliveThread cancelled.");
+            Log.Verbose("ProcessAutoFlush", $"KeepAliveThread cancelled. Info: {ex}");
+            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("ProcessAutoFlush", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("ProcessAutoFlush", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
         }
     }
 
@@ -551,8 +611,16 @@ public class Client : IDisposable, IListenWebSocketClient
             var val = Enum.Parse(typeof(ListenType), data.RootElement.GetProperty("type").GetString()!);
 
             Log.Verbose("ProcessDataReceived", $"Type: {val}");
+
+
+            if (_deepgramClientOptions.InspectMessage())
+            {
+                Log.Debug("ProcessDataReceived", "Call InspectMessage...");
+                InspectMessage(val, data);
+            }
+
             switch (val)
-            {         
+            {
                 case ListenType.Open:
                     var openResponse = data.Deserialize<OpenResponse>();
                     if (_openReceived == null)
@@ -615,7 +683,7 @@ public class Client : IDisposable, IListenWebSocketClient
                         Log.Verbose("ProcessDataReceived", "LEAVE");
                         return;
                     }
-                    if ( utteranceEndResponse == null)
+                    if (utteranceEndResponse == null)
                     {
                         Log.Warning("ProcessDataReceived", "UtteranceEndResponse is invalid");
                         Log.Verbose("ProcessDataReceived", "LEAVE");
@@ -808,13 +876,27 @@ public class Client : IDisposable, IListenWebSocketClient
     /// Retrieves the connection state of the WebSocket
     /// </summary>
     /// <returns>Returns the connection state of the WebSocket</returns>
-    public WebSocketState State() => _clientWebSocket.State;
+    public WebSocketState State()
+    {
+        if (_clientWebSocket == null)
+        {
+            return WebSocketState.None;
+        }
+        return _clientWebSocket.State;
+    }
 
     /// <summary>
     /// Indicates whether the WebSocket is connected
     /// </summary> 
     /// <returns>Returns true if the WebSocket is connected</returns>
-    public bool IsConnected() => _clientWebSocket.State == WebSocketState.Open;
+    public bool IsConnected() {
+        if (_clientWebSocket == null)
+        {
+            return false;
+        }
+            
+        return _clientWebSocket.State == WebSocketState.Open;
+    }
 
     /// <summary>
     /// Handle channel options
@@ -836,7 +918,7 @@ public class Client : IDisposable, IListenWebSocketClient
         return new Uri($"{options.BaseAddress}/{UriSegments.LISTEN}?{queryString}");
     }
 
-    internal void InvokeParallel<T>(EventHandler<T> eventHandler, T e)
+    private void InvokeParallel<T>(EventHandler<T> eventHandler, T e)
     {
         if (eventHandler != null)
         {
@@ -855,6 +937,70 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 Log.Error("InvokeParallel", $"Exception occurred in event handler: {ex}");
             }
+        }
+    }
+
+    private void InspectMessage(object type, JsonDocument data)
+    {
+        Log.Verbose("InspectMessage", "ENTER");
+
+        try
+        {
+            switch (type)
+            {
+                case ListenType.Results:
+                    var resultResponse = data.Deserialize<ResultResponse>();
+                    if (resultResponse == null)
+                    {
+                        Log.Warning("InspectMessage", "ResultResponse is invalid");
+                        Log.Verbose("InspectMessage", "LEAVE");
+                        return;
+                    }
+
+                    var sentence = resultResponse.Channel.Alternatives[0].Transcript;
+
+                    if (resultResponse.Channel.Alternatives.Count == 0 || sentence == "") {
+                        Log.Verbose("InspectMessage", $"resultResponse has empty message");
+                        Log.Verbose("InspectMessage", "LEAVE");
+                        return;
+                    }
+
+                    if (_deepgramClientOptions.AutoFlushReplyDelta > 0)
+                    {
+                        if ((bool)resultResponse.IsFinal)
+                        {
+                            var now = DateTime.Now;
+                            Log.Debug("InspectMessage", $"AutoFlush IsFinal received. Time: {now}");
+                            lock(_mutexLastDatagram)
+                            {
+                                _lastReceived = null;
+                            }
+                        } else {
+                            var now = DateTime.Now;
+                            Log.Debug("InspectMessage", $"AutoFlush Interim received. Time: {now}");
+                            lock (_mutexLastDatagram)
+                            {
+                                _lastReceived = now;
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            Log.Debug("InspectMessage", "Succeeded");
+            Log.Verbose("InspectMessage", "LEAVE");
+        }
+        catch (JsonException ex)
+        {
+            Log.Error("InspectMessage", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("InspectMessage", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.InspectMessage", "LEAVE");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("InspectMessage", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("InspectMessage", $"Excepton: {ex}");
+            Log.Verbose("LiveClient.InspectMessage", "LEAVE");
         }
     }
     #endregion

@@ -52,6 +52,16 @@ public class Client : WS.Client, ILiveClient
         }
     }
 
+    // The private static classes below provide the ability to nest the EventHandlers between this legacy LiveClient and the
+    // ListenWebSocketClient. This is needed because the EventHandler are templatized and are defined using a concrete class type.
+    // Even though the older/obsolete response classes extend the newer response classes because they are concrete types this doesn't
+    // really buy use anything when it comes to the EventHandlers.
+    //
+    // This means we need to translate the older/obsolete response classes into the new classes and chain the EventHandlers from the newer
+    // ListenWebSocketClient to the legacy/obsolete LiveClient. In otherwords, since LiveClient extends ListenWebSocketClient the event coming out
+    // are NEW.Response type. This needs to be converted to OLD.Response. To do this, we need to chain how the events are emitted.
+    //
+    // ListenWebSocketClient --emit NEW.Response--> Wrapper Class --emit OLD.Response--> User-Defined Callback is Notified
     private static class EventHandlerMetadataWrapper
     {
         public static EventHandler<NEW.MetadataResponse> Wrap(EventHandler<OLD.MetadataResponse> oldHandler)

@@ -32,7 +32,14 @@ public record ResultResponse
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("is_final")]
-    public bool? IsFinal { get; set; }
+    public bool? IsFinal { get; set; } = false;
+
+    /// <summary>
+    /// Is the result final.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("from_finalize")]
+    public bool? FromFinalize { get; set; }
 
     /// <summary>
     /// Metadata information.

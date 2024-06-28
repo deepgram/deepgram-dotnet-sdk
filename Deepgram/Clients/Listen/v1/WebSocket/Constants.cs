@@ -15,5 +15,7 @@ public static class Constants
     // Default timeout for connect/disconnect
     public const int DefaultConnectTimeout = 5000;
     public const int DefaultDisconnectTimeout = 5000;
+
+    public const int DefaultFlushPeriodInMs = 500;
 }
 
