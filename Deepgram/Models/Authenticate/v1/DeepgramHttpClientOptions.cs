@@ -38,9 +38,10 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     /*****************************/
 
     /*****************************/
-    // Live
+    // Live (These aren't used in this class)
     /*****************************/
     public bool KeepAlive { get; }
+    public decimal AutoFlushReplyDelta { get; }
 
     /*****************************/
     // OnPrem

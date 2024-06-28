@@ -42,6 +42,11 @@ public interface IDeepgramClientOptions
     /// </summary>
     public bool KeepAlive { get; }
 
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public decimal AutoFlushReplyDelta { get; }
+
     /*****************************/
     // OnPrem
     /*****************************/

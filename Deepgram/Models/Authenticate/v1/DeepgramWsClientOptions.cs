@@ -41,6 +41,11 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     /// </summary>
     public bool KeepAlive { get; set; } = false;
 
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public decimal AutoFlushReplyDelta { get; set; } = 0;
+
     /*****************************/
     // OnPrem
     /*****************************/

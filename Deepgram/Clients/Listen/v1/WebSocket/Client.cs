@@ -36,7 +36,8 @@ public class Client : IDisposable, IListenWebSocketClient
         Log.Debug("LiveClient", $"APIVersion: {options.APIVersion}");
         Log.Debug("LiveClient", $"BaseAddress: {options.BaseAddress}");
         Log.Debug("LiveClient", $"KeepAlive: {options.KeepAlive}");
-        Log.Debug("LiveClient", $"options: {options.OnPrem}");
+        Log.Debug("LiveClient", $"OnPrem: {options.OnPrem}");
+        Log.Debug("LiveClient", $"Autoflush: {options.AutoFlushReplyDelta}");
         Log.Verbose("LiveClient", "LEAVE");
     }
 
@@ -132,6 +133,12 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
                 StartKeepAliveBackgroundThread();
+            }
+
+            if (_deepgramClientOptions.AutoFlushReplyDelta > 0)
+            {
+                Log.Debug("Connect", "Starting AutoFlush Thread...");
+                //StartKeepAliveBackgroundThread();
             }
 
             // send a OpenResponse event
@@ -281,6 +288,24 @@ public class Client : IDisposable, IListenWebSocketClient
 
     #region Send Functions
     /// <summary>
+    /// Sends a KeepAlive message to Deepgram
+    /// </summary>
+    public void SendKeepAlive()
+    {
+        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"KeepAlive\"}");
+        SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends a Finalize message to Deepgram
+    /// </summary>
+    public void SendFinalize()
+    {
+        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"Finalize\"}");
+        SendMessageImmediately(data);
+    }
+
+    /// <summary>
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
@@ -358,7 +383,7 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 if (_cancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    Log.Information("ProcessSendQueue", "KeepAliveThread cancelled");
+                    Log.Information("ProcessSendQueue", "ProcessSendQueue cancelled");
                     break;
                 }
 
