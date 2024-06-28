@@ -45,15 +45,31 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new OnPremClient
+    // *********** WARNING ***********
+    // This function creates a OnPrem Client for the Deepgram API
+    //
+    // Deprecated: This function is deprecated. Use the `CreateSelfHostedClient` function instead.
+    // This will be removed in a future release.
+    //
+    // This class is frozen and no new functionality will be added.
+    // *********** WARNING ***********
+    /// </summary>
+    [Obsolete("Please use CreateSelfHostedClient instead", false)]
+    public static IOnPremClient CreateOnPremClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new OnPremClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Create a new SelfHostedClient
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static IOnPremClient CreateOnPremClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
-        return new OnPremClient(apiKey, options, httpId);
+        return new SelfHostedClient(apiKey, options, httpId);
     }
 
     /// <summary>

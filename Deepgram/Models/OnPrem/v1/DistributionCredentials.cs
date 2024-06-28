@@ -2,50 +2,21 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using SH = Deepgram.Models.SelfHosted.v1;
+
 namespace Deepgram.Models.OnPrem.v1;
 
-public record DistributionCredentials
+/// <summary>
+// *********** WARNING ***********
+// This class provides the DistributionCredentials implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Models.SelfHosted.v1` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Models.SelfHosted.v1.DistributionCredentials instead", false)]
+public record DistributionCredentials :  SH.DistributionCredentials
 {
-    /// <summary>
-    /// Distribution credentials ID
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("distribution_credentials_id")]
-    public string? DistributionCredentialsId { get; set; }
-
-    /// <summary>
-    /// Provider name
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("provider")]
-    public string? Provider { get; set; }
-
-    /// <summary>
-    /// Comment
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("comment")]
-    public string? Comment { get; set; }
-
-    /// <summary>
-    /// Scopes of the credentials
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("scopes")]
-    public IReadOnlyList<string>? Scopes { get; set; }
-
-    /// <summary>
-    /// Created date/time
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("created")]
-    public DateTime? Created { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

@@ -2,29 +2,21 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using SH = Deepgram.Models.SelfHosted.v1;
+
 namespace Deepgram.Models.OnPrem.v1;
 
-public record Member
+/// <summary>
+// *********** WARNING ***********
+// This class provides the Member implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Models.SelfHosted.v1` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Models.SelfHosted.v1.Member instead", false)]
+public record Member : SH.Member
 {
-    /// <summary>
-    /// Member ID
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("member_id")]
-    public string? MemberId { get; set; }
-
-    /// <summary>
-    /// Email of the member
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("email")]
-    public string? Email { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

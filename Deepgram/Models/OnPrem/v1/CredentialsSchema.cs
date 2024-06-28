@@ -2,36 +2,21 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using SH = Deepgram.Models.SelfHosted.v1;
+
 namespace Deepgram.Models.OnPrem.v1;
 
-public class CredentialsSchema
+/// <summary>
+// *********** WARNING ***********
+// This class provides the CredentialsSchema implementation
+//
+// Deprecated: This class is deprecated. Use the `Deepgram.Models.SelfHosted.v1` namespace instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
+/// </summary>
+[Obsolete("Please use Deepgram.Models.SelfHosted.v1.CredentialsSchema instead", false)]
+public class CredentialsSchema : SH.CredentialsSchema
 {
-    /// <summary>
-    /// comment to credentials
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("comment")]
-    public string? Comment { get; set; }
-
-    /// <summary>
-    /// scopes of credentials
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("scopes")]
-    public List<string>? Scopes { get; set; }
-
-    /// <summary>
-    /// provider
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("provider")]
-    public string? Provider { get; set; }
-
-    /// <summary>
-    /// Override ToString method to serialize the object
-    /// </summary>
-    public override string ToString()
-    {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
-    }
 }

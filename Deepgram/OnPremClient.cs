@@ -8,8 +8,16 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the OnPrem Client.
+// *********** WARNING ***********
+// This class provides the OnPrem Client implementation
+//
+// Deprecated: This class is deprecated. Use SelfHostedClient instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use SelfHostedClient instead", false)]
 public class OnPremClient : Client
 {
     public OnPremClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
