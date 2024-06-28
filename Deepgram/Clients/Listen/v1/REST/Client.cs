@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Clients.Interfaces.v1;
 
-namespace Deepgram.Clients.PreRecorded.v1;
+namespace Deepgram.Clients.Listen.v1.REST;
 
 /// <summary>
 /// Implements version 1 of the Analyze Client.
@@ -14,7 +14,7 @@ namespace Deepgram.Clients.PreRecorded.v1;
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
 public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
-    : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IPreRecordedClient
+    : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IListenRESTClient
 
 {
     #region NoneCallBacks

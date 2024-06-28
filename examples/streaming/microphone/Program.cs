@@ -8,7 +8,6 @@ using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Live.v1;
 using Deepgram.Logger;
 using Deepgram.Microphone;
-using System.Threading;
 
 namespace SampleApp
 {

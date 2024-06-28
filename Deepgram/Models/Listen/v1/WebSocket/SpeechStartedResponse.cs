@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Live.v1;
+namespace Deepgram.Models.Listen.v1.WebSocket;
 
 public record SpeechStartedResponse
 {
@@ -12,7 +12,7 @@ public record SpeechStartedResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.SpeechStarted;
+    public ListenType? Type { get; set; } = ListenType.SpeechStarted;
 
     /// <summary>
     /// Channel index information

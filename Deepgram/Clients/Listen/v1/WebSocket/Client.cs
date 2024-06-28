@@ -4,15 +4,15 @@
 
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Live.v1;
+using Deepgram.Models.Listen.v1.WebSocket;
 using Deepgram.Clients.Interfaces.v1;
 
-namespace Deepgram.Clients.Live.v1;
+namespace Deepgram.Clients.Listen.v1.WebSocket;
 
 /// <summary>
 /// Implements version 1 of the Live Client.
 /// </summary>
-public class Client : IDisposable, ILiveClient
+public class Client : IDisposable, IListenWebSocketClient
 {
     #region Fields
     private readonly IDeepgramClientOptions _deepgramClientOptions;
@@ -139,7 +139,7 @@ public class Client : IDisposable, ILiveClient
             {
                 Log.Debug("Connect", "Sending OpenResponse event...");
                 var data = new OpenResponse();
-                data.Type = LiveType.Open;
+                data.Type = ListenType.Open;
                 _openReceived.Invoke(null, data);
             }
 
@@ -523,12 +523,12 @@ public class Client : IDisposable, ILiveClient
         {
             Log.Verbose("ProcessDataReceived", $"raw response: {response}");
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(LiveType), data.RootElement.GetProperty("type").GetString()!);
+            var val = Enum.Parse(typeof(ListenType), data.RootElement.GetProperty("type").GetString()!);
 
             Log.Verbose("ProcessDataReceived", $"Type: {val}");
             switch (val)
             {         
-                case LiveType.Open:
+                case ListenType.Open:
                     var openResponse = data.Deserialize<OpenResponse>();
                     if (_openReceived == null)
                     {
@@ -546,7 +546,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking OpenResponse. event: {openResponse}");
                     InvokeParallel(_openReceived, openResponse);
                     break;
-                case LiveType.Results:
+                case ListenType.Results:
                     var resultResponse = data.Deserialize<ResultResponse>();
                     if (_resultsReceived == null)
                     {
@@ -564,7 +564,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking ResultsResponse. event: {resultResponse}");
                     InvokeParallel(_resultsReceived, resultResponse);
                     break;
-                case LiveType.Metadata:
+                case ListenType.Metadata:
                     var metadataResponse = data.Deserialize<MetadataResponse>();
                     if (_metadataReceived == null)
                     {
@@ -582,7 +582,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking MetadataResponse. event: {metadataResponse}");
                     InvokeParallel(_metadataReceived, metadataResponse);
                     break;
-                case LiveType.UtteranceEnd:
+                case ListenType.UtteranceEnd:
                     var utteranceEndResponse = data.Deserialize<UtteranceEndResponse>();
                     if (_utteranceEndReceived == null)
                     {
@@ -600,7 +600,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
                     InvokeParallel(_utteranceEndReceived, utteranceEndResponse);
                     break;
-                case LiveType.SpeechStarted:
+                case ListenType.SpeechStarted:
                     var speechStartedResponse = data.Deserialize<SpeechStartedResponse>();
                     if (_speechStartedReceived == null)
                     {
@@ -618,7 +618,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
                     InvokeParallel(_speechStartedReceived, speechStartedResponse);
                     break;
-                case LiveType.Close:
+                case ListenType.Close:
                     var closeResponse = data.Deserialize<CloseResponse>();
                     if (_closeReceived == null)
                     {
@@ -636,7 +636,7 @@ public class Client : IDisposable, ILiveClient
                     Log.Debug("ProcessDataReceived", $"Invoking CloseResponse. event: {closeResponse}");
                     InvokeParallel(_closeReceived, closeResponse);
                     break;
-                case LiveType.Error:
+                case ListenType.Error:
                     var errorResponse = data.Deserialize<ErrorResponse>();
                     if (_errorReceived == null)
                     {
@@ -663,7 +663,7 @@ public class Client : IDisposable, ILiveClient
                     }
 
                     var unhandledResponse = new UnhandledResponse();
-                    unhandledResponse.Type = LiveType.Unhandled;
+                    unhandledResponse.Type = ListenType.Unhandled;
                     unhandledResponse.Raw = response;
 
                     Log.Debug("ProcessDataReceived", $"Invoking UnhandledResponse. event: {unhandledResponse}");
@@ -736,7 +736,7 @@ public class Client : IDisposable, ILiveClient
             {
                 Log.Debug("Stop", "Sending CloseResponse event...");
                 var data = new CloseResponse();
-                data.Type = LiveType.Close;
+                data.Type = ListenType.Close;
                 InvokeParallel(_closeReceived, data);
             }
 

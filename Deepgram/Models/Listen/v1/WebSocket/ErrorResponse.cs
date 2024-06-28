@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Live.v1;
+namespace Deepgram.Models.Listen.v1.WebSocket;
 
 public record ErrorResponse
 {
@@ -33,7 +33,7 @@ public record ErrorResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.Error;
+    public ListenType? Type { get; set; } = ListenType.Error;
 
     /// <summary>
     /// Override ToString method to serialize the object

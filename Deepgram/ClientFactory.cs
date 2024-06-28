@@ -22,7 +22,7 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new AnalyzeClient
+    /// Create a new LiveClient
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
@@ -30,6 +30,17 @@ public static class ClientFactory
     public static ILiveClient CreateLiveClient(string apiKey = "", DeepgramWsClientOptions? options = null)
     {
         return new LiveClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// Create a new ListenWebSocketClient
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static IListenWebSocketClient CreateListenWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new ListenWebSocketClient(apiKey, options);
     }
 
     /// <summary>
@@ -66,6 +77,18 @@ public static class ClientFactory
     public static IPreRecordedClient CreatePreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new PreRecordedClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Create a new ListenRESTClient
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new ListenRESTClient(apiKey, options, httpId);
     }
 
     /// <summary>

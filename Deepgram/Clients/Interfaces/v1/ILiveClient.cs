@@ -9,15 +9,8 @@ namespace Deepgram.Clients.Interfaces.v1;
 /// <summary>
 /// Implements version 1 of the Live Client.
 /// </summary>
-public interface ILiveClient
+public interface ILiveClient : IListenWebSocketClient
 {
-    #region Connect and Disconnect
-    public Task Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
-        Dictionary<string, string>? headers = null);
-
-    public Task Stop(CancellationTokenSource? cancelToken = null);
-    #endregion
-
     #region Subscribe Event
     /// <summary>
     /// Subscribe to an Open event from the Deepgram API
@@ -68,48 +61,5 @@ public interface ILiveClient
     /// </summary>
     /// <returns>True if successful</returns>
     public bool Subscribe(EventHandler<ErrorResponse> eventHandler);
-    #endregion
-
-    #region Send Functions
-    /// <summary>
-    /// Sends a binary message over the WebSocket connection.
-    /// </summary>
-    /// <param name="data">The data to be sent over the WebSocket.</param>
-    public void Send(byte[] data);
-
-    /// <summary>
-    /// This method sends a binary message over the WebSocket connection.
-    /// </summary>
-    /// <param name="data"></param>
-    public void SendBinary(byte[] data);
-
-    /// <summary>
-    /// This method sends a text message over the WebSocket connection.
-    /// </summary>
-    public void SendMessage(byte[] data);
-
-    /// <summary>
-    /// This method sends a binary message over the WebSocket connection immediately without queueing.
-    /// </summary>
-    public void SendBinaryImmediately(byte[] data);
-
-    /// <summary>
-    /// This method sends a text message over the WebSocket connection immediately without queueing.
-    /// </summary>
-    public void SendMessageImmediately(byte[] data);
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Retrieves the connection state of the WebSocket
-    /// </summary>
-    /// <returns>Returns the connection state of the WebSocket</returns>
-    public WebSocketState State();
-
-    /// <summary>
-    /// Indicates whether the WebSocket is connected
-    /// </summary> 
-    /// <returns>Returns true if the WebSocket is connected</returns>
-    public bool IsConnected();
     #endregion
 }

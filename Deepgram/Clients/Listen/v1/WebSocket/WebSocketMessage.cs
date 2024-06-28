@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Clients.Live.v1;
+namespace Deepgram.Clients.Listen.v1.WebSocket;
 
 internal readonly struct WebSocketMessage(byte[] message, WebSocketMessageType type)
 {

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Live.v1;
+namespace Deepgram.Models.Listen.v1.WebSocket;
 
 public record MetadataResponse
 {
@@ -68,7 +68,7 @@ public record MetadataResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public LiveType? Type { get; set; } = LiveType.Metadata;
+    public ListenType? Type { get; set; } = ListenType.Metadata;
 
     /// <summary>
     /// Deepgram’s Extra Metadata feature allows you to attach arbitrary key-value pairs to your API requests that are attached to the API response for usage in downstream processing.

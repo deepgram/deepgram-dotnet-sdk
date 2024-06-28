@@ -10,9 +10,9 @@ namespace Deepgram;
 /// <summary>
 /// Implements the latest supported version of the PreRecorded Client.
 /// </summary>
-public class PreRecordedClient : Client
+public class ListenRESTClient : Client
 {
-    public PreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
+    public ListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
         string? httpId = null) : base(apiKey, deepgramClientOptions, httpId)
     {
     }
