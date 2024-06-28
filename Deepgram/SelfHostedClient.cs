@@ -8,7 +8,7 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the OnPrem Client.
+/// Implements the latest supported version of the SelfHosted Client.
 /// </summary>
 public class SelfHostedClient : Client
 {
