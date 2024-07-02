@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.OnPrem.v1;
-using Deepgram.Clients.OnPrem.v1;
+using Deepgram.Models.SelfHosted.v1;
+using Deepgram.Clients.SelfHosted.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
-public class OnPremClientTests
+public class SelfHostedClientTests
 {
     DeepgramHttpClientOptions _options;
     string _projectId;
@@ -28,12 +28,12 @@ public class OnPremClientTests
     public async Task ListCredentials_Should_Call_GetAsync_Returning_CredentialsResponse()
     {
         // Input and Output
-        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.SELF_HOSTED}");
         var expectedResponse = new AutoFaker<CredentialsResponse>().Generate();
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
+        var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
 
         // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -57,12 +57,12 @@ public class OnPremClientTests
     {
         // Input and Output
         var credentialsId = new Faker().Random.Guid().ToString();
-        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.SELF_HOSTED}/{credentialsId}");
         var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
+        var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -86,12 +86,12 @@ public class OnPremClientTests
     {
         // Input and Output
         var credentialsId = new Faker().Random.Guid().ToString();
-        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}/{credentialsId}");
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.SELF_HOSTED}/{credentialsId}");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
         
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
+        var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
@@ -115,13 +115,13 @@ public class OnPremClientTests
     public async Task CreateCredentials_Should_Return_CredentialResponse()
     {
         // Input and Output
-        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.ONPREM}");
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.SELF_HOSTED}");
         var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
         var createOnPremCredentialsSchema = new CredentialsSchema();
 
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
-        var onPremClient = Substitute.For<OnPremClient>(_apiKey, _options, null);
+        var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
         
         // Mock methods
         onPremClient.When(x => x.PostAsync<CredentialsSchema, CredentialResponse>(Arg.Any<string>(), Arg.Any<CredentialsSchema>())).DoNotCallBase();
