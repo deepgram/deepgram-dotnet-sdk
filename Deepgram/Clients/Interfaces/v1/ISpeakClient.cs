@@ -2,40 +2,19 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Speak.v1;
-
 namespace Deepgram.Clients.Interfaces.v1;
 
 /// <summary>
-/// Implements version 1 of the Speak Client.
+// *********** WARNING ***********
+// This class provides the ISpeakClient implementation for the Deepgram API
+//
+// Deprecated: This class is deprecated. Use the ISpeakRESTClient interface instead.
+// This will be removed in a future release.
+//
+// This package is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
-/// <param name="apiKey">Required DeepgramApiKey</param>
-/// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-public interface ISpeakClient
+[Obsolete("Please use ISpeakRESTClient instead", false)]
+public interface ISpeakClient : ISpeakRESTClient
 {
-    #region NoneCallBacks
-    /// <summary>
-    /// Speaks a file using the provided stream
-    /// </summary>
-    /// <param name="source">file is the form of a stream <see cref="Stream"/></param>
-    /// <param name="speakSchema">Options for the transcription <see cref="SpeakSchema"/></param>
-    /// <returns><see cref="SyncResponse"/></returns>
-    public Task<SyncResponse> ToStream(TextSource source, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
-
-    public Task<SyncResponse> ToFile(TextSource source, string filename, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
-    #endregion
-
-    #region  CallBack Methods
-    /// <summary>
-    /// Speaks a file using the provided byte array and providing a CallBack
-    /// </summary>
-    /// <param name="source">file is the form of a byte[]</param>  
-    /// <param name="callBack">CallBack url</param>    
-    /// <param name="speakSchema">Options for the transcription<see cref="SpeakSchema"></param>
-    /// <returns><see cref="AsyncResponse"/></returns>
-    public Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
-        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
-    #endregion
 }

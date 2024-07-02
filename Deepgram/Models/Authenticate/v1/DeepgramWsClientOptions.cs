@@ -96,12 +96,12 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
         }
 
         // base url
-        Log.Debug("DeepgramWsClientOptions", $"REST BaseAddress: {BaseAddress}");
+        Log.Debug("DeepgramWsClientOptions", $"WS BaseAddress: {BaseAddress}");
 
         Regex regex = new Regex(@"\b(\/v[0-9]+)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(BaseAddress))
         {
-            Log.Information("DeepgramWsClientOptions", $"REST BaseAddress does not contain API version: {BaseAddress}");
+            Log.Information("DeepgramWsClientOptions", $"WS BaseAddress does not contain API version: {BaseAddress}");
             BaseAddress = $"{BaseAddress}/{APIVersion}";
             Log.Debug("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         }

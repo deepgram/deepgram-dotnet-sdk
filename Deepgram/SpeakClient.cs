@@ -8,8 +8,16 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the Speak Client.
+// *********** WARNING ***********
+// This package provides the Speak Client implementation for the Deepgram API
+//
+// Deprecated: This class is deprecated. Use the namespace `Deepgram.Clients.Speak.v1.REST` instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use SpeakRESTClient instead", false)]
 public class SpeakClient : Client
 {
     public SpeakClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
