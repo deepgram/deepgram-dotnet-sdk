@@ -42,6 +42,16 @@ public interface IDeepgramClientOptions
     /// </summary>
     public bool KeepAlive { get; }
 
+    /// <summary>
+    /// Enable sending KeepAlives for Streaming
+    /// </summary>
+    public decimal AutoFlushReplyDelta { get; }
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectMessage();
+
     /*****************************/
     // OnPrem
     /*****************************/
