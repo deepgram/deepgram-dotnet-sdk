@@ -67,14 +67,8 @@ This SDK aims to reduce complexity and abstract/hide some internal Deepgram deta
 You can find a [walkthrough](https://developers.deepgram.com/docs/pre-recorded-audio-transcription) on our documentation site. Transcribing Pre-Recorded Audio can be done using the following sample code:
 
 ```csharp
-// JSON options
-JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
-{
-  WriteIndented = true
-};
-
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var deepgramClient = new PreRecordedClient();
+var deepgramClient = ClientFactory.CreateListenRESTClient();
 
 var response = await deepgramClient.TranscribeUrl(
   new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
@@ -92,7 +86,7 @@ You can find a [walkthrough](https://developers.deepgram.com/docs/live-streaming
 
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var liveClient = new LiveClient();
+var liveClient = ClientFactory.CreateListenWebSocketClient();
 
 // Subscribe to the EventResponseReceived event
 liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
@@ -147,6 +141,7 @@ var microphone = new Microphone(liveClient.Send);
 microphone.Start();
 
 // Wait for the user to press a key
+Console.WriteLine("Press ENTER to exit...");
 Console.ReadKey();
 
 // Stop the microphone
@@ -162,9 +157,13 @@ There are examples for **every** API call in this SDK. You can find all of these
 
 These examples provide:
 
-- Text to Speech:
-    - Factory - [examples/speak/](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speak/file/factory_example/Program.cs)
-    - Asynchronous - [example/speak/](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speak/file/hello-world/Program.cs)
+- Text to Speech - REST:
+
+    - Hello World - [examples/text-to-speech/rest/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/text-to-speech/rest/file/hello-world/Program.cs)
+
+- Text to Speech - WebSocket:
+
+    - Simple - [example/speak/websocket/simple](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/text-to-speech/websocket/simple/Program.cs)
 
 - Analyze Text:
 
@@ -175,18 +174,18 @@ These examples provide:
 
 - PreRecorded Audio:
 
-    - Transcription From an Audio File - [examples/prerecorded/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/file/Program.cs)
-    - Transcription From a URL - [examples/prerecorded/url](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/url/Program.cs)
-    - Intent Recognition - [examples/prerecorded/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/intent/Program.cs)
-    - Sentiment Analysis - [examples/prerecorded/sentiment](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/sentiment/Program.cs)
-    - Summarization - [examples/prerecorded/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/summary/Program.cs)
-    - Topic Detection - [examples/prerecorded/topic](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/prerecorded/topic/Program.cs)
+    - Transcription From an Audio File - [examples/speech-to-text/rest/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/file/Program.cs)
+    - Transcription From a URL - [examples/speech-to-text/rest/url](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/url/Program.cs)
+    - Intent Recognition - [examples/speech-to-text/rest/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/intent/Program.cs)
+    - Sentiment Analysis - [examples/speech-to-text/rest/sentiment](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/sentiment/Program.cs)
+    - Summarization - [examples/speech-to-text/rest/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/summary/Program.cs)
+    - Topic Detection - [examples/speech-to-text/rest/topic](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/rest/topic/Program.cs)
 
 - Live Audio Transcription:
 
-    - From a Microphone - [examples/streaming/microphone](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/streaming/microphone/Program.cs)
-    - From an HTTP stream - [examples/streaming/http](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/streaming/http/Program.cs)
-    - From a File - [examples/streaming/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/streaming/file/Program.cs)
+    - From a Microphone - [examples/speech-to-text/websocket/microphone](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/websocket/microphone/Program.cs)
+    - From an HTTP stream - [examples/speech-to-text/websocket/http](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/websocket/http/Program.cs)
+    - From a File - [examples/speech-to-text/websocket/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/speech-to-text/websocket/file/Program.cs)
 
 - Management API exercise the full [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations for:
 

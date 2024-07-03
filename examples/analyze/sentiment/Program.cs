@@ -2,8 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
 using Deepgram.Models.Analyze.v1;
 
 namespace PreRecorded
@@ -16,8 +14,8 @@ namespace PreRecorded
             // Normal logging is "Info" level
             Library.Initialize();
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new AnalyzeClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = ClientFactory.CreateAnalyzeClient();
 
             // check to see if the file exists
             if (!File.Exists(@"conversation.txt"))

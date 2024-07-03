@@ -105,6 +105,18 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Create a new ListenRESTClient
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new ListenRESTClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     // *********** WARNING ***********
     // This function creates a Speak Client for the Deepgram API
     //

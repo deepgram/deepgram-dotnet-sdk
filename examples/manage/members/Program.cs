@@ -2,11 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram.Logger;
-using Deepgram.Models.Manage.v1;
-
 namespace SampleApp
 {
     class Program
@@ -18,14 +13,12 @@ namespace SampleApp
             // Initialize Library with default logging
             // Normal logging is "Info" level
             Library.Initialize();
-            // OR very chatty logging
-            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new ManageClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = ClientFactory.CreateManageClient();
 
             // Get projects
-            var projectResp = deepgramClient.GetProjects();
+            var projectResp = await deepgramClient.GetProjects();
             if (projectResp == null)
             {
                 Console.WriteLine("ListProjects failed.");
@@ -33,7 +26,7 @@ namespace SampleApp
             }
 
             string myId = null;
-            foreach (var project in projectResp.Result.Projects)
+            foreach (var project in projectResp.Projects)
             {
                 myId = project.ProjectId;
                 string myName = project.Name;
@@ -42,7 +35,7 @@ namespace SampleApp
 
             // List members
             string delMemberId = null;
-            var listResp = deepgramClient.GetMembers(myId);
+            var listResp = await deepgramClient.GetMembers(myId);
             if (listResp == null)
             {
                 Console.WriteLine("No members found");
@@ -51,7 +44,7 @@ namespace SampleApp
             {
                 Console.WriteLine($"\n\n{listResp}\n\n");
 
-                foreach (var member in listResp.Result.Members)
+                foreach (var member in listResp.Members)
                 {
                     if (member.Email == DELETE_MEMBER_BY_EMAIL)
                     {
@@ -71,7 +64,7 @@ namespace SampleApp
                 Environment.Exit(1);
             }
 
-            var deleteResp = deepgramClient.RemoveMember(myId, delMemberId);
+            var deleteResp = await deepgramClient.RemoveMember(myId, delMemberId);
             if (deleteResp == null)
             {
                 Console.WriteLine("\n\nRemoveMember failed.\n\n");
@@ -83,7 +76,7 @@ namespace SampleApp
             }
 
             // List members
-            listResp = deepgramClient.GetMembers(myId);
+            listResp = await deepgramClient.GetMembers(myId);
             if (listResp == null)
             {
                 Console.WriteLine("\n\nNo members found.\n\n");

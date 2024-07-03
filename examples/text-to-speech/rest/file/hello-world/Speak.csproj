@@ -15,5 +15,8 @@
 	  <ProjectReference Include="..\..\..\..\..\Deepgram\Deepgram.csproj" />
 	</ItemGroup>
 
+    <ItemGroup>
+        <Using Include="Deepgram" />
+    </ItemGroup>
 
 </Project>

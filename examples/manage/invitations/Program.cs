@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
 
 using Deepgram.Logger;
 using Deepgram.Models.Manage.v1;
@@ -15,12 +14,12 @@ namespace SampleApp
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            Library.Initialize();
+            //Library.Initialize();
             // OR very chatty logging
-            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new ManageClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = ClientFactory.CreateManageClient();
 
             // get projects
             var projectResp = await deepgramClient.GetProjects();

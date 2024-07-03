@@ -15,15 +15,16 @@ namespace SampleApp
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
-            //Library.Initialize();
+            Library.Initialize();
             // OR very chatty logging
-            Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
 
-            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
-            var clientOptions = new DeepgramWsClientOptions("", "api.beta.deepgram.com");
-            var speakClient = ClientFactory.CreateSpeakWebSocketClient("", clientOptions);
+            //// use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            //DeepgramWsClientOptions options = new DeepgramWsClientOptions("", "");
+            //var speakClient = ClientFactory.CreateSpeakWebSocketClient("", options);
+            var speakClient = ClientFactory.CreateSpeakWebSocketClient();
 
             // Subscribe to the EventResponseReceived event
             speakClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>

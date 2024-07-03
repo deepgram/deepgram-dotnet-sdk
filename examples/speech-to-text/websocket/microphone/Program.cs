@@ -2,12 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Live.v1;
 using Deepgram.Logger;
 using Deepgram.Microphone;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Listen.v1.WebSocket;
 
 namespace SampleApp
 {
@@ -19,17 +17,17 @@ namespace SampleApp
             // Normal logging is "Info" level
             Deepgram.Library.Initialize();
             // OR very chatty logging
-            Deepgram.Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+            // Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+
+            // Initialize the microphone library
             Deepgram.Microphone.Library.Initialize();
 
             Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
-            options.AutoFlushReplyDelta = 2000;
-            var liveClient = new LiveClient("", options);
-            // OR
-            //var liveClient = new LiveClienkt("set your DEEPGRAM_API_KEY here");
+            //options.AutoFlushReplyDelta = 2000; // if your live stream application is like "push to talk".
+            var liveClient = new ListenWebSocketClient("", options);
 
             // Subscribe to the EventResponseReceived event
             liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
@@ -42,6 +40,7 @@ namespace SampleApp
             }));
             liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
+                Console.WriteLine($"----> {e.Type} received");
                 if (e.Channel.Alternatives[0].Transcript.Trim() == "")
                 {
                     return;
@@ -68,7 +67,7 @@ namespace SampleApp
             }));
             liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
             {
-                Console.WriteLine($"----> { e.Type} received. Error: {e.Message}");
+                Console.WriteLine($"----> {e.Type} received. Error: {e.Message}");
             }));
 
             // Start the connection
