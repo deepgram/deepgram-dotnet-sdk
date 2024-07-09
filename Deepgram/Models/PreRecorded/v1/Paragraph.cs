@@ -18,7 +18,7 @@ public record Paragraph
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("num_words")]
-    internal int? NumWords { get; set; }
+    public int? NumWords { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph starts.
@@ -26,6 +26,13 @@ public record Paragraph
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("start")]
     public decimal? Start { get; set; }
+
+    /// <summary>
+    /// speak Index
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("speaker")]
+    public int? Speaker { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph ends.

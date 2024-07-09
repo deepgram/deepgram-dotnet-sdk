@@ -27,6 +27,13 @@ public record Alternative
     public IReadOnlyList<Word>? Words { get; set; }
 
     /// <summary>
+    /// ReadOnlyList of Languages Detected
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages")]
+    public IReadOnlyList<string>? Languages { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
