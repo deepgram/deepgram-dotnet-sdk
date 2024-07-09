@@ -42,6 +42,13 @@ public record Word
     public string? PunctuatedWord { get; set; }
 
     /// <summary>
+    /// Language detected
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("language")]
+    public string? Language { get; set; }
+
+    /// <summary>
     /// Speaker index of who said this word
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

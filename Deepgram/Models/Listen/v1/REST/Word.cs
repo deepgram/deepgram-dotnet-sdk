@@ -22,6 +22,13 @@ public record Word
     public decimal? End { get; set; }
 
     /// <summary>
+    /// Language detected
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("language")]
+    public string? Language { get; set; }
+
+    /// <summary>
     /// Punctuated version of the word
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

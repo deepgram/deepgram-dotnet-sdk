@@ -22,6 +22,13 @@ public record Alternative
     public IReadOnlyList<Entity>? Entities { get; set; }
 
     /// <summary>
+    /// ReadOnlyList of Languages Detected
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages")]
+    public IReadOnlyList<string>? Languages { get; set; }
+
+    /// <summary>
     /// ReadOnly List of <see cref="ParagraphGroup"/> containing  separated transcript and <see cref="Paragraph"/> objects.
     /// </summary>
     /// <remark>Only used when the paragraph feature is enabled on the request</remark>
