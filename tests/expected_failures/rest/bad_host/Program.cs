@@ -2,10 +2,8 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram.Models.PreRecorded.v1;
 using Deepgram.Logger;
+using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Models.Authenticate.v1;
 
 namespace SampleApp
@@ -21,7 +19,7 @@ namespace SampleApp
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             var clientOptions = new DeepgramHttpClientOptions(null, "http://127.0.0.1");
-            var deepgramClient = new PreRecordedClient("", clientOptions);
+            var deepgramClient = ClientFactory.CreateListenRESTClient("", clientOptions);
 
             try
             {
@@ -32,7 +30,7 @@ namespace SampleApp
                         Model = "nova-2",
                     });
 
-                    Console.WriteLine(JsonSerializer.Serialize(response));
+                    Console.WriteLine(response);
             }
             catch (Exception ex)
             {

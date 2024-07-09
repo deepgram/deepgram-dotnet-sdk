@@ -2,9 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Logger;
 
 namespace SampleApp
@@ -19,7 +17,7 @@ namespace SampleApp
             //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new PreRecordedClient();
+            var deepgramClient = ClientFactory.CreateListenRESTClient();
 
             // intentionally cancel the request after 250ms
             CancellationTokenSource cancelToken = new CancellationTokenSource(250);

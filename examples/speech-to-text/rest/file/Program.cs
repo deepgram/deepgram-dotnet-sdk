@@ -2,11 +2,8 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
 using Deepgram.Logger;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Listen.v1.REST;
 
 namespace PreRecorded
 {
@@ -20,10 +17,8 @@ namespace PreRecorded
             // OR very chatty logging
             Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            //DeepgramHttpClientOptions dgOptions = new DeepgramHttpClientOptions(null, "38.104.135.210");
-            //var deepgramClient = new PreRecordedClient("", dgOptions);
-            var deepgramClient = new PreRecordedClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = ClientFactory.CreateListenRESTClient();
 
             // check to see if the file exists
             if (!File.Exists(@"Bueller-Life-moves-pretty-fast.wav"))

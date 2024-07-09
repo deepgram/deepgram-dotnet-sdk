@@ -2,10 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram;
-using Deepgram.Models.Speak.v1;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Speak.v1.REST;
+using Microsoft.Extensions.Options;
 
 namespace SampleApp
 {
@@ -16,9 +15,13 @@ namespace SampleApp
             // Initialize Library with default logging
             // Normal logging is "Info" level
             Library.Initialize();
+            // OR very chatty logging
+            //Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new SpeakClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            //DeepgramHttpClientOptions options = new DeepgramHttpClientOptions("", "");
+            //var deepgramClient = SpeakRESTClient("", options);
+            var deepgramClient = new SpeakRESTClient();
 
             var response = await deepgramClient.ToFile(
                 new TextSource("How much wood could a woodchuck chuck? If a woodchuck could chuck wood? As much wood as a woodchuck could chuck, if a woodchuck could chuck wood."),

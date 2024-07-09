@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.PreRecorded.v1;
+using Deepgram.Models.Listen.v1.REST;
 
 namespace PreRecorded
 {
@@ -14,15 +14,21 @@ namespace PreRecorded
             // Normal logging is "Info" level
             Library.Initialize();
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var deepgramClient = new PreRecordedClient();
+            // create a ListenRESTClient directly (without using the factory method) with a API Key
+            // set using the "DEEPGRAM_API_KEY" environment variable
+            var deepgramClient = new ListenRESTClient();
+
+            var customOptions = new Dictionary<string, string>();
+            customOptions["smart_format"] = "true";
 
             var response = await deepgramClient.TranscribeUrl(
                 new UrlSource("https://dpgr.am/bueller.wav"),
                 new PreRecordedSchema()
                 {
                     Model = "nova-2",
-                });
+                },
+                null, // use the default timeout
+                customOptions);
 
             Console.WriteLine(response);
             Console.ReadKey();

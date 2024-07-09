@@ -2,9 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Live.v1;
-using Deepgram.Logger;
-using System.Net.WebSockets;
+using Deepgram.Models.Listen.v1.WebSocket;
 
 namespace SampleApp
 {
@@ -15,8 +13,8 @@ namespace SampleApp
             // Initialize Library with default logging
             Library.Initialize();
 
-            // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-            var liveClient = new LiveClient();
+            // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
+            var liveClient = new ListenWebSocketClient();
 
             // Subscribe to the EventResponseReceived event
             liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
@@ -45,7 +43,7 @@ namespace SampleApp
                 {
                     using (Stream receiveStream = await client.GetStreamAsync(url))
                     {
-                        while (liveClient.State() == WebSocketState.Open)
+                        while (liveClient.IsConnected())
                         {
                             byte[] buffer = new byte[2048];
                             await receiveStream.ReadAsync(buffer, 0, buffer.Length);
