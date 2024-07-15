@@ -144,14 +144,14 @@ public static class ClientFactory
         return new SpeakRESTClient(apiKey, options, httpId);
     }
 
-    /// <summary>
-    /// Create a new AnalyzeClient
-    /// </summary>
-    /// <param name="apiKey"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
-    public static ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
-    {
-        return new SpeakWebSocketClient(apiKey, options);
-    }
+    ///// <summary>
+    ///// Create a new AnalyzeClient
+    ///// </summary>
+    ///// <param name="apiKey"></param>
+    ///// <param name="options"></param>
+    ///// <returns></returns>
+    //public static ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    //{
+    //    return new SpeakWebSocketClient(apiKey, options);
+    //}
 }
