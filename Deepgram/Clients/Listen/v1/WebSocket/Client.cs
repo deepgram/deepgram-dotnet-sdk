@@ -613,7 +613,7 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Verbose("ProcessDataReceived", $"Type: {val}");
 
 
-            if (_deepgramClientOptions.InspectMessage())
+            if (_deepgramClientOptions.InspectListenMessage())
             {
                 Log.Debug("ProcessDataReceived", "Call InspectMessage...");
                 InspectMessage(val, data);
