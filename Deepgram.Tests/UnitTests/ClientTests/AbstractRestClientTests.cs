@@ -129,14 +129,14 @@ public class AbstractRestfulClientTests
     public async Task Delete_Should_Throws_HttpRequestException_On_Response_Containing_Error()
     {
         // Input and Output  
-        var httpClient = MockHttpClient.CreateHttpClientWithException(new DeepgramException());
+        var httpClient = MockHttpClient.CreateHttpClientWithException(new HttpRequestException());
 
         // Fake Clients
         var client = new ConcreteRestClient(_apiKey, _clientOptions);
 
         // Act & Assert
         await client.Invoking(async y => await y.DeleteAsync<MessageResponse>($"{Defaults.DEFAULT_URI}/{UriSegments.PROJECTS}"))
-             .Should().ThrowAsync<DeepgramException>();
+             .Should().ThrowAsync<HttpRequestException>();
     }
 
     //Test for the delete calls that do not return a value

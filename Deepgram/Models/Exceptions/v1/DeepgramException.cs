@@ -8,6 +8,9 @@ public class DeepgramException : Exception
 {
     public DeepgramException() : base()
     {
+        ErrMsg = "Unknown DeepgramException";
+        ErrCode = "Unknown Error Code";
+        RequestId = "Unknown Request ID";
     }
 
     public DeepgramException(string errMsg) : base(errMsg)

@@ -6,7 +6,7 @@ namespace Deepgram.Models.Exceptions.v1;
 
 public class DeepgramRESTException : DeepgramException
 {
-    public DeepgramRESTException(string errMsg) : base(errMsg)
+    public DeepgramRESTException(string errMsg = "") : base(errMsg)
     {
     }
 }
