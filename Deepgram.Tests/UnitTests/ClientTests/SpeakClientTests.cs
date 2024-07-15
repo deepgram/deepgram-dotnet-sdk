@@ -152,6 +152,7 @@ public class SpeakClientTests
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var speakSchema = new AutoFaker<SpeakSchema>().Generate();
         var source = new TextSource("Hello World!");
+        speakSchema.CallBack = null;
 
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
@@ -160,8 +161,6 @@ public class SpeakClientTests
         // Mock Methods
         speakClient.When(x => x.PostAsync<Stream, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         speakClient.PostAsync<Stream, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
-        
-        speakSchema.CallBack = null;
 
         // Act and Assert
         await speakClient.Invoking(y => y.StreamCallBack(source, null, speakSchema))
