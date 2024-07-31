@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -9,7 +9,7 @@ using Deepgram.Clients.Interfaces.v1;
 namespace Deepgram.Clients.Manage.v1;
 
 /// <summary>
-/// Implements version 1 of the Manage Client.
+/// Implements version 1 of the Models Client.
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
@@ -119,6 +119,99 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("LeaveProject", $"{uri} Succeeded");
         Log.Debug("LeaveProject", $"result: {result}");
         Log.Verbose("ManageClient.LeaveProject", "LEAVE");
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets projects associated to ApiKey 
+    /// </summary>
+    /// <returns><see cref="ModelsResponse"/></returns>
+    public async Task<ModelsResponse> GetProjectModels(string projectId, ModelSchema? modelSchema = null, CancellationTokenSource ? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("ManageClient.GetProjectModels", "ENTER");
+
+        if (modelSchema is null)
+        {
+           modelSchema = new ModelSchema();
+        }
+
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MODELS}");
+        var result = await GetAsync<ModelSchema, ModelsResponse>(uri, modelSchema, cancellationToken, addons, headers);
+
+        Log.Information("GetProjectModels", $"{uri} Succeeded");
+        Log.Debug("GetProjectModels", $"result: {result}");
+        Log.Verbose("ManageClient.GetProjectModels", "LEAVE");
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets project associated with project Id
+    /// </summary>
+    /// <param name="projectId">Id of Project</param>
+    /// <returns><see cref="ModelResponse"/></returns>
+    public async Task<ModelResponse> GetProjectModel(string projectId, string modelId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("ManageClient.GetProjectModel", "ENTER");
+        Log.Information("ProjectId", $"projectId: {projectId}");
+        Log.Information("ModelId", $"modelId: {modelId}");
+
+        var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MODELS}/{modelId}");
+        var result = await GetAsync<ModelResponse>(uri, cancellationToken, addons, headers);
+
+        Log.Information("GetProjectModel", $"{uri} Succeeded");
+        Log.Debug("GetProjectModel", $"result: {result}");
+        Log.Verbose("ManageClient.GetProjectModel", "LEAVE");
+
+        return result;
+    }
+    #endregion
+
+    #region Models
+    /// <summary>
+    /// Gets models available in Deepgram
+    /// </summary>
+    /// <returns><see cref="ModelsResponse"/></returns>
+    public async Task<ModelsResponse> GetModels(ModelSchema? modelSchema = null, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("ManageClient.GetModels", "ENTER");
+
+        if (modelSchema is null)
+        {
+           modelSchema = new ModelSchema();
+        }
+
+        var uri = GetUri(_options, $"{UriSegments.MODELS}");
+        var result = await GetAsync<ModelSchema, ModelsResponse>(uri, modelSchema, cancellationToken, addons, headers);
+
+        Log.Information("GetModels", $"{uri} Succeeded");
+        Log.Debug("GetModels", $"result: {result}");
+        Log.Verbose("ManageClient.GetModels", "LEAVE");
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets a specific model within Deepgram
+    /// </summary>
+    /// <param name="projectId">Id of Model</param>
+    /// <returns><see cref="ModelResponse"/></returns>
+    public async Task<ModelResponse> GetModel(string modelId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("ManageClient.GetModel", "ENTER");
+        Log.Information("ModelID", $"modelId: {modelId}");
+
+        var uri = GetUri(_options, $"{UriSegments.MODELS}/{modelId}");
+        var result = await GetAsync<ModelResponse>(uri, cancellationToken, addons, headers);
+
+        Log.Information("GetModel", $"{uri} Succeeded");
+        Log.Debug("GetModel", $"result: {result}");
+        Log.Verbose("ManageClient.GetModel", "LEAVE");
 
         return result;
     }
