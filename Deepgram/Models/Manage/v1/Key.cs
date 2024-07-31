@@ -49,6 +49,13 @@ public record Key
     public IReadOnlyList<string>? Tags { get; set; }
 
     /// <summary>
+    /// Creation date of the Deepgram API key
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("expiration_date")]
+    public DateTime? ExpirationDate { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
