@@ -49,7 +49,7 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Create a new LiveClient
+    /// Create a new ManageClient
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>

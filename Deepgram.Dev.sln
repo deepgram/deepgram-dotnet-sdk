@@ -155,6 +155,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speak", "examples\text-to-s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speak", "examples\text-to-speech\rest\file\woodchuck\Speak.csproj", "{12115887-AFBF-4EEF-953D-936B9D810E97}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "models", "models", "{1CC0C0DE-55D9-4B83-9070-1668A4472A27}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "examples\manage\models\Models.csproj", "{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -285,6 +289,10 @@ Global
 		{12115887-AFBF-4EEF-953D-936B9D810E97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12115887-AFBF-4EEF-953D-936B9D810E97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12115887-AFBF-4EEF-953D-936B9D810E97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -359,6 +367,8 @@ Global
 		{E1B8DE3D-2B86-4A60-BDC1-A7F425986DC1} = {F2DCE1E6-FC12-4CA5-A738-5A3F359B8A96}
 		{1850D8CC-ADFD-4187-80D4-C5DBDA55B6E3} = {F31817AD-AC9F-4021-A9E0-7C26C31D5744}
 		{12115887-AFBF-4EEF-953D-936B9D810E97} = {E1B8DE3D-2B86-4A60-BDC1-A7F425986DC1}
+		{1CC0C0DE-55D9-4B83-9070-1668A4472A27} = {FA5723B3-74E9-4221-80EF-4833C1C3DD9F}
+		{918E56D3-FABF-4F50-AC01-8DDFF58FB0CE} = {1CC0C0DE-55D9-4B83-9070-1668A4472A27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D4ABC6D-7126-4EE2-9303-43A954616B2A}
