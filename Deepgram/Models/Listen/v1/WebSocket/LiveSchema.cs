@@ -59,6 +59,15 @@ public class LiveSchema
     public string? DiarizeVersion { get; set; }
 
     /// <summary>
+    /// Dictation is a feature of Deepgram’s Speech-to-Text API that converts spoken dictation commands into their corresponding punctuation marks. 
+    /// <see href="https://developers.deepgram.com/docs/dictation">
+    /// default is false
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("dictation")]
+    public bool? Dictation { get; set; }
+
+    /// <summary>
     /// Encoding allows you to specify the expected encoding of your submitted audio.
     /// <see href="https://developers.deepgram.com/docs/encoding">
     /// supported encodings <see cref="AudioEncoding"/>
