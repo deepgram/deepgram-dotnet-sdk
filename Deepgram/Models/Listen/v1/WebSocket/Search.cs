@@ -4,21 +4,21 @@
 
 namespace Deepgram.Models.Listen.v1.WebSocket;
 
-public record Channel
+public record Search
 {
     /// <summary>
-    /// ReadOnlyList of <see cref="Alternative"/> objects.
+    /// Term for which Deepgram is searching.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("alternatives")]
-    public IReadOnlyList<Alternative>? Alternatives { get; set; }
+	[JsonPropertyName("query")]
+    public string? Query { get; set; }
 
     /// <summary>
-    /// ReadOnlyList of Search objects.
+    /// ReadonlyList of <see cref="Hit"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("search")]
-    public IReadOnlyList<Search>? Search { get; set; }
+	[JsonPropertyName("hits")]
+    public IReadOnlyList<Hit>? Hits { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
@@ -28,3 +28,4 @@ public record Channel
         return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
     }
 }
+
