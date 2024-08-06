@@ -187,6 +187,7 @@ These examples provide:
 
     - Balances - [examples/manage/balances](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/balances/Program.cs)
     - Invitations - [examples/manage/invitations](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/invitations/Program.cs)
+    - Models - [examples/manage/models](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/models/Program.cs)
     - Keys - [examples/manage/keys](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/keys/Program.cs)
     - Members - [examples/manage/members](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/members/Program.cs)
     - Projects - [examples/manage/projects](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/projects/Program.cs)
