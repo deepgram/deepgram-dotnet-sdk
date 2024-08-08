@@ -30,6 +30,11 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     /// </summary>
     public Dictionary<string, string> Headers { get; set; }
 
+    /// <summary>
+    /// Global addons to always be added to the request
+    /// </summary>
+    public Dictionary<string, string> Addons { get; set; }
+
     /*****************************/
     // Prerecorded
     /*****************************/
@@ -43,16 +48,24 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     public bool KeepAlive { get; set; } = false;
 
     /// <summary>
-    /// Enable sending KeepAlives for Streaming
+    /// Enable sending KeepAlives for Listen Streaming
     /// </summary>
     public decimal AutoFlushReplyDelta { get; set; } = 0;
 
     /// <summary>
-    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// Based on the options set, do we want to inspect the Listen Messages. If yes, then return true.
     /// </summary>
-    public bool InspectMessage()
+    public bool InspectListenMessage()
     {
         return AutoFlushReplyDelta > 0;
+    }
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Speak Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectSpeakMessage()
+    {
+        return AutoFlushSpeakDelta > 0;
     }
 
     /*****************************/
@@ -75,6 +88,11 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     // Speak
     /*****************************/
 
+    /// <summary>
+    /// Enable sending Flush for Speak Streaming
+    /// </summary>
+    public decimal AutoFlushSpeakDelta { get; set; } = 0;
+
     /*****************************/
     // Constructor
     /*****************************/
@@ -87,14 +105,30 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
         var onPrem = Environment.GetEnvironmentVariable("DEEPGRAM_ON_PREM") ?? "";
         var keepAlive = Environment.GetEnvironmentVariable("DEEPGRAM_KEEP_ALIVE") ?? "";
         var autoFlushReplyDelta = Environment.GetEnvironmentVariable("DEEPGRAM_WEBSOCKET_AUTO_FLUSH") ?? "";
+        var autoFlushSpeakDelta = Environment.GetEnvironmentVariable("DEEPGRAM_WEBSOCKET_AUTO_FLUSH") ?? "";
 
-        Headers = new Dictionary<string, string>();
+        Addons = new Dictionary<string, string>();
         for (int x = 0; x < 20; x++)
         {
             var param = Environment.GetEnvironmentVariable($"DEEPGRAM_PARAM_{x}");
             if (param != null)
             {
                 var value = Environment.GetEnvironmentVariable($"DEEPGRAM_PARAM_VALUE_{x}") ?? "";
+                Addons[param] = value;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        Headers = new Dictionary<string, string>();
+        for (int x = 0; x < 20; x++)
+        {
+            var param = Environment.GetEnvironmentVariable($"DEEPGRAM_HEADERS_{x}");
+            if (param != null)
+            {
+                var value = Environment.GetEnvironmentVariable($"DEEPGRAM_HEADERS_VALUE_{x}") ?? "";
                 Headers[param] = value;
             }
             else
@@ -106,6 +140,26 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
         OnPrem = onPrem.ToLower() == "true";
         KeepAlive = keepAlive.ToLower() == "true";
         AutoFlushReplyDelta = Convert.ToDecimal(autoFlushReplyDelta);
-    }
+        AutoFlushSpeakDelta = Convert.ToDecimal(autoFlushSpeakDelta);
 
+        // addons
+        if (Addons.ContainsKey(Constants.AutoFlushReplyDelta))
+        {
+            var addonValue = Addons[Constants.AutoFlushReplyDelta];
+            if (decimal.TryParse(addonValue, out var parsedValue))
+            {
+                Log.Verbose("DeepgramWsClientOptions", $"AutoFlushReplyDelta: {parsedValue}");
+                AutoFlushReplyDelta = parsedValue;
+            }
+        }
+        if (Addons.ContainsKey(Constants.AutoFlushSpeakDelta))
+        {
+            var addonValue = Addons[Constants.AutoFlushSpeakDelta];
+            if (decimal.TryParse(addonValue, out var parsedValue))
+            {
+                Log.Verbose("DeepgramWsClientOptions", $"AutoFlushSpeakDelta: {parsedValue}");
+                AutoFlushSpeakDelta = parsedValue;
+            }
+        }
+    }
 }
