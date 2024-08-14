@@ -54,6 +54,40 @@ public interface IManageClient
     /// <returns><see cref="MessageResponse"/></returns>
     public Task<MessageResponse> LeaveProject(string projectId, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+
+    /// <summary>
+    /// Get all models associated with the project Id
+    /// </summary>
+    /// <param name="projectId">Id of project</param>
+    /// <returns><see cref="ModelsResponse"/></returns>
+    public Task<ModelsResponse> GetProjectModels(string projectId, ModelSchema? modelSchema = null, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+
+    /// <summary>
+    /// Get a specific model associated with the project Id
+    /// </summary>
+    /// <param name="projectId">Id of project</param>
+    /// <param name="modelId">Id of model</param>
+    /// <returns><see cref="ModelResponse"/></returns>
+    public Task<ModelResponse> GetProjectModel(string projectId, string modelId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+    #endregion
+
+    #region Models
+    /// <summary>
+    /// Gets models available in Deepgram
+    /// </summary>
+    /// <returns><see cref="ModelsResponse"/></returns>
+    public Task<ModelsResponse> GetModels(ModelSchema? modelSchema = null, CancellationTokenSource? cancellationToken = default,
+    Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+
+    /// <summary>
+    /// Gets a specific model within Deepgram
+    /// </summary>
+    /// <param name="projectId">Id of Model</param>
+    /// <returns><see cref="ModelResponse"/></returns>
+    public Task<ModelResponse> GetModel(string modelId, CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
     #endregion
 
     #region ProjectKeys

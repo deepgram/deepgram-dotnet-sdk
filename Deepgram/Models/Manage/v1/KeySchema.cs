@@ -6,7 +6,6 @@ namespace Deepgram.Models.Manage.v1;
 
 public class KeySchema
 {
-
     /// <summary>
     /// Comment to describe key
     /// </summary>
