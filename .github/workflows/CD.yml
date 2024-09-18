@@ -33,7 +33,7 @@ jobs:
         run: |
           dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist
