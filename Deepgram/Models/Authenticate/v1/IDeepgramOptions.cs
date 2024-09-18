@@ -30,6 +30,11 @@ public interface IDeepgramClientOptions
     /// </summary>
     public Dictionary<string, string> Headers { get; }
 
+    /// <summary>
+    /// Global addons to always be added to the request
+    /// </summary>
+    public Dictionary<string, string> Addons { get; }
+
     /*****************************/
     // Prerecorded
     /*****************************/
@@ -43,14 +48,19 @@ public interface IDeepgramClientOptions
     public bool KeepAlive { get; }
 
     /// <summary>
-    /// Enable sending KeepAlives for Streaming
+    /// <summary>
+    /// Sets the interval for automatic flushing of replies in Listen Streaming
     /// </summary>
     public decimal AutoFlushReplyDelta { get; }
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Listen Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectListenMessage();
 
     /// <summary>
-    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// Based on the options set, do we want to inspect the Speak Messages. If yes, then return true.
     /// </summary>
-    public bool InspectMessage();
+    public bool InspectSpeakMessage();
 
     /*****************************/
     // OnPrem
@@ -71,4 +81,9 @@ public interface IDeepgramClientOptions
     /*****************************/
     // Speak
     /*****************************/
+
+    /// <summary>
+    /// Sets the interval for automatic flushing in Speak Streaming
+    /// </summary>
+    public decimal AutoFlushSpeakDelta { get; }
 }

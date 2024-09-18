@@ -161,6 +161,10 @@ These examples provide:
 
     - Hello World - [examples/text-to-speech/rest/file](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/text-to-speech/rest/file/hello-world/Program.cs)
 
+- Text to Speech - WebSocket:
+
+    - Simple - [example/speak/websocket/simple](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/text-to-speech/websocket/simple/Program.cs)
+
 - Analyze Text:
 
     - Intent Recognition - [examples/analyze/intent](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/analyze/intent/Program.cs)

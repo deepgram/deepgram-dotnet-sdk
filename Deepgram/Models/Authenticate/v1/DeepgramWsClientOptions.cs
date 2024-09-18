@@ -33,6 +33,11 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     /// </summary>
     public Dictionary<string, string> Headers { get; set; }
 
+    /// <summary>
+    /// Global addons to always be added to the request
+    /// </summary>
+    public Dictionary<string, string> Addons { get; set; }
+
     /*****************************/
     // Live
     /*****************************/
@@ -42,16 +47,24 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     public bool KeepAlive { get; set; } = false;
 
     /// <summary>
-    /// Enable sending KeepAlives for Streaming
+    /// Enable sending KeepAlives for Listen Streaming
     /// </summary>
     public decimal AutoFlushReplyDelta { get; set; } = 0;
 
     /// <summary>
-    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// Based on the options set, do we want to inspect the Listen Messages. If yes, then return true.
     /// </summary>
-    public bool InspectMessage()
+    public bool InspectListenMessage()
     {
         return AutoFlushReplyDelta > 0;
+    }
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Speak Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectSpeakMessage()
+    {
+        return AutoFlushSpeakDelta > 0;
     }
 
     /*****************************/
@@ -66,10 +79,15 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     // Speak
     /*****************************/
 
+    /// <summary>
+    /// Enable sending Flush for Speak Streaming
+    /// </summary>
+    public decimal AutoFlushSpeakDelta { get; set; } = 0;
+
     /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? headers = null)
+    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("DeepgramWsClientOptions", "ENTER");
         Log.Debug("DeepgramWsClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
@@ -77,11 +95,13 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
         Log.Debug("DeepgramWsClientOptions", keepAlive == null ? "KeepAlive is null" : "KeepAlive provided");
         Log.Debug("DeepgramWsClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramWsClientOptions", headers == null ? "Headers is null" : "Headers provided");
+        Log.Debug("DeepgramWsClientOptions", addons == null ? "Addons is null" : "Addons provided");
 
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         KeepAlive = keepAlive ?? false;
         OnPrem = onPrem ?? false;
+        Addons = addons ?? new Dictionary<string, string>();
         Headers = headers ?? new Dictionary<string, string>();
 
         Log.Information("DeepgramWsClientOptions", $"KeepAlive: {KeepAlive}");
@@ -137,6 +157,26 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
             Log.Debug("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         }
         BaseAddress = BaseAddress.TrimEnd('/');
+
+        // addons
+        if (Addons.ContainsKey(Constants.AutoFlushReplyDelta))
+        {
+            var addonValue = Addons[Constants.AutoFlushReplyDelta];
+            if (decimal.TryParse(addonValue, out var parsedValue))
+            {
+                Log.Verbose("DeepgramWsClientOptions", $"AutoFlushReplyDelta: {parsedValue}");
+                AutoFlushReplyDelta = parsedValue;
+            }
+        }
+        if (Addons.ContainsKey(Constants.AutoFlushSpeakDelta))
+        {
+            var addonValue = Addons[Constants.AutoFlushSpeakDelta];
+            if (decimal.TryParse(addonValue, out var parsedValue))
+            {
+                Log.Verbose("DeepgramWsClientOptions", $"AutoFlushSpeakDelta: {parsedValue}");
+                AutoFlushSpeakDelta = parsedValue;
+            }
+        }
 
         Log.Information("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         Log.Verbose("DeepgramWsClientOptions", "LEAVE");

@@ -33,6 +33,11 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     /// </summary>
     public Dictionary<string, string> Headers { get; set; }
 
+    /// <summary>
+    /// Global addons to always be added to the request
+    /// </summary>
+    public Dictionary<string, string> Addons { get; set; }
+
     /*****************************/
     // Prerecorded
     /*****************************/
@@ -44,9 +49,18 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     public decimal AutoFlushReplyDelta { get; }
 
     /// <summary>
-    /// Based on the options set, do we want to inspect the Messages. If yes, then return true.
+    /// Based on the options set, do we want to inspect the Listen Messages. If yes, then return true.
     /// </summary>
-    public bool InspectMessage()
+    public bool InspectListenMessage()
+    {
+        // This is only a WebSocket capability
+        return false;
+    }
+
+    /// <summary>
+    /// Based on the options set, do we want to inspect the Speak Messages. If yes, then return true.
+    /// </summary>
+    public bool InspectSpeakMessage()
     {
         // This is only a WebSocket capability
         return false;
@@ -72,10 +86,12 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     // Speak
     /*****************************/
 
+    public decimal AutoFlushSpeakDelta { get; }
+
     /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? headers = null)
+    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? options = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("DeepgramHttpClientOptions", "ENTER");
         Log.Debug("DeepgramHttpClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
@@ -87,6 +103,7 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
         ApiKey = apiKey ?? "";
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         OnPrem = onPrem ?? false;
+        Addons = headers ?? new Dictionary<string, string>();
         Headers = headers ?? new Dictionary<string, string>();
 
         Log.Information("DeepgramHttpClientOptions", $"OnPrem: {OnPrem}");
