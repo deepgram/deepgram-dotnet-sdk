@@ -181,6 +181,14 @@ public class PreRecordedSchema
     public bool? MultiChannel { get; set; }
 
     /// <summary>
+    /// Numerals converts numbers from written format to numerical format.
+    /// <see href="https://developers.deepgram.com/docs/numerals">
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("numerals")]
+    public bool? Numerals { get; set; }
+
+    /// <summary>
     /// Enable paragraph detection
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -246,14 +254,6 @@ public class PreRecordedSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("sentiment")]
     public bool? Sentiment { get; set; }
-
-    /// <summary>
-    /// Numerals converts numbers from written format to numerical format.
-    /// <see href="https://developers.deepgram.com/docs/numerals">
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("numerals")]
-    public bool? numerals { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 

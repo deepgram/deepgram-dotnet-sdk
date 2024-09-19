@@ -150,6 +150,14 @@ public class LiveSchema
     public bool? NoDelay { get; set; }
 
     /// <summary>
+    /// Numerals converts numbers from written format to numerical format.
+    /// <see href="https://developers.deepgram.com/docs/numerals">
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("numerals")]
+    public bool? Numerals { get; set; }
+
+    /// <summary>
     /// Profanity Filter looks for recognized profanity and converts it to the nearest recognized 
     /// non-profane word or removes it from the transcript completely.
     /// <see href="https://developers.deepgram.com/docs/profanity-filter">
@@ -202,14 +210,6 @@ public class LiveSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("search")]
     public List<string>? Search { get; set; }
-
-    /// <summary>
-    /// Numerals converts numbers from written format to numerical format.
-    /// <see href="https://developers.deepgram.com/docs/numerals">
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("numerals")]
-    public bool? numerals { get; set; }
 
     /// <summary>
     /// Smart Format formats transcripts to improve readability. 
