@@ -204,6 +204,14 @@ public class LiveSchema
     public List<string>? Search { get; set; }
 
     /// <summary>
+    /// Numerals converts numbers from written format to numerical format.
+    /// <see href="https://developers.deepgram.com/docs/numerals">
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("numerals")]
+    public bool? numerals { get; set; }
+
+    /// <summary>
     /// Smart Format formats transcripts to improve readability. 
     /// <see href="https://developers.deepgram.com/docs/smart-format">
     /// </summary>
