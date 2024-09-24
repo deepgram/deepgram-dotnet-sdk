@@ -17,9 +17,26 @@ public record Warning
     /// The type of warning
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public WarningType? Type { get; set; }
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
+    /// <summary>
+    /// Returns the WarningType enum value based on the Type string
+    /// </summary>
+    public WarningType WarningType
+    {
+        get
+        {
+            return Type switch
+            {
+                "unsupported_language" => WarningType.UnsupportedLanguage,
+                "unsupported_model" => WarningType.UnsupportedModel,
+                "unsupported_encoding" => WarningType.UnsupportedEncoding,
+                "deprecated" => WarningType.Deprecated,
+                _ => WarningType.UnsupportedLanguage
+            };
+        }
+    }
 
     /// <summary>
     /// The warning message
