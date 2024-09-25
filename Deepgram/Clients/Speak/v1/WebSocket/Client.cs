@@ -348,7 +348,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
-    public void Send(byte[] data) => SendMessage(data);
+    public void Send(byte[] data, int length = Constants.UseArrayLengthForSend) => SendMessage(data, length);
 
     ///// <summary>
     ///// This method sends a binary message over the WebSocket connection.
@@ -361,7 +361,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection.
     /// </summary>
-    public void SendMessage(byte[] data)
+    public void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
         // auto flush
         if (_deepgramClientOptions.InspectSpeakMessage())
@@ -384,7 +384,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
         }
 
         // send message
-        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text));
+        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length));
     }
     ///// <summary>
     ///// This method sends a binary message over the WebSocket connection immediately without queueing.
@@ -403,7 +403,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendMessageImmediately(byte[] data)
+    public void SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
         // auto flush
         if (_deepgramClientOptions.InspectSpeakMessage())
@@ -428,7 +428,11 @@ public class Client : IDisposable, ISpeakWebSocketClient
         lock (_mutexSend)
         {
             Log.Verbose("SendBinaryImmediately", "Sending text message immediately..");  // TODO: dump this message
-            _clientWebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
+            if (length == Constants.UseArrayLengthForSend)
+            {
+                length = data.Length;
+            }
+            _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
                 .ConfigureAwait(false);
         }
     }

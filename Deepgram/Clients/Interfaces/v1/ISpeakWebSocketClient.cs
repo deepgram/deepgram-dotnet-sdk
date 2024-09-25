@@ -109,7 +109,7 @@ public interface ISpeakWebSocketClient
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
-    public void Send(byte[] data);
+    public void Send(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     ///// <summary>
     ///// This method sends a binary message over the WebSocket connection.
@@ -120,7 +120,7 @@ public interface ISpeakWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection.
     /// </summary>
-    public void SendMessage(byte[] data);
+    public void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     ///// <summary>
     ///// This method sends a binary message over the WebSocket connection immediately without queueing.
@@ -130,7 +130,7 @@ public interface ISpeakWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendMessageImmediately(byte[] data);
+    public void SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend);
     #endregion
 
     #region Helpers

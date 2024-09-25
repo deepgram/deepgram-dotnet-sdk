@@ -11,7 +11,7 @@ namespace Deepgram.Microphone;
 /// </summary>
 public class Microphone
 {
-    private Action<byte[]> _push_callback;
+    private Action<byte[], int> _push_callback;
 
     private int _rate;
     private uint _chunk;
@@ -27,7 +27,7 @@ public class Microphone
     /// Constructor for Microphone
     /// </summary>
     public Microphone(
-        Action<byte[]> push_callback,
+        Action<byte[], int> push_callback,
         int rate = Defaults.RATE,
         uint chunkSize = Defaults.CHUNK_SIZE,
         int channels = Defaults.CHANNELS,
@@ -120,7 +120,7 @@ public class Microphone
         }
 
         // Push the data to the callback
-        _push_callback(buf);
+        _push_callback(buf, buf.Length);
 
         return StreamCallbackResult.Continue;
     }

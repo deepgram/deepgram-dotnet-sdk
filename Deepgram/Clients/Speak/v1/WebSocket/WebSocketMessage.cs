@@ -4,9 +4,30 @@
 
 namespace Deepgram.Clients.Speak.v1.WebSocket;
 
-internal readonly struct WebSocketMessage(byte[] message, WebSocketMessageType type)
+internal readonly struct WebSocketMessage
 {
-    public ArraySegment<byte> Message { get; } = new ArraySegment<byte>(message);
+    public WebSocketMessage(byte[] message, WebSocketMessageType type)
+        : this(message, type, Constants.UseArrayLengthForSend)
+    {
+    }
 
-    public WebSocketMessageType MessageType { get; } = type;
+    public WebSocketMessage(byte[] message, WebSocketMessageType type, int length)
+    {
+        if (length != Constants.UseArrayLengthForSend || length < Constants.UseArrayLengthForSend)
+        {
+            Message = new ArraySegment<byte>(message, 0, length);
+        }
+        else
+        {
+            Message = new ArraySegment<byte>(message, 0, message.Length);
+        }
+        MessageType = type;
+        Length = length;
+    }
+
+    public int Length { get; }
+
+    public ArraySegment<byte> Message { get; }
+
+    public WebSocketMessageType MessageType { get; }
 }

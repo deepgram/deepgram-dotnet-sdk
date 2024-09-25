@@ -72,31 +72,46 @@ public interface IListenWebSocketClient
 
     #region Send Functions
     /// <summary>
+    /// Sends a KeepAlive message to Deepgram
+    /// </summary>
+    public void SendKeepAlive();
+
+    /// <summary>
+    /// Sends a Finalize message to Deepgram
+    /// </summary>
+    public void SendFinalize();
+
+    /// <summary>
+    /// Sends a Close message to Deepgram
+    /// </summary>
+    public void SendClose(bool nullByte = false);
+
+    /// <summary>
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
-    public void Send(byte[] data);
+    public void Send(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data"></param>
-    public void SendBinary(byte[] data);
+    public void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     /// <summary>
     /// This method sends a text message over the WebSocket connection.
     /// </summary>
-    public void SendMessage(byte[] data);
+    public void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendBinaryImmediately(byte[] data);
+    public void SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend);
 
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendMessageImmediately(byte[] data);
+    public void SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend);
     #endregion
 
     #region Helpers
