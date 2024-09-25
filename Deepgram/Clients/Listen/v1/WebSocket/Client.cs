@@ -315,33 +315,58 @@ public class Client : IDisposable, IListenWebSocketClient
     }
 
     /// <summary>
+    /// Sends a Close message to Deepgram
+    /// </summary>
+    public void SendClose(bool nullByte = false)
+    {
+        Log.Debug("SendFinalize", "Sending Close Message Immediately...");
+        if (nullByte && _clientWebSocket != null)
+        {
+            // send a close to Deepgram
+            lock (_mutexSend)
+            {
+                _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                    .ConfigureAwait(false);
+            }
+            return;
+        }
+
+        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"CloseStream\"}");
+        SendMessageImmediately(data);
+    }
+
+    /// <summary>
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
-    public void Send(byte[] data) => SendBinary(data);
+    public void Send(byte[] data, int length = Constants.UseArrayLengthForSend) => SendBinary(data, length);
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data"></param>
-    public void SendBinary(byte[] data) =>
-        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Binary));
+    public void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend) =>
+        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Binary, length));
 
     /// <summary>
     /// This method sends a text message over the WebSocket connection.
     /// </summary>
-    public void SendMessage(byte[] data) =>
-        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text));
+    public void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend) =>
+        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length));
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendBinaryImmediately(byte[] data)
+    public void SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
         lock (_mutexSend)
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately..");  // TODO: dump this message
-            _clientWebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+            if (length == Constants.UseArrayLengthForSend)
+            {
+                length = data.Length;
+            }
+            _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
                 .ConfigureAwait(false);
         }
     }
@@ -349,12 +374,16 @@ public class Client : IDisposable, IListenWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public void SendMessageImmediately(byte[] data)
+    public void SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
         lock (_mutexSend)
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately..");  // TODO: dump this message
-            _clientWebSocket.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
+            if (length == Constants.UseArrayLengthForSend)
+            {
+                length = data.Length;
+            }
+            _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
                 .ConfigureAwait(false);
         }
     }
