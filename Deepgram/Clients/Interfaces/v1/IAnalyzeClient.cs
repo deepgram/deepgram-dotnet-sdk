@@ -19,6 +19,14 @@ public interface IAnalyzeClient
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
 
     /// <summary>
+    ///  Analyze by providing text 
+    /// </summary>
+    /// <param name="source">Text that is to be analyzed <see cref="TextSource"></param>
+    /// <param name="analyzeSchema">Options for the transcription <see cref="AnalyzeSchema"/></param>
+    /// <returns><see cref="SyncResponse"/></returns>
+    public Task<SyncResponse> AnalyzeText(TextSource source, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+
+    /// <summary>
     /// Analyzes a file using the provided byte array
     /// </summary>
     /// <param name="source">file is the form of a byte[]</param>
@@ -70,5 +78,14 @@ public interface IAnalyzeClient
     public Task<AsyncResponse> AnalyzeUrlCallBack(UrlSource source, string? callBack, AnalyzeSchema? analyzeSchema,
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
+
+    // <summary>
+    /// Analyze by providing text and a CallBack
+    /// </summary>
+    /// <param name="source">Text that is to be analyzed <see cref="UrlSource"/></param>
+    /// <param name="callBack">CallBack url</param>    
+    /// <param name="analyzeSchema">Options for the transcription<see cref="AnalyzeSchema"></param>
+    /// <returns><see cref="AsyncResponse"/></returns>
+    public Task<AsyncResponse> AnalyzeTextCallBack(TextSource source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
     #endregion
 }

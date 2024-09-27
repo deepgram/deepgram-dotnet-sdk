@@ -195,6 +195,177 @@ public class AnalyzeClientTests
     }
 
     [Test]
+    public async Task AnalyzeText_Should_Call_PostAsync_Returning_SyncResponse()
+    {
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<SyncResponse>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+        analyzeSchema.CallBack = null;
+        var source = new AutoFaker<TextSource>().Generate();
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+        
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<TextSource, AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
+        analyzeClient.PostAsync<TextSource, AnalyzeSchema, SyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>()).Returns(expectedResponse);
+
+        // Act
+        var result = await analyzeClient.AnalyzeText(source, analyzeSchema);
+
+        // Assert
+        await analyzeClient.Received().PostAsync<TextSource, AnalyzeSchema, SyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>());
+
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<SyncResponse>();
+            result.Should().BeEquivalentTo(expectedResponse);
+        }
+    }
+
+    [Test]
+    public async Task AnalyzeText_Should_Throw_ArgumentException_If_CallBack_Not_Null()
+    {
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+        var source = new AutoFaker<TextSource>().Generate();
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
+        analyzeClient.PostAsync<AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>()).Returns(expectedResponse);
+        
+        // Act and Assert
+        await analyzeClient.Invoking(y => y.AnalyzeText(source, analyzeSchema))
+            .Should().ThrowAsync<ArgumentException>();
+
+        await analyzeClient.DidNotReceive().PostAsync<AnalyzeSchema, SyncResponse>(url, Arg.Any<AnalyzeSchema>());
+    }
+
+    [Test]
+    public async Task AnalyzeTextCallBack_Should_Call_PostAsync_Returning_SyncResponse_With_CallBack_Parameter()
+    {
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
+        var source = new AutoFaker<TextSource>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+        // analyzeSchema is not null here as we first need to get the querystring with the callBack included
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
+        analyzeClient.PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>()).Returns(expectedResponse);
+
+        //before we act to test this call with the callBack parameter and not the callBack property we need to null the callBack property
+        var callBackParameter = analyzeSchema.CallBack;
+        analyzeSchema.CallBack = null;
+
+        // Act
+        var result = await analyzeClient.AnalyzeTextCallBack(source, callBackParameter, analyzeSchema);
+
+        // Assert
+        await analyzeClient.Received().PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>());
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<AsyncResponse>();
+            result.Should().BeEquivalentTo(expectedResponse);
+        }
+    }
+
+    [Test]
+    public async Task AnalyzeTextCallBack_Should_Call_PostAsync_Returning_SyncResponse_With_CallBack_Property()
+    {
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
+        var source = new AutoFaker<TextSource>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
+        analyzeClient.PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>()).Returns(expectedResponse);
+
+        // Act
+        var result = await analyzeClient.AnalyzeTextCallBack(source, null, analyzeSchema);
+        
+        // Assert
+        await analyzeClient.Received().PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>(), Arg.Any<TextSource>());
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<AsyncResponse>();
+            result.Should().BeEquivalentTo(expectedResponse);
+        }
+    }
+
+    [Test]
+    public async Task AnalyzeTextCallBack_Should_Throw_ArgumentException_With_CallBack_Property_And_CallBack_Parameter_Set()
+    {
+        // Input and Output
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
+        var source = new AutoFaker<TextSource>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<AnalyzeSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
+        analyzeClient.PostAsync<AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>()).Returns(expectedResponse);
+        var callBackParameter = analyzeSchema.CallBack;
+
+        // Act and Assert
+        await analyzeClient.Invoking(y => y.AnalyzeTextCallBack(source, callBackParameter, analyzeSchema))
+            .Should().ThrowAsync<ArgumentException>();
+
+        await analyzeClient.DidNotReceive().PostAsync<AnalyzeSchema, AsyncResponse>(url, Arg.Any<AnalyzeSchema>());
+    }
+
+    [Test]
+    public async Task AnalyzeTextCallBack_Should_Throw_ArgumentException_With_No_CallBack_Set()
+    {
+        // Input and Output 
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.READ}");
+        var expectedResponse = new AutoFaker<SyncResponse>().Generate();
+        var source = new AutoFaker<TextSource>().Generate();
+        var analyzeSchema = new AutoFaker<AnalyzeSchema>().Generate();
+        analyzeSchema.CallBack = null;
+
+        // Fake Clients
+        var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
+        var analyzeClient = Substitute.For<AnalyzeClient>(_apiKey, _options, null);
+
+        // Mock methods
+        analyzeClient.When(x => x.PostAsync<AnalyzeSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<AnalyzeSchema>())).DoNotCallBase();
+        analyzeClient.PostAsync<AnalyzeSchema, SyncResponse>(url, Arg.Any<AnalyzeSchema>()).Returns(expectedResponse);
+
+        // Act and Assert
+        await analyzeClient.Invoking(y => y.AnalyzeTextCallBack(source, null, analyzeSchema))
+            .Should().ThrowAsync<ArgumentException>();
+        
+        await analyzeClient.DidNotReceive().PostAsync<AnalyzeSchema, SyncResponse>(url, Arg.Any<AnalyzeSchema>());
+    }
+
+    [Test]
     public async Task AnalyzeFile_With_Stream_Should_Call_PostAsync_Returning_SyncResponse()
     {
         // Input and Output
