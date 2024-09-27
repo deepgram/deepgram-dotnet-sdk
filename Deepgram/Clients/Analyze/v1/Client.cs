@@ -43,6 +43,32 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         return result;
     }
 
+    /// <summary>
+    ///  Analyze by providing text 
+    /// </summary>
+    /// <param name="source">Text that is to be analyzed <see cref="TextSource"></param>
+    /// <param name="analyzeSchema">Options for the transcription <see cref="AnalyzeSchema"/></param>
+    /// <returns><see cref="SyncResponse"/></returns>
+    public async Task<SyncResponse> AnalyzeText(TextSource source, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("AnalyzeClient.AnalyzeText", "ENTER");
+        Log.Information("AnalyzeText", $"source: {source}");
+        Log.Information("AnalyzeText", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
+
+        VerifyNoCallBack(nameof(AnalyzeText), analyzeSchema);
+
+        var uri = GetUri(_options, UriSegments.READ);
+        var result = await PostAsync<TextSource, AnalyzeSchema, SyncResponse>(
+            uri, analyzeSchema, source, cancellationToken, addons, headers
+            );
+
+        Log.Information("AnalyzeText", $"{uri} Succeeded");
+        Log.Debug("AnalyzeText", $"result: {result}");
+        Log.Verbose("AnalyzeClient.AnalyzeText", "LEAVE");
+
+        return result;
+    }
+
 
     /// <summary>
     /// Analyzes a file using the provided byte array
@@ -156,6 +182,36 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         return result;
     }
+
+    /// <summary>
+    /// Analyze by providing text and a CallBack
+    /// </summary>
+    /// <param name="source">Text that is to be analyzed <see cref="UrlSource"/></param>
+    /// <param name="callBack">CallBack url</param>    
+    /// <param name="analyzeSchema">Options for the transcription<see cref="AnalyzeSchema"></param>
+    /// <returns><see cref="AsyncResponse"/></returns>
+    public async Task<AsyncResponse> AnalyzeTextCallBack(TextSource source, string? callBack, AnalyzeSchema? analyzeSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("AnalyzeClient.AnalyzeTextCallBack", "ENTER");
+        Log.Information("AnalyzeTextCallBack", $"source: {source}");
+        Log.Information("AnalyzeTextCallBack", $"callBack: {callBack}");
+        Log.Information("AnalyzeTextCallBack", $"analyzeSchema:\n{JsonSerializer.Serialize(analyzeSchema, JsonSerializeOptions.DefaultOptions)}");
+
+        VerifyOneCallBackSet(nameof(AnalyzeTextCallBack), callBack, analyzeSchema);
+        if (callBack != null)
+            analyzeSchema.CallBack = callBack;
+
+        var uri = GetUri(_options, UriSegments.READ);
+        var result = await PostAsync<TextSource, AnalyzeSchema, AsyncResponse>(
+            uri, analyzeSchema, source, cancellationToken, addons, headers
+            );
+
+        Log.Information("AnalyzeTextCallBack", $"{uri} Succeeded");
+        Log.Debug("AnalyzeTextCallBack", $"result: {result}");
+        Log.Verbose("AnalyzeClient.AnalyzeTextCallBack", "LEAVE");
+
+        return result;
+    }
     #endregion
 
     #region CallbackChecks
@@ -168,7 +224,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
             var exStr = $"CallBack cannot be provided as schema option to a synchronous transcription when calling {method}. Use {nameof(AnalyzeFileCallBack)} or {nameof(AnalyzeUrlCallBack)}";
             Log.Error("VerifyNoCallBack", $"Exception: {exStr}");
             throw new ArgumentException(exStr);
-        }        
+        }
     }
 
     private void VerifyOneCallBackSet(string method, string? callBack, AnalyzeSchema? analyzeSchema)
