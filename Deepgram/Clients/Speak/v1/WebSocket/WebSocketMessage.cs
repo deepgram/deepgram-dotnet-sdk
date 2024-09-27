@@ -13,7 +13,7 @@ internal readonly struct WebSocketMessage
 
     public WebSocketMessage(byte[] message, WebSocketMessageType type, int length)
     {
-        if (length != Constants.UseArrayLengthForSend || length < Constants.UseArrayLengthForSend)
+        if (length != Constants.UseArrayLengthForSend && length <= message.Length && length > 0)
         {
             Message = new ArraySegment<byte>(message, 0, length);
         }
@@ -22,10 +22,9 @@ internal readonly struct WebSocketMessage
             Message = new ArraySegment<byte>(message, 0, message.Length);
         }
         MessageType = type;
-        Length = length;
     }
 
-    public int Length { get; }
+    public int Length => Message.Count;
 
     public ArraySegment<byte> Message { get; }
 
