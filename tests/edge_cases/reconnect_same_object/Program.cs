@@ -2,13 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using System.Text.Json;
-
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Live.v1;
 using Deepgram.Logger;
 using Deepgram.Microphone;
-using System.Threading;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Listen.v1.WebSocket;
 
 namespace SampleApp
 {
@@ -23,53 +20,54 @@ namespace SampleApp
             Deepgram.Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
             Deepgram.Microphone.Library.Initialize();
 
-            Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
-
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
-            var liveClient = new LiveClient("", options);
+            var liveClient = ClientFactory.CreateListenWebSocketClient(apiKey: "", options: options);
+
+
             // OR
             //var liveClient = new LiveClienkt("set your DEEPGRAM_API_KEY here");
 
             // Subscribe to the EventResponseReceived event
-            liveClient._openReceived += (sender, e) =>
+            liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._metadataReceived += (sender, e) =>
+                Console.WriteLine($"\n\n----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<MetadataResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received: {JsonSerializer.Serialize(e)}");
-            };
-            liveClient._resultsReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
-                if (e.Channel.Alternatives[0].Transcript == "")
+                Console.WriteLine($"----> {e.Type} received");
+                if (e.Channel.Alternatives[0].Transcript.Trim() == "")
                 {
                     return;
                 }
 
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
-                Console.WriteLine($"\n\n\nSpeaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
-            };
-            liveClient._speechStartedReceived += (sender, e) =>
+                Console.WriteLine($"----> Speaker: {e.Channel.Alternatives[0].Transcript}");
+            }));
+            liveClient.Subscribe(new EventHandler<SpeechStartedResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._utteranceEndReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<UtteranceEndResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._closeReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received");
-            };
-            liveClient._unhandledReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<UnhandledResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received. Raw: {e.Raw}");
-            };
-            liveClient._errorReceived += (sender, e) =>
+                Console.WriteLine($"----> {e.Type} received");
+            }));
+            liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
             {
-                Console.WriteLine($"{e.Type} received. Error: {e.Message}");
-            };
+                Console.WriteLine($"----> {e.Type} received. Error: {e.Message}");
+            }));
 
             // my own cancellation token
             //var cancellationToken = new CancellationTokenSource();
@@ -86,29 +84,35 @@ namespace SampleApp
                 UtteranceEnd = "1000",
                 VadEvents = true,
             };
-            //await liveClient.Connect(liveSchema, cancellationToken);
-            await liveClient.Connect(liveSchema);
 
-            // Microphone streaming
-            var microphone = new Microphone(liveClient.Send);
-            microphone.Start();
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"Client iteration: #{i}\n");
 
-            // Wait for the user to press a key
-            Console.ReadKey();
+                // connect
+                //await liveClient.Connect(liveSchema, cancellationToken);
+                await liveClient.Connect(liveSchema);
 
-            Console.WriteLine("Stopping the microphone streaming...");
-            microphone.Stop();
+                // Microphone streaming
+                var microphone = new Microphone(liveClient.Send);
+                microphone.Start();
 
-            //// START: test an external cancellation
-            //cancellationToken.Cancel();
-            //Thread.Sleep(10000);    // wait 10 seconds to cancel externally
-            //// END: test an external cancellation
+                //// START: test an external cancellation
+                //cancellationToken.Cancel();
+                await Task.Delay(10000);
 
-            // Stop the connection
-            await liveClient.Stop();
+                //// Wait for the user to press a key
+                //Console.ReadKey();
 
-            // Dispose the client
-            liveClient.Dispose();
+                Console.WriteLine("Stopping the microphone streaming...");
+                microphone.Stop();
+
+                // Stop the connection
+                await liveClient.Stop();
+
+                // small delay before reconnecting
+                await Task.Delay(2000);
+            }
 
             // Terminate Libraries
             Deepgram.Microphone.Library.Terminate();

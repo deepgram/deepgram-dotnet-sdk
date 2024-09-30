@@ -27,7 +27,7 @@ namespace SampleApp
             // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
             DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
             //options.AutoFlushReplyDelta = 2000; // if your live stream application is like "push to talk".
-            var liveClient = new ListenWebSocketClient("", options);
+            var liveClient = ClientFactory.CreateListenWebSocketClient(apiKey: "", options: options);
 
             // Subscribe to the EventResponseReceived event
             liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
