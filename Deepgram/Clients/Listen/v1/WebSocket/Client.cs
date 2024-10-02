@@ -4,6 +4,7 @@
 
 
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
 using Deepgram.Models.Listen.v1.WebSocket;
 using Deepgram.Clients.Interfaces.v1;
 
@@ -66,7 +67,7 @@ public class Client : IDisposable, IListenWebSocketClient
     public async Task Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("LiveClient.Connect", "ENTER");
+        Log.Verbose("ListenWSClient.Connect", "ENTER");
         Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
         Log.Debug("Connect", $"addons: {addons}");
 
@@ -76,7 +77,7 @@ public class Client : IDisposable, IListenWebSocketClient
             // client has already connected
             var exStr = "Client has already been initialized";
             Log.Error("Connect", exStr);
-            Log.Verbose("LiveClient.Connect", "LEAVE");
+            Log.Verbose("ListenWSClient.Connect", "LEAVE");
             throw new InvalidOperationException(exStr);
         }
 
@@ -126,6 +127,13 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Debug("Connect", "Connecting to Deepgram API...");
             await _clientWebSocket.ConnectAsync(_uri, cancelToken.Token).ConfigureAwait(false);
 
+            if (!IsConnected())
+            {
+                Log.Error("Connect", "Failed to connect to Deepgram API");
+                Log.Verbose("ListenWSClient.Connect", "LEAVE");
+                throw new DeepgramWebSocketException("Failed to connect to Deepgram API");
+            }
+
             Log.Debug("Connect", "Starting Sender Thread...");
             StartSenderBackgroundThread();
 
@@ -154,19 +162,19 @@ public class Client : IDisposable, IListenWebSocketClient
             }
 
             Log.Debug("Connect", "Connect Succeeded");
-            Log.Verbose("LiveClient.Connect", "LEAVE");
+            Log.Verbose("ListenWSClient.Connect", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("Connect", "Connect cancelled.");
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
-            Log.Verbose("LiveClient.Connect", "LEAVE");
+            Log.Verbose("ListenWSClient.Connect", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.Connect", "LEAVE");
+            Log.Verbose("ListenWSClient.Connect", "LEAVE");
             throw;
         }
 
@@ -404,7 +412,7 @@ public class Client : IDisposable, IListenWebSocketClient
 
     internal async Task ProcessSendQueue()
     {
-        Log.Verbose("LiveClient.ProcessSendQueue", "ENTER");
+        Log.Verbose("ListenWSClient.ProcessSendQueue", "ENTER");
 
         if (_clientWebSocket == null)
         {
@@ -439,25 +447,25 @@ public class Client : IDisposable, IListenWebSocketClient
             }
 
             Log.Verbose("ProcessSendQueue", "Exit");
-            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessSendQueue", "LEAVE");
         }
         catch (OperationCanceledException ex)
         {
             Log.Debug("ProcessSendQueue", "SendThread cancelled.");
             Log.Verbose("ProcessSendQueue", $"SendThread cancelled. Info: {ex}");
-            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessSendQueue", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessSendQueue", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessSendQueue", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessSendQueue", "LEAVE");
         }
     }
 
     internal async void ProcessKeepAlive()
     {
-        Log.Verbose("LiveClient.ProcessKeepAlive", "ENTER");
+        Log.Verbose("ListenWSClient.ProcessKeepAlive", "ENTER");
 
         try
         {
@@ -476,26 +484,26 @@ public class Client : IDisposable, IListenWebSocketClient
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
-            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessKeepAlive", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("ProcessKeepAlive", "KeepAliveThread cancelled.");
             Log.Verbose("ProcessKeepAlive", $"KeepAliveThread cancelled. Info: {ex}");
-            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessKeepAlive", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessKeepAlive", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessKeepAlive", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.ProcessKeepAlive", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessKeepAlive", "LEAVE");
         }
     }
 
 
     internal async void ProcessAutoFlush()
     {
-        Log.Verbose("LiveClient.ProcessAutoFlush", "ENTER");
+        Log.Verbose("ListenWSClient.ProcessAutoFlush", "ENTER");
 
         var diffTicks = TimeSpan.FromMilliseconds((double)_deepgramClientOptions.AutoFlushReplyDelta);
 
@@ -533,25 +541,25 @@ public class Client : IDisposable, IListenWebSocketClient
             }
 
             Log.Verbose("ProcessAutoFlush", "Exit");
-            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessAutoFlush", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("ProcessAutoFlush", "KeepAliveThread cancelled.");
             Log.Verbose("ProcessAutoFlush", $"KeepAliveThread cancelled. Info: {ex}");
-            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessAutoFlush", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessAutoFlush", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessAutoFlush", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.ProcessAutoFlush", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessAutoFlush", "LEAVE");
         }
     }
 
     internal async Task ProcessReceiveQueue()
     {
-        Log.Verbose("LiveClient.ProcessReceiveQueue", "ENTER");
+        Log.Verbose("ListenWSClient.ProcessReceiveQueue", "ENTER");
 
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
@@ -601,27 +609,27 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 Log.Debug("ProcessReceiveQueue", "ReceiveThread cancelled.");
                 Log.Verbose("ProcessReceiveQueue", $"ReceiveThread cancelled. Info: {ex}");
-                Log.Verbose("LiveClient.ProcessReceiveQueue", "LEAVE");
+                Log.Verbose("ListenWSClient.ProcessReceiveQueue", "LEAVE");
             }
             catch (Exception ex)
             {
                 Log.Error("ProcessReceiveQueue", $"{ex.GetType()} thrown {ex.Message}");
                 Log.Verbose("ProcessReceiveQueue", $"Excepton: {ex}");
-                Log.Verbose("LiveClient.ProcessReceiveQueue", "LEAVE");
+                Log.Verbose("ListenWSClient.ProcessReceiveQueue", "LEAVE");
             }
         }
     }
 
     internal void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
     {
-        Log.Verbose("LiveClient.ProcessDataReceived", "ENTER");
+        Log.Verbose("ListenWSClient.ProcessDataReceived", "ENTER");
 
         ms.Seek(0, SeekOrigin.Begin);
 
         if (result.MessageType != WebSocketMessageType.Text)
         {
             Log.Warning("ProcessDataReceived", "Received a text message. This is not supported.");
-            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessDataReceived", "LEAVE");
             return;
         }
 
@@ -629,7 +637,7 @@ public class Client : IDisposable, IListenWebSocketClient
         if (response == null)
         {
             Log.Warning("ProcessDataReceived", "Response is null");
-            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessDataReceived", "LEAVE");
             return;
         }
 
@@ -794,19 +802,19 @@ public class Client : IDisposable, IListenWebSocketClient
             }
 
             Log.Debug("ProcessDataReceived", "Succeeded");
-            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessDataReceived", "LEAVE");
         }
         catch (JsonException ex)
         {
             Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessDataReceived", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("ListenWSClient.ProcessDataReceived", "LEAVE");
         }
     }
 
@@ -816,13 +824,13 @@ public class Client : IDisposable, IListenWebSocketClient
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task Stop(CancellationTokenSource? cancelToken = null)
     {
-        Log.Verbose("LiveClient.Stop", "ENTER");
+        Log.Verbose("ListenWSClient.Stop", "ENTER");
 
         // client is already disposed
         if (_clientWebSocket == null)
         {
             Log.Information("Stop", "Client has already been disposed");
-            Log.Verbose("LiveClient.Stop", "LEAVE");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
             return;
         }
 
@@ -883,19 +891,19 @@ public class Client : IDisposable, IListenWebSocketClient
             _clientWebSocket = null;
 
             Log.Debug("Stop", "Succeeded");
-            Log.Verbose("LiveClient.Stop", "LEAVE");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
-            Log.Verbose("LiveClient.Stop", "LEAVE");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("Stop", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Stop", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.Stop", "LEAVE");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
             throw;
         }
     }
@@ -911,6 +919,7 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             return WebSocketState.None;
         }
+        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
         return _clientWebSocket.State;
     }
 
@@ -923,7 +932,8 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             return false;
         }
-            
+
+        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
         return _clientWebSocket.State == WebSocketState.Open;
     }
 
@@ -1023,13 +1033,13 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             Log.Error("InspectMessage", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("InspectMessage", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.InspectMessage", "LEAVE");
+            Log.Verbose("ListenWSClient.InspectMessage", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("InspectMessage", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("InspectMessage", $"Excepton: {ex}");
-            Log.Verbose("LiveClient.InspectMessage", "LEAVE");
+            Log.Verbose("ListenWSClient.InspectMessage", "LEAVE");
         }
     }
     #endregion

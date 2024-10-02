@@ -26,7 +26,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<SyncResponse> ToStream(TextSource source, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("SpeakClient.ToStream", "ENTER");
+        Log.Verbose("SpeakRESTClient.ToStream", "ENTER");
         Log.Information("ToStream", $"source: {source}");
         Log.Information("ToStream", $"analyzeSchema:\n{speakSchema}");
 
@@ -85,7 +85,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("ToStream", $"{uri} Succeeded");
         Log.Debug("ToStream", $"response: {response}");
-        Log.Verbose("Client.ToStream", "LEAVE");
+        Log.Verbose("SpeakRESTClient.ToStream", "LEAVE");
 
         // add stream to response
         response.Stream = localFileResult.Content;
@@ -96,7 +96,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<SyncResponse> ToFile(TextSource source, string filename, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("Client.ToFile", "ENTER");
+        Log.Verbose("SpeakRESTClient.ToFile", "ENTER");
         Log.Information("ToFile", $"filename: {filename}");
 
         var response = await ToStream(source, speakSchema, cancellationToken, addons, headers);
@@ -111,7 +111,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         // clear the stream
         response.Stream = null;
 
-        Log.Verbose("Client.ToFile", "LEAVE");
+        Log.Verbose("SpeakRESTClient.ToFile", "LEAVE");
 
         return response;
     }
@@ -128,7 +128,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSchema? speakSchema, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("SpeakClient.StreamCallBack", "ENTER");
+        Log.Verbose("SpeakRESTClient.StreamCallBack", "ENTER");
         Log.Information("StreamCallBack", $"source: {source}");
         Log.Information("StreamCallBack", $"callBack: {callBack}");
         Log.Information("StreamCallBack", $"speakSchema:\n{speakSchema}");
@@ -142,7 +142,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("StreamCallBack", $"{uri} Succeeded");
         Log.Debug("StreamCallBack", $"result: {result}");
-        Log.Verbose("Client.StreamCallBack", "LEAVE");
+        Log.Verbose("SpeakRESTClient.StreamCallBack", "LEAVE");
 
         return result;
     }

@@ -4,6 +4,7 @@
 
 
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
 using Deepgram.Models.Speak.v1.WebSocket;
 using Deepgram.Clients.Interfaces.v1;
 
@@ -32,16 +33,16 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// <param name="deepgramClientOptions"><see cref="IDeepgramClientOptions"/> for HttpClient Configuration</param>
     public Client(string? apiKey = null, IDeepgramClientOptions? options = null)
     {
-        Log.Verbose("SpeakClient", "ENTER");
+        Log.Verbose("SpeakWSClient", "ENTER");
 
         options ??= new DeepgramWsClientOptions(apiKey);
         _deepgramClientOptions = options;
 
-        Log.Debug("SpeakClient", $"APIVersion: {options.APIVersion}");
-        Log.Debug("SpeakClient", $"BaseAddress: {options.BaseAddress}");
-        Log.Debug("SpeakClient", $"options: {options.OnPrem}");
-        Log.Debug("LiveClient", $"Autoflush: {options.AutoFlushSpeakDelta}");
-        Log.Verbose("SpeakClient", "LEAVE");
+        Log.Debug("SpeakWSClient", $"APIVersion: {options.APIVersion}");
+        Log.Debug("SpeakWSClient", $"BaseAddress: {options.BaseAddress}");
+        Log.Debug("SpeakWSClient", $"options: {options.OnPrem}");
+        Log.Debug("SpeakWSClient", $"Autoflush: {options.AutoFlushSpeakDelta}");
+        Log.Verbose("SpeakWSClient", "LEAVE");
     }
 
     #region Event Handlers
@@ -67,7 +68,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
     public async Task Connect(SpeakSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("SpeakClient.Connect", "ENTER");
+        Log.Verbose("SpeakWSClient.Connect", "ENTER");
         Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
         Log.Debug("Connect", $"addons: {addons}");
 
@@ -77,7 +78,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
             // client has already connected
             var exStr = "Client has already been initialized";
             Log.Error("Connect", exStr);
-            Log.Verbose("SpeakClient.Connect", "LEAVE");
+            Log.Verbose("SpeakWSClient.Connect", "LEAVE");
             throw new InvalidOperationException(exStr);
         }
 
@@ -128,6 +129,13 @@ public class Client : IDisposable, ISpeakWebSocketClient
             Log.Debug("Connect", "Connecting to Deepgram API...");
             await _clientWebSocket.ConnectAsync(_uri, cancelToken.Token).ConfigureAwait(false);
 
+            if (!IsConnected())
+            {
+                Log.Error("Connect", "Failed to connect to Deepgram API");
+                Log.Verbose("SpeakWSClient.Connect", "LEAVE");
+                throw new DeepgramWebSocketException("Failed to connect to Deepgram API");
+            }
+
             Log.Debug("Connect", "Starting Sender Thread...");
             StartSenderBackgroundThread();
 
@@ -150,19 +158,19 @@ public class Client : IDisposable, ISpeakWebSocketClient
             }
 
             Log.Debug("Connect", "Connect Succeeded");
-            Log.Verbose("SpeakClient.Connect", "LEAVE");
+            Log.Verbose("SpeakWSClient.Connect", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("Connect", "Connect cancelled.");
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
-            Log.Verbose("SpeakClient.Connect", "LEAVE");
+            Log.Verbose("SpeakWSClient.Connect", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Excepton: {ex}");
-            Log.Verbose("SpeakClient.Connect", "LEAVE");
+            Log.Verbose("SpeakWSClient.Connect", "LEAVE");
             throw;
         }
 
@@ -453,7 +461,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
 
     internal async Task ProcessSendQueue()
     {
-        Log.Verbose("SpeakClient.ProcessSendQueue", "ENTER");
+        Log.Verbose("SpeakWSClient.ProcessSendQueue", "ENTER");
 
         if (_clientWebSocket == null)
         {
@@ -488,19 +496,19 @@ public class Client : IDisposable, ISpeakWebSocketClient
             }
 
             Log.Verbose("ProcessSendQueue", "Exit");
-            Log.Verbose("SpeakClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessSendQueue", "LEAVE");
         }
         catch (OperationCanceledException ex)
         {
             Log.Debug("ProcessSendQueue", "SendThread cancelled.");
             Log.Verbose("ProcessSendQueue", $"SendThread cancelled. Info: {ex}");
-            Log.Verbose("SpeakClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessSendQueue", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessSendQueue", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessSendQueue", $"Excepton: {ex}");
-            Log.Verbose("SpeakClient.ProcessSendQueue", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessSendQueue", "LEAVE");
         }
     }
 
@@ -563,7 +571,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
 
     internal async Task ProcessReceiveQueue()
     {
-        Log.Verbose("SpeakClient.ProcessReceiveQueue", "ENTER");
+        Log.Verbose("SpeakWSClient.ProcessReceiveQueue", "ENTER");
 
         while (_clientWebSocket?.State == WebSocketState.Open)
         {
@@ -613,20 +621,20 @@ public class Client : IDisposable, ISpeakWebSocketClient
             {
                 Log.Debug("ProcessReceiveQueue", "ReceiveThread cancelled.");
                 Log.Verbose("ProcessReceiveQueue", $"ReceiveThread cancelled. Info: {ex}");
-                Log.Verbose("SpeakClient.ProcessReceiveQueue", "LEAVE");
+                Log.Verbose("SpeakWSClient.ProcessReceiveQueue", "LEAVE");
             }
             catch (Exception ex)
             {
                 Log.Error("ProcessReceiveQueue", $"{ex.GetType()} thrown {ex.Message}");
                 Log.Verbose("ProcessReceiveQueue", $"Excepton: {ex}");
-                Log.Verbose("SpeakClient.ProcessReceiveQueue", "LEAVE");
+                Log.Verbose("SpeakWSClient.ProcessReceiveQueue", "LEAVE");
             }
         }
     }
 
     internal void ProcessDataReceived(WebSocketReceiveResult result, MemoryStream ms)
     {
-        Log.Verbose("SpeakClient.ProcessDataReceived", "ENTER");
+        Log.Verbose("SpeakWSClient.ProcessDataReceived", "ENTER");
 
         ms.Seek(0, SeekOrigin.Begin);
 
@@ -660,7 +668,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
                 if (response == null)
                 {
                     Log.Warning("ProcessDataReceived", "Response is null");
-                    Log.Verbose("SpeakClient.ProcessDataReceived", "LEAVE");
+                    Log.Verbose("SpeakWSClient.ProcessDataReceived", "LEAVE");
                     return;
                 }
 
@@ -832,19 +840,19 @@ public class Client : IDisposable, ISpeakWebSocketClient
             }
 
             Log.Debug("ProcessDataReceived", "Succeeded");
-            Log.Verbose("SpeakClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessDataReceived", "LEAVE");
         }
         catch (JsonException ex)
         {
             Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
-            Log.Verbose("SpeakClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessDataReceived", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("ProcessDataReceived", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessDataReceived", $"Excepton: {ex}");
-            Log.Verbose("SpeakClient.ProcessDataReceived", "LEAVE");
+            Log.Verbose("SpeakWSClient.ProcessDataReceived", "LEAVE");
         }
     }
 
@@ -854,13 +862,13 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task Stop(CancellationTokenSource? cancelToken = null)
     {
-        Log.Verbose("SpeakClient.Stop", "ENTER");
+        Log.Verbose("SpeakWSClient.Stop", "ENTER");
 
         // client is already disposed
         if (_clientWebSocket == null)
         {
             Log.Information("Stop", "Client has already been disposed");
-            Log.Verbose("SpeakClient.Stop", "LEAVE");
+            Log.Verbose("SpeakWSClient.Stop", "LEAVE");
             return;
         }
 
@@ -921,19 +929,19 @@ public class Client : IDisposable, ISpeakWebSocketClient
             _clientWebSocket = null;
 
             Log.Debug("Stop", "Succeeded");
-            Log.Verbose("SpeakClient.Stop", "LEAVE");
+            Log.Verbose("SpeakWSClient.Stop", "LEAVE");
         }
         catch (TaskCanceledException ex)
         {
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
-            Log.Verbose("SpeakClient.Stop", "LEAVE");
+            Log.Verbose("SpeakWSClient.Stop", "LEAVE");
         }
         catch (Exception ex)
         {
             Log.Error("Stop", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Stop", $"Excepton: {ex}");
-            Log.Verbose("SpeakClient.Stop", "LEAVE");
+            Log.Verbose("SpeakWSClient.Stop", "LEAVE");
             throw;
         }
     }
@@ -949,6 +957,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
         {
             return WebSocketState.None;
         }
+        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
         return _clientWebSocket.State;
     }
 
@@ -962,7 +971,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
         {
             return false;
         }
-
+        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
         return _clientWebSocket.State == WebSocketState.Open;
     }
 
