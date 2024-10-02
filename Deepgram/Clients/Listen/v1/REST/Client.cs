@@ -27,7 +27,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<SyncResponse> TranscribeUrl(UrlSource source, PreRecordedSchema? prerecordedSchema,
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PreRecordedClient.TranscribeUrl", "ENTER");
+        Log.Verbose("ListenRESTClient.TranscribeUrl", "ENTER");
         Log.Information("TranscribeUrl", $"source: {source}");
         Log.Information("TranscribeUrl", $"prerecordedSchema:\n{prerecordedSchema}");
 
@@ -38,7 +38,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("TranscribeUrl", $"{uri} Succeeded");
         Log.Debug("TranscribeUrl", $"result: {result}");
-        Log.Verbose("PreRecordedClient.TranscribeUrl", "LEAVE");
+        Log.Verbose("ListenRESTClient.TranscribeUrl", "LEAVE");
 
         return result;
     }
@@ -64,7 +64,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// <returns><see cref="SyncResponse"/></returns>
     public async Task<SyncResponse> TranscribeFile(Stream source, PreRecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PreRecordedClient.TranscribeFile", "ENTER");
+        Log.Verbose("ListenRESTClient.TranscribeFile", "ENTER");
         Log.Information("TranscribeFile", $"source: {source}");
         Log.Information("TranscribeFile", $"prerecordedSchema:\n{prerecordedSchema}");
 
@@ -75,7 +75,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("TranscribeFile", $"{uri} Succeeded");
         Log.Debug("TranscribeFile", $"result: {result}");
-        Log.Verbose("PreRecordedClient.TranscribeFile", "LEAVE");
+        Log.Verbose("ListenRESTClient.TranscribeFile", "LEAVE");
 
         return result;
     }
@@ -105,7 +105,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// <returns><see cref="AsyncResponse"/></returns>
     public async Task<AsyncResponse> TranscribeFileCallBack(Stream source, string? callBack, PreRecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PreRecordedClient.TranscribeFileCallBack", "ENTER");
+        Log.Verbose("ListenRESTClient.TranscribeFileCallBack", "ENTER");
         Log.Information("TranscribeFileCallBack", $"source: {source}");
         Log.Information("TranscribeFileCallBack", $"callBack: {callBack}");
         Log.Information("TranscribeFileCallBack", $"prerecordedSchema:\n{prerecordedSchema}");
@@ -119,7 +119,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("TranscribeFileCallBack", $"{uri} Succeeded");
         Log.Debug("TranscribeFileCallBack", $"result: {result}");
-        Log.Verbose("PreRecordedClient.TranscribeFileCallBack", "LEAVE");
+        Log.Verbose("ListenRESTClient.TranscribeFileCallBack", "LEAVE");
 
         return result;
     }
@@ -133,7 +133,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// <returns><see cref="AsyncResponse"/></returns>
     public async Task<AsyncResponse> TranscribeUrlCallBack(UrlSource source, string? callBack, PreRecordedSchema? prerecordedSchema, CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
-        Log.Verbose("PreRecordedClient.TranscribeUrlCallBack", "ENTER");
+        Log.Verbose("ListenRESTClient.TranscribeUrlCallBack", "ENTER");
         Log.Information("TranscribeUrlCallBack", $"source: {source}");
         Log.Information("TranscribeUrlCallBack", $"callBack: {callBack}");
         Log.Information("TranscribeUrlCallBack", $"prerecordedSchema:\n{prerecordedSchema}");
@@ -148,7 +148,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         Log.Information("TranscribeUrlCallBack", $"{uri} Succeeded");
         Log.Debug("TranscribeUrlCallBack", $"result: {result}");
-        Log.Verbose("PreRecordedClient.TranscribeUrlCallBack", "LEAVE");
+        Log.Verbose("ListenRESTClient.TranscribeUrlCallBack", "LEAVE");
 
         return result;
     }
