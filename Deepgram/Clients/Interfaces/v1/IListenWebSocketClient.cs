@@ -15,7 +15,7 @@ public interface IListenWebSocketClient
     public Task Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
 
-    public Task Stop(CancellationTokenSource? cancelToken = null);
+    public Task Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false);
     #endregion
 
     #region Subscribe Event

@@ -345,11 +345,23 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// <summary>
     ///  This method tells Deepgram to initiate the close server-side.
     /// </summary>
-    public void Close()
+    public void Close(bool nullByte = false)
     {
+        Log.Debug("SendFinalize", "Sending Close Message Immediately...");
+        if (nullByte && _clientWebSocket != null)
+        {
+            // send a close to Deepgram
+            lock (_mutexSend)
+            {
+                _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                    .ConfigureAwait(false);
+            }
+            return;
+        }
+
         ControlMessage controlMessage = new ControlMessage(Constants.Close);
         byte[] byteArray = Encoding.UTF8.GetBytes(controlMessage.ToString());
-        Send(byteArray);
+        SendMessageImmediately(byteArray);
     }
 
     /// <summary>
@@ -860,7 +872,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Stop(CancellationTokenSource? cancelToken = null)
+    public async Task Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
     {
         Log.Verbose("SpeakWSClient.Stop", "ENTER");
 
@@ -880,24 +892,15 @@ public class Client : IDisposable, ISpeakWebSocketClient
 
         try
         {
-            // cancel the internal token to stop all threads
-            if (_cancellationTokenSource != null)
-            {
-                Log.Debug("Stop", "Cancelling native token...");
-                _cancellationTokenSource.Cancel();
-            }
-
             // if websocket is open, send a close message
             if (_clientWebSocket!.State == WebSocketState.Open)
             {
                 Log.Debug("Stop", "Sending Close message...");
-                // send a close to Deepgram
-                lock (_mutexSend)
-                {
-                    _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, cancelToken.Token)
-                        .ConfigureAwait(false);
-                }
+                Close(nullByte);
             }
+
+            // small delay to wait for any final transcription
+            await Task.Delay(100, cancelToken.Token).ConfigureAwait(false);
 
             // send a CloseResponse event
             if (_closeReceived != null)
