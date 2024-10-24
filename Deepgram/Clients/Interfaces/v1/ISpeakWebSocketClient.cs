@@ -15,7 +15,7 @@ public interface ISpeakWebSocketClient
     public Task Connect(SpeakSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
 
-    public Task Stop(CancellationTokenSource? cancelToken = null);
+    public Task Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false);
     #endregion
 
     #region Subscribe Event
@@ -97,7 +97,7 @@ public interface ISpeakWebSocketClient
     ///// <summary>
     /////  This method tells Deepgram to initiate the close server-side.
     ///// </summary>
-    public void Close();
+    public void Close(bool nullByte = false);
 
     ///// <summary>
     ///// This method sends a binary message over the WebSocket connection.

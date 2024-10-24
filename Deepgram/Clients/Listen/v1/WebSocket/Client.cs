@@ -822,7 +822,7 @@ public class Client : IDisposable, IListenWebSocketClient
     /// Closes the Web Socket connection to the Deepgram API
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task Stop(CancellationTokenSource? cancelToken = null)
+    public async Task Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
     {
         Log.Verbose("ListenWSClient.Stop", "ENTER");
 
@@ -842,24 +842,15 @@ public class Client : IDisposable, IListenWebSocketClient
 
         try
         {
-            // cancel the internal token to stop all threads
-            if (_cancellationTokenSource != null)
-            {
-                Log.Debug("Stop", "Cancelling native token...");
-                _cancellationTokenSource.Cancel();
-            }
-
             // if websocket is open, send a close message
             if (_clientWebSocket!.State == WebSocketState.Open)
             {
                 Log.Debug("Stop", "Sending Close message...");
-                // send a close to Deepgram
-                lock (_mutexSend)
-                {
-                    _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, cancelToken.Token)
-                        .ConfigureAwait(false);
-                }
+                SendClose(nullByte);
             }
+
+            // small delay to wait for any final transcription
+            await Task.Delay(100, cancelToken.Token).ConfigureAwait(false);
 
             // send a CloseResponse event
             if (_closeReceived != null)
