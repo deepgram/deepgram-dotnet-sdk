@@ -7,7 +7,7 @@ namespace Deepgram.Models.Speak.v1.WebSocket;
 public class ControlMessage(string text)
 {
     /// <summary>
-    /// Text of the words to speak
+    /// Gets or sets the type of control message.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]

@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Clients.Interfaces.v1;
+using V1 = Deepgram.Clients.Interfaces.v1;
+using V2 = Deepgram.Clients.Interfaces.v2;
+
+using ListenV1 = Deepgram.Clients.Listen.v1.WebSocket;
+using ListenV2 = Deepgram.Clients.Listen.v2.WebSocket;
+using SpeakV1 = Deepgram.Clients.Speak.v1.WebSocket;
+using SpeakV2 = Deepgram.Clients.Speak.v2.WebSocket;
 
 namespace Deepgram;
 
@@ -16,8 +22,17 @@ public static class ClientFactory
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        return new AnalyzeClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// This method allows you to create an AnalyzeClient with a specific version of the client.
+    /// </summary>
+    public static object CreateAnalyzeClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        // Currently only a single version of the AnalyzeClient exists
         return new AnalyzeClient(apiKey, options, httpId);
     }
 
@@ -32,20 +47,39 @@ public static class ClientFactory
     // *********** WARNING ***********
     /// </summary>
     [Obsolete("Please use CreateListenWebSocketClient instead", false)]
-    public static ILiveClient CreateLiveClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    public static V1.ILiveClient CreateLiveClient(string apiKey = "", DeepgramWsClientOptions? options = null)
     {
         return new LiveClient(apiKey, options);
     }
 
     /// <summary>
-    /// Create a new ListenWebSocketClient
+    /// Create a new ListenWebSocketClient using the latest version
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IListenWebSocketClient CreateListenWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    public static V2.IListenWebSocketClient CreateListenWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
     {
         return new ListenWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// This method allows you to create an AnalyzeClient with a specific version of the client.
+    /// </summary>
+    public static object CreateListenWebSocketClient(int version, string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        // at some point this needs to be changed to use reflection to get the type of the client
+        switch(version)
+        {
+            case 1:
+                Log.Information("ClientFactory", $"Version 1 of the ListenWebSocketClient is being deprecated in the next major version.");
+                Log.Information("ClientFactory", $"Transition to the latest version at your earliest convenience.");
+                return new ListenV1.Client(apiKey, options);
+            case 2:
+                return new ListenV2.Client(apiKey, options);
+            default:
+                throw new ArgumentException("Invalid version", nameof(version));
+        }
     }
 
     /// <summary>
@@ -55,8 +89,17 @@ public static class ClientFactory
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        return new ManageClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// This method allows you to create an ManageClient with a specific version of the client.
+    /// </summary>
+    public static object CreateManageClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        // Currently only a single version of the ManageClient exists
         return new ManageClient(apiKey, options, httpId);
     }
 
@@ -71,7 +114,7 @@ public static class ClientFactory
     // *********** WARNING ***********
     /// </summary>
     [Obsolete("Please use CreateSelfHostedClient instead", false)]
-    public static IOnPremClient CreateOnPremClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.IOnPremClient CreateOnPremClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new OnPremClient(apiKey, options, httpId);
     }
@@ -83,8 +126,17 @@ public static class ClientFactory
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        return new SelfHostedClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// This method allows you to create an SelfHostedClient with a specific version of the client.
+    /// </summary>
+    public static object CreateSelfHostedClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        // Currently only a single version of the SelfHostedClient exists
         return new SelfHostedClient(apiKey, options, httpId);
     }
 
@@ -99,7 +151,7 @@ public static class ClientFactory
     // *********** WARNING ***********
     /// </summary>
     [Obsolete("Please use CreateListenRESTClient instead", false)]
-    public static IPreRecordedClient CreatePreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.IPreRecordedClient CreatePreRecordedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new PreRecordedClient(apiKey, options, httpId);
     }
@@ -111,8 +163,17 @@ public static class ClientFactory
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        return new ListenRESTClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// This method allows you to create an ListenRESTClient with a specific version of the client.
+    /// </summary>
+    public static object CreateListenRESTClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        // Currently only a single version of the ListenRESTClient exists
         return new ListenRESTClient(apiKey, options, httpId);
     }
 
@@ -127,7 +188,7 @@ public static class ClientFactory
     // *********** WARNING ***********
     /// </summary>
     [Obsolete("Please use CreateSpeakRESTClient instead", false)]
-    public static ISpeakClient CreateSpeakClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.ISpeakClient CreateSpeakClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new SpeakClient(apiKey, options, httpId);
     }
@@ -139,8 +200,17 @@ public static class ClientFactory
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
-    public static ISpeakRESTClient CreateSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    public static V1.ISpeakRESTClient CreateSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
+        return new SpeakRESTClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// This method allows you to create an SpeakRESTClient with a specific version of the client.
+    /// </summary>
+    public static object CreateSpeakRESTClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        // Currently only a single version of the SpeakRESTClient exists
         return new SpeakRESTClient(apiKey, options, httpId);
     }
 
@@ -150,8 +220,27 @@ public static class ClientFactory
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    public static V2.ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
     {
         return new SpeakWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// This method allows you to create an SpeakWebSocketClient with a specific version of the client.
+    /// </summary>
+    public static object CreateSpeakWebSocketClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null)
+    {
+        // at some point this needs to be changed to use reflection to get the type of the client
+        switch (version)
+        {
+            case 1:
+                Log.Information("ClientFactory", $"Version 1 of the ListenWebSocketClient is being deprecated in the next major version.");
+                Log.Information("ClientFactory", $"Transition to the latest version at your earliest convenience.");
+                return new SpeakV1.Client(apiKey, options);
+            case 2:
+                return new SpeakV2.Client(apiKey, options);
+            default:
+                throw new ArgumentException("Invalid version", nameof(version));
+        }
     }
 }

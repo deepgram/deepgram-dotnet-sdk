@@ -2,10 +2,12 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Clients.Interfaces.v1;
+namespace Deepgram.Models.Common.v2.WebSocket;
 
-public class IResponseEvent<T>
+public enum WebSocketType
 {
-    public T? Response { get; set; }
+    Open,
+    Close,
+    Unhandled,
+    Error,
 }
-

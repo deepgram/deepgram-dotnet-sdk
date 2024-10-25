@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Manage.v1;
-using Deepgram.Abstractions;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 

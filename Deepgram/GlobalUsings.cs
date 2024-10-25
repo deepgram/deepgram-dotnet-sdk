@@ -2,7 +2,6 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-global using System.Collections.Concurrent;
 global using System.Net.Http.Headers;
 global using System.Net.WebSockets;
 global using System.Reflection;
@@ -12,7 +11,6 @@ global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;
 global using System.Threading.Channels;
 global using System.Web;
-global using Deepgram.Abstractions;
 global using Deepgram.Constants;
 global using Deepgram.Logger;
 global using Deepgram.Utilities;

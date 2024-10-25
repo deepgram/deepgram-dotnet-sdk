@@ -4,8 +4,13 @@
 
 namespace Deepgram.Clients.Speak.v1.WebSocket;
 
-public class ResponseEvent<T>(T? response) : EventArgs
+public class ResponseEvent<T> : EventArgs
 {
-    public T? Response { get; set; } = response;
+    public T? Response { get; }
+
+    public ResponseEvent(T? response)
+    {
+        Response = response;
+    }
 }
 

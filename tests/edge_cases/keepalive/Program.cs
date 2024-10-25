@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Listen.v1.WebSocket;
+using Deepgram.Models.Listen.v2.WebSocket;
 using Deepgram.Logger;
 
 namespace SampleApp
@@ -25,11 +25,11 @@ namespace SampleApp
             var liveClient = ClientFactory.CreateListenWebSocketClient("", options);
 
             // Subscribe to the EventResponseReceived event
-            liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
                 if (e.Channel.Alternatives[0].Transcript == "")
                 {
@@ -39,11 +39,11 @@ namespace SampleApp
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
                 Console.WriteLine($"\n\n\n----> Speaker: {e.Channel.Alternatives[0].Transcript}\n\n\n");
             }));
-            liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received. Error: {e.Message}");
             }));

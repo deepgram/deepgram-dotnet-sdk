@@ -11,8 +11,16 @@ using Deepgram.Clients.Interfaces.v1;
 namespace Deepgram.Clients.Speak.v1.WebSocket;
 
 /// <summary>
-/// Implements version 1 of the Live Client.
+// *********** WARNING ***********
+// Implements version 1 of the Speak WebSocket Client
+//
+// Deprecated: This class is deprecated. Use the `v2` of the client instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use Deepgram.Clients.Speak.v2.WebSocket instead", false)]
 public class Client : IDisposable, ISpeakWebSocketClient
 {
     #region Fields

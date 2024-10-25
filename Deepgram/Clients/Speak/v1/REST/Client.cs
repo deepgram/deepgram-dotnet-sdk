@@ -5,6 +5,7 @@
 using Deepgram.Models.Speak.v1.REST;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Clients.Speak.v1.REST;
 

@@ -5,8 +5,7 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Clients.Manage.v1;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using NSubstitute;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

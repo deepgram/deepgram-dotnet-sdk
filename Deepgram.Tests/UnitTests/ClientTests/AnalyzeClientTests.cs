@@ -5,6 +5,7 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Clients.Analyze.v1;
 using Deepgram.Models.Analyze.v1;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
