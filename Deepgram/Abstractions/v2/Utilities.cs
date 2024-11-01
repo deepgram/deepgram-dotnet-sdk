@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Abstractions;
+namespace Deepgram.Abstractions.v2;
 
 /// <summary>
 /// Helper funcitons for HttpRequests

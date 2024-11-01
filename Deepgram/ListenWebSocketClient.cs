@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Clients.Listen.v1.WebSocket;
+using Deepgram.Clients.Listen.v2.WebSocket;
 using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram;

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.Fakes;
 

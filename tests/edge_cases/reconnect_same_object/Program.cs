@@ -5,7 +5,7 @@
 using Deepgram.Logger;
 using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Listen.v1.WebSocket;
+using Deepgram.Models.Listen.v2.WebSocket;
 
 namespace SampleApp
 {
@@ -29,15 +29,15 @@ namespace SampleApp
             //var liveClient = new LiveClienkt("set your DEEPGRAM_API_KEY here");
 
             // Subscribe to the EventResponseReceived event
-            liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
             {
                 Console.WriteLine($"\n\n----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<MetadataResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<MetadataResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
                 if (e.Channel.Alternatives[0].Transcript.Trim() == "")
@@ -48,23 +48,23 @@ namespace SampleApp
                 // Console.WriteLine("Transcription received: " + JsonSerializer.Serialize(e.Transcription));
                 Console.WriteLine($"----> Speaker: {e.Channel.Alternatives[0].Transcript}");
             }));
-            liveClient.Subscribe(new EventHandler<SpeechStartedResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<SpeechStartedResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<UtteranceEndResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<UtteranceEndResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<CloseResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<UnhandledResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<UnhandledResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received");
             }));
-            liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
             {
                 Console.WriteLine($"----> {e.Type} received. Error: {e.Message}");
             }));

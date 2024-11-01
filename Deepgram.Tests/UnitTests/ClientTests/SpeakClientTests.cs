@@ -5,6 +5,7 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Speak.v1.REST;
 using Deepgram.Clients.Speak.v1.REST;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

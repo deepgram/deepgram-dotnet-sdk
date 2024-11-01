@@ -11,8 +11,16 @@ using Deepgram.Clients.Interfaces.v1;
 namespace Deepgram.Clients.Listen.v1.WebSocket;
 
 /// <summary>
-/// Implements version 1 of the Live Client.
+// *********** WARNING ***********
+// Implements version 1 of the Listen WebSocket Client
+//
+// Deprecated: This class is deprecated. Use the `v2` of the client instead.
+// This will be removed in a future release.
+//
+// This class is frozen and no new functionality will be added.
+// *********** WARNING ***********
 /// </summary>
+[Obsolete("Please use Deepgram.Clients.Listen.v2.WebSocket instead", false)]
 public class Client : IDisposable, IListenWebSocketClient
 {
     #region Fields

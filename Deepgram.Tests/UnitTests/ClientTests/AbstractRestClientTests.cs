@@ -5,7 +5,6 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
-using Deepgram.Models.Exceptions.v1;
 
 using Deepgram.Clients.Manage.v1;
 

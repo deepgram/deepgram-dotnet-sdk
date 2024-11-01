@@ -7,7 +7,7 @@ namespace Deepgram.Models.Speak.v1.WebSocket;
 public record AudioResponse : IDisposable
 {
     /// <summary>
-    /// Open event type.
+    /// The type of speak response, defaults to Audio.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("type")]

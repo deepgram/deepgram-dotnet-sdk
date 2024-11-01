@@ -5,6 +5,7 @@
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Clients.Manage.v1;
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Abstractions;
+namespace Deepgram.Abstractions.v1;
 
 /// <summary>
 /// Just a NoopSchema where you dont need to marshall JSON into a Async function.
