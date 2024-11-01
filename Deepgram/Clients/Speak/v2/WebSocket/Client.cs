@@ -327,7 +327,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     /// This method sends a close message over the WebSocket connection.
     /// NOTE: This is fine to use the SendImmediately methods because you want to shutdown the websocket ASAP.
     /// </summary>
-    public override async Task SendClose(bool nullByte = false)
+    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
         if (_clientWebSocket == null || !IsConnected())
         {
@@ -335,11 +335,14 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             return;
         }
 
+        // provide a cancellation token, or use the one in the class
+        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancellationTokenSource.Token);
+            await _mutexSend.WaitAsync(_cancelToken.Token);
             try
             {
                 await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
@@ -354,7 +357,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 
         ControlMessage controlMessage = new ControlMessage(Constants.Close);
         byte[] data = Encoding.UTF8.GetBytes(controlMessage.ToString());
-        await SendMessageImmediately(data);
+        await SendMessageImmediately(data, Constants.UseArrayLengthForSend, _cancelToken);
     }
 
     /// <summary>
