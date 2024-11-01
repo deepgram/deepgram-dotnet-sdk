@@ -83,6 +83,12 @@
     <PackageReference Include="System.Text.Json" Version="8.*" />
     <PackageReference Include="System.Threading.Channels" Version="8.*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Agent\v1\**" />
+    <EmbeddedResource Remove="Models\Agent\v1\**" />
+    <None Remove="Models\Agent\v1\**" />
+  </ItemGroup>
  
 
   <ItemGroup>
