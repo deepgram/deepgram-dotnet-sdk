@@ -46,7 +46,7 @@ internal static class QueryParameterUtil
     /// <summary>
     /// Encodes the specified parameters into a URL
     /// </summary>
-    internal static string UrlEncode<T>(T parameters, IEnumerable<PropertyInfo>? propertyInfoList, Dictionary<string, string>? addons = null)
+    internal static string UrlEncode<T>(T? parameters, IEnumerable<PropertyInfo>? propertyInfoList, Dictionary<string, string>? addons = null)
     {
         var sb = new StringBuilder();
         if (propertyInfoList != null)

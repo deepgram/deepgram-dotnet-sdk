@@ -11,5 +11,10 @@ public static class Constants
 {
     // Default flush period
     public const int DefaultFlushPeriodInMs = 500;
+
+    // user message types
+    public const string KeepAlive = "KeepAlive";
+    public const string Finalize = "Finalize";
+    public const string CloseStream = "CloseStream";
 }
 

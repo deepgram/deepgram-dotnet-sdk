@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Abstractions.v2;
+using Abstract = Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
@@ -277,7 +278,8 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     public async Task SendKeepAlive()
     {
         Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
-        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"KeepAlive\"}");
+        ControlMessage message = new ControlMessage(Constants.KeepAlive);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
 
@@ -287,9 +289,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     public async Task SendFinalize()
     {
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
-        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"Finalize\"}");
+        ControlMessage message = new ControlMessage(Constants.Finalize);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
+
+    /// <summary>
+    /// Sends a binary message over the WebSocket connection.
+    /// </summary>
+    /// <param name="data">The data to be sent over the WebSocket.</param>
+    public void Send(byte[] data, int length = Abstract.Constants.UseArrayLengthForSend) => SendBinary(data, length);
 
     /// <summary>
     /// Sends a Close message to Deepgram
@@ -322,7 +331,8 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             return;
         }
 
-        byte[] data = Encoding.ASCII.GetBytes("{\"type\": \"CloseStream\"}");
+        ControlMessage message = new ControlMessage(Constants.CloseStream);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
     #endregion

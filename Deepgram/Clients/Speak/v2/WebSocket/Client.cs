@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Abstractions.v2;
+using Abstract = Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Speak.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
@@ -389,10 +390,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     /// We need to override the Send function to use the SendMessage function. This is different than STT
     /// because we only deal in text messages for TTS where STT is sending binary (or audio) messages.
     /// </summary>
-    public override void Send(byte[] data, int length = Constants.UseArrayLengthForSend)
-    {
-        SendMessage(data, length);
-    }
+    public void Send(byte[] data, int length = Abstract.Constants.UseArrayLengthForSend) => SendMessage(data, length);
     #endregion
 
     internal async Task ProcessAutoFlush()

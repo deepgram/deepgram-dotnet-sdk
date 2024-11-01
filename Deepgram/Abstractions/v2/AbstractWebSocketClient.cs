@@ -251,12 +251,6 @@ public abstract class AbstractWebSocketClient : IDisposable
     }
 
     /// <summary>
-    /// Sends a binary message over the WebSocket connection.
-    /// </summary>
-    /// <param name="data">The data to be sent over the WebSocket.</param>
-    public virtual void Send(byte[] data, int length = Constants.UseArrayLengthForSend) => SendBinary(data, length);
-
-    /// <summary>
     /// This method sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data"></param>
