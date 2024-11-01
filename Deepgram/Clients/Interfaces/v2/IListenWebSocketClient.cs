@@ -12,9 +12,15 @@ namespace Deepgram.Clients.Interfaces.v2;
 public interface IListenWebSocketClient
 {
     #region Connect and Disconnect
+    /// <summary>
+    /// Connects to the Deepgram WebSocket API
+    /// </summary>
     public Task<bool> Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
 
+    /// <summary>
+    /// Disconnects from the Deepgram WebSocket API
+    /// </summary>
     public Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false);
     #endregion
 
