@@ -245,7 +245,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public virtual Task SendClose(bool nullByte = false)
+    public virtual Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
         throw new DeepgramException("Unimplemented");
     }
@@ -271,8 +271,8 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
-    /// </summary>
-    public virtual async Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
+    /// </summary>, 
+    public virtual async Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
         if (!IsConnected())
         {
@@ -280,7 +280,10 @@ public abstract class AbstractWebSocketClient : IDisposable
             return;
         }
 
-        await _mutexSend.WaitAsync(_cancellationTokenSource.Token);
+        // provide a cancellation token, or use the one in the class
+        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+
+        await _mutexSend.WaitAsync(_cancelToken.Token);
         try
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately...");
@@ -288,7 +291,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 length = data.Length;
             }
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, _cancelToken.Token)
                 .ConfigureAwait(false);
         }
         finally
@@ -300,7 +303,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
-    public virtual async Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
+    public virtual async Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
         if (!IsConnected())
         {
@@ -308,7 +311,10 @@ public abstract class AbstractWebSocketClient : IDisposable
             return;
         }
 
-        await _mutexSend.WaitAsync(_cancellationTokenSource.Token);
+        // provide a cancellation token, or use the one in the class
+        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+
+        await _mutexSend.WaitAsync(_cancelToken.Token);
         try
         {
             Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
@@ -316,7 +322,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 length = data.Length;
             }
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
+            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancelToken.Token)
                 .ConfigureAwait(false);
         }
         finally
@@ -613,7 +619,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             if (_clientWebSocket!.State == WebSocketState.Open)
             {
                 Log.Debug("Stop", "Sending Close message...");
-                await SendClose(nullByte);
+                await SendClose(nullByte, cancelToken);
             }
 
             // small delay to wait for any final transcription

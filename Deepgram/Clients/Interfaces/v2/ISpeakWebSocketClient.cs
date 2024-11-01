@@ -108,7 +108,7 @@ public interface ISpeakWebSocketClient
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public Task SendClose(bool nullByte = false);
+    public Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null);
 
     /// <summary>
     /// Sends a binary message over the WebSocket connection.
@@ -140,7 +140,8 @@ public interface ISpeakWebSocketClient
     /// </summary>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
-    public Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend);
+    /// /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>
+    public Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null);
     #endregion
 
     #region Helpers

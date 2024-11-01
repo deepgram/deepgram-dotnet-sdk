@@ -17,9 +17,9 @@ namespace SampleApp
             {
                 // Initialize Library with default logging
                 // Normal logging is "Info" level
-                //Library.Initialize();
+                Library.Initialize();
                 // OR very chatty logging
-                Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+                //Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
                 //// use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
                 //DeepgramWsClientOptions options = new DeepgramWsClientOptions();

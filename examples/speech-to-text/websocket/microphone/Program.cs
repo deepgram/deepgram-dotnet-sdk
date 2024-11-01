@@ -17,9 +17,9 @@ namespace SampleApp
             {
                 // Initialize Library with default logging
                 // Normal logging is "Info" level
-                //Deepgram.Library.Initialize();
+                Deepgram.Library.Initialize();
                 // OR very chatty logging
-                Deepgram.Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
+                //Deepgram.Library.Initialize(LogLevel.Debug); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
                 // Initialize the microphone library
                 Deepgram.Microphone.Library.Initialize();

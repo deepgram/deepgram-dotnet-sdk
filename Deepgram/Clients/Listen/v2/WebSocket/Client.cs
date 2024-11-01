@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -294,7 +294,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public override async Task SendClose(bool nullByte = false)
+    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
         if (_clientWebSocket == null || !IsConnected())
         {
@@ -302,11 +302,14 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             return;
         }
 
+        // provide a cancellation token, or use the one in the class
+        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancellationTokenSource.Token);
+            await _mutexSend.WaitAsync(_cancelToken.Token);
             try
             {
                 await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
