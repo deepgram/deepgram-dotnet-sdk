@@ -100,7 +100,10 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
         Log.Debug("DeepgramHttpClientOptions", headers == null ? "Headers is null" : "Headers provided");
 
         KeepAlive = false;
-        ApiKey = apiKey ?? "";
+        if (string.IsNullOrWhiteSpace(ApiKey))
+        {
+            ApiKey = apiKey ?? "";
+        }
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         OnPrem = onPrem ?? false;
         Addons = headers ?? new Dictionary<string, string>();
