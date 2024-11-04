@@ -97,7 +97,10 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
         Log.Debug("DeepgramWsClientOptions", headers == null ? "Headers is null" : "Headers provided");
         Log.Debug("DeepgramWsClientOptions", addons == null ? "Addons is null" : "Addons provided");
 
-        ApiKey = apiKey ?? "";
+        if (string.IsNullOrWhiteSpace(ApiKey))
+        {
+            ApiKey = apiKey ?? "";
+        }
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         KeepAlive = keepAlive ?? false;
         OnPrem = onPrem ?? false;

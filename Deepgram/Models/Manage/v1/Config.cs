@@ -20,12 +20,14 @@ public record Config
 	[JsonPropertyName("callback")]
     public string? Callback { get; set; }
 
-    /// <summary>
-    /// Indicates whether topic detection was requested.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("detect_topics")]
-    public bool? DetectTopics { get; set; }
+    // TODO: This is throwing an error, need to figure out how to handle this. Commenting out for now.
+    // Please see: https://github.com/deepgram/deepgram-dotnet-sdk/issues/346
+    ///// <summary>
+    ///// Indicates whether topic detection was requested.
+    ///// </summary>
+    //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    //[JsonPropertyName("detect_topics")]
+    //public bool? DetectTopics { get; set; }
 
     /// <summary>
     /// Indicates whether diarization was requested.
