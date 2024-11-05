@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 
+using System;
+using System.Threading.Tasks;
+using Deepgram;
 using Deepgram.Logger;
 using Deepgram.Models.Manage.v1;
 

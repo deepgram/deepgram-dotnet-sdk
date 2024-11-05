@@ -2,14 +2,17 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Threading.Tasks;
+using Deepgram;
 using Deepgram.Logger;
 using Deepgram.Models.Manage.v1;
 
 namespace SampleApp
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level

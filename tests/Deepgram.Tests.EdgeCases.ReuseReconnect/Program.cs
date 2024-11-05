@@ -2,16 +2,18 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Threading.Tasks;
 using Deepgram.Logger;
 using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
 
-namespace SampleApp
+namespace Deepgram.Tests.EdgeCases.ReuseReconnect
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level
@@ -94,7 +96,7 @@ namespace SampleApp
                 await liveClient.Connect(liveSchema);
 
                 // Microphone streaming
-                var microphone = new Microphone(liveClient.Send);
+                var microphone = new Microphone.Microphone(liveClient.Send);
                 microphone.Start();
 
                 //// START: test an external cancellation

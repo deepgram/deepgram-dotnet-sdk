@@ -2,6 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Deepgram;
 using Deepgram.Models.Listen.v2.WebSocket;
 
 namespace SampleApp

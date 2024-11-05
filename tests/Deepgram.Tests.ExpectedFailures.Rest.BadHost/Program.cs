@@ -2,15 +2,17 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Threading.Tasks;
 using Deepgram.Logger;
-using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Listen.v1.REST;
 
-namespace SampleApp
+namespace Deepgram.Tests.ExpectedFailures.Rest.BadHost
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Normal logging is "Info" level
             Library.Initialize();
@@ -30,7 +32,7 @@ namespace SampleApp
                         Model = "nova-2",
                     });
 
-                    Console.WriteLine(response);
+                Console.WriteLine(response);
             }
             catch (Exception ex)
             {

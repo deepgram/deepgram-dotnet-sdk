@@ -2,14 +2,16 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Listen.v2.WebSocket;
+using System;
+using System.Threading.Tasks;
 using Deepgram.Logger;
+using Deepgram.Models.Listen.v2.WebSocket;
 
-namespace SampleApp
+namespace Deepgram.Tests.ExpectedFailures.Websocket.CreateTimeout
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Normal logging is "Info" level
             //Library.Initialize();

@@ -2,15 +2,16 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Threading.Tasks;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
-using Deepgram.Logger;
 
-namespace SampleApp
+namespace Deepgram.Tests.EdgeCases.KeepAlive
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level

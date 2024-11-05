@@ -2,17 +2,20 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Speak.v1.WebSocket;
 using SpeakV1 = Deepgram.Clients.Speak.v1.WebSocket;
-using Deepgram.Logger;
 
 
-namespace SampleApp
+namespace Deepgram.Tests.EdgeCases.TextToSpeech.V1.ClientExample
 {
-    class Program
+    public static class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // Initialize Library with default logging
             // Normal logging is "Info" level

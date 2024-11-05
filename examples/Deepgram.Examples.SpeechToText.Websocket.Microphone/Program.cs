@@ -2,6 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Threading.Tasks;
+using Deepgram;
 using Deepgram.Logger;
 using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
