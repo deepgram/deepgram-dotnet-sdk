@@ -88,7 +88,7 @@ In scenarios where urgent issues arise, the `hotfix` branch comes into play. A h
 This dual approach of leveraging both **GitHub Flow** and **Git Flow** ensures that the project can iterate quickly while maintaining high standards of code stability and release management.
 ### Creating a Release
 
-Since the latest stable code is contained on `main` in a typical **GitHub Flow**, to create a release someone with write access to the repository needs to simply just `git tag` the release and then create a (draft) release using that tag in the [repository's release page](https://github.com/deepgram/deepgram-python-sdk/releases).
+Since the latest stable code is contained on `main` in a typical **GitHub Flow**, to create a release someone with write access to the repository needs to simply just `git tag` the release and then create a (draft) release using that tag in the [repository's release page](https://github.com/deepgram/deepgram-dotnet-sdk/releases).
 
 If you haven't done this before, these are the typicial commands to execute at the root of the repository assuming you are on your fork:
 
