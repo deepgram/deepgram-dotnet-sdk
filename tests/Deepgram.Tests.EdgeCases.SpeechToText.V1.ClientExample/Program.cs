@@ -56,7 +56,7 @@ namespace Deepgram.Tests.EdgeCases.SpeechToText.V1.ClientExample
                         while (liveClient.IsConnected())
                         {
                             byte[] buffer = new byte[2048];
-                            await receiveStream.ReadAsync(buffer, 0, buffer.Length);
+                            await receiveStream.ReadExactlyAsync(buffer);
                             liveClient.Send(buffer);
                         }
                     }
