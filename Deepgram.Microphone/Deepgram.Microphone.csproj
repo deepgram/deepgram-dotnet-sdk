@@ -2,81 +2,31 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0;net8.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.sln'">
-    <!-- Properties related to NuGet packaging: -->
     <IsPackable>true</IsPackable>
-    <Company>Deepgram</Company>
+  </PropertyGroup>
+  <PropertyGroup Label="Nuget">
     <PackageId>Deepgram.Microphone</PackageId>
     <Title>Deepgram .NET Microphone</Title>
     <Description>Helper Microphone Package</Description>
     <Summary>Helper Microphone Package</Summary>
-    <Authors>Deepgram .NET SDK Contributors</Authors>
-    <Copyright>2024 Deepgram</Copyright>
-    <PackageIcon>dg_logo.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/deepgram/deepgram-dotnet-sdk</RepositoryUrl>
-    <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.DevBuild.sln'">
-    <!-- Properties related to NuGet packaging: -->
-    <IsPackable>true</IsPackable>
-    <Company>Deepgram</Company>
+  <PropertyGroup Label="Nuget Dev" Condition="$(ContinuousIntegrationBuild) == 'true'">
     <PackageId>Deepgram.Unstable.Microphone.Builds</PackageId>
-    <Title>Deepgram.Microphone - UNSTABLE DEVELOPER BUILDS</Title>
-    <Description>UNSTABLE DEVELOPER BUILDS - Deepgram .NET Microphone</Description>
-    <Summary>UNSTABLE DEVELOPER BUILDS - Deepgram .NET Microphone</Summary>
-    <Authors>Deepgram .NET SDK Contributors</Authors>
-    <Copyright>2024 Deepgram</Copyright>
-    <PackageIcon>dg_logo.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/deepgram/deepgram-dotnet-sdk</RepositoryUrl>
-    <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest</AnalysisLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
+    <Title>$(Title) - UNSTABLE DEVELOPER BUILDS</Title>
+    <Description>UNSTABLE DEVELOPER BUILDS - $(Description)</Description>
+    <Summary>UNSTABLE DEVELOPER BUILDS - $(Summary)</Summary>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Deepgram.Tests" />
     <None Include="$(ProjectRoot)/extras/dg_logo.png" Pack="true" PackagePath="/" />
     <None Include="$(ProjectRoot)/README.md" Pack="true" PackagePath="/" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="PortAudioSharp2" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Logging" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" />
+    <PackageReference Include="PortAudioSharp2" />
     <PackageReference Include="System.Text.Json" />
     <PackageReference Include="System.Threading.Channels" />
   </ItemGroup>

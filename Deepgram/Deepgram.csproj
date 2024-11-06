@@ -2,70 +2,24 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0;net8.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.sln'">
-    <!-- Properties related to NuGet packaging: -->
     <IsPackable>true</IsPackable>
-    <Company>Deepgram</Company>
+  </PropertyGroup>
+  <PropertyGroup Label="Nuget">
     <PackageId>Deepgram</PackageId>
     <Title>Deepgram .NET SDK</Title>
     <Description>SDK for communicating with the Deepgram APIs </Description>
     <Summary>SDK for communicating with the Deepgram APIs </Summary>
-    <Authors>Deepgram .NET SDK Contributors</Authors>
-    <Copyright>2021-2024 Deepgram</Copyright>
-    <PackageIcon>dg_logo.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/deepgram/deepgram-dotnet-sdk</RepositoryUrl>
-    <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(SolutionFileName)' == 'Deepgram.DevBuild.sln'">
-    <!-- Properties related to NuGet packaging: -->
-    <IsPackable>true</IsPackable>
-    <Company>Deepgram</Company>
+  <PropertyGroup Label="Nuget Dev" Condition="$(ContinuousIntegrationBuild) == 'true'">
     <PackageId>Deepgram.Unstable.SDK.Builds</PackageId>
-    <Title>Deepgram - UNSTABLE DEVELOPER BUILDS</Title>
-    <Description>UNSTABLE DEVELOPER BUILDS - Deepgram .NET SDK</Description>
-    <Summary>UNSTABLE DEVELOPER BUILDS - .NET SDK for communicating with the Deepgram APIs</Summary>
-    <Authors>Deepgram .NET SDK Contributors</Authors>
-    <Copyright>2021-2024 Deepgram</Copyright>
-    <PackageIcon>dg_logo.png</PackageIcon>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/deepgram/deepgram-dotnet-sdk</RepositoryUrl>
-    <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
-    <EnableNETAnalyzers>True</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest</AnalysisLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
+    <Title>$(Title) - UNSTABLE DEVELOPER BUILDS</Title>
+    <Description>UNSTABLE DEVELOPER BUILDS - $(Description)</Description>
+    <Summary>UNSTABLE DEVELOPER BUILDS - $(Summary)</Summary>
   </PropertyGroup>
   <ItemGroup>
+    <InternalsVisibleTo Include="Deepgram.Tests" />
+    <None Include="$(ProjectRoot)/extras/dg_logo.png" Pack="true" PackagePath="/" />
+    <None Include="$(ProjectRoot)/README.md" Pack="true" PackagePath="/" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
@@ -77,12 +31,5 @@
     <PackageReference Include="Serilog" />
     <PackageReference Include="System.Text.Json" />
     <PackageReference Include="System.Threading.Channels" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(ProjectRoot)/extras/dg_logo.png" Pack="true" PackagePath="/" />
-    <None Include="$(ProjectRoot)/README.md" Pack="true" PackagePath="/" />
-  </ItemGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="Deepgram.Tests" />
   </ItemGroup>
 </Project>

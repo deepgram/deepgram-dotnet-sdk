@@ -1,6 +1,24 @@
 <Project>
     <PropertyGroup>
-        <ProjectRoot>$(MSBuildThisFileDirectory)</ProjectRoot>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <IsPackable>false</IsPackable>
+        <LangVersion>latest</LangVersion>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <Nullable>enable</Nullable>
+        <ProjectRoot>$(MSBuildThisFileDirectory)</ProjectRoot>
+    </PropertyGroup>
+    <PropertyGroup Label="NuGet">
+        <Authors>Deepgram .NET SDK Contributors</Authors>
+        <Company>Deepgram</Company>
+        <Copyright>2024 Deepgram</Copyright>
+        <PackageIcon>dg_logo.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://developers.deepgram.com/sdks-tools/sdks/dotnet-sdk/</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageTags>speech-to-text,captions,speech-recognition,deepgram,dotnet</PackageTags>
+        <RepositoryUrl>https://github.com/deepgram/deepgram-dotnet-sdk</RepositoryUrl>
     </PropertyGroup>
 </Project>
