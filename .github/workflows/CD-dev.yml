@@ -26,15 +26,15 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
-        run: dotnet restore Deepgram.DevBuild.sln
+        run: dotnet restore Deepgram.sln
       - name: Get the version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Build
-        run: dotnet build Deepgram.DevBuild.sln --configuration Release --no-restore
+        run: dotnet build Deepgram.sln --configuration Release --no-restore
       - name: Pack
         run: |
-          dotnet pack Deepgram.DevBuild.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
+          dotnet pack Deepgram.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
         with:
