@@ -36,18 +36,21 @@ jobs:
         run: |
           dotnet pack Deepgram.DevBuild.sln --configuration Release --no-restore --output ./dist -p:Version=${{ steps.get_version.outputs.VERSION }}
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist
+          name: dist-${{matrix.dotnet-version}}
+          path: "dist"
+          # Not sure if this is necessary, but this preserves existing behaviour.
+          include-hidden-files: true
   publish:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: dist
+          pattern: dist-*
+          merge-multiple: true
           path: "dist"
       - name: Publish packages
         run: dotnet nuget push ./dist/**.nupkg --source nuget.org --api-key ${{secrets.NUGET_API_KEY}}
