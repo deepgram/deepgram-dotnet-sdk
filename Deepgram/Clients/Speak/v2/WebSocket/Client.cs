@@ -288,7 +288,9 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     /// <param name="text">The string of text you want to be converted to audio.</param>
     public void SpeakWithText(string text)
     {
-        TextSource textSource = new TextSource(text);
+        TextSource textSource = new TextSource(text.Replace("\r\n", "\\n")
+                                             .Replace("\n", "\\n")
+                                             .Replace("\"", "\\\""));
         byte[] byteArray = Encoding.UTF8.GetBytes(textSource.ToString());
         SendMessage(byteArray);
     }
