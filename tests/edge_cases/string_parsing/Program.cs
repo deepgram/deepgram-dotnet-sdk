@@ -111,11 +111,12 @@ namespace SampleProgram
                     return;
                 }
                 // Send some Text to convert to audio
-                speakClient.SpeakWithText(@"let's go home and make some ""coffee""!"); //NOT WORKING
-                speakClient.SpeakWithText("let's go home and make some \"coffee\"!"); //NOT WORKING
-                speakClient.SpeakWithText("let's go home and make some coffee! \n"); //NOT WORKING
-                speakClient.SpeakWithText(@"let's go home and make some coffee!" + Environment.NewLine);//NOT WORKING
-                speakClient.SpeakWithText(@"let's go home and make some coffee!");//Working
+                speakClient.SpeakWithText(@"This is the first ""test string""!");
+                speakClient.SpeakWithText("This is the second \"test string\"!");
+                speakClient.SpeakWithText("This is the third test string! \n");
+                speakClient.SpeakWithText(@"This is the fourth test string!" + Environment.NewLine);
+                speakClient.SpeakWithText(@"This is the fifth test string!");
+                speakClient.SpeakWithText("/This\nis\nthe\bsixth\ttest\fstring!\r\n");
 
                 //Flush the audio
                 speakClient.Flush();

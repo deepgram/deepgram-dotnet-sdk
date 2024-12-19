@@ -290,7 +290,10 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     {
         TextSource textSource = new TextSource(text.Replace("\r\n", "\\n")
                                              .Replace("\n", "\\n")
-                                             .Replace("\"", "\\\""));
+                                             .Replace("\"", "\\\"")
+                                             .Replace("\b", "\\b")
+                                             .Replace("\f", "\\f")
+                                             .Replace("\t", "\\t"));
         byte[] byteArray = Encoding.UTF8.GetBytes(textSource.ToString());
         SendMessage(byteArray);
     }

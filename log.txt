@@ -1033,3 +1033,1374 @@
 2024-12-19 11:54:25.440 [Debug] ProcessDataReceived: _flushedReceived has no listeners
 2024-12-19 11:54:25.440 [Verbose] ProcessDataReceived: LEAVE
 2024-12-19 11:54:25.440 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:01.906 [Verbose] AbstractWebSocketClient: ENTER
+2024-12-19 12:35:01.981 [Verbose] DeepgramWsClientOptions: ENTER
+2024-12-19 12:35:01.981 [Debug] DeepgramWsClientOptions: API KEY provided
+2024-12-19 12:35:01.982 [Debug] DeepgramWsClientOptions: BaseAddress is null
+2024-12-19 12:35:01.982 [Debug] DeepgramWsClientOptions: KeepAlive is null
+2024-12-19 12:35:01.982 [Debug] DeepgramWsClientOptions: OnPrem is null
+2024-12-19 12:35:01.983 [Debug] DeepgramWsClientOptions: Headers is null
+2024-12-19 12:35:01.983 [Debug] DeepgramWsClientOptions: Addons is null
+2024-12-19 12:35:01.985 [Information] DeepgramWsClientOptions: KeepAlive: False
+2024-12-19 12:35:01.985 [Information] DeepgramWsClientOptions: OnPrem: False
+2024-12-19 12:35:01.985 [Information] DeepgramWsClientOptions: APIVersion: v1
+2024-12-19 12:35:01.986 [Debug] DeepgramWsClientOptions: WS BaseAddress: api.deepgram.com
+2024-12-19 12:35:02.000 [Information] DeepgramWsClientOptions: WS BaseAddress does not contain API version: api.deepgram.com
+2024-12-19 12:35:02.001 [Debug] DeepgramWsClientOptions: BaseAddress: api.deepgram.com/v1
+2024-12-19 12:35:02.002 [Information] DeepgramWsClientOptions: BaseAddress does not contain protocol: api.deepgram.com/v1
+2024-12-19 12:35:02.002 [Debug] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:02.002 [Information] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:02.003 [Verbose] DeepgramWsClientOptions: LEAVE
+2024-12-19 12:35:02.003 [Debug] AbstractWebSocketClient: APIVersion: v1
+2024-12-19 12:35:02.003 [Debug] AbstractWebSocketClient: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:02.003 [Debug] AbstractWebSocketClient: OnPrem: False
+2024-12-19 12:35:02.004 [Verbose] AbstractWebSocketClient: LEAVE
+2024-12-19 12:35:02.004 [Verbose] SpeakWSClient: ENTER
+2024-12-19 12:35:02.005 [Debug] SpeakWSClient: Autoflush: 0
+2024-12-19 12:35:02.006 [Verbose] SpeakWSClient: LEAVE
+2024-12-19 12:35:02.011 [Verbose] SpeakWSClient.Connect: ENTER
+2024-12-19 12:35:02.091 [Information] Connect: options:
+{
+  "model": "aura-asteria-en",
+  "encoding": "linear16",
+  "sample_rate": 48000
+}
+2024-12-19 12:35:02.093 [Debug] Connect: addons: 
+2024-12-19 12:35:02.100 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:35:02.107 [Verbose] AbstractWebSocketClient.Connect: ENTER
+2024-12-19 12:35:02.109 [Debug] Connect: headers: 
+2024-12-19 12:35:02.111 [Information] Connect: Using default connect cancellation token
+2024-12-19 12:35:02.116 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:35:02.117 [Debug] Connect: Connecting to Deepgram API...
+2024-12-19 12:35:02.665 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:02.665 [Debug] Connect: Starting Sender Thread...
+2024-12-19 12:35:02.665 [Debug] Connect: Starting Receiver Thread...
+2024-12-19 12:35:02.667 [Debug] Connect: Connect Succeeded
+2024-12-19 12:35:02.667 [Verbose] AbstractWebSocketClient.Connect: LEAVE
+2024-12-19 12:35:02.667 [Verbose] AbstractWebSocketClient.ProcessReceiveQueue: ENTER
+2024-12-19 12:35:02.668 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:02.668 [Debug] Connect: Connect Succeeded
+2024-12-19 12:35:02.668 [Verbose] AbstractWebSocketClient.ProcessSendQueue: ENTER
+2024-12-19 12:35:02.668 [Verbose] SpeakWSClient.Connect: LEAVE
+2024-12-19 12:35:02.671 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:02.671 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:02.674 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:35:02.674 [Verbose] ProcessDataReceived: raw response: {"type":"Metadata","request_id":"0a3600a1-189a-4020-b93b-eb908484ec54","model_name":"aura-asteria-en","model_version":"2024-11-19.0","model_uuid":"ecb76e9d-f2db-4127-8060-79b05590d22f"}
+2024-12-19 12:35:02.688 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:02.690 [Verbose] ProcessSendQueue: Reading message off queue...
+2024-12-19 12:35:02.693 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.697 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.698 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.698 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.698 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.698 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.699 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:02.719 [Verbose] ProcessDataReceived: Type: Metadata
+2024-12-19 12:35:02.755 [Debug] ProcessDataReceived: _metadataReceived has no listeners
+2024-12-19 12:35:02.755 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:35:02.756 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:02.757 [Information] ProcessReceiveQueue: Received WebSocket Close. Trigger cancel...
+2024-12-19 12:35:02.758 [Verbose] AbstractWebSocketClient.Stop: ENTER
+2024-12-19 12:35:02.758 [Information] Stop: Using default disconnect cancellation token
+2024-12-19 12:35:02.859 [Debug] Stop: Closing WebSocket connection...
+2024-12-19 12:35:02.867 [Debug] Stop: Disposing internal token...
+2024-12-19 12:35:02.867 [Debug] Stop: Disposing WebSocket socket...
+2024-12-19 12:35:02.867 [Debug] Stop: Succeeded
+2024-12-19 12:35:02.867 [Verbose] AbstractWebSocketClient.Stop: LEAVE
+2024-12-19 12:35:02.868 [Verbose] ProcessReceiveQueue: LEAVE
+2024-12-19 12:35:09.017 [Verbose] AbstractWebSocketClient.Stop: ENTER
+2024-12-19 12:35:09.017 [Information] Stop: Client has already been disposed
+2024-12-19 12:35:09.017 [Verbose] AbstractWebSocketClient.Stop: LEAVE
+2024-12-19 12:35:35.481 [Verbose] AbstractWebSocketClient: ENTER
+2024-12-19 12:35:35.565 [Verbose] DeepgramWsClientOptions: ENTER
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: API KEY provided
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: BaseAddress is null
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: KeepAlive is null
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: OnPrem is null
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: Headers is null
+2024-12-19 12:35:35.566 [Debug] DeepgramWsClientOptions: Addons is null
+2024-12-19 12:35:35.568 [Information] DeepgramWsClientOptions: KeepAlive: False
+2024-12-19 12:35:35.568 [Information] DeepgramWsClientOptions: OnPrem: False
+2024-12-19 12:35:35.568 [Information] DeepgramWsClientOptions: APIVersion: v1
+2024-12-19 12:35:35.569 [Debug] DeepgramWsClientOptions: WS BaseAddress: api.deepgram.com
+2024-12-19 12:35:35.587 [Information] DeepgramWsClientOptions: WS BaseAddress does not contain API version: api.deepgram.com
+2024-12-19 12:35:35.587 [Debug] DeepgramWsClientOptions: BaseAddress: api.deepgram.com/v1
+2024-12-19 12:35:35.588 [Information] DeepgramWsClientOptions: BaseAddress does not contain protocol: api.deepgram.com/v1
+2024-12-19 12:35:35.588 [Debug] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:35.589 [Information] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:35.589 [Verbose] DeepgramWsClientOptions: LEAVE
+2024-12-19 12:35:35.589 [Debug] AbstractWebSocketClient: APIVersion: v1
+2024-12-19 12:35:35.590 [Debug] AbstractWebSocketClient: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:35:35.590 [Debug] AbstractWebSocketClient: OnPrem: False
+2024-12-19 12:35:35.590 [Verbose] AbstractWebSocketClient: LEAVE
+2024-12-19 12:35:35.590 [Verbose] SpeakWSClient: ENTER
+2024-12-19 12:35:35.591 [Debug] SpeakWSClient: Autoflush: 0
+2024-12-19 12:35:35.592 [Verbose] SpeakWSClient: LEAVE
+2024-12-19 12:35:35.598 [Verbose] SpeakWSClient.Connect: ENTER
+2024-12-19 12:35:35.682 [Information] Connect: options:
+{
+  "model": "aura-asteria-en",
+  "encoding": "linear16",
+  "sample_rate": 48000
+}
+2024-12-19 12:35:35.682 [Debug] Connect: addons: 
+2024-12-19 12:35:35.687 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:35:35.690 [Verbose] AbstractWebSocketClient.Connect: ENTER
+2024-12-19 12:35:35.690 [Debug] Connect: headers: 
+2024-12-19 12:35:35.691 [Information] Connect: Using default connect cancellation token
+2024-12-19 12:35:35.695 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:35:35.698 [Debug] Connect: Connecting to Deepgram API...
+2024-12-19 12:35:36.164 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.165 [Debug] Connect: Starting Sender Thread...
+2024-12-19 12:35:36.165 [Debug] Connect: Starting Receiver Thread...
+2024-12-19 12:35:36.165 [Debug] Connect: Connect Succeeded
+2024-12-19 12:35:36.165 [Verbose] AbstractWebSocketClient.Connect: LEAVE
+2024-12-19 12:35:36.166 [Debug] Connect: Connect Succeeded
+2024-12-19 12:35:36.166 [Verbose] SpeakWSClient.Connect: LEAVE
+2024-12-19 12:35:36.167 [Verbose] AbstractWebSocketClient.ProcessSendQueue: ENTER
+2024-12-19 12:35:36.167 [Verbose] AbstractWebSocketClient.ProcessReceiveQueue: ENTER
+2024-12-19 12:35:36.168 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.170 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.171 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.174 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:35:36.175 [Verbose] ProcessDataReceived: raw response: {"type":"Metadata","request_id":"c07b5769-9899-419c-8eea-3a3a3beb160d","model_name":"aura-asteria-en","model_version":"2024-11-19.0","model_uuid":"ecb76e9d-f2db-4127-8060-79b05590d22f"}
+2024-12-19 12:35:36.183 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.184 [Verbose] ProcessSendQueue: Reading message off queue...
+2024-12-19 12:35:36.186 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.193 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.193 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.193 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.193 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.193 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:35:36.218 [Verbose] ProcessDataReceived: Type: Metadata
+2024-12-19 12:35:36.249 [Debug] ProcessDataReceived: _metadataReceived has no listeners
+2024-12-19 12:35:36.249 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:35:36.249 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.310 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.312 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.314 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.316 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.322 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.347 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.348 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.348 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.348 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.349 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.349 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.349 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.349 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.349 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.350 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.356 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.356 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.356 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.356 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.357 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.379 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.380 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.380 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.380 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.381 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.381 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.381 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.381 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.382 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.382 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.389 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.389 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.389 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.389 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.389 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.410 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.410 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.410 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.411 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.411 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.421 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.421 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.421 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.421 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.421 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.421 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.422 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.422 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.422 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.422 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.432 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.432 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.432 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.432 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.433 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.438 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.438 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.438 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.439 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.439 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.446 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.447 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.447 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.447 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.447 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.447 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.447 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.447 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.447 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.447 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.455 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.455 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.455 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.455 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.455 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.459 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.460 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.460 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.460 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.460 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.460 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.460 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.460 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.460 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.461 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.471 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.471 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.471 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.472 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.472 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.475 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.476 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.476 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.476 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.476 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.477 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.477 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.477 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.477 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.478 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.482 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.483 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.483 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.483 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.484 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.486 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.486 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.486 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.486 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.487 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.487 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.487 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.487 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.487 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.487 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.490 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.490 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.490 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.490 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.490 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.493 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.494 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.494 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.494 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.494 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.496 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.496 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.496 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.497 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.497 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.500 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.500 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.501 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.501 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.501 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.503 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.503 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.503 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.504 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.504 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.508 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.509 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.509 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.509 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.509 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.509 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.509 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.509 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.509 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.510 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.510 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.510 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.510 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.510 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.510 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.510 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.510 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.510 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.510 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.511 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.514 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.514 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.515 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.515 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.515 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.515 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.515 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.516 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.516 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.516 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.516 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.516 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.516 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.516 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.518 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.518 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.518 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.518 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.519 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.519 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.519 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.519 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.519 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.519 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.520 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.520 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.520 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.520 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.521 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.521 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.521 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.521 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.521 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.521 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.522 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.523 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.524 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.524 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.524 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.524 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.526 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.527 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.527 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.527 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.527 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.528 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.529 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.529 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.529 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.529 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.530 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.530 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.530 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.530 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.531 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.531 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.531 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.531 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.531 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.532 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.532 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.532 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.532 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.532 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.532 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.532 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.533 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.533 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.533 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.533 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.533 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.533 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.533 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.533 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.533 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.533 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.533 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.534 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.534 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.534 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.534 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.535 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.535 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.535 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.535 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.535 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.535 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.535 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.536 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.536 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.536 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.536 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.536 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.536 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.537 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.537 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.537 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.537 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.537 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.537 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.537 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.537 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.537 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.537 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.538 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.538 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.538 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.538 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.538 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.539 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.542 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.542 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.542 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.542 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.542 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.543 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.543 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.544 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.544 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.544 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.544 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.544 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.544 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.544 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.545 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.545 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.545 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.545 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.545 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.545 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.546 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.546 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.546 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.546 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.546 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.549 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.549 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.549 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.549 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.550 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.550 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.550 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.550 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:35:36.550 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:35:36.551 [Debug] State: WebSocket State: Open
+2024-12-19 12:35:36.551 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:35:36.551 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:35:36.551 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:35:36.551 [Verbose] ProcessDataReceived: raw response: {"type":"Flushed","sequence_id":0}
+2024-12-19 12:35:36.553 [Verbose] ProcessDataReceived: Type: Flushed
+2024-12-19 12:35:36.556 [Debug] ProcessDataReceived: _flushedReceived has no listeners
+2024-12-19 12:35:36.556 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:35:36.557 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:17.171 [Verbose] AbstractWebSocketClient: ENTER
+2024-12-19 12:36:17.226 [Verbose] DeepgramWsClientOptions: ENTER
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: API KEY provided
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: BaseAddress is null
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: KeepAlive is null
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: OnPrem is null
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: Headers is null
+2024-12-19 12:36:17.226 [Debug] DeepgramWsClientOptions: Addons is null
+2024-12-19 12:36:17.228 [Information] DeepgramWsClientOptions: KeepAlive: False
+2024-12-19 12:36:17.228 [Information] DeepgramWsClientOptions: OnPrem: False
+2024-12-19 12:36:17.228 [Information] DeepgramWsClientOptions: APIVersion: v1
+2024-12-19 12:36:17.229 [Debug] DeepgramWsClientOptions: WS BaseAddress: api.deepgram.com
+2024-12-19 12:36:17.242 [Information] DeepgramWsClientOptions: WS BaseAddress does not contain API version: api.deepgram.com
+2024-12-19 12:36:17.242 [Debug] DeepgramWsClientOptions: BaseAddress: api.deepgram.com/v1
+2024-12-19 12:36:17.243 [Information] DeepgramWsClientOptions: BaseAddress does not contain protocol: api.deepgram.com/v1
+2024-12-19 12:36:17.243 [Debug] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:36:17.243 [Information] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:36:17.243 [Verbose] DeepgramWsClientOptions: LEAVE
+2024-12-19 12:36:17.243 [Debug] AbstractWebSocketClient: APIVersion: v1
+2024-12-19 12:36:17.243 [Debug] AbstractWebSocketClient: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:36:17.243 [Debug] AbstractWebSocketClient: OnPrem: False
+2024-12-19 12:36:17.243 [Verbose] AbstractWebSocketClient: LEAVE
+2024-12-19 12:36:17.243 [Verbose] SpeakWSClient: ENTER
+2024-12-19 12:36:17.244 [Debug] SpeakWSClient: Autoflush: 0
+2024-12-19 12:36:17.244 [Verbose] SpeakWSClient: LEAVE
+2024-12-19 12:36:17.248 [Verbose] SpeakWSClient.Connect: ENTER
+2024-12-19 12:36:17.315 [Information] Connect: options:
+{
+  "model": "aura-asteria-en",
+  "encoding": "linear16",
+  "sample_rate": 48000
+}
+2024-12-19 12:36:17.315 [Debug] Connect: addons: 
+2024-12-19 12:36:17.319 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:36:17.322 [Verbose] AbstractWebSocketClient.Connect: ENTER
+2024-12-19 12:36:17.322 [Debug] Connect: headers: 
+2024-12-19 12:36:17.322 [Information] Connect: Using default connect cancellation token
+2024-12-19 12:36:17.325 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:36:17.325 [Debug] Connect: Connecting to Deepgram API...
+2024-12-19 12:36:17.903 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:17.904 [Debug] Connect: Starting Sender Thread...
+2024-12-19 12:36:17.904 [Debug] Connect: Starting Receiver Thread...
+2024-12-19 12:36:17.904 [Debug] Connect: Connect Succeeded
+2024-12-19 12:36:17.905 [Verbose] AbstractWebSocketClient.Connect: LEAVE
+2024-12-19 12:36:17.905 [Debug] Connect: Connect Succeeded
+2024-12-19 12:36:17.905 [Verbose] SpeakWSClient.Connect: LEAVE
+2024-12-19 12:36:17.906 [Verbose] AbstractWebSocketClient.ProcessSendQueue: ENTER
+2024-12-19 12:36:17.906 [Verbose] AbstractWebSocketClient.ProcessReceiveQueue: ENTER
+2024-12-19 12:36:17.907 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:17.909 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:17.910 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:17.911 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:36:17.912 [Verbose] ProcessDataReceived: raw response: {"type":"Metadata","request_id":"c76060a4-9a1d-456a-bad2-42eb897e1492","model_name":"aura-asteria-en","model_version":"2024-11-19.0","model_uuid":"ecb76e9d-f2db-4127-8060-79b05590d22f"}
+2024-12-19 12:36:17.918 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:17.918 [Verbose] ProcessSendQueue: Reading message off queue...
+2024-12-19 12:36:17.919 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.922 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.923 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.923 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.923 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.923 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.923 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:36:17.948 [Verbose] ProcessDataReceived: Type: Metadata
+2024-12-19 12:36:17.974 [Debug] ProcessDataReceived: _metadataReceived has no listeners
+2024-12-19 12:36:17.974 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:36:17.974 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.109 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.109 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.110 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.110 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.115 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.182 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.182 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.182 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.182 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.183 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.183 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.183 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.183 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.183 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.183 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.192 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.192 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.192 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.192 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.192 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.193 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.193 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.193 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.193 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.193 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.201 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.201 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.201 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.201 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.201 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.282 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.282 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.282 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.282 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.282 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.282 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.283 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.283 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.283 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.283 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.283 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.283 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.283 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.283 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.284 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.284 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.284 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.284 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.284 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.284 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.351 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.351 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.351 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.351 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.351 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.356 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.356 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.356 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.356 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.356 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.356 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.356 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.356 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.356 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.357 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.367 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.367 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.367 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.367 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.367 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.369 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.369 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.369 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.369 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.370 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.371 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.371 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.371 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.371 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.372 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.372 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.373 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.373 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.373 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.373 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.374 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.374 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.374 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.374 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.374 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.441 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.442 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.442 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.442 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.442 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.442 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.442 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.442 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.442 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.443 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.451 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.452 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.452 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.452 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.453 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.453 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.453 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.454 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.454 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.454 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.454 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.454 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.454 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.454 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.455 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.456 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.457 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.457 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.457 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.457 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.457 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.457 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.457 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.457 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.457 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.458 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.458 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.458 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.458 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.460 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.460 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.460 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.460 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.460 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.460 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.460 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.460 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.460 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.460 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.461 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.462 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.462 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.462 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.462 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.463 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.463 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.463 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.463 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.463 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.463 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.463 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.464 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.464 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.464 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.464 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.464 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.464 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.464 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.464 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.464 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.465 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.465 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.465 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.465 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.465 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.527 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.527 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.527 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.527 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.527 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.527 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.528 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.528 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.528 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.528 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.531 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.531 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.531 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.531 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.531 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.531 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.531 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.531 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.532 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.532 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.532 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.532 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.532 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.532 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.532 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.533 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.533 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.533 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.533 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.533 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.533 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.533 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.533 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.533 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.533 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.534 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.534 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.534 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.534 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.534 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.536 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.536 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.536 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.537 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.537 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.537 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.538 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.538 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.538 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.539 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.539 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.540 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.541 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.541 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.541 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.541 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.542 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.542 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.542 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.542 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.542 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.542 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.542 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.542 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.542 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.542 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.543 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.543 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.543 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.543 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.543 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.543 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.543 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.543 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.543 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.543 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.543 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.544 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.544 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.545 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.545 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.546 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.546 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.546 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.546 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.556 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.556 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.556 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.556 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.557 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.557 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.557 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.557 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.557 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.557 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.557 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.557 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.557 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.558 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.559 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.559 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.559 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.560 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.560 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.561 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.561 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.562 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.562 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.562 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.562 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.563 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.563 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.563 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.563 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.564 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.564 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.564 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.564 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.565 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.565 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.565 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.566 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.566 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.566 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.566 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.567 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.567 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.567 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.567 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.567 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.568 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.568 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.568 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.568 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.569 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.569 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.570 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.570 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.570 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.570 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.570 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.570 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.570 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.570 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.570 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.571 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.573 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.573 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.573 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.573 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.573 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.574 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.574 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.574 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.575 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.575 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.575 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.575 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.576 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.576 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.577 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.577 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.577 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.577 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.577 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.577 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.577 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.580 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.580 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.581 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.581 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.582 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.583 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.583 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.583 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.583 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.583 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.584 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.584 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.584 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.584 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.584 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.585 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.585 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.585 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.585 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.585 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.586 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.586 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.586 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.587 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.587 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.587 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.587 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.588 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.617 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.617 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.618 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.618 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.618 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.619 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.620 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.620 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.620 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.621 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.621 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.621 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.621 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.621 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.622 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.622 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.622 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.622 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.622 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.622 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.623 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.623 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.623 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.623 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.623 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.623 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.623 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.623 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:36:18.623 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:36:18.624 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:18.624 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:36:18.624 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:36:18.624 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:36:18.624 [Verbose] ProcessDataReceived: raw response: {"type":"Flushed","sequence_id":0}
+2024-12-19 12:36:18.626 [Verbose] ProcessDataReceived: Type: Flushed
+2024-12-19 12:36:18.630 [Debug] ProcessDataReceived: _flushedReceived has no listeners
+2024-12-19 12:36:18.630 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:36:18.630 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:44.164 [Verbose] AbstractWebSocketClient.Stop: ENTER
+2024-12-19 12:36:44.164 [Information] Stop: Using default disconnect cancellation token
+2024-12-19 12:36:44.164 [Debug] Stop: Sending Close message...
+2024-12-19 12:36:44.165 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:44.165 [Debug] SendClose: Sending Close Message Immediately...
+2024-12-19 12:36:44.167 [Debug] State: WebSocket State: Open
+2024-12-19 12:36:44.167 [Verbose] SendMessageImmediately: Sending text message immediately...
+2024-12-19 12:36:44.267 [Debug] Stop: Closing WebSocket connection...
+2024-12-19 12:36:44.269 [Debug] Stop: Disposing internal token...
+2024-12-19 12:36:44.269 [Debug] Stop: Disposing WebSocket socket...
+2024-12-19 12:36:44.269 [Debug] Stop: Succeeded
+2024-12-19 12:36:44.269 [Verbose] AbstractWebSocketClient.Stop: LEAVE
+2024-12-19 12:37:02.701 [Verbose] AbstractWebSocketClient: ENTER
+2024-12-19 12:37:02.754 [Verbose] DeepgramWsClientOptions: ENTER
+2024-12-19 12:37:02.754 [Debug] DeepgramWsClientOptions: API KEY provided
+2024-12-19 12:37:02.755 [Debug] DeepgramWsClientOptions: BaseAddress is null
+2024-12-19 12:37:02.755 [Debug] DeepgramWsClientOptions: KeepAlive is null
+2024-12-19 12:37:02.755 [Debug] DeepgramWsClientOptions: OnPrem is null
+2024-12-19 12:37:02.755 [Debug] DeepgramWsClientOptions: Headers is null
+2024-12-19 12:37:02.755 [Debug] DeepgramWsClientOptions: Addons is null
+2024-12-19 12:37:02.756 [Information] DeepgramWsClientOptions: KeepAlive: False
+2024-12-19 12:37:02.756 [Information] DeepgramWsClientOptions: OnPrem: False
+2024-12-19 12:37:02.756 [Information] DeepgramWsClientOptions: APIVersion: v1
+2024-12-19 12:37:02.757 [Debug] DeepgramWsClientOptions: WS BaseAddress: api.deepgram.com
+2024-12-19 12:37:02.769 [Information] DeepgramWsClientOptions: WS BaseAddress does not contain API version: api.deepgram.com
+2024-12-19 12:37:02.770 [Debug] DeepgramWsClientOptions: BaseAddress: api.deepgram.com/v1
+2024-12-19 12:37:02.770 [Information] DeepgramWsClientOptions: BaseAddress does not contain protocol: api.deepgram.com/v1
+2024-12-19 12:37:02.770 [Debug] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:37:02.770 [Information] DeepgramWsClientOptions: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:37:02.770 [Verbose] DeepgramWsClientOptions: LEAVE
+2024-12-19 12:37:02.770 [Debug] AbstractWebSocketClient: APIVersion: v1
+2024-12-19 12:37:02.771 [Debug] AbstractWebSocketClient: BaseAddress: wss://api.deepgram.com/v1
+2024-12-19 12:37:02.771 [Debug] AbstractWebSocketClient: OnPrem: False
+2024-12-19 12:37:02.771 [Verbose] AbstractWebSocketClient: LEAVE
+2024-12-19 12:37:02.771 [Verbose] SpeakWSClient: ENTER
+2024-12-19 12:37:02.772 [Debug] SpeakWSClient: Autoflush: 0
+2024-12-19 12:37:02.772 [Verbose] SpeakWSClient: LEAVE
+2024-12-19 12:37:02.775 [Verbose] SpeakWSClient.Connect: ENTER
+2024-12-19 12:37:02.834 [Information] Connect: options:
+{
+  "model": "aura-asteria-en",
+  "encoding": "linear16",
+  "sample_rate": 48000
+}
+2024-12-19 12:37:02.835 [Debug] Connect: addons: 
+2024-12-19 12:37:02.838 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:37:02.840 [Verbose] AbstractWebSocketClient.Connect: ENTER
+2024-12-19 12:37:02.840 [Debug] Connect: headers: 
+2024-12-19 12:37:02.840 [Information] Connect: Using default connect cancellation token
+2024-12-19 12:37:02.842 [Debug] Connect: uri: wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=linear16&sample_rate=48000
+2024-12-19 12:37:02.842 [Debug] Connect: Connecting to Deepgram API...
+2024-12-19 12:37:03.346 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.346 [Debug] Connect: Starting Sender Thread...
+2024-12-19 12:37:03.347 [Debug] Connect: Starting Receiver Thread...
+2024-12-19 12:37:03.347 [Debug] Connect: Connect Succeeded
+2024-12-19 12:37:03.347 [Verbose] AbstractWebSocketClient.Connect: LEAVE
+2024-12-19 12:37:03.347 [Debug] Connect: Connect Succeeded
+2024-12-19 12:37:03.347 [Verbose] SpeakWSClient.Connect: LEAVE
+2024-12-19 12:37:03.348 [Verbose] AbstractWebSocketClient.ProcessSendQueue: ENTER
+2024-12-19 12:37:03.348 [Verbose] AbstractWebSocketClient.ProcessReceiveQueue: ENTER
+2024-12-19 12:37:03.349 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.351 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.352 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.353 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:37:03.353 [Verbose] ProcessDataReceived: raw response: {"type":"Metadata","request_id":"187ffe5f-6cce-4f3d-8484-934b94b8c3c2","model_name":"aura-asteria-en","model_version":"2024-11-19.0","model_uuid":"ecb76e9d-f2db-4127-8060-79b05590d22f"}
+2024-12-19 12:37:03.357 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.357 [Verbose] ProcessSendQueue: Reading message off queue...
+2024-12-19 12:37:03.358 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.361 [Verbose] ProcessSendQueue: Sending message...
+2024-12-19 12:37:03.382 [Verbose] ProcessDataReceived: Type: Metadata
+2024-12-19 12:37:03.405 [Debug] ProcessDataReceived: _metadataReceived has no listeners
+2024-12-19 12:37:03.406 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:37:03.406 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.524 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.524 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.524 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.525 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.529 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.609 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.609 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.609 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.609 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.609 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.609 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.610 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.610 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.610 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.610 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.610 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.610 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.610 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.610 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.610 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.698 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.698 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.699 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.699 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.699 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.699 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.699 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.699 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.699 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.700 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.706 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.707 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.707 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.707 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.707 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.707 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.707 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.708 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.708 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.708 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.786 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.786 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.786 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.787 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.787 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.787 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.787 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.787 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.788 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.788 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.788 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.788 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.788 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.788 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.789 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.789 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.789 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.789 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.789 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.789 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.794 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.794 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.794 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.794 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.794 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.796 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.796 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.796 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.796 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.797 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.797 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.797 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.797 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.797 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.797 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.872 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.872 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.872 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.872 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.873 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.877 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.877 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.877 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.877 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.878 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.878 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.878 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.878 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.878 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.878 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.883 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.883 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.883 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.883 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.883 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.883 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.884 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.884 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.884 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.884 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.889 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.889 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.889 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.889 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.890 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.890 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.890 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.890 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.890 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.890 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.890 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.891 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.891 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.891 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.891 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.891 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.891 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.891 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.892 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.892 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.892 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.892 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.892 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.892 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.893 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.894 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.894 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.894 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.894 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.895 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.895 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.895 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.896 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.896 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.896 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.896 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.896 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.896 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.896 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.896 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.897 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.897 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.897 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.897 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.897 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.922 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.922 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.922 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.922 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.923 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.923 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.923 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.923 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.923 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.923 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.961 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.961 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.961 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.962 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.962 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.962 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.962 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.962 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.962 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.962 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.966 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.967 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.967 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.967 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.967 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.967 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.967 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.967 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.967 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.968 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.968 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.968 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.968 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.968 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.968 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.968 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.968 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.969 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.969 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.969 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.969 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.969 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.970 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.970 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.970 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.970 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.970 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.970 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.970 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.970 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.970 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.970 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.971 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.971 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.971 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.972 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.972 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.973 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.973 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.973 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.974 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.974 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.974 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.974 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.975 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.977 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.977 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.977 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.977 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.978 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.978 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.978 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.978 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.978 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.979 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.979 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.979 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.979 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.979 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.979 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.980 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.980 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.980 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.980 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.980 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.986 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.986 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.986 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.986 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.986 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.986 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.986 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.986 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.986 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.986 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.987 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.987 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.987 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.987 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.987 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.987 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.987 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.987 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.987 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.987 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.988 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.988 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.988 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.988 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.988 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.988 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.988 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.988 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.988 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.988 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.988 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.988 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.989 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.989 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.989 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.989 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.989 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.989 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.989 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.989 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.989 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.989 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.990 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.990 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.990 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.990 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.990 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.990 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.990 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.991 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.991 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.991 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.991 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.992 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.992 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.992 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.993 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.994 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.994 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.994 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.995 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.995 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.995 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.995 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.995 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.996 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.996 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.996 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.996 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.996 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.996 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.996 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.996 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.996 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.996 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.996 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.997 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.997 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.997 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.997 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.997 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.997 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.997 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.997 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.998 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.998 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.998 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.998 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.998 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.998 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.998 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.998 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.998 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.998 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.998 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:03.999 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:03.999 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:03.999 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:03.999 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:03.999 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.046 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.046 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.046 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.047 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.047 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.047 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.047 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.047 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.047 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.047 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.055 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.056 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.056 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.056 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.056 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.056 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.056 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.056 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.056 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.057 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.057 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.057 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.057 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.057 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.057 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.058 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.058 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.058 [Debug] ProcessBinaryMessage: Received WebSocketMessageType.Binary
+2024-12-19 12:37:04.058 [Debug] ProcessBinaryMessage: Invoking AudioResponse
+2024-12-19 12:37:04.058 [Debug] State: WebSocket State: Open
+2024-12-19 12:37:04.058 [Verbose] ProcessReceiveQueue: Received message: System.Net.WebSockets.WebSocketReceiveResult / System.IO.MemoryStream
+2024-12-19 12:37:04.058 [Verbose] AbstractWebSocketClient.ProcessDataReceived: ENTER
+2024-12-19 12:37:04.058 [Debug] ProcessDataReceived: Received WebSocketMessageType.Text
+2024-12-19 12:37:04.058 [Verbose] ProcessDataReceived: raw response: {"type":"Flushed","sequence_id":0}
+2024-12-19 12:37:04.060 [Verbose] ProcessDataReceived: Type: Flushed
+2024-12-19 12:37:04.062 [Debug] ProcessDataReceived: _flushedReceived has no listeners
+2024-12-19 12:37:04.062 [Verbose] ProcessDataReceived: LEAVE
+2024-12-19 12:37:04.062 [Debug] State: WebSocket State: Open
