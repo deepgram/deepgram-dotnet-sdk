@@ -95,8 +95,6 @@ Right click on project and select manage nuget packages
 # Targeted Frameworks
 
 - 8.0.x
-- 7.0.x
-- 6.0.x
 - NetStandard2.0
 
 

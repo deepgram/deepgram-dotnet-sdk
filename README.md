@@ -35,8 +35,6 @@ You can learn more about the full Deepgram API at [https://developers.deepgram.c
 This SDK supports the following versions:
 
 - .NET 8.0
-- .NET 7.0
-- .NET 6.0
 
 # Installation
 
