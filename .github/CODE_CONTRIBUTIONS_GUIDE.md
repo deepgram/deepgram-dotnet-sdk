@@ -103,7 +103,7 @@ For macOS, there are two options. The recommended option is [Visual Studio Code]
 **NOTE:** By default, we target the oldest support .NET for the projects contained within this repo. This is done to ensure we are using something other than functionality that is supported at a later version and onward. To target the specific .NET that you downloaded (for example, .NET 8), run the following commands from the root of the repo:
 
 ```bash
-find ./ -type f -iname "*.csproj" -not -path "./.git" -exec sed -i.bak 's/<TargetFramework>net6.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/g' "{}" +;
+find ./ -type f -iname "*.csproj" -not -path "./.git" -exec sed -i.bak 's/<TargetFramework>net8.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/g' "{}" +;
 # if you are comfortable with what was changed, you can delete the backup files by running this command
 # find ./ -type f -iname "*.bak" -not -path "./.git" -exec rm -rf "{}" +;
 ```
@@ -161,7 +161,7 @@ All Linux distributions have the GNU tools available. The most popular distribut
 **NOTE:** By default we target the oldest support .NET in the projects contained within this repo. This is done to ensure we are using something other than functionality supported at a later version and onward. To target the specific .NET that you downloaded (for example, .NET 8), run the following commands from the root of the repo:
 
 ```bash
-find ./ -type f -iname "*.csproj" -not -path "./.git" -exec sed -i.bak 's/<TargetFramework>net6.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/g' "{}" +;
+find ./ -type f -iname "*.csproj" -not -path "./.git" -exec sed -i.bak 's/<TargetFramework>net8.0<\/TargetFramework>/<TargetFramework>net8.0<\/TargetFramework>/g' "{}" +;
 # if you are comfortable with what was changed, you can delete the backup files by running this command
 # find ./ -type f -iname "*.bak" -not -path "./.git" -exec rm -rf "{}" +;
 ```
