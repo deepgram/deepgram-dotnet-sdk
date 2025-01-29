@@ -105,6 +105,30 @@ public interface IAgentWebSocketClient
     /// </summary>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<ErrorResponse> eventHandler);
+
+    /// <summary>
+    /// Subscribe to an Error event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<SettingsAppliedResponse> eventHandler);
+
+    /// <summary>
+    /// Subscribe to an Error event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<InjectionRefusedResponse> eventHandler);
+
+/// <summary>
+    /// Subscribe to an Error event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<InstructionsUpdatedResponse> eventHandler);
+
+    /// <summary>
+    /// Subscribe to an Error event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler);
     #endregion
 
     #region Send Functions
