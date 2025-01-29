@@ -189,9 +189,11 @@ namespace SampleApp
                 var settingsConfiguration = new SettingsConfigurationSchema();
                 settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
                 settingsConfiguration.Agent.Think.Model = "gpt-4o-mini";
-                settingsConfiguration.Agent.Think.Instructions = "You are a helpful AI assistant.";
-                settingsConfiguration.Audio.Output.SampleRate = 48000;
-                settingsConfiguration.Audio.Input.SampleRate = 16000;
+                settingsConfiguration.Audio.Output.SampleRate = 16000;
+                settingsConfiguration.Audio.Output.Container = "wav";
+                settingsConfiguration.Audio.Input.SampleRate = 44100;
+                settingsConfiguration.Context.Messages = new List<object> {};
+                settingsConfiguration.Context.Replay = false;
 
                 bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)

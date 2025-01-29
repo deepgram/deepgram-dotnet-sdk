@@ -4,7 +4,7 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public record Content
+public record Context
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("messages")]
