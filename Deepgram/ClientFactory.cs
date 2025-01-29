@@ -16,6 +16,17 @@ namespace Deepgram;
 public static class ClientFactory
 {
     /// <summary>
+    /// Create a new AgentWebSocketClient using the latest version
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IAgentWebSocketClient CreateAgentWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new AgentWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
     /// Create a new AnalyzeClient
     /// </summary>
     /// <param name="apiKey"></param>
@@ -107,6 +118,15 @@ public static class ClientFactory
     /// that version to the latest version (ie transition to the function above). Older clients will be removed at the next major version
     /// and the latest version will be renamed to v1.
     /// 
+
+    /// <summary>
+    /// This method allows you to create an AgentClient with a specific version of the client.
+    /// TODO: this should be revisited at a later time. Opportunity to use reflection to get the type of the client
+    /// </summary>
+    public static object CreateAgentWebSocketClient(int version, string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new AgentWebSocketClient(apiKey, options);
+    }
 
     /// <summary>
     /// This method allows you to create an AnalyzeClient with a specific version of the client.
