@@ -195,6 +195,9 @@ These examples provide:
     - Projects - [examples/manage/projects](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/projects/Program.cs)
     - Scopes - [examples/manage/scopes](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/scopes/Program.cs)
     - Usage - [examples/manage/usage](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/manage/usage/Program.cs)
+	
+- Voice Agent API
+    - From a Microphone - [examples/agent/websocket/simple](https://github.com/deepgram/deepgram-dotnet-sdk/blob/main/examples/agent/websocket/simple/Program.cs)
 
 To run each example, set the `DEEPGRAM_API_KEY` as an environment variable, then `cd` into each example folder and execute the example: `dotnet run <Project File>.csproj`.
 
