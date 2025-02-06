@@ -149,6 +149,14 @@ public class PreRecordedSchema
     public List<string>? Keywords { get; set; }
 
     /// <summary>
+    /// Keyterm Prompting allows you improve Keyword Recall Rate (KRR) for important keyterms or phrases up to 90%.
+    /// <see href="https://developers.deepgram.com/docs/keyterm">
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("keyterms")]
+    public List<string>? Keyterms { get; set; }
+
+    /// <summary>
     /// Primary spoken language of submitted audio 
     /// <see href="https://developers.deepgram.com/docs/language">
     /// default value is 'en' 
