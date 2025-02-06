@@ -12,7 +12,7 @@ public record Listen
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("keyterms")]
-    public string[] Keyterms { get; set; }
+    public List<string>? Keyterms { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

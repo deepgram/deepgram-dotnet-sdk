@@ -6,6 +6,7 @@ using Deepgram.Logger;
 using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
+using System.Collections.Generic;
 
 namespace SampleApp
 {
@@ -195,7 +196,7 @@ namespace SampleApp
                 settingsConfiguration.Context.Messages = new List<object> {};
                 settingsConfiguration.Context.Replay = false;
                 settingsConfiguration.Agent.Listen.Model = "nova-3";
-                settingsConfiguration.Agent.Listen.Keyterms = new string[] { "Deepgram" };
+                settingsConfiguration.Agent.Listen.Keyterms = new List<string> { "Deepgram" };
 
                 bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)
