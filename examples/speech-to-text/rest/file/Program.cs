@@ -4,6 +4,7 @@
 
 using Deepgram.Logger;
 using Deepgram.Models.Listen.v1.REST;
+using System.Collections.Generic;
 
 namespace PreRecorded
 {
@@ -36,7 +37,8 @@ namespace PreRecorded
                 audioData,
                 new PreRecordedSchema()
                 {
-                    Model = "nova-2",
+                    Model = "nova-3",
+                    Keyterms = new List<string> { "Bueller" },
                     Punctuate = true,
                 },
                 cancelToken);

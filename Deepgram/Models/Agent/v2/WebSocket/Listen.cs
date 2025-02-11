@@ -8,7 +8,11 @@ public record Listen
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("model")]
-    public string Model { get; set; } = "nova-2";
+    public string Model { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("keyterms")]
+    public List<string>? Keyterms { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

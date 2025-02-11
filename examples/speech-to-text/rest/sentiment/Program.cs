@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Listen.v1.REST;
+using System.Collections.Generic;
 
 namespace PreRecorded
 {
@@ -29,7 +30,8 @@ namespace PreRecorded
                 audioData,
                 new PreRecordedSchema()
                 {
-                    Model = "nova-2",
+                    Model = "nova-3",
+                    Keyterms = new List<string> { "Call Center" },
                     Punctuate = true,
                     Utterances = true,
                     Sentiment = true,

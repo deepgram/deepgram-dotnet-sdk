@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Listen.v1.REST;
+using System.Collections.Generic;
 
 namespace PreRecorded
 {
@@ -25,7 +26,8 @@ namespace PreRecorded
                 new UrlSource("https://dpgr.am/bueller.wav"),
                 new PreRecordedSchema()
                 {
-                    Model = "nova-2",
+                    Model = "nova-3",
+                    Keyterms = new List<string> { "Bueller" },
                 },
                 null, // use the default timeout
                 customOptions);

@@ -8,6 +8,7 @@ using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using Deepgram.Clients.Interfaces.v2;
+using Deepgram.Models.Exceptions.v1;
 
 namespace Deepgram.Clients.Listen.v2.WebSocket;
 
@@ -49,6 +50,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     public async Task<bool> Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
+        if (!options.Model.StartsWith("nova-3") && options.Keyterms?.Count > 0)
+        {
+            throw new DeepgramException("Keyterms is only supported in Nova 3 models.");
+        }
         Log.Verbose("ListenWSClient.Connect", "ENTER");
         Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
         Log.Debug("Connect", $"addons: {addons}");
