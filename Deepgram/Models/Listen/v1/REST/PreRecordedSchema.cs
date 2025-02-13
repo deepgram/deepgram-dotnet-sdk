@@ -153,8 +153,8 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/keyterm">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("keyterms")]
-    public List<string>? Keyterms { get; set; }
+    [JsonPropertyName("keyterm")]
+    public List<string>? Keyterm { get; set; }
 
     /// <summary>
     /// Primary spoken language of submitted audio 

@@ -50,9 +50,9 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     public async Task<bool> Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        if (!options.Model.StartsWith("nova-3") && options.Keyterms?.Count > 0)
+        if (!options.Model.StartsWith("nova-3") && options.Keyterm?.Count > 0)
         {
-            throw new DeepgramException("Keyterms is only supported in Nova 3 models.");
+            throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }
         Log.Verbose("ListenWSClient.Connect", "ENTER");
         Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");

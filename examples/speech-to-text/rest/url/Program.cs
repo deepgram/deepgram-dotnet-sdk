@@ -27,7 +27,7 @@ namespace PreRecorded
                 new PreRecordedSchema()
                 {
                     Model = "nova-3",
-                    Keyterms = new List<string> { "Bueller" },
+                    Keyterm = new List<string> { "Bueller" },
                 },
                 null, // use the default timeout
                 customOptions);
