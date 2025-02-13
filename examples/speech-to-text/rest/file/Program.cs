@@ -38,7 +38,7 @@ namespace PreRecorded
                 new PreRecordedSchema()
                 {
                     Model = "nova-3",
-                    Keyterms = new List<string> { "Bueller" },
+                    Keyterm = new List<string> { "Bueller" },
                     Punctuate = true,
                 },
                 cancelToken);

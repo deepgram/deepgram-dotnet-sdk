@@ -11,8 +11,8 @@ public record Listen
     public string Model { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("keyterms")]
-    public List<string>? Keyterms { get; set; }
+    [JsonPropertyName("keyterm")]
+    public List<string>? Keyterm { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

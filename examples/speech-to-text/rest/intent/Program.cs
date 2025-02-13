@@ -31,7 +31,7 @@ namespace PreRecorded
                 new PreRecordedSchema()
                 {
                     Model = "nova-3",
-                    Keyterms = new List<string> { "Call Center" },
+                    Keyterm = new List<string> { "Call Center" },
                     Punctuate = true,
                     Intents = true,
                 });
