@@ -196,7 +196,7 @@ namespace SampleApp
                 settingsConfiguration.Context.Messages = new List<object> {};
                 settingsConfiguration.Context.Replay = false;
                 settingsConfiguration.Agent.Listen.Model = "nova-3";
-                settingsConfiguration.Agent.Listen.Keyterm = new List<string> { "Deepgram" };
+                settingsConfiguration.Agent.Listen.Keyterms = new List<string> { "Deepgram" };
 
                 bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)

@@ -52,7 +52,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     public async Task<bool> Connect(SettingsConfigurationSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        if (!options.Agent.Listen.Model.StartsWith("nova-3") && options.Agent.Listen.Keyterm?.Count > 0)
+        if (!options.Agent.Listen.Model.StartsWith("nova-3") && options.Agent.Listen.Keyterms?.Count > 0)
         {
             throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }

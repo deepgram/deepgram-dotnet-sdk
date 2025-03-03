@@ -10,9 +10,13 @@ public record Listen
     [JsonPropertyName("model")]
     public string Model { get; set; }
 
+    /// <summary>
+    /// Keyterm Prompting allows you improve Keyword Recall Rate (KRR) for important keyterms or phrases up to 90%.
+    /// <see href="https://developers.deepgram.com/docs/keyterm">
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("keyterm")]
-    public List<string>? Keyterm { get; set; }
+    [JsonPropertyName("keyterms")]
+    public List<string>? Keyterms { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
