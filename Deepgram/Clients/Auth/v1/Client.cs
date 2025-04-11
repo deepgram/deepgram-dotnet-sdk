@@ -18,7 +18,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IAuthClient
 {
     /// <summary>
-    /// Gets a short-lived JWT for the Deepgram API.
+    /// Gets a temporary JWT for the Deepgram API.
     /// </summary>
     /// <returns><see cref="GrantTokenResponse"/></returns>
     public async Task<GrantTokenResponse> GrantToken(CancellationTokenSource? cancellationToken = default,
