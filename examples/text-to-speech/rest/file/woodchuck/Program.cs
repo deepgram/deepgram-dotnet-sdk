@@ -28,7 +28,7 @@ namespace SampleApp
                 "test.mp3",
                 new SpeakSchema()
                 {
-                    Model = "aura-asteria-en",
+                    Model = "aura-2-thalia-en",
                 });
 
             //Console.WriteLine(response);
