@@ -50,6 +50,18 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Create a new AuthClient
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static V1.IAuthClient CreateAuthClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AuthClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new ManageClient
     /// </summary>
     /// <param name="apiKey"></param>
