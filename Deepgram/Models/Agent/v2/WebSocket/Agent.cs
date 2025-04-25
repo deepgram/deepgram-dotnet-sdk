@@ -26,10 +26,18 @@ public record Agent
     public Speak Speak { get; set; } = new Speak();
 
     /// <summary>
+    /// The message to speak at the start of the connection.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("greeting")]
+    public string? Greeting { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
     {
         return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
     }
+    
 }

@@ -15,11 +15,11 @@ public record Speak
     public SpeakProvider Provider { get; set; } = new SpeakProvider();
 
     /// <summary>
-    /// Custom endpoint for custom models - to use a custom model, set provider.type to "something???".
+    /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]
-    public Endpoint? Endpoint { get; set; } = new Endpoint();
+    public Endpoint? Endpoint { get; set; } = null;
 
     /// <summary>
     /// Override ToString method to serialize the object

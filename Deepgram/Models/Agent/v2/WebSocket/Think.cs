@@ -9,7 +9,10 @@ public record Think
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
     public ThinkProvider Provider { get; set; } = new ThinkProvider();
-
+    
+    /// <summary>
+    /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]
     public Endpoint? Endpoint { get; set; }

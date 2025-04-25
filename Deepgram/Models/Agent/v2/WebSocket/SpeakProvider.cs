@@ -33,7 +33,7 @@ public record SpeakProvider
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("voice")]
-    public CartesiaVoice? Voice { get; set; } = new CartesiaVoice();
+    public CartesiaVoice? Voice { get; set; } = null;
 
     /// <summary>
     /// Optional Cartesia Language
