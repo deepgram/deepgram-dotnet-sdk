@@ -8,21 +8,19 @@ public record Think
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
-    public Provider? Provider { get; set; } = new Provider();
+    public ThinkProvider Provider { get; set; } = new ThinkProvider();
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
+    [JsonPropertyName("endpoint")]
+    public Endpoint? Endpoint { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("instructions")]
-    public string? Instructions { get; set; }
+    [JsonPropertyName("prompt")]
+    public string? Prompt { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("functions")]
     public List<Function>? Functions { get; set; }
-
-
 
     /// <summary>
     /// Override ToString method to serialize the object

@@ -4,15 +4,18 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public record Listen
+public class UpdatePromptSchema
 {
     /// <summary>
-    /// The provider for the TTS.
-    /// Must be "deepgram".
+    /// UpdatePrompt event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("provider")]
-    public ListenProvider Provider { get; set; } = new ListenProvider();
+    [JsonPropertyName("type")]
+    public string? Type { get; } = AgentClientTypes.UpdatePrompt;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("prompt")]
+    public string? Prompt { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

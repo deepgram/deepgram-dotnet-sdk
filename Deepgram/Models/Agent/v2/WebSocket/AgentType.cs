@@ -30,7 +30,7 @@ public enum AgentType
 public static class AgentClientTypes
 {
     // user message types
-    public const string SettingsConfiguration = "SettingsConfiguration";
+    public const string Settings = "Settings";
     public const string UpdatePrompt = "UpdatePrompt";
     public const string UpdateSpeak = "UpdateSpeak";
     public const string InjectAgentMessage = "InjectAgentMessage";

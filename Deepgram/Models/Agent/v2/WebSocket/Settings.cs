@@ -4,14 +4,21 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class SettingsConfigurationSchema
+public class SettingsSchema
 {
     /// <summary>
-    /// SettingsConfiguration event type.
+    /// Settings event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; } = AgentClientTypes.SettingsConfiguration;
+    public string? Type { get; } = AgentClientTypes.Settings;
+
+    /// <summary>
+    /// Set to true to enable experimental features.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("experimental")]
+    public bool? Experimental { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("audio")]
@@ -21,9 +28,12 @@ public class SettingsConfigurationSchema
     [JsonPropertyName("agent")]
     public Agent Agent { get; set; } = new Agent();
 
+    /// <summary>
+    /// The message to speak at the start of the connection.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("context")]
-    public Context Context { get; set; } = new Context();
+    [JsonPropertyName("greeting")]
+    public string? Greeting { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

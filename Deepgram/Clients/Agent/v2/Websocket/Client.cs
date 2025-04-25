@@ -49,10 +49,10 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task<bool> Connect(SettingsConfigurationSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
+    public async Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        if (!options.Agent.Listen.Model.StartsWith("nova-3") && options.Agent.Listen.Keyterms?.Count > 0)
+        if (!options.Agent.Listen.Provider.Model.StartsWith("nova-3") && options.Agent.Listen.Provider.Keyterms?.Count > 0)
         {
             throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }
@@ -333,7 +333,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     }
 
     /// <summary>
-    /// Subscribe to a InstructionsUpdated event from the Deepgram API
+    /// Subscribe to a PromptUpdated event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<PromptUpdatedResponse> eventHandler)

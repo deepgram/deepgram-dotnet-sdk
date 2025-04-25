@@ -12,7 +12,7 @@ public record Input
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("sample_rate")]
-    public long? SampleRate { get; set; } = 24000;
+    public long? SampleRate { get; set; } = 16000;
 
     /// <summary>
     /// Override ToString method to serialize the object

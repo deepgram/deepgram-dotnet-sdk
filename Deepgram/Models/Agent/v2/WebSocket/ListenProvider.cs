@@ -1,29 +1,31 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public record Agent
+public record ListenProvider
 {
     /// <summary>
-    /// ISO 639-1 language code for the agent.
+    /// The provider for the TTS.
+    /// Must be "deepgram".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("language")]
-    public string? Language { get; set; } = "en";
+    [JsonPropertyName("type")]
+    public string? Type { get; set; } = "deepgram";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("listen")]
-    public Listen Listen { get; set; } = new Listen();
+    [JsonPropertyName("model")]
+    public string Model { get; set; }
 
+    /// <summary>
+    /// Keyterm Prompting allows you improve Keyword Recall Rate (KRR) for important keyterms or phrases up to 90%.
+    /// Only available for Nova 3.
+    /// See https://developers.deepgram.com/docs/keyterm
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("think")]
-    public Think Think { get; set; } = new Think();
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("speak")]
-    public Speak Speak { get; set; } = new Speak();
+    [JsonPropertyName("keyterms")]
+    public List<string>? Keyterms { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
