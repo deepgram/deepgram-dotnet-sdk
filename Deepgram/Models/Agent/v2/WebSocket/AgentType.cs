@@ -23,7 +23,7 @@ public enum AgentType
     Audio,
     InjectionRefused,
     SettingsApplied,
-    InstructionsUpdated,
+    PromptUpdated,
     SpeakUpdated,
 }
 
@@ -31,7 +31,7 @@ public static class AgentClientTypes
 {
     // user message types
     public const string SettingsConfiguration = "SettingsConfiguration";
-    public const string UpdateInstructions = "UpdateInstructions";
+    public const string UpdatePrompt = "UpdatePrompt";
     public const string UpdateSpeak = "UpdateSpeak";
     public const string InjectAgentMessage = "InjectAgentMessage";
     public const string FunctionCallResponse = "FunctionCallResponse";

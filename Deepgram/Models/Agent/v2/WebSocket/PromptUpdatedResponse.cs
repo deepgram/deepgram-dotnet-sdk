@@ -4,7 +4,7 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public record InstructionsUpdatedResponse
+public record PromptUpdatedResponse
 {
     /// <summary>
     /// SettingsConfiguration event type.
@@ -12,7 +12,7 @@ public record InstructionsUpdatedResponse
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public AgentType? Type { get; } = AgentType.InstructionsUpdated;
+    public AgentType? Type { get; } = AgentType.PromptUpdated;
 
     /// <summary>
     /// Override ToString method to serialize the object

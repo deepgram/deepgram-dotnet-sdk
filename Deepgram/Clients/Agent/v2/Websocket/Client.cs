@@ -40,7 +40,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<WelcomeResponse>? _welcomeReceived;
     private event EventHandler<SettingsAppliedResponse>? _settingsAppliedReceived;
     private event EventHandler<InjectionRefusedResponse>? _injectionRefusedReceived;
-    private event EventHandler<InstructionsUpdatedResponse>? _instructionsUpdatedReceived;
+    private event EventHandler<PromptUpdatedResponse>? _promptUpdatedReceived;
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
     #endregion
 
@@ -336,12 +336,12 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     /// Subscribe to a InstructionsUpdated event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
-    public async Task<bool> Subscribe(EventHandler<InstructionsUpdatedResponse> eventHandler)
+    public async Task<bool> Subscribe(EventHandler<PromptUpdatedResponse> eventHandler)
     {
         await _mutexSubscribe.WaitAsync();
         try
         {
-            _instructionsUpdatedReceived += (sender, e) => eventHandler(sender, e);
+            _promptUpdatedReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -772,23 +772,23 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
                     Log.Debug("ProcessTextMessage", $"Invoking InjectionRefusedResponse. event: {injectionRefusedResponse}");
                     InvokeParallel(_injectionRefusedReceived, injectionRefusedResponse);
                     break;
-                case AgentType.InstructionsUpdated:
-                    var instructionsUpdatedResponse = data.Deserialize<InstructionsUpdatedResponse>();
-                    if (_instructionsUpdatedReceived == null)
+                case AgentType.PromptUpdated:
+                    var promptUpdatedResponse = data.Deserialize<PromptUpdatedResponse>();
+                    if (_promptUpdatedReceived == null)
                     {
-                        Log.Debug("ProcessTextMessage", "_instructionsUpdatedReceived has no listeners");
+                        Log.Debug("ProcessTextMessage", "_promptUpdatedReceived has no listeners");
                         Log.Verbose("ProcessTextMessage", "LEAVE");
                         return;
                     }
-                    if (instructionsUpdatedResponse == null)
+                    if (promptUpdatedResponse == null)
                     {
-                        Log.Warning("ProcessTextMessage", "InstructionsUpdatedResponse is invalid");
+                        Log.Warning("ProcessTextMessage", "PromptUpdatedResponse is invalid");
                         Log.Verbose("ProcessTextMessage", "LEAVE");
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking InstructionsUpdatedResponse. event: {instructionsUpdatedResponse}");
-                    InvokeParallel(_instructionsUpdatedReceived, instructionsUpdatedResponse);
+                    Log.Debug("ProcessTextMessage", $"Invoking PromptUpdatedResponse. event: {promptUpdatedResponse}");
+                    InvokeParallel(_promptUpdatedReceived, promptUpdatedResponse);
                     break;
                 case AgentType.SpeakUpdated:
                     var speakUpdatedResponse = data.Deserialize<SpeakUpdatedResponse>();
