@@ -7,6 +7,7 @@ using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
+using PortAudioSharp;
 
 namespace SampleApp
 {
@@ -23,7 +24,30 @@ namespace SampleApp
                 //Deepgram.Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
                 // Initialize the microphone library
-                Deepgram.Microphone.Library.Initialize();
+                Console.WriteLine("Initializing microphone library...");
+                try
+                {
+                    Deepgram.Microphone.Library.Initialize();
+                    Console.WriteLine("Microphone library initialized successfully.");
+
+                    // Get default input device
+                    int defaultDevice = PortAudio.DefaultInputDevice;
+                    if (defaultDevice == PortAudio.NoDevice)
+                    {
+                        Console.WriteLine("Error: No default input device found.");
+                        return;
+                    }
+
+                    var deviceInfo = PortAudio.GetDeviceInfo(defaultDevice);
+                    Console.WriteLine($"Using default input device: {deviceInfo.name}");
+                    Console.WriteLine($"Sample rate: {deviceInfo.defaultSampleRate}");
+                    Console.WriteLine($"Channels: {deviceInfo.maxInputChannels}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing microphone library: {ex.Message}");
+                    return;
+                }
 
                 Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
 
@@ -213,14 +237,28 @@ namespace SampleApp
                 }
 
                 // Microphone streaming
-                var microphone = new Microphone(agentClient.SendBinary);
-                microphone.Start();
+                Console.WriteLine("Starting microphone...");
+                Microphone microphone = null;
+                try
+                {
+                    microphone = new Microphone(agentClient.SendBinary);
+                    microphone.Start();
+                    Console.WriteLine("Microphone started successfully. Waiting for audio input...");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error starting microphone: {ex.Message}");
+                    return;
+                }
 
                 // Wait for the user to press a key
                 Console.ReadKey();
 
                 // Stop the microphone
-                microphone.Stop();
+                if (microphone != null)
+                {
+                    microphone.Stop();
+                }
 
                 // Stop the connection
                 await agentClient.Stop();
