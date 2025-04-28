@@ -51,6 +51,14 @@ namespace SampleApp
                 // settingsConfiguration.Agent.Speak.Endpoint = new Endpoint();
                 // settingsConfiguration.Agent.Think.Endpoint = new Endpoint();
 
+                 bool bConnected = await agentClient.Connect(settingsConfiguration);
+                if (!bConnected)
+                {
+                    Console.WriteLine("Failed to connect to Deepgram WebSocket server.");
+                    return;
+                }
+
+
                 // Subscribe to the EventResponseReceived event
                 var subscribeResult = await agentClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
                 {
@@ -300,13 +308,6 @@ namespace SampleApp
                 if (!subscribeResult)
                 {
                     Console.WriteLine("Failed to subscribe to ErrorResponse event");
-                    return;
-                }
-
-                bool bConnected = await agentClient.Connect(settingsConfiguration);
-                if (!bConnected)
-                {
-                    Console.WriteLine("Failed to connect to Deepgram WebSocket server.");
                     return;
                 }
 
