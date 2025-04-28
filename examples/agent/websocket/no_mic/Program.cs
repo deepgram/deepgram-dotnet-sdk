@@ -32,6 +32,25 @@ namespace SampleApp
                 var lastAudioTime = DateTime.Now;
                 var audioFileCount = 0;
 
+                // Start the connection
+                var settingsConfiguration = new SettingsSchema();
+                settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
+                settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini";
+                settingsConfiguration.Audio.Output.SampleRate = 16000;
+                settingsConfiguration.Audio.Output.Container = "wav";
+                settingsConfiguration.Audio.Input.SampleRate = 44100;
+                settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
+                settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
+                settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
+                settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";
+                settingsConfiguration.Agent.Speak.Provider.Model = "aura-2-thalia-en";
+
+                // To avoid issues with empty objects, Voice and Endpoint are instantiated as null. Construct them as needed.
+                // settingsConfiguration.Agent.Speak.Provider.Voice = new CartesiaVoice();
+                // settingsConfiguration.Agent.Speak.Provider.Voice.Id = "en-US-Wavenet-D";
+                // settingsConfiguration.Agent.Speak.Endpoint = new Endpoint();
+                // settingsConfiguration.Agent.Think.Endpoint = new Endpoint();
+
                 // Subscribe to the EventResponseReceived event
                 var subscribeResult = await agentClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
                 {
@@ -283,25 +302,6 @@ namespace SampleApp
                     Console.WriteLine("Failed to subscribe to ErrorResponse event");
                     return;
                 }
-
-                // Start the connection
-                var settingsConfiguration = new SettingsSchema();
-                settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
-                settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini";
-                settingsConfiguration.Audio.Output.SampleRate = 16000;
-                settingsConfiguration.Audio.Output.Container = "wav";
-                settingsConfiguration.Audio.Input.SampleRate = 44100;
-                settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
-                settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
-                settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
-                settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";
-                settingsConfiguration.Agent.Speak.Provider.Model = "aura-2-thalia-en";
-
-                // To avoid issues with empty objects, Voice and Endpoint are instantiated as null. Construct them as needed.
-                // settingsConfiguration.Agent.Speak.Provider.Voice = new CartesiaVoice();
-                // settingsConfiguration.Agent.Speak.Provider.Voice.Id = "en-US-Wavenet-D";
-                // settingsConfiguration.Agent.Speak.Endpoint = new Endpoint();
-                // settingsConfiguration.Agent.Think.Endpoint = new Endpoint();
 
                 bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)
