@@ -36,9 +36,9 @@ namespace SampleApp
                 var settingsConfiguration = new SettingsSchema();
                 settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
                 settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini";
-                settingsConfiguration.Audio.Output.SampleRate = 16000;
+                settingsConfiguration.Audio.Output.SampleRate = 24000;
                 settingsConfiguration.Audio.Output.Container = "wav";
-                settingsConfiguration.Audio.Input.SampleRate = 44100;
+                settingsConfiguration.Audio.Input.SampleRate = 24000;
                 settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
                 settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
                 settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
@@ -89,7 +89,7 @@ namespace SampleApp
                         {
                             Console.WriteLine("Adding WAV header to output.wav");
                             byte[] wavHeader = new byte[44];
-                            int sampleRate = 48000;
+                            int sampleRate = 24000;
                             short bitsPerSample = 16;
                             short channels = 1;
                             int byteRate = sampleRate * channels * (bitsPerSample / 8);
