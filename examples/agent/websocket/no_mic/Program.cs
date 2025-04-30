@@ -40,6 +40,7 @@ namespace SampleApp
                 settingsConfiguration.Audio.Output.Container = "wav";
                 settingsConfiguration.Audio.Input.SampleRate = 24000;
                 settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
+                settingsConfiguration.Agent.Listen.Provider.Type = "deepgram";
                 settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
                 settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
                 settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";
@@ -198,16 +199,6 @@ namespace SampleApp
                 if (!subscribeResult)
                 {
                     Console.WriteLine("Failed to subscribe to ConversationTextResponse event");
-                    return;
-                }
-
-                subscribeResult = await agentClient.Subscribe(new EventHandler<FunctionCallingResponse>((sender, e) =>
-                {
-                    Console.WriteLine($"----> {e} received");
-                }));
-                if (!subscribeResult)
-                {
-                    Console.WriteLine("Failed to subscribe to FunctionCallingResponse event");
                     return;
                 }
 

@@ -165,10 +165,6 @@ namespace SampleApp
                 {
                     Console.WriteLine($"----> {e} received");
                 }));
-                await agentClient.Subscribe(new EventHandler<FunctionCallingResponse>((sender, e) =>
-                {
-                    Console.WriteLine($"----> {e} received");
-                }));
                 await agentClient.Subscribe(new EventHandler<FunctionCallRequestResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e} received");
@@ -218,6 +214,7 @@ namespace SampleApp
                 settingsConfiguration.Audio.Output.Container = "wav";
                 settingsConfiguration.Audio.Input.SampleRate = 44100;
                 settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
+                settingsConfiguration.Agent.Listen.Provider.Type = "deepgram";
                 settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
                 settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
                 settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";

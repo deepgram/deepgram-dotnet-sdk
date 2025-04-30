@@ -15,8 +15,8 @@ public record WelcomeResponse
     public AgentType? Type { get; } = AgentType.Welcome;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("session_id")]
-    public string? SessionId { get; set; }
+    [JsonPropertyName("request_id")]
+    public string? RequestId { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
