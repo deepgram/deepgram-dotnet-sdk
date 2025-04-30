@@ -34,7 +34,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<AgentStartedSpeakingResponse>? _agentStartedSpeakingReceived;
     private event EventHandler<AgentThinkingResponse>? _agentThinkingReceived;
     private event EventHandler<ConversationTextResponse>? _conversationTextReceived;
-    private event EventHandler<FunctionCallingResponse>? _functionCallingReceived;
     private event EventHandler<FunctionCallRequestResponse>? _functionCallRequestReceived;
     private event EventHandler<UserStartedSpeakingResponse>? _userStartedSpeakingReceived;
     private event EventHandler<WelcomeResponse>? _welcomeReceived;
@@ -216,24 +215,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         try
         {
             _conversationTextReceived += (sender, e) => eventHandler(sender, e);
-        }
-        finally
-        {
-            _mutexSubscribe.Release();
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// Subscribe to a FunctionCalling event from the Deepgram API
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public async Task<bool> Subscribe(EventHandler<FunctionCallingResponse> eventHandler)
-    {
-        await _mutexSubscribe.WaitAsync();
-        try
-        {
-            _functionCallingReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -663,24 +644,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
                     Log.Debug("ProcessTextMessage", $"Invoking ConversationTextResponse. event: {conversationTextResponse}");
                     InvokeParallel(_conversationTextReceived, conversationTextResponse);
-                    break;
-                case AgentType.FunctionCalling:
-                    var functionCallingResponse = data.Deserialize<FunctionCallingResponse>();
-                    if (_functionCallingReceived == null)
-                    {
-                        Log.Debug("ProcessTextMessage", "_functionCallingReceived has no listeners");
-                        Log.Verbose("ProcessTextMessage", "LEAVE");
-                        return;
-                    }
-                    if (functionCallingResponse == null)
-                    {
-                        Log.Warning("ProcessTextMessage", "FunctionCallingResponse is invalid");
-                        Log.Verbose("ProcessTextMessage", "LEAVE");
-                        return;
-                    }
-
-                    Log.Debug("ProcessTextMessage", $"Invoking FunctionCallingResponse. event: {functionCallingResponse}");
-                    InvokeParallel(_functionCallingReceived, functionCallingResponse);
                     break;
                 case AgentType.FunctionCallRequest:
                     var functionCallRequestResponse = data.Deserialize<FunctionCallRequestResponse>();

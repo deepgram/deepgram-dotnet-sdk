@@ -8,7 +8,7 @@ public record Endpoint
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("url")]
-    public string? URL { get; set; }
+    public string URL { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("headers")]

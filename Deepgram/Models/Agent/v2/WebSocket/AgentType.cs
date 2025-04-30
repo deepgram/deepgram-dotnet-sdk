@@ -17,7 +17,6 @@ public enum AgentType
     UserStartedSpeaking,
     AgentThinking,
     FunctionCallRequest,
-    FunctionCalling,
     AgentStartedSpeaking,
     AgentAudioDone,
     Audio,

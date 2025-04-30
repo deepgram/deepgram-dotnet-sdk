@@ -8,11 +8,10 @@ public record ListenProvider
 {
     /// <summary>
     /// The provider for the TTS.
-    /// Must be "deepgram".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; set; } = "deepgram";
+    public string? Type { get; set; };
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("model")]

@@ -12,6 +12,7 @@ public record Think
     
     /// <summary>
     /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
+    /// This is optional ONLY if you are using OpenAI or Anthropic as your `provider.type`.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]

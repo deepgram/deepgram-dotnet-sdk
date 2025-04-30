@@ -14,8 +14,8 @@ public class InjectAgentMessageSchema
     public string? Type { get; } = AgentClientTypes.InjectAgentMessage;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

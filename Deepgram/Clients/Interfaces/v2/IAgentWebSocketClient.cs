@@ -65,12 +65,6 @@ public interface IAgentWebSocketClient
     public Task<bool> Subscribe(EventHandler<ConversationTextResponse> eventHandler);
 
     /// <summary>
-    /// Subscribe to a FunctionCalling event from the Deepgram API
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public Task<bool> Subscribe(EventHandler<FunctionCallingResponse> eventHandler);
-
-    /// <summary>
     /// Subscribe to a FunctionCallRequest event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
