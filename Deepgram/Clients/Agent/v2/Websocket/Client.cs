@@ -34,13 +34,12 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<AgentStartedSpeakingResponse>? _agentStartedSpeakingReceived;
     private event EventHandler<AgentThinkingResponse>? _agentThinkingReceived;
     private event EventHandler<ConversationTextResponse>? _conversationTextReceived;
-    private event EventHandler<FunctionCallingResponse>? _functionCallingReceived;
     private event EventHandler<FunctionCallRequestResponse>? _functionCallRequestReceived;
     private event EventHandler<UserStartedSpeakingResponse>? _userStartedSpeakingReceived;
     private event EventHandler<WelcomeResponse>? _welcomeReceived;
     private event EventHandler<SettingsAppliedResponse>? _settingsAppliedReceived;
     private event EventHandler<InjectionRefusedResponse>? _injectionRefusedReceived;
-    private event EventHandler<InstructionsUpdatedResponse>? _instructionsUpdatedReceived;
+    private event EventHandler<PromptUpdatedResponse>? _promptUpdatedReceived;
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
     #endregion
 
@@ -49,10 +48,10 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     /// </summary>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public async Task<bool> Connect(SettingsConfigurationSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
+    public async Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        if (!options.Agent.Listen.Model.StartsWith("nova-3") && options.Agent.Listen.Keyterms?.Count > 0)
+        if (!options.Agent.Listen.Provider.Model.StartsWith("nova-3") && options.Agent.Listen.Provider.Keyterms?.Count > 0)
         {
             throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }
@@ -225,24 +224,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     }
 
     /// <summary>
-    /// Subscribe to a FunctionCalling event from the Deepgram API
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public async Task<bool> Subscribe(EventHandler<FunctionCallingResponse> eventHandler)
-    {
-        await _mutexSubscribe.WaitAsync();
-        try
-        {
-            _functionCallingReceived += (sender, e) => eventHandler(sender, e);
-        }
-        finally
-        {
-            _mutexSubscribe.Release();
-        }
-        return true;
-    }
-
-    /// <summary>
     /// Subscribe to a FunctionCallRequest event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
@@ -333,15 +314,15 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     }
 
     /// <summary>
-    /// Subscribe to a InstructionsUpdated event from the Deepgram API
+    /// Subscribe to a PromptUpdated event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
-    public async Task<bool> Subscribe(EventHandler<InstructionsUpdatedResponse> eventHandler)
+    public async Task<bool> Subscribe(EventHandler<PromptUpdatedResponse> eventHandler)
     {
         await _mutexSubscribe.WaitAsync();
         try
         {
-            _instructionsUpdatedReceived += (sender, e) => eventHandler(sender, e);
+            _promptUpdatedReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -664,24 +645,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
                     Log.Debug("ProcessTextMessage", $"Invoking ConversationTextResponse. event: {conversationTextResponse}");
                     InvokeParallel(_conversationTextReceived, conversationTextResponse);
                     break;
-                case AgentType.FunctionCalling:
-                    var functionCallingResponse = data.Deserialize<FunctionCallingResponse>();
-                    if (_functionCallingReceived == null)
-                    {
-                        Log.Debug("ProcessTextMessage", "_functionCallingReceived has no listeners");
-                        Log.Verbose("ProcessTextMessage", "LEAVE");
-                        return;
-                    }
-                    if (functionCallingResponse == null)
-                    {
-                        Log.Warning("ProcessTextMessage", "FunctionCallingResponse is invalid");
-                        Log.Verbose("ProcessTextMessage", "LEAVE");
-                        return;
-                    }
-
-                    Log.Debug("ProcessTextMessage", $"Invoking FunctionCallingResponse. event: {functionCallingResponse}");
-                    InvokeParallel(_functionCallingReceived, functionCallingResponse);
-                    break;
                 case AgentType.FunctionCallRequest:
                     var functionCallRequestResponse = data.Deserialize<FunctionCallRequestResponse>();
                     if (_functionCallRequestReceived == null)
@@ -772,23 +735,23 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
                     Log.Debug("ProcessTextMessage", $"Invoking InjectionRefusedResponse. event: {injectionRefusedResponse}");
                     InvokeParallel(_injectionRefusedReceived, injectionRefusedResponse);
                     break;
-                case AgentType.InstructionsUpdated:
-                    var instructionsUpdatedResponse = data.Deserialize<InstructionsUpdatedResponse>();
-                    if (_instructionsUpdatedReceived == null)
+                case AgentType.PromptUpdated:
+                    var promptUpdatedResponse = data.Deserialize<PromptUpdatedResponse>();
+                    if (_promptUpdatedReceived == null)
                     {
-                        Log.Debug("ProcessTextMessage", "_instructionsUpdatedReceived has no listeners");
+                        Log.Debug("ProcessTextMessage", "_promptUpdatedReceived has no listeners");
                         Log.Verbose("ProcessTextMessage", "LEAVE");
                         return;
                     }
-                    if (instructionsUpdatedResponse == null)
+                    if (promptUpdatedResponse == null)
                     {
-                        Log.Warning("ProcessTextMessage", "InstructionsUpdatedResponse is invalid");
+                        Log.Warning("ProcessTextMessage", "PromptUpdatedResponse is invalid");
                         Log.Verbose("ProcessTextMessage", "LEAVE");
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking InstructionsUpdatedResponse. event: {instructionsUpdatedResponse}");
-                    InvokeParallel(_instructionsUpdatedReceived, instructionsUpdatedResponse);
+                    Log.Debug("ProcessTextMessage", $"Invoking PromptUpdatedResponse. event: {promptUpdatedResponse}");
+                    InvokeParallel(_promptUpdatedReceived, promptUpdatedResponse);
                     break;
                 case AgentType.SpeakUpdated:
                     var speakUpdatedResponse = data.Deserialize<SpeakUpdatedResponse>();

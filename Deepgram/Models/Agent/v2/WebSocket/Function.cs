@@ -16,19 +16,11 @@ public record Function
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("parameters")]
-    public Parameters? Parameters { get; set; }
+    public Dictionary<string, object>? Parameters { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("url")]
-    public string? Url { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("headers")]
-    public List<Header>? Headers { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("method")]
-    public string? Method { get; set; }
+    [JsonPropertyName("endpoint")]
+    public FunctionEndpoint? Endpoint { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

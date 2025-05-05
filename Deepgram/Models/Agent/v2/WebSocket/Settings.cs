@@ -4,18 +4,29 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class UpdateInstructionsSchema
+public class SettingsSchema
 {
     /// <summary>
-    /// SettingsConfiguration event type.
+    /// Settings event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; } = AgentClientTypes.UpdateInstructions;
+    public string? Type { get; } = AgentClientTypes.Settings;
+
+    /// <summary>
+    /// Set to true to enable experimental features.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("experimental")]
+    public bool? Experimental { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("instructions")]
-    public string? Instructions { get; set; }
+    [JsonPropertyName("audio")]
+    public Audio Audio { get; set; } = new Audio();
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("agent")]
+    public Agent Agent { get; set; } = new Agent();
 
     /// <summary>
     /// Override ToString method to serialize the object

@@ -8,21 +8,23 @@ public record Think
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
-    public Provider? Provider { get; set; } = new Provider();
+    public ThinkProvider Provider { get; set; } = new ThinkProvider();
+    
+    /// <summary>
+    /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
+    /// This is optional ONLY if you are using OpenAI or Anthropic as your `provider.type`.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("endpoint")]
+    public Endpoint? Endpoint { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("instructions")]
-    public string? Instructions { get; set; }
+    [JsonPropertyName("prompt")]
+    public string? Prompt { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("functions")]
     public List<Function>? Functions { get; set; }
-
-
 
     /// <summary>
     /// Override ToString method to serialize the object

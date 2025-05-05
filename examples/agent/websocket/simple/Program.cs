@@ -7,6 +7,7 @@ using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
+using PortAudioSharp;
 
 namespace SampleApp
 {
@@ -18,12 +19,35 @@ namespace SampleApp
             {
                 // Initialize Library with default logging
                 // Normal logging is "Info" level
-                Deepgram.Library.Initialize();
+                Deepgram.Library.Initialize(LogLevel.Debug);
                 // OR very chatty logging
                 //Deepgram.Library.Initialize(LogLevel.Verbose); // LogLevel.Default, LogLevel.Debug, LogLevel.Verbose
 
                 // Initialize the microphone library
-                Deepgram.Microphone.Library.Initialize();
+                Console.WriteLine("Initializing microphone library...");
+                try
+                {
+                    Deepgram.Microphone.Library.Initialize();
+                    Console.WriteLine("Microphone library initialized successfully.");
+
+                    // Get default input device
+                    int defaultDevice = PortAudio.DefaultInputDevice;
+                    if (defaultDevice == PortAudio.NoDevice)
+                    {
+                        Console.WriteLine("Error: No default input device found.");
+                        return;
+                    }
+
+                    var deviceInfo = PortAudio.GetDeviceInfo(defaultDevice);
+                    Console.WriteLine($"Using default input device: {deviceInfo.name}");
+                    Console.WriteLine($"Sample rate: {deviceInfo.defaultSampleRate}");
+                    Console.WriteLine($"Channels: {deviceInfo.maxInputChannels}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing microphone library: {ex.Message}");
+                    return;
+                }
 
                 Console.WriteLine("\n\nPress any key to stop and exit...\n\n\n");
 
@@ -141,10 +165,6 @@ namespace SampleApp
                 {
                     Console.WriteLine($"----> {e} received");
                 }));
-                await agentClient.Subscribe(new EventHandler<FunctionCallingResponse>((sender, e) =>
-                {
-                    Console.WriteLine($"----> {e} received");
-                }));
                 await agentClient.Subscribe(new EventHandler<FunctionCallRequestResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e} received");
@@ -169,7 +189,7 @@ namespace SampleApp
                 {
                     Console.WriteLine($"----> {e} received");
                 }));
-                await agentClient.Subscribe(new EventHandler<InstructionsUpdatedResponse>((sender, e) =>
+                await agentClient.Subscribe(new EventHandler<PromptUpdatedResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e} received");
                 }));
@@ -187,16 +207,24 @@ namespace SampleApp
                 }));
 
                 // Start the connection
-                var settingsConfiguration = new SettingsConfigurationSchema();
+                var settingsConfiguration = new SettingsSchema();
                 settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
-                settingsConfiguration.Agent.Think.Model = "gpt-4o-mini";
+                settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini";
                 settingsConfiguration.Audio.Output.SampleRate = 16000;
                 settingsConfiguration.Audio.Output.Container = "wav";
                 settingsConfiguration.Audio.Input.SampleRate = 44100;
-                settingsConfiguration.Context.Messages = new List<object> {};
-                settingsConfiguration.Context.Replay = false;
-                settingsConfiguration.Agent.Listen.Model = "nova-3";
-                settingsConfiguration.Agent.Listen.Keyterms = new List<string> { "Deepgram" };
+                settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
+                settingsConfiguration.Agent.Listen.Provider.Type = "deepgram";
+                settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
+                settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
+                settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";
+                settingsConfiguration.Agent.Speak.Provider.Model = "aura-2-thalia-en";
+
+                // To avoid issues with empty objects, Voice and Endpoint are instantiated as null. Construct them as needed.
+                // settingsConfiguration.Agent.Speak.Provider.Voice = new CartesiaVoice();
+                // settingsConfiguration.Agent.Speak.Provider.Voice.Id = "en-US-Wavenet-D";
+                // settingsConfiguration.Agent.Speak.Endpoint = new Endpoint();
+                // settingsConfiguration.Agent.Think.Endpoint = new Endpoint();
 
                 bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)
@@ -206,14 +234,28 @@ namespace SampleApp
                 }
 
                 // Microphone streaming
-                var microphone = new Microphone(agentClient.SendBinary);
-                microphone.Start();
+                Console.WriteLine("Starting microphone...");
+                Microphone microphone = null;
+                try
+                {
+                    microphone = new Microphone(agentClient.SendBinary);
+                    microphone.Start();
+                    Console.WriteLine("Microphone started successfully. Waiting for audio input...");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error starting microphone: {ex.Message}");
+                    return;
+                }
 
                 // Wait for the user to press a key
                 Console.ReadKey();
 
                 // Stop the microphone
-                microphone.Stop();
+                if (microphone != null)
+                {
+                    microphone.Stop();
+                }
 
                 // Stop the connection
                 await agentClient.Stop();

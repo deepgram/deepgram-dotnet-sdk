@@ -20,7 +20,7 @@ public record Output
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("container")]
-    public string? Container { get; set; }
+    public string? Container { get; set; } = "none";
 
     /// <summary>
     /// Override ToString method to serialize the object

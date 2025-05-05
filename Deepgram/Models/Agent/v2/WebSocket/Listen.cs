@@ -6,17 +6,13 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 
 public record Listen
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string Model { get; set; }
-
     /// <summary>
-    /// Keyterm Prompting allows you improve Keyword Recall Rate (KRR) for important keyterms or phrases up to 90%.
-    /// <see href="https://developers.deepgram.com/docs/keyterm">
+    /// The provider for the TTS.
+    /// Must be "deepgram".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("keyterms")]
-    public List<string>? Keyterms { get; set; }
+    [JsonPropertyName("provider")]
+    public ListenProvider Provider { get; set; } = new ListenProvider();
 
     /// <summary>
     /// Override ToString method to serialize the object

@@ -4,10 +4,13 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
+/// <summary>
+/// You will ONLY receive this event if you have set the `experimental` parameter to `true` in your settings.
+/// </summary>
 public record AgentStartedSpeakingResponse
 {
     /// <summary>
-    /// SettingsConfiguration event type.
+    /// AgentStartedSpeaking event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]

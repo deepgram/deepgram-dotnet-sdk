@@ -12,5 +12,5 @@ public static class UriSegments
 
     //using constants instead of inline value(magic strings) make consistence
     //across SDK And Test Projects Simpler and Easier to change
-    public const string AGENT = "agent";
+    public const string AGENT = "v1/agent/converse";
 }

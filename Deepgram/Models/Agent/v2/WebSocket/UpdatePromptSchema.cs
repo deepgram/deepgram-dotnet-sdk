@@ -4,26 +4,18 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class SettingsConfigurationSchema
+public class UpdatePromptSchema
 {
     /// <summary>
-    /// SettingsConfiguration event type.
+    /// UpdatePrompt event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; } = AgentClientTypes.SettingsConfiguration;
+    public string? Type { get; } = AgentClientTypes.UpdatePrompt;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("audio")]
-    public Audio Audio { get; set; } = new Audio();
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("agent")]
-    public Agent Agent { get; set; } = new Agent();
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("context")]
-    public Context Context { get; set; } = new Context();
+    [JsonPropertyName("prompt")]
+    public string? Prompt { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

@@ -6,9 +6,20 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 
 public record Speak
 {
+    /// <summary>
+    /// The provider for the TTS.
+    /// Must be "deepgram".
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string Model { get; set; } = "aura-asteria-en";
+    [JsonPropertyName("provider")]
+    public SpeakProvider Provider { get; set; } = new SpeakProvider();
+
+    /// <summary>
+    /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("endpoint")]
+    public Endpoint? Endpoint { get; set; } = null;
 
     /// <summary>
     /// Override ToString method to serialize the object

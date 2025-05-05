@@ -15,7 +15,7 @@ public interface IAgentWebSocketClient
     /// <summary>
     /// Connects to the Deepgram WebSocket API
     /// </summary>
-    public Task<bool> Connect(SettingsConfigurationSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
+    public Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
 
     /// <summary>
@@ -63,12 +63,6 @@ public interface IAgentWebSocketClient
     /// </summary>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<ConversationTextResponse> eventHandler);
-
-    /// <summary>
-    /// Subscribe to a FunctionCalling event from the Deepgram API
-    /// </summary>
-    /// <returns>True if successful</returns>
-    public Task<bool> Subscribe(EventHandler<FunctionCallingResponse> eventHandler);
 
     /// <summary>
     /// Subscribe to a FunctionCallRequest event from the Deepgram API
@@ -122,7 +116,7 @@ public interface IAgentWebSocketClient
     /// Subscribe to an InstructionsUpdated event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
-    public Task<bool> Subscribe(EventHandler<InstructionsUpdatedResponse> eventHandler);
+    public Task<bool> Subscribe(EventHandler<PromptUpdatedResponse> eventHandler);
 
     /// <summary>
     /// Subscribe to a SpeakUpdated event from the Deepgram API

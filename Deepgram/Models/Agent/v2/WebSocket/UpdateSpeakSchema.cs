@@ -14,9 +14,8 @@ public class UpdateSpeakSchema
     public string? Type { get; } = AgentClientTypes.UpdateSpeak;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
-
+    [JsonPropertyName("speak")]
+    public Speak Speak { get; set; }
     /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
