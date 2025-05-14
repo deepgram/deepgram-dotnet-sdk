@@ -28,7 +28,7 @@ namespace SampleApp
                 DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
                 var agentClient = ClientFactory.CreateAgentWebSocketClient(apiKey: "", options: options);
 
-                var lastAudioTime = DateTime.Now;
+                var lastAudioTime = new DateTime(1970, 1, 1);
                 var audioFileCount = 0;
 
                 // Start the connection
