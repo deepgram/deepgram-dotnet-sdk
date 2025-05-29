@@ -77,14 +77,24 @@ public class SpeakProvider: DynamicObject
 
     public override bool TrySetMember(SetMemberBinder binder, object? value)
     {
-        var name = binder.Name;
+        // Convert the property name to snake_case
+        var name = ToSnakeCase(binder.Name);
         if (AdditionalProperties == null)
             AdditionalProperties = new Dictionary<string, JsonElement>();
 
-        // Convert value to JsonElement
         var json = JsonSerializer.Serialize(value);
         AdditionalProperties[name] = JsonDocument.Parse(json).RootElement;
         return true;
+    }
+
+    // Helper method for snake_case conversion
+    private static string ToSnakeCase(string name)
+    {
+        return string.Concat(
+            name.Select((x, i) =>
+                i > 0 && char.IsUpper(x) ? "_" + char.ToLower(x) : char.ToLower(x).ToString()
+            )
+        );
     }
 
     public override string ToString()
