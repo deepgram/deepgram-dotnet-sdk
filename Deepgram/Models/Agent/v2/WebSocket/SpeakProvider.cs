@@ -17,41 +17,6 @@ public class SpeakProvider: DynamicObject
     public string? Type { get; set; } = "deepgram";
 
     /// <summary>
-    /// Deepgram OR OpenAI model to use.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
-
-    /// <summary>
-    /// Eleven Labs OR Cartesia model to use.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model_id")]
-    public string? ModelId { get; set; }
-
-    /// <summary>
-    /// Cartesia voice configuration.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("voice")]
-    public CartesiaVoice? Voice { get; set; } = null;
-
-    /// <summary>
-    /// Optional Cartesia Language
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("language")]
-    public string? Language { get; set; }
-
-    /// <summary>
-    /// Optional Eleven labs language.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("language_id")]
-    public string? LanguageId { get; set; }
-
-    /// <summary>
     /// Arbitrary additional properties.
     /// </summary>
     [JsonExtensionData]
