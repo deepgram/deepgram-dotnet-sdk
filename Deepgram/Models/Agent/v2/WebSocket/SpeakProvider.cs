@@ -1,10 +1,12 @@
-// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
-// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
-// SPDX-License-Identifier: MIT
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Dynamic;
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public record SpeakProvider
+public class SpeakProvider: DynamicObject
 {
     /// <summary>
     /// The provider for the TTS.
@@ -50,8 +52,41 @@ public record SpeakProvider
     public string? LanguageId { get; set; }
 
     /// <summary>
-    /// Override ToString method to serialize the object
+    /// Arbitrary additional properties.
     /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
+    {
+        var name = binder.Name;
+        if (AdditionalProperties != null && AdditionalProperties.TryGetValue(name, out var value))
+        {
+            result = value.ValueKind switch
+            {
+                JsonValueKind.String => value.GetString(),
+                JsonValueKind.Number => value.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                _ => value.ToString()
+            };
+            return true;
+        }
+        result = null;
+        return false;
+    }
+
+    public override bool TrySetMember(SetMemberBinder binder, object? value)
+    {
+        var name = binder.Name;
+        if (AdditionalProperties == null)
+            AdditionalProperties = new Dictionary<string, JsonElement>();
+
+        // Convert value to JsonElement
+        var json = JsonSerializer.Serialize(value);
+        AdditionalProperties[name] = JsonDocument.Parse(json).RootElement;
+        return true;
+    }
+
     public override string ToString()
     {
         return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
