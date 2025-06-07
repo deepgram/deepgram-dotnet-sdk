@@ -7,12 +7,11 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 public record Speak
 {
     /// <summary>
-    /// The provider for the TTS.
-    /// Must be "deepgram".
+    /// The provider configuration for the TTS.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
-    public dynamic Provider { get; set; } = new SpeakProvider();
+    public dynamic Provider { get; set; } = new Provider();
 
     /// <summary>
     /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).

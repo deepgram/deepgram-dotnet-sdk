@@ -6,9 +6,12 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 
 public record Think
 {
+    /// <summary>
+    /// The provider configuration for the LLM.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
-    public ThinkProvider Provider { get; set; } = new ThinkProvider();
+    public dynamic Provider { get; set; } = new Provider();
     
     /// <summary>
     /// Custom endpoint for custom models - to use a custom model, set provider.type to the flavour of API you are using (e.g. open_ai for OpenAI-like APIs).
