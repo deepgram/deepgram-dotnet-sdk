@@ -7,12 +7,11 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 public record Listen
 {
     /// <summary>
-    /// The provider for the TTS.
-    /// Must be "deepgram".
+    /// The provider configuration for the STT.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("provider")]
-    public ListenProvider Provider { get; set; } = new ListenProvider();
+    public dynamic Provider { get; set; } = new Provider();
 
     /// <summary>
     /// Override ToString method to serialize the object

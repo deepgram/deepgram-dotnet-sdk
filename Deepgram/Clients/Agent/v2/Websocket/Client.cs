@@ -51,10 +51,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     public async Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null)
     {
-        if (!options.Agent.Listen.Provider.Model.StartsWith("nova-3") && options.Agent.Listen.Provider.Keyterms?.Count > 0)
-        {
-            throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
-        }
         Log.Verbose("AgentWSClient.Connect", "ENTER");
         Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
         Log.Debug("Connect", $"addons: {addons}");
