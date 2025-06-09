@@ -2,6 +2,8 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+// This example should fail, due to the arbitrary key being included in the settings payload.
+
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
@@ -121,14 +123,14 @@ namespace SampleApp
                     return;
                 }
 
-                // Wait for the user to press a key
-                Console.ReadKey();
-
                 // Stop the connection
                 await agentClient.Stop();
 
                 // Terminate Libraries
                 Deepgram.Library.Terminate();
+
+                Console.WriteLine("Finished! You should see an error for the arbitrary key - scroll up and you can see it is included in the settings payload.");
+                Console.WriteLine("If you do not see that error, this example has failed.");
             }
             catch (Exception ex)
             {
