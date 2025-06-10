@@ -30,6 +30,14 @@ public record Think
     public List<Function>? Functions { get; set; }
 
     /// <summary>
+    /// The context length, which can be an integer or the literal string "max".
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("context_length")]
+    // The object type allows for both integer and string values, accommodating the "max" case.
+    public object? ContextLength { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
