@@ -236,7 +236,6 @@ Library.Initialize();
 // Create WebSocket client
 var liveClient = ClientFactory.CreateListenWebSocketClient();
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var liveClient = ClientFactory.CreateListenWebSocketClient();
 
 // Subscribe to transcription results
 await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>

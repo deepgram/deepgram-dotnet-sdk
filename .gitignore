@@ -253,7 +253,6 @@ project.lock.json
 log.txt
 
 # Example outputs
-*.wav
-*.mp3
+examples/**/output_*.wav
+examples/**/output_*.mp3
 chatlog.txt
-output_*.wav
