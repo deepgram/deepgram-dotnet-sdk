@@ -161,7 +161,7 @@ publish/
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
-# Comment the next line if you want to checkin your web deploy settings 
+# Comment the next line if you want to checkin your web deploy settings
 # but database connection strings (with potential passwords) will be unencrypted
 *.pubxml
 
@@ -251,3 +251,8 @@ project.lock.json
 
 # Log
 log.txt
+
+# Example outputs
+examples/**/output_*.wav
+examples/**/output_*.mp3
+chatlog.txt
