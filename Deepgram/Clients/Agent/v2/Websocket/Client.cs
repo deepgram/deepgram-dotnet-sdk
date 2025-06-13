@@ -8,6 +8,8 @@ using Deepgram.Models.Agent.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Models.Exceptions.v1;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -75,17 +77,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
             // Check agent exists
             if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
             {
-                void DeleteIfEmpty(JsonObject parent, string key)
-                {
-                    if (parent.TryGetPropertyValue(key, out var childNode))
-                    {
-                        if (childNode is JsonObject childObj && childObj.Count == 0)
-                        {
-                            parent.Remove(key);
-                        }
-                    }
-                }
-
                 void DeleteProviderIfEmpty(JsonObject parent)
                 {
                     if (parent.TryGetPropertyValue("provider", out var providerNode))
