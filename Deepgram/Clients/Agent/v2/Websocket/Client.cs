@@ -8,6 +8,10 @@ using Deepgram.Models.Agent.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Models.Exceptions.v1;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Deepgram.Clients.Agent.v2.WebSocket;
 
@@ -67,8 +71,42 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
                 return false;
             }
 
-            // send the settings configuration
-            var bytes = Encoding.UTF8.GetBytes(options.ToString());
+            var json = options.ToString(); // Assuming options is a serializable object
+            var root = JsonNode.Parse(json)!.AsObject();
+
+            // Check agent exists
+            if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
+            {
+                void DeleteProviderIfEmpty(JsonObject parent)
+                {
+                    if (parent.TryGetPropertyValue("provider", out var providerNode))
+                    {
+                        if (providerNode is JsonObject providerObj && providerObj.Count == 0)
+                        {
+                            parent.Remove("provider");
+                        }
+                    }
+                }
+
+                string[] sections = { "think", "speak", "listen" };
+
+                foreach (var section in sections)
+                {
+                    if (agent.TryGetPropertyValue(section, out var sectionNode) && sectionNode is JsonObject sectionObj)
+                    {
+                        DeleteProviderIfEmpty(sectionObj);
+                        if (sectionObj.Count == 0)
+                        {
+                            agent.Remove(section);
+                        }
+                    }
+                }
+            }
+
+            // Re-serialize the cleaned object
+            var cleanedJson = root.ToJsonString();
+            Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
+            var bytes = Encoding.UTF8.GetBytes(cleanedJson);
             await SendMessageImmediately(bytes);
 
             // keepalive thread

@@ -217,8 +217,6 @@ namespace SampleApp
                 settingsConfiguration.Agent.Listen.Provider.Type = "deepgram";
                 settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
                 settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
-                settingsConfiguration.Agent.Speak.Provider.Type = "deepgram";
-                settingsConfiguration.Agent.Speak.Provider.Model = "aura-2-thalia-en";
 
                 // To avoid issues with empty objects, Voice and Endpoint are instantiated as null. Construct them as needed.
                 // settingsConfiguration.Agent.Speak.Provider.Voice = new CartesiaVoice();
