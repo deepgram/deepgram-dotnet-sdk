@@ -13,7 +13,7 @@ public class Provider: DynamicObject
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; set; } = "deepgram";
+    public string? Type { get; set; } = null;
 
     /// <summary>
     /// Arbitrary additional properties.
