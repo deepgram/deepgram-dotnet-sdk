@@ -18,6 +18,11 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     public string ApiKey { get; set; }
 
     /// <summary>
+    /// Deepgram Access Token (OAuth 2.0 compliant)
+    /// </summary>
+    public string AccessToken { get; set; }
+
+    /// <summary>
     /// BaseAddress of the server :defaults to api.deepgram.com
     /// no need to attach the protocol it will be added internally
     /// </summary>
@@ -91,19 +96,16 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? options = null, Dictionary<string, string>? headers = null)
+    public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? options = null, Dictionary<string, string>? headers = null, string? accessToken = null)
     {
         Log.Verbose("DeepgramHttpClientOptions", "ENTER");
         Log.Debug("DeepgramHttpClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
         Log.Debug("DeepgramHttpClientOptions", baseAddress == null ? "BaseAddress is null" : "BaseAddress provided");
+        Log.Debug("DeepgramHttpClientOptions", accessToken == null ? "ACCESS TOKEN is null" : "ACCESS TOKEN provided");
         Log.Debug("DeepgramHttpClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramHttpClientOptions", headers == null ? "Headers is null" : "Headers provided");
 
         KeepAlive = false;
-        if (string.IsNullOrWhiteSpace(ApiKey))
-        {
-            ApiKey = apiKey ?? "";
-        }
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         OnPrem = onPrem ?? false;
         Addons = headers ?? new Dictionary<string, string>();
@@ -112,24 +114,56 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
         Log.Information("DeepgramHttpClientOptions", $"OnPrem: {OnPrem}");
         Log.Information("DeepgramHttpClientOptions", $"APIVersion: {APIVersion}");
 
-        // user provided takes precedence
-        if (string.IsNullOrWhiteSpace(ApiKey))
+        // Priority-based credential resolution
+        // 1. Explicit accessToken parameter (highest priority)
+        // 2. Explicit apiKey parameter
+        // 3. DEEPGRAM_ACCESS_TOKEN environment variable
+        // 4. DEEPGRAM_API_KEY environment variable (lowest priority)
+
+        // Initialize both credentials to empty strings
+        ApiKey = "";
+        AccessToken = "";
+
+        if (!string.IsNullOrWhiteSpace(accessToken))
         {
-            // then try the environment variable
-            Log.Debug("DeepgramHttpClientOptions", "API KEY is not set");
-            ApiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
-            if (!string.IsNullOrEmpty(ApiKey))
+            AccessToken = accessToken;
+            // ApiKey remains empty (cleared above)
+            Log.Information("DeepgramHttpClientOptions", "ACCESS TOKEN set from parameter");
+        }
+        else if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            ApiKey = apiKey;
+            // AccessToken remains empty (cleared above)
+            Log.Information("DeepgramHttpClientOptions", "API KEY set from parameter");
+        }
+        else
+        {
+            // Try environment variables with same priority order
+            var envAccessToken = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_ACCESS_TOKEN);
+            var envApiKey = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_API_KEY);
+
+            if (!string.IsNullOrWhiteSpace(envAccessToken))
             {
+                AccessToken = envAccessToken;
+                // ApiKey remains empty (cleared above)
+                Log.Information("DeepgramHttpClientOptions", "ACCESS TOKEN set from environment variable");
+            }
+            else if (!string.IsNullOrWhiteSpace(envApiKey))
+            {
+                ApiKey = envApiKey;
+                // AccessToken remains empty (cleared above)
                 Log.Information("DeepgramHttpClientOptions", "API KEY set from environment variable");
             }
             else
             {
-                Log.Warning("DeepgramHttpClientOptions", "API KEY environment variable not set");
+                Log.Warning("DeepgramHttpClientOptions", "No authentication credentials found in parameters or environment variables");
             }
         }
-        if (!OnPrem && string.IsNullOrEmpty(ApiKey))
+
+        // Ensure we have some form of authentication for non-OnPrem deployments
+        if (!OnPrem && string.IsNullOrWhiteSpace(AccessToken) && string.IsNullOrWhiteSpace(ApiKey))
         {
-            var exStr = "Deepgram API Key is invalid";
+            var exStr = "Deepgram authentication is required. Please provide either an API Key or Access Token.";
             Log.Error("DeepgramHttpClientOptions", exStr);
             throw new ArgumentException(exStr);
         }
@@ -157,5 +191,41 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
 
         Log.Information("DeepgramHttpClientOptions", $"BaseAddress: {BaseAddress}");
         Log.Verbose("DeepgramHttpClientOptions", "LEAVE");
+    }
+
+    /*****************************/
+    // Dynamic Authentication Methods
+    /*****************************/
+
+    /// <summary>
+    /// Sets the API Key for authentication (clears AccessToken)
+    /// </summary>
+    /// <param name="apiKey">The API Key to use</param>
+    public void SetApiKey(string apiKey)
+    {
+        ApiKey = apiKey ?? "";
+        AccessToken = ""; // Clear access token when setting API key
+        Log.Information("DeepgramHttpClientOptions", "API KEY set, ACCESS TOKEN cleared");
+    }
+
+    /// <summary>
+    /// Sets the Access Token for authentication (clears ApiKey)
+    /// </summary>
+    /// <param name="accessToken">The Access Token to use</param>
+    public void SetAccessToken(string accessToken)
+    {
+        AccessToken = accessToken ?? "";
+        ApiKey = ""; // Clear API key when setting access token
+        Log.Information("DeepgramHttpClientOptions", "ACCESS TOKEN set, API KEY cleared");
+    }
+
+    /// <summary>
+    /// Clears all authentication credentials
+    /// </summary>
+    public void ClearCredentials()
+    {
+        ApiKey = "";
+        AccessToken = "";
+        Log.Information("DeepgramHttpClientOptions", "All authentication credentials cleared");
     }
 }

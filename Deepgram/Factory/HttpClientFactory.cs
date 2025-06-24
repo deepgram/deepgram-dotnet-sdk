@@ -40,7 +40,9 @@ internal class HttpClientFactory
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
+
+        // Set authentication header with priority: AccessToken > ApiKey
+        SetAuthenticationHeader(client, options);
 
         if (options.Headers is not null)
             foreach (var header in options.Headers)
@@ -51,5 +53,30 @@ internal class HttpClientFactory
         client.BaseAddress = new Uri(options.BaseAddress);
 
         return client;
+    }
+
+    /// <summary>
+    /// Sets the appropriate authentication header based on available credentials.
+    /// Priority: AccessToken (Bearer) > ApiKey (Token)
+    /// </summary>
+    /// <param name="client">HttpClient to configure</param>
+    /// <param name="options">Client options containing credentials</param>
+    private static void SetAuthenticationHeader(HttpClient client, IDeepgramClientOptions options)
+    {
+        if (!string.IsNullOrWhiteSpace(options.AccessToken))
+        {
+            // Use Bearer token authentication (highest priority)
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
+        }
+        else if (!string.IsNullOrWhiteSpace(options.ApiKey))
+        {
+            // Use API key authentication (fallback)
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
+        }
+        else
+        {
+            // No authentication credentials available
+            Log.Warning("SetAuthenticationHeader", "No authentication credentials provided. API calls may fail.");
+        }
     }
 }

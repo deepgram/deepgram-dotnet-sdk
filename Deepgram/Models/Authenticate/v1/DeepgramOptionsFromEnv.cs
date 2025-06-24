@@ -15,6 +15,11 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     public string ApiKey { get; set; }
 
     /// <summary>
+    /// Deepgram Access Token (OAuth 2.0 compliant)
+    /// </summary>
+    public string AccessToken { get; set; }
+
+    /// <summary>
     /// BaseAddress of the server :defaults to api.deepgram.com
     /// no need to attach the protocol it will be added internally
     /// </summary>
@@ -99,7 +104,27 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
 
     public DeepgramOptionsFromEnv()
     {
-        ApiKey = Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY") ?? "";
+        // Initialize both credentials to empty strings
+        ApiKey = "";
+        AccessToken = "";
+
+        // Priority-based credential resolution from environment variables
+        // 1. DEEPGRAM_ACCESS_TOKEN (highest priority)
+        // 2. DEEPGRAM_API_KEY (fallback)
+        var envAccessToken = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_ACCESS_TOKEN);
+        var envApiKey = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_API_KEY);
+
+        if (!string.IsNullOrWhiteSpace(envAccessToken))
+        {
+            AccessToken = envAccessToken;
+            // ApiKey remains empty (initialized above)
+        }
+        else if (!string.IsNullOrWhiteSpace(envApiKey))
+        {
+            ApiKey = envApiKey;
+            // AccessToken remains empty (initialized above)
+        }
+
         BaseAddress = Environment.GetEnvironmentVariable("DEEPGRAM_HOST") ?? Defaults.DEFAULT_URI;
         APIVersion = Environment.GetEnvironmentVariable("DEEPGRAM_API_VERSION") ?? Defaults.DEFAULT_API_VERSION;
         var onPrem = Environment.GetEnvironmentVariable("DEEPGRAM_ON_PREM") ?? "";
@@ -139,8 +164,15 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
 
         OnPrem = onPrem.ToLower() == "true";
         KeepAlive = keepAlive.ToLower() == "true";
-        AutoFlushReplyDelta = Convert.ToDecimal(autoFlushReplyDelta);
-        AutoFlushSpeakDelta = Convert.ToDecimal(autoFlushSpeakDelta);
+        if (decimal.TryParse(autoFlushReplyDelta, out var replyDelta))
+        {
+            AutoFlushReplyDelta = replyDelta;
+        }
+
+        if (decimal.TryParse(autoFlushSpeakDelta, out var speakDelta))
+        {
+            AutoFlushSpeakDelta = speakDelta;
+        }
 
         // addons
         if (Addons.ContainsKey(Constants.AutoFlushReplyDelta))
@@ -161,5 +193,41 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
                 AutoFlushSpeakDelta = parsedValue;
             }
         }
+    }
+
+    /*****************************/
+    // Dynamic Authentication Methods
+    /*****************************/
+
+    /// <summary>
+    /// Sets the API Key for authentication (clears AccessToken)
+    /// </summary>
+    /// <param name="apiKey">The API Key to use</param>
+    public void SetApiKey(string apiKey)
+    {
+        ApiKey = apiKey ?? "";
+        AccessToken = ""; // Clear access token when setting API key
+        Log.Information("DeepgramOptionsFromEnv", "API KEY set, ACCESS TOKEN cleared");
+    }
+
+    /// <summary>
+    /// Sets the Access Token for authentication (clears ApiKey)
+    /// </summary>
+    /// <param name="accessToken">The Access Token to use</param>
+    public void SetAccessToken(string accessToken)
+    {
+        AccessToken = accessToken ?? "";
+        ApiKey = ""; // Clear API key when setting access token
+        Log.Information("DeepgramOptionsFromEnv", "ACCESS TOKEN set, API KEY cleared");
+    }
+
+    /// <summary>
+    /// Clears all authentication credentials
+    /// </summary>
+    public void ClearCredentials()
+    {
+        ApiKey = "";
+        AccessToken = "";
+        Log.Information("DeepgramOptionsFromEnv", "All authentication credentials cleared");
     }
 }

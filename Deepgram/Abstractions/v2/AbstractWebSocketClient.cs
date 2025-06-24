@@ -80,8 +80,9 @@ public abstract class AbstractWebSocketClient : IDisposable
         _clientWebSocket = new ClientWebSocket();
 
         // set headers
-        _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_deepgramClientOptions.ApiKey}");
-        if (_deepgramClientOptions.Headers is not null) {
+        SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
+        if (_deepgramClientOptions.Headers is not null)
+        {
             foreach (var header in _deepgramClientOptions.Headers)
             {
                 var tmp = header.Key.ToLower();
@@ -689,7 +690,8 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// Indicates whether the WebSocket is connected
     /// </summary> 
     /// <returns>Returns true if the WebSocket is connected</returns>
-    public bool IsConnected() {
+    public bool IsConnected()
+    {
         if (_clientWebSocket == null)
         {
             return false;
@@ -726,6 +728,31 @@ public abstract class AbstractWebSocketClient : IDisposable
             }
         }
     }
+
+    /// <summary>
+    /// Sets the appropriate authentication header for WebSocket connections.
+    /// Priority: AccessToken (Bearer) > ApiKey (Token)
+    /// </summary>
+    /// <param name="webSocket">ClientWebSocket to configure</param>
+    /// <param name="options">Client options containing credentials</param>
+    private void SetAuthenticationHeader(ClientWebSocket webSocket, IDeepgramClientOptions options)
+    {
+        if (!string.IsNullOrWhiteSpace(options.AccessToken))
+        {
+            // Use Bearer token authentication (highest priority)
+            webSocket.Options.SetRequestHeader("Authorization", $"Bearer {options.AccessToken}");
+        }
+        else if (!string.IsNullOrWhiteSpace(options.ApiKey))
+        {
+            // Use API key authentication (fallback)
+            webSocket.Options.SetRequestHeader("Authorization", $"token {options.ApiKey}");
+        }
+        else
+        {
+            // No authentication credentials available
+            Log.Warning("SetAuthenticationHeader", "No authentication credentials provided. WebSocket connection may fail.");
+        }
+    }
     #endregion
 
     #region Dispose
@@ -738,7 +765,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             return;
         }
-          
+
         if (_cancellationTokenSource != null)
         {
             if (!_cancellationTokenSource.Token.IsCancellationRequested)

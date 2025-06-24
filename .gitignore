@@ -217,7 +217,6 @@ UpgradeLog*.htm
 # but keep track of directories ending in .cache
 !?*.[Cc]ache/
 
-
 # SQL Server files
 *.mdf
 *.ldf
@@ -256,3 +255,6 @@ log.txt
 examples/**/output_*.wav
 examples/**/output_*.mp3
 chatlog.txt
+
+# Ignore .env file
+.env
