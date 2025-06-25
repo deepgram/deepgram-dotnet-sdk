@@ -189,7 +189,7 @@ var response = await deepgramClient.TranscribeUrl(
     new PreRecordedSchema()
     {
         Model = "nova-3",
-        Callback = "https://your-callback-url.com/webhook",
+        CallBack = "https://your-callback-url.com/webhook",
     });
 
 // Writes to Console
@@ -212,7 +212,7 @@ var response = await deepgramClient.TranscribeFile(
     new PreRecordedSchema()
     {
         Model = "nova-3",
-        Callback = "https://your-callback-url.com/webhook",
+        CallBack = "https://your-callback-url.com/webhook",
     });
 
 Console.WriteLine($"Request ID: {response.RequestId}");
