@@ -10,12 +10,22 @@ namespace Deepgram.Models.Authenticate.v1;
 public class DeepgramWsClientOptions : IDeepgramClientOptions
 {
     /*****************************/
+    // Thread Safety
+    /*****************************/
+    private readonly object _credentialLock = new object();
+
+    /*****************************/
     // General Options
     /*****************************/
     /// <summary>
     /// Deepgram API KEY
     /// </summary>
     public string ApiKey { get; set; }
+
+    /// <summary>
+    /// Deepgram Access Token (OAuth 2.0 compliant)
+    /// </summary>
+    public string AccessToken { get; set; }
 
     /// <summary>
     /// BaseAddress of the server :defaults to api.deepgram.com
@@ -87,20 +97,17 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     /*****************************/
     // Constructor
     /*****************************/
-    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    public DeepgramWsClientOptions(string? apiKey = null, string? baseAddress = null, bool? keepAlive = null, bool? onPrem = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null, string? accessToken = null)
     {
         Log.Verbose("DeepgramWsClientOptions", "ENTER");
         Log.Debug("DeepgramWsClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
         Log.Debug("DeepgramWsClientOptions", baseAddress == null ? "BaseAddress is null" : "BaseAddress provided");
+        Log.Debug("DeepgramWsClientOptions", accessToken == null ? "ACCESS TOKEN is null" : "ACCESS TOKEN provided");
         Log.Debug("DeepgramWsClientOptions", keepAlive == null ? "KeepAlive is null" : "KeepAlive provided");
         Log.Debug("DeepgramWsClientOptions", onPrem == null ? "OnPrem is null" : "OnPrem provided");
         Log.Debug("DeepgramWsClientOptions", headers == null ? "Headers is null" : "Headers provided");
         Log.Debug("DeepgramWsClientOptions", addons == null ? "Addons is null" : "Addons provided");
 
-        if (string.IsNullOrWhiteSpace(ApiKey))
-        {
-            ApiKey = apiKey ?? "";
-        }
         BaseAddress = baseAddress ?? Defaults.DEFAULT_URI;
         KeepAlive = keepAlive ?? false;
         OnPrem = onPrem ?? false;
@@ -111,22 +118,56 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
         Log.Information("DeepgramWsClientOptions", $"OnPrem: {OnPrem}");
         Log.Information("DeepgramWsClientOptions", $"APIVersion: {APIVersion}");
 
-        // user provided takes precedence
-        if (string.IsNullOrWhiteSpace(ApiKey))
+        // Priority-based credential resolution
+        // 1. Explicit accessToken parameter (highest priority)
+        // 2. Explicit apiKey parameter
+        // 3. DEEPGRAM_ACCESS_TOKEN environment variable
+        // 4. DEEPGRAM_API_KEY environment variable (lowest priority)
+
+        // Initialize both credentials to empty strings
+        ApiKey = "";
+        AccessToken = "";
+
+        if (!string.IsNullOrWhiteSpace(accessToken))
         {
-            // then try the environment variable
-            Log.Debug("DeepgramWsClientOptions", "API KEY is not set");
-            ApiKey = Environment.GetEnvironmentVariable(variable: Defaults.DEEPGRAM_API_KEY) ?? "";
-            if (!string.IsNullOrEmpty(ApiKey))
+            AccessToken = accessToken;
+            // ApiKey remains empty (cleared above)
+            Log.Information("DeepgramWsClientOptions", "ACCESS TOKEN set from parameter");
+        }
+        else if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            ApiKey = apiKey;
+            // AccessToken remains empty (cleared above)
+            Log.Information("DeepgramWsClientOptions", "API KEY set from parameter");
+        }
+        else
+        {
+            // Try environment variables with same priority order
+            var envAccessToken = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_ACCESS_TOKEN);
+            var envApiKey = Environment.GetEnvironmentVariable(Defaults.DEEPGRAM_API_KEY);
+
+            if (!string.IsNullOrWhiteSpace(envAccessToken))
             {
+                AccessToken = envAccessToken;
+                // ApiKey remains empty (cleared above)
+                Log.Information("DeepgramWsClientOptions", "ACCESS TOKEN set from environment variable");
+            }
+            else if (!string.IsNullOrWhiteSpace(envApiKey))
+            {
+                ApiKey = envApiKey;
+                // AccessToken remains empty (cleared above)
                 Log.Information("DeepgramWsClientOptions", "API KEY set from environment variable");
-            } else {
-                Log.Warning("DeepgramWsClientOptions", "API KEY environment variable not set");
+            }
+            else
+            {
+                Log.Warning("DeepgramWsClientOptions", "No authentication credentials found in parameters or environment variables");
             }
         }
-        if (!OnPrem && string.IsNullOrEmpty(ApiKey))
+
+        // Ensure we have some form of authentication for non-OnPrem deployments
+        if (!OnPrem && string.IsNullOrWhiteSpace(AccessToken) && string.IsNullOrWhiteSpace(ApiKey))
         {
-            var exStr = "Deepgram API Key is invalid";
+            var exStr = "Deepgram authentication is required. Please provide either an API Key or Access Token.";
             Log.Error("DeepgramWsClientOptions", exStr);
             throw new ArgumentException(exStr);
         }
@@ -183,5 +224,75 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
 
         Log.Information("DeepgramWsClientOptions", $"BaseAddress: {BaseAddress}");
         Log.Verbose("DeepgramWsClientOptions", "LEAVE");
+    }
+
+    /*****************************/
+    // Dynamic Authentication Methods
+    /*****************************/
+
+    /// <summary>
+    /// Sets the API Key for authentication (clears AccessToken)
+    /// </summary>
+    /// <param name="apiKey">The API Key to use</param>
+    /// <exception cref="ArgumentException">Thrown when apiKey is null or empty</exception>
+    public void SetApiKey(string apiKey)
+    {
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            var exStr = "API Key cannot be null or empty";
+            Log.Error("DeepgramWsClientOptions.SetApiKey", exStr);
+            throw new ArgumentException(exStr, nameof(apiKey));
+        }
+
+        lock (_credentialLock)
+        {
+            ApiKey = apiKey;
+            AccessToken = ""; // Clear access token when setting API key
+            Log.Information("DeepgramWsClientOptions", "API KEY set, ACCESS TOKEN cleared");
+        }
+    }
+
+    /// <summary>
+    /// Sets the Access Token for authentication (clears ApiKey)
+    /// </summary>
+    /// <param name="accessToken">The Access Token to use</param>
+    /// <exception cref="ArgumentException">Thrown when accessToken is null or empty</exception>
+    public void SetAccessToken(string accessToken)
+    {
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            var exStr = "Access Token cannot be null or empty";
+            Log.Error("DeepgramWsClientOptions.SetAccessToken", exStr);
+            throw new ArgumentException(exStr, nameof(accessToken));
+        }
+
+        lock (_credentialLock)
+        {
+            AccessToken = accessToken;
+            ApiKey = ""; // Clear API key when setting access token
+            Log.Information("DeepgramWsClientOptions", "ACCESS TOKEN set, API KEY cleared");
+        }
+    }
+
+    /// <summary>
+    /// Clears all authentication credentials
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when attempting to clear credentials in non-OnPrem deployments</exception>
+    public void ClearCredentials()
+    {
+        // Validate that credential clearing is allowed
+        if (!OnPrem)
+        {
+            var exStr = "Cannot clear authentication credentials in non-OnPrem deployments. Authentication is required for cloud-based Deepgram services.";
+            Log.Error("DeepgramWsClientOptions.ClearCredentials", exStr);
+            throw new InvalidOperationException(exStr);
+        }
+
+        lock (_credentialLock)
+        {
+            ApiKey = "";
+            AccessToken = "";
+            Log.Information("DeepgramWsClientOptions", "All authentication credentials cleared (OnPrem deployment)");
+        }
     }
 }

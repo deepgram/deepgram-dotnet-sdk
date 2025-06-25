@@ -99,8 +99,9 @@ public class Client : IDisposable, IListenWebSocketClient
         _clientWebSocket = new ClientWebSocket();
 
         // set headers
-        _clientWebSocket.Options.SetRequestHeader("Authorization", $"token {_deepgramClientOptions.ApiKey}");
-        if (_deepgramClientOptions.Headers is not null) {
+        SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
+        if (_deepgramClientOptions.Headers is not null)
+        {
             foreach (var header in _deepgramClientOptions.Headers)
             {
                 var tmp = header.Key.ToLower();
@@ -926,7 +927,8 @@ public class Client : IDisposable, IListenWebSocketClient
     /// Indicates whether the WebSocket is connected
     /// </summary> 
     /// <returns>Returns true if the WebSocket is connected</returns>
-    public bool IsConnected() {
+    public bool IsConnected()
+    {
         if (_clientWebSocket == null)
         {
             return false;
@@ -997,7 +999,8 @@ public class Client : IDisposable, IListenWebSocketClient
 
                     var sentence = resultResponse.Channel.Alternatives[0].Transcript;
 
-                    if (resultResponse.Channel.Alternatives.Count == 0 || sentence == "") {
+                    if (resultResponse.Channel.Alternatives.Count == 0 || sentence == "")
+                    {
                         Log.Verbose("InspectMessage", $"resultResponse has empty message");
                         Log.Verbose("InspectMessage", "LEAVE");
                         return;
@@ -1009,11 +1012,13 @@ public class Client : IDisposable, IListenWebSocketClient
                         {
                             var now = DateTime.Now;
                             Log.Debug("InspectMessage", $"AutoFlush IsFinal received. Time: {now}");
-                            lock(_mutexLastDatagram)
+                            lock (_mutexLastDatagram)
                             {
                                 _lastReceived = null;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             var now = DateTime.Now;
                             Log.Debug("InspectMessage", $"AutoFlush Interim received. Time: {now}");
                             lock (_mutexLastDatagram)
@@ -1041,6 +1046,31 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Verbose("ListenWSClient.InspectMessage", "LEAVE");
         }
     }
+
+    /// <summary>
+    /// Sets the appropriate authentication header for WebSocket connections.
+    /// Priority: AccessToken (Bearer) > ApiKey (Token)
+    /// </summary>
+    /// <param name="webSocket">ClientWebSocket to configure</param>
+    /// <param name="options">Client options containing credentials</param>
+    private void SetAuthenticationHeader(ClientWebSocket webSocket, IDeepgramClientOptions options)
+    {
+        if (!string.IsNullOrWhiteSpace(options.AccessToken))
+        {
+            // Use Bearer token authentication (highest priority)
+            webSocket.Options.SetRequestHeader("Authorization", $"Bearer {options.AccessToken}");
+        }
+        else if (!string.IsNullOrWhiteSpace(options.ApiKey))
+        {
+            // Use API key authentication (fallback)
+            webSocket.Options.SetRequestHeader("Authorization", $"token {options.ApiKey}");
+        }
+        else
+        {
+            // No authentication credentials available
+            Log.Warning("SetAuthenticationHeader", "No authentication credentials provided. WebSocket connection may fail.");
+        }
+    }
     #endregion
 
     #region Dispose
@@ -1053,7 +1083,7 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             return;
         }
-          
+
         if (_cancellationTokenSource != null)
         {
             if (!_cancellationTokenSource.Token.IsCancellationRequested)

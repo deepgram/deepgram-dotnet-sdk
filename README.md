@@ -991,6 +991,24 @@ you can set the `Debug` level but using this code:
 Library.Initialize(LogLevel.Debug);
 ```
 
+## Testing
+
+### Unit Tests
+
+Run:
+
+```bash
+   dotnet test Deepgram.Tests/Deepgram.Tests.csproj
+```
+
+### Integration Tests
+
+See the [tests](./tests/) directory for integration tests and edge case validation beyond the unit tests.
+
+### Examples
+
+See the [examples](./examples/) directory for working code samples for different Deepgram SDK features.
+
 ## Backwards Compatibility
 
 We follow semantic versioning (semver) to ensure a smooth upgrade experience.

@@ -14,4 +14,7 @@ public static class Defaults
 
     // Default API key environment variable
     public const string DEEPGRAM_API_KEY = "DEEPGRAM_API_KEY";
+
+    // Default access token environment variable
+    public const string DEEPGRAM_ACCESS_TOKEN = "DEEPGRAM_ACCESS_TOKEN";
 }

@@ -15,6 +15,11 @@ public interface IDeepgramClientOptions
     public string ApiKey { get; }
 
     /// <summary>
+    /// Deepgram Access Token (OAuth 2.0 compliant)
+    /// </summary>
+    public string AccessToken { get; }
+
+    /// <summary>
     /// BaseAddress of the server :defaults to api.deepgram.com
     /// no need to attach the protocol it will be added internally
     /// </summary>
@@ -86,4 +91,25 @@ public interface IDeepgramClientOptions
     /// Sets the interval for automatic flushing in Speak Streaming
     /// </summary>
     public decimal AutoFlushSpeakDelta { get; }
+
+    /*****************************/
+    // Dynamic Authentication Methods
+    /*****************************/
+
+    /// <summary>
+    /// Sets the API Key for authentication (clears AccessToken)
+    /// </summary>
+    /// <param name="apiKey">The API Key to use</param>
+    void SetApiKey(string apiKey);
+
+    /// <summary>
+    /// Sets the Access Token for authentication (clears ApiKey)
+    /// </summary>
+    /// <param name="accessToken">The Access Token to use</param>
+    void SetAccessToken(string accessToken);
+
+    /// <summary>
+    /// Clears all authentication credentials
+    /// </summary>
+    void ClearCredentials();
 }
