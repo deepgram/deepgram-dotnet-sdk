@@ -7,6 +7,11 @@ namespace Deepgram.Models.Authenticate.v1;
 public class DeepgramOptionsFromEnv : IDeepgramClientOptions
 {
     /*****************************/
+    // Thread Safety
+    /*****************************/
+    private readonly object _credentialLock = new object();
+
+    /*****************************/
     // General Options
     /*****************************/
     /// <summary>
@@ -203,31 +208,65 @@ public class DeepgramOptionsFromEnv : IDeepgramClientOptions
     /// Sets the API Key for authentication (clears AccessToken)
     /// </summary>
     /// <param name="apiKey">The API Key to use</param>
+    /// <exception cref="ArgumentException">Thrown when apiKey is null or empty</exception>
     public void SetApiKey(string apiKey)
     {
-        ApiKey = apiKey ?? "";
-        AccessToken = ""; // Clear access token when setting API key
-        Log.Information("DeepgramOptionsFromEnv", "API KEY set, ACCESS TOKEN cleared");
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            var exStr = "API Key cannot be null or empty";
+            Log.Error("DeepgramOptionsFromEnv.SetApiKey", exStr);
+            throw new ArgumentException(exStr, nameof(apiKey));
+        }
+
+        lock (_credentialLock)
+        {
+            ApiKey = apiKey;
+            AccessToken = ""; // Clear access token when setting API key
+            Log.Information("DeepgramOptionsFromEnv", "API KEY set, ACCESS TOKEN cleared");
+        }
     }
 
     /// <summary>
     /// Sets the Access Token for authentication (clears ApiKey)
     /// </summary>
     /// <param name="accessToken">The Access Token to use</param>
+    /// <exception cref="ArgumentException">Thrown when accessToken is null or empty</exception>
     public void SetAccessToken(string accessToken)
     {
-        AccessToken = accessToken ?? "";
-        ApiKey = ""; // Clear API key when setting access token
-        Log.Information("DeepgramOptionsFromEnv", "ACCESS TOKEN set, API KEY cleared");
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            var exStr = "Access Token cannot be null or empty";
+            Log.Error("DeepgramOptionsFromEnv.SetAccessToken", exStr);
+            throw new ArgumentException(exStr, nameof(accessToken));
+        }
+
+        lock (_credentialLock)
+        {
+            AccessToken = accessToken;
+            ApiKey = ""; // Clear API key when setting access token
+            Log.Information("DeepgramOptionsFromEnv", "ACCESS TOKEN set, API KEY cleared");
+        }
     }
 
     /// <summary>
     /// Clears all authentication credentials
     /// </summary>
+    /// <exception cref="InvalidOperationException">Thrown when attempting to clear credentials in non-OnPrem deployments</exception>
     public void ClearCredentials()
     {
-        ApiKey = "";
-        AccessToken = "";
-        Log.Information("DeepgramOptionsFromEnv", "All authentication credentials cleared");
+        // Validate that credential clearing is allowed
+        if (!OnPrem)
+        {
+            var exStr = "Cannot clear authentication credentials in non-OnPrem deployments. Authentication is required for cloud-based Deepgram services.";
+            Log.Error("DeepgramOptionsFromEnv.ClearCredentials", exStr);
+            throw new InvalidOperationException(exStr);
+        }
+
+        lock (_credentialLock)
+        {
+            ApiKey = "";
+            AccessToken = "";
+            Log.Information("DeepgramOptionsFromEnv", "All authentication credentials cleared (OnPrem deployment)");
+        }
     }
 }
