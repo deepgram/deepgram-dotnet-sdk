@@ -132,6 +132,18 @@ public interface IAgentWebSocketClient
     public Task SendKeepAlive();
 
     /// <summary>
+    /// Sends an InjectUserMessage to the agent
+    /// </summary>
+    /// <param name="content">The specific phrase or statement the agent should respond to</param>
+    public Task SendInjectUserMessage(string content);
+
+    /// <summary>
+    /// Sends an InjectUserMessage to the agent using a schema object
+    /// </summary>
+    /// <param name="injectUserMessageSchema">The InjectUserMessage schema containing the message details</param>
+    public Task SendInjectUserMessage(InjectUserMessageSchema injectUserMessageSchema);
+
+    /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
     public Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null);
@@ -176,7 +188,7 @@ public interface IAgentWebSocketClient
 
     /// <summary>
     /// Indicates whether the WebSocket is connected
-    /// </summary> 
+    /// </summary>
     /// <returns>Returns true if the WebSocket is connected</returns>
     public bool IsConnected();
     #endregion

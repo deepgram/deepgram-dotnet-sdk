@@ -463,6 +463,50 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
+
+    /// <summary>
+    /// Sends an InjectUserMessage to the agent
+    /// </summary>
+    /// <param name="content">The specific phrase or statement the agent should respond to</param>
+    public async Task SendInjectUserMessage(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            Log.Warning("SendInjectUserMessage", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(content));
+        }
+
+        var injectUserMessage = new InjectUserMessageSchema
+        {
+            Content = content
+        };
+
+        await SendInjectUserMessage(injectUserMessage);
+    }
+
+    /// <summary>
+    /// Sends an InjectUserMessage to the agent using a schema object
+    /// </summary>
+    /// <param name="injectUserMessageSchema">The InjectUserMessage schema containing the message details</param>
+    public async Task SendInjectUserMessage(InjectUserMessageSchema injectUserMessageSchema)
+    {
+        if (injectUserMessageSchema == null)
+        {
+            Log.Warning("SendInjectUserMessage", "InjectUserMessageSchema cannot be null");
+            throw new ArgumentNullException(nameof(injectUserMessageSchema));
+        }
+
+        if (string.IsNullOrWhiteSpace(injectUserMessageSchema.Content))
+        {
+            Log.Warning("SendInjectUserMessage", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(injectUserMessageSchema.Content));
+        }
+
+        Log.Debug("SendInjectUserMessage", $"Sending InjectUserMessage: {injectUserMessageSchema.Content}");
+
+        byte[] data = Encoding.UTF8.GetBytes(injectUserMessageSchema.ToString());
+        await SendMessageImmediately(data);
+    }
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
@@ -831,7 +875,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     #region Helpers
     /// <summary>
     /// Get the URI for the WebSocket connection
-    /// </summary> 
+    /// </summary>
     internal static Uri GetUri(IDeepgramClientOptions options)
     {
         var baseAddress = options.BaseAddress;
