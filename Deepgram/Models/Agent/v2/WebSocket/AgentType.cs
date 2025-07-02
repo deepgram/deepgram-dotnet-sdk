@@ -33,6 +33,7 @@ public static class AgentClientTypes
     public const string UpdatePrompt = "UpdatePrompt";
     public const string UpdateSpeak = "UpdateSpeak";
     public const string InjectAgentMessage = "InjectAgentMessage";
+    public const string InjectUserMessage = "InjectUserMessage";
     public const string FunctionCallResponse = "FunctionCallResponse";
     public const string KeepAlive = "KeepAlive";
     public const string Close = "Close";
