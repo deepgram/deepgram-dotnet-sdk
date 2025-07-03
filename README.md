@@ -311,6 +311,7 @@ var settings = new SettingsSchema()
                 Model = "nova-3",
             },
         },
+        // Option 1: Single Provider (Backward Compatibility)
         Speak = new SpeakSchema()
         {
             Provider = new ProviderSchema()
@@ -319,6 +320,45 @@ var settings = new SettingsSchema()
                 Model = "aura-2-thalia-en",
             },
         },
+
+        // Option 2: Multiple Providers with Fallback Support
+        // Uncomment the section below and comment out the single provider above
+        // to use multiple TTS providers for enhanced reliability
+        /*
+        Speak = new SpeakSchema()
+        {
+            SpeakProviders = new List<SpeakProviderConfig>
+            {
+                // Primary provider: Deepgram
+                new SpeakProviderConfig
+                {
+                    Provider = new ProviderSchema()
+                    {
+                        Type = "deepgram",
+                        Model = "aura-2-zeus-en",
+                    }
+                },
+                // Fallback provider: OpenAI
+                new SpeakProviderConfig
+                {
+                    Provider = new ProviderSchema()
+                    {
+                        Type = "open_ai",
+                        Model = "tts-1",
+                        Voice = "shimmer",
+                    },
+                    Endpoint = new EndpointSchema()
+                    {
+                        URL = "https://api.openai.com/v1/audio/speech",
+                        Headers = new Dictionary<string, string>
+                        {
+                            { "authorization", "Bearer {{OPENAI_API_KEY}}" }
+                        }
+                    }
+                }
+            }
+        },
+        */
     },
     Greeting = "Hello, I'm your AI assistant.",
 };
@@ -1003,11 +1043,13 @@ Run:
 
 ### Integration Tests
 
-See the [tests](./tests/) directory for integration tests and edge case validation beyond the unit tests.
+See the [tests](./tests/) directory for integration tests and edge case validation
+beyond the unit tests.
 
 ### Examples
 
-See the [examples](./examples/) directory for working code samples for different Deepgram SDK features.
+See the [examples](./examples/) directory for working code samples for different
+Deepgram SDK features.
 
 ## Backwards Compatibility
 
