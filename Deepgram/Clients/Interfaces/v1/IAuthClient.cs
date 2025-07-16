@@ -19,4 +19,16 @@ public interface IAuthClient
     /// <returns><see cref="GrantTokenResponse"/></returns>
     public Task<GrantTokenResponse> GrantToken(CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
+
+    /// <summary>
+    /// Gets a short-lived JWT for the Deepgram API with custom TTL.
+    /// </summary>
+    /// <param name="grantTokenSchema"><see cref="GrantTokenSchema"/> for grant token configuration</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="addons">Additional parameters to add to the request</param>
+    /// <param name="headers">Additional headers to add to the request</param>
+    /// <returns><see cref="GrantTokenResponse"/></returns>
+    public Task<GrantTokenResponse> GrantToken(GrantTokenSchema grantTokenSchema,
+        CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null);
 }
