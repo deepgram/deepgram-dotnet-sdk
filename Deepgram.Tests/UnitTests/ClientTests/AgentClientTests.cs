@@ -198,4 +198,165 @@ public class AgentClientTests
             parsed.RootElement.GetProperty("content").GetString().Should().Be("Hello! Can you hear me?");
         }
     }
+
+    #region MipOptOut Tests
+
+    [Test]
+    public void Agent_MipOptOut_Should_Have_Default_Value_False()
+    {
+        // Arrange & Act
+        var agent = new Agent();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            agent.MipOptOut.Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void Agent_MipOptOut_Should_Be_Settable()
+    {
+        // Arrange & Act
+        var agent = new Agent
+        {
+            MipOptOut = true
+        };
+
+        // Assert
+        using (new AssertionScope())
+        {
+            agent.MipOptOut.Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public void Agent_MipOptOut_Should_Serialize_To_Snake_Case()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            MipOptOut = true
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("mip_opt_out");
+            result.Should().Contain("true");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public void Agent_MipOptOut_False_Should_Serialize_Correctly()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            MipOptOut = false
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("mip_opt_out");
+            result.Should().Contain("false");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void Agent_MipOptOut_Null_Should_Not_Serialize()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            MipOptOut = null
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().NotContain("mip_opt_out");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.TryGetProperty("mip_opt_out", out _).Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void Agent_With_MipOptOut_Should_Serialize_With_Other_Properties()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Language = "en",
+            Greeting = "Hello, I'm your agent",
+            MipOptOut = true
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("language");
+            result.Should().Contain("greeting");
+            result.Should().Contain("mip_opt_out");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.GetProperty("language").GetString().Should().Be("en");
+            parsed.RootElement.GetProperty("greeting").GetString().Should().Be("Hello, I'm your agent");
+            parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public void Agent_MipOptOut_Schema_Should_Match_API_Specification()
+    {
+        // Arrange - Test both default (false) and explicit true values
+        var agentDefault = new Agent();
+        var agentOptOut = new Agent { MipOptOut = true };
+
+        // Act
+        var defaultResult = agentDefault.ToString();
+        var optOutResult = agentOptOut.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            // Default should be false
+            var defaultParsed = JsonDocument.Parse(defaultResult);
+            defaultParsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeFalse();
+
+            // Explicit true should be true
+            var optOutParsed = JsonDocument.Parse(optOutResult);
+            optOutParsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+        }
+    }
+
+    #endregion
 }

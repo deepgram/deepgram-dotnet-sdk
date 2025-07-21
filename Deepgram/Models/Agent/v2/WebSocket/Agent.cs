@@ -33,11 +33,18 @@ public record Agent
     public string? Greeting { get; set; }
 
     /// <summary>
+    /// To opt out of Deepgram Model Improvement Program
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; } = false;
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
     {
         return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
     }
-    
+
 }
