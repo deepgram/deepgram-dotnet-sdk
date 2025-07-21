@@ -35,4 +35,33 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         return result;
     }
+
+    /// <summary>
+    /// Gets a temporary JWT for the Deepgram API with custom TTL.
+    /// </summary>
+    /// <param name="grantTokenSchema"><see cref="GrantTokenSchema"/> for grant token configuration</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="addons">Additional parameters to add to the request</param>
+    /// <param name="headers">Additional headers to add to the request</param>
+    /// <returns><see cref="GrantTokenResponse"/></returns>
+    public async Task<GrantTokenResponse> GrantToken(GrantTokenSchema grantTokenSchema,
+        CancellationTokenSource? cancellationToken = default,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        {
+        if (grantTokenSchema is null)
+        {
+            throw new ArgumentNullException(nameof(grantTokenSchema));
+        }
+
+        Log.Verbose("AuthClient.GrantToken", "ENTER");
+
+        var uri = GetUri(_options, $"auth/{UriSegments.GRANTTOKEN}");
+        var result = await PostAsync<GrantTokenSchema, GrantTokenResponse>(uri, grantTokenSchema, cancellationToken, addons, headers);
+
+        Log.Information("GrantToken", $"{uri} Succeeded");
+        Log.Debug("GrantToken", $"result: {result}");
+        Log.Verbose("AuthClient.GrantToken", "LEAVE");
+
+        return result;
+    }
 }
