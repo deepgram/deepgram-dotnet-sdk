@@ -389,4 +389,237 @@ public class AgentClientTests
     }
 
     #endregion
+
+    #region Tags Tests
+
+    [Test]
+    public void Agent_Tags_Should_Have_Default_Value_Null()
+    {
+        // Arrange & Act
+        var agent = new Agent();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            agent.Tags.Should().BeNull();
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Should_Be_Settable()
+    {
+        // Arrange & Act
+        var agent = new Agent
+        {
+            Tags = new List<string> { "test", "demo", "agent" }
+        };
+
+        // Assert
+        using (new AssertionScope())
+        {
+            agent.Tags.Should().NotBeNull();
+            agent.Tags.Should().HaveCount(3);
+            agent.Tags.Should().Contain("test");
+            agent.Tags.Should().Contain("demo");
+            agent.Tags.Should().Contain("agent");
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Should_Serialize_To_Json_Array()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Tags = new List<string> { "production", "voice-bot", "customer-service" }
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("tags");
+            result.Should().Contain("[");
+            result.Should().Contain("]");
+            result.Should().Contain("production");
+            result.Should().Contain("voice-bot");
+            result.Should().Contain("customer-service");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            var tagsArray = parsed.RootElement.GetProperty("tags");
+            tagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            tagsArray.GetArrayLength().Should().Be(3);
+
+            var tagsList = new List<string>();
+            foreach (var tag in tagsArray.EnumerateArray())
+            {
+                tagsList.Add(tag.GetString()!);
+            }
+            tagsList.Should().Contain("production");
+            tagsList.Should().Contain("voice-bot");
+            tagsList.Should().Contain("customer-service");
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Empty_List_Should_Serialize_As_Empty_Array()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Tags = new List<string>()
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("tags");
+            result.Should().Contain("[]");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            var tagsArray = parsed.RootElement.GetProperty("tags");
+            tagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            tagsArray.GetArrayLength().Should().Be(0);
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Null_Should_Not_Serialize()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Tags = null
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().NotContain("tags");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.TryGetProperty("tags", out _).Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void Agent_With_Tags_Should_Serialize_With_Other_Properties()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Language = "en",
+            Greeting = "Hello, I'm your agent",
+            Tags = new List<string> { "test-tag", "integration" },
+            MipOptOut = true
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("language");
+            result.Should().Contain("greeting");
+            result.Should().Contain("tags");
+            result.Should().Contain("mip_opt_out");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.GetProperty("language").GetString().Should().Be("en");
+            parsed.RootElement.GetProperty("greeting").GetString().Should().Be("Hello, I'm your agent");
+            parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+
+            var tagsArray = parsed.RootElement.GetProperty("tags");
+            tagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            tagsArray.GetArrayLength().Should().Be(2);
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Should_Support_Special_Characters()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Tags = new List<string> { "test-with-dashes", "test_with_underscores", "test with spaces", "test.with.dots" }
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            var tagsArray = parsed.RootElement.GetProperty("tags");
+            tagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            tagsArray.GetArrayLength().Should().Be(4);
+
+            var tagsList = new List<string>();
+            foreach (var tag in tagsArray.EnumerateArray())
+            {
+                tagsList.Add(tag.GetString()!);
+            }
+            tagsList.Should().Contain("test-with-dashes");
+            tagsList.Should().Contain("test_with_underscores");
+            tagsList.Should().Contain("test with spaces");
+            tagsList.Should().Contain("test.with.dots");
+        }
+    }
+
+    [Test]
+    public void Agent_Tags_Schema_Should_Match_API_Specification()
+    {
+        // Arrange - Test various scenarios as per API specification
+        var agentWithTags = new Agent { Tags = new List<string> { "search-filter", "analytics", "production" } };
+        var agentWithoutTags = new Agent { Tags = null };
+        var agentWithEmptyTags = new Agent { Tags = new List<string>() };
+
+        // Act
+        var withTagsResult = agentWithTags.ToString();
+        var withoutTagsResult = agentWithoutTags.ToString();
+        var emptyTagsResult = agentWithEmptyTags.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            // With tags should serialize array
+            var withTagsParsed = JsonDocument.Parse(withTagsResult);
+            var tagsArray = withTagsParsed.RootElement.GetProperty("tags");
+            tagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            tagsArray.GetArrayLength().Should().Be(3);
+
+            // Without tags should not include tags property
+            var withoutTagsParsed = JsonDocument.Parse(withoutTagsResult);
+            withoutTagsParsed.RootElement.TryGetProperty("tags", out _).Should().BeFalse();
+
+            // Empty tags should serialize as empty array
+            var emptyTagsParsed = JsonDocument.Parse(emptyTagsResult);
+            var emptyTagsArray = emptyTagsParsed.RootElement.GetProperty("tags");
+            emptyTagsArray.ValueKind.Should().Be(JsonValueKind.Array);
+            emptyTagsArray.GetArrayLength().Should().Be(0);
+        }
+    }
+
+    #endregion
 }

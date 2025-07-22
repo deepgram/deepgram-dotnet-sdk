@@ -26,6 +26,13 @@ public record Agent
     public Speak Speak { get; set; } = new Speak();
 
     /// <summary>
+    /// Tags to associate with the request.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("tags")]
+    public List<string>? Tags { get; set; }
+
+    /// <summary>
     /// The message to speak at the start of the connection.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
