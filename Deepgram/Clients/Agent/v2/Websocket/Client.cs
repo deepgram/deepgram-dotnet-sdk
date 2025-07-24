@@ -542,6 +542,108 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent
+    /// </summary>
+    /// <param name="role">The role (user or assistant) who spoke the statement</param>
+    /// <param name="content">The actual statement that was spoken</param>
+    public async Task SendHistoryConversationText(string role, string content)
+    {
+        if (string.IsNullOrWhiteSpace(role))
+        {
+            Log.Warning("SendHistoryConversationText", "Role cannot be null or empty");
+            throw new ArgumentException("Role cannot be null or empty", nameof(role));
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            Log.Warning("SendHistoryConversationText", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(content));
+        }
+
+        var historyMessage = new HistoryConversationText
+        {
+            Role = role,
+            Content = content
+        };
+
+        await SendHistoryConversationText(historyMessage);
+    }
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyConversationText">The history conversation text schema containing the message details</param>
+    public async Task SendHistoryConversationText(HistoryConversationText historyConversationText)
+    {
+        if (historyConversationText == null)
+        {
+            Log.Warning("SendHistoryConversationText", "HistoryConversationText cannot be null");
+            throw new ArgumentNullException(nameof(historyConversationText));
+        }
+
+        if (string.IsNullOrWhiteSpace(historyConversationText.Role))
+        {
+            Log.Warning("SendHistoryConversationText", "Role cannot be null or empty");
+            throw new ArgumentException("Role cannot be null or empty", nameof(historyConversationText.Role));
+        }
+
+        if (string.IsNullOrWhiteSpace(historyConversationText.Content))
+        {
+            Log.Warning("SendHistoryConversationText", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(historyConversationText.Content));
+        }
+
+        Log.Debug("SendHistoryConversationText", $"Sending History Conversation Text: {historyConversationText.Role} - {historyConversationText.Content}");
+
+        byte[] data = Encoding.UTF8.GetBytes(historyConversationText.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends a history function calls message to the agent
+    /// </summary>
+    /// <param name="functionCalls">List of function call objects to send as history</param>
+    public async Task SendHistoryFunctionCalls(List<HistoryFunctionCall> functionCalls)
+    {
+        if (functionCalls == null || functionCalls.Count == 0)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "FunctionCalls cannot be null or empty");
+            throw new ArgumentException("FunctionCalls cannot be null or empty", nameof(functionCalls));
+        }
+
+        var historyMessage = new HistoryFunctionCalls
+        {
+            FunctionCalls = functionCalls
+        };
+
+        await SendHistoryFunctionCalls(historyMessage);
+    }
+
+    /// <summary>
+    /// Sends a history function calls message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyFunctionCalls">The history function calls schema containing the function call details</param>
+    public async Task SendHistoryFunctionCalls(HistoryFunctionCalls historyFunctionCalls)
+    {
+        if (historyFunctionCalls == null)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "HistoryFunctionCalls cannot be null");
+            throw new ArgumentNullException(nameof(historyFunctionCalls));
+        }
+
+        if (historyFunctionCalls.FunctionCalls == null || historyFunctionCalls.FunctionCalls.Count == 0)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "FunctionCalls cannot be null or empty");
+            throw new ArgumentException("FunctionCalls cannot be null or empty", nameof(historyFunctionCalls.FunctionCalls));
+        }
+
+        Log.Debug("SendHistoryFunctionCalls", $"Sending History Function Calls: {historyFunctionCalls.FunctionCalls.Count} calls");
+
+        byte[] data = Encoding.UTF8.GetBytes(historyFunctionCalls.ToString());
+        await SendMessageImmediately(data);
+    }
     #endregion
 
     internal async Task ProcessKeepAlive()

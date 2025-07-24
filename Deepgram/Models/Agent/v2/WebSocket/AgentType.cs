@@ -24,6 +24,7 @@ public enum AgentType
     SettingsApplied,
     PromptUpdated,
     SpeakUpdated,
+    History,
 }
 
 public static class AgentClientTypes
@@ -37,4 +38,5 @@ public static class AgentClientTypes
     public const string FunctionCallResponse = "FunctionCallResponse";
     public const string KeepAlive = "KeepAlive";
     public const string Close = "Close";
+    public const string History = "History";
 }

@@ -13,6 +13,13 @@ public record Agent
     [JsonPropertyName("language")]
     public string? Language { get; set; } = "en";
 
+    /// <summary>
+    /// Conversation context including the history of messages and function calls
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("context")]
+    public Context? Context { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("listen")]
     public Listen Listen { get; set; } = new Listen();
