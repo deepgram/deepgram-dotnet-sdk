@@ -1,39 +1,36 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using Deepgram.Utilities;
+
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class SettingsSchema
+public record HistoryConversationText
 {
     /// <summary>
-    /// Settings event type.
+    /// Message type identifier for conversation text
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; } = AgentClientTypes.Settings;
+    public string? Type { get; set; } = "History";
 
     /// <summary>
-    /// Set to true to enable experimental features.
+    /// Identifies who spoke the statement
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("experimental")]
-    public bool? Experimental { get; set; }
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
 
     /// <summary>
-    /// Agent flags configuration
+    /// The actual statement that was spoken
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("flags")]
-    public Flags? Flags { get; set; } = new Flags();
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("audio")]
-    public Audio Audio { get; set; } = new Audio();
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("agent")]
-    public Agent Agent { get; set; } = new Agent();
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
