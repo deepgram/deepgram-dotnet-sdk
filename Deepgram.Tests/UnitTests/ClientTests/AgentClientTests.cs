@@ -202,23 +202,23 @@ public class AgentClientTests
     #region MipOptOut Tests
 
     [Test]
-    public void Agent_MipOptOut_Should_Have_Default_Value_False()
+    public void SettingsSchema_MipOptOut_Should_Have_Default_Value_False()
     {
         // Arrange & Act
-        var agent = new Agent();
+        var settings = new SettingsSchema();
 
         // Assert
         using (new AssertionScope())
         {
-            agent.MipOptOut.Should().BeFalse();
+            settings.MipOptOut.Should().BeFalse();
         }
     }
 
     [Test]
-    public void Agent_MipOptOut_Should_Be_Settable()
+    public void SettingsSchema_MipOptOut_Should_Be_Settable()
     {
         // Arrange & Act
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             MipOptOut = true
         };
@@ -226,21 +226,21 @@ public class AgentClientTests
         // Assert
         using (new AssertionScope())
         {
-            agent.MipOptOut.Should().BeTrue();
+            settings.MipOptOut.Should().BeTrue();
         }
     }
 
     [Test]
-    public void Agent_MipOptOut_Should_Serialize_To_Snake_Case()
+    public void SettingsSchema_MipOptOut_Should_Serialize_To_Snake_Case()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             MipOptOut = true
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -256,16 +256,16 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_MipOptOut_False_Should_Serialize_Correctly()
+    public void SettingsSchema_MipOptOut_False_Should_Serialize_Correctly()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             MipOptOut = false
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -281,16 +281,16 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_MipOptOut_Null_Should_Not_Serialize()
+    public void SettingsSchema_MipOptOut_Null_Should_Not_Serialize()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             MipOptOut = null
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -305,45 +305,50 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_With_MipOptOut_Should_Serialize_With_Other_Properties()
+    public void SettingsSchema_With_MipOptOut_Should_Serialize_With_Other_Properties()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
-            Language = "en",
-            Greeting = "Hello, I'm your agent",
-            MipOptOut = true
+            Experimental = true,
+            MipOptOut = true,
+            Agent = new Agent
+            {
+                Language = "en",
+                Greeting = "Hello, I'm your agent"
+            }
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
-            result.Should().Contain("language");
-            result.Should().Contain("greeting");
+            result.Should().Contain("experimental");
             result.Should().Contain("mip_opt_out");
+            result.Should().Contain("agent");
 
             // Verify it's valid JSON by parsing it
             var parsed = JsonDocument.Parse(result);
-            parsed.RootElement.GetProperty("language").GetString().Should().Be("en");
-            parsed.RootElement.GetProperty("greeting").GetString().Should().Be("Hello, I'm your agent");
+            parsed.RootElement.GetProperty("experimental").GetBoolean().Should().BeTrue();
             parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+            parsed.RootElement.GetProperty("agent").GetProperty("language").GetString().Should().Be("en");
+            parsed.RootElement.GetProperty("agent").GetProperty("greeting").GetString().Should().Be("Hello, I'm your agent");
         }
     }
 
     [Test]
-    public void Agent_MipOptOut_Schema_Should_Match_API_Specification()
+    public void SettingsSchema_MipOptOut_Schema_Should_Match_API_Specification()
     {
         // Arrange - Test both default (false) and explicit true values
-        var agentDefault = new Agent();
-        var agentOptOut = new Agent { MipOptOut = true };
+        var settingsDefault = new SettingsSchema();
+        var settingsOptOut = new SettingsSchema { MipOptOut = true };
 
         // Act
-        var defaultResult = agentDefault.ToString();
-        var optOutResult = agentOptOut.ToString();
+        var defaultResult = settingsDefault.ToString();
+        var optOutResult = settingsOptOut.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -355,6 +360,31 @@ public class AgentClientTests
             // Explicit true should be true
             var optOutParsed = JsonDocument.Parse(optOutResult);
             optOutParsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public void Agent_Should_Not_Have_MipOptOut_Property()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Language = "en",
+            Greeting = "Hello, I'm your agent"
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().NotContain("mip_opt_out");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.TryGetProperty("mip_opt_out", out _).Should().BeFalse();
         }
     }
 

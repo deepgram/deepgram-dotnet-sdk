@@ -20,6 +20,13 @@ public class SettingsSchema
     [JsonPropertyName("experimental")]
     public bool? Experimental { get; set; }
 
+    /// <summary>
+    /// To opt out of Deepgram Model Improvement Program
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; } = false;
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("audio")]
     public Audio Audio { get; set; } = new Audio();
