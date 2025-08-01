@@ -21,6 +21,13 @@ public class SettingsSchema
     public bool? Experimental { get; set; }
 
     /// <summary>
+    /// Tags to associate with the request.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("tags")]
+    public List<string>? Tags { get; set; }
+
+    /// <summary>
     /// To opt out of Deepgram Model Improvement Program
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

@@ -393,23 +393,23 @@ public class AgentClientTests
     #region Tags Tests
 
     [Test]
-    public void Agent_Tags_Should_Have_Default_Value_Null()
+    public void SettingsSchema_Tags_Should_Have_Default_Value_Null()
     {
         // Arrange & Act
-        var agent = new Agent();
+        var settings = new SettingsSchema();
 
         // Assert
         using (new AssertionScope())
         {
-            agent.Tags.Should().BeNull();
+            settings.Tags.Should().BeNull();
         }
     }
 
     [Test]
-    public void Agent_Tags_Should_Be_Settable()
+    public void SettingsSchema_Tags_Should_Be_Settable()
     {
         // Arrange & Act
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             Tags = new List<string> { "test", "demo", "agent" }
         };
@@ -417,25 +417,25 @@ public class AgentClientTests
         // Assert
         using (new AssertionScope())
         {
-            agent.Tags.Should().NotBeNull();
-            agent.Tags.Should().HaveCount(3);
-            agent.Tags.Should().Contain("test");
-            agent.Tags.Should().Contain("demo");
-            agent.Tags.Should().Contain("agent");
+            settings.Tags.Should().NotBeNull();
+            settings.Tags.Should().HaveCount(3);
+            settings.Tags.Should().Contain("test");
+            settings.Tags.Should().Contain("demo");
+            settings.Tags.Should().Contain("agent");
         }
     }
 
     [Test]
-    public void Agent_Tags_Should_Serialize_To_Json_Array()
+    public void SettingsSchema_Tags_Should_Serialize_To_Json_Array()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             Tags = new List<string> { "production", "voice-bot", "customer-service" }
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -466,16 +466,16 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_Tags_Empty_List_Should_Serialize_As_Empty_Array()
+    public void SettingsSchema_Tags_Empty_List_Should_Serialize_As_Empty_Array()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             Tags = new List<string>()
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -493,16 +493,16 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_Tags_Null_Should_Not_Serialize()
+    public void SettingsSchema_Tags_Null_Should_Not_Serialize()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             Tags = null
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -517,33 +517,30 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_With_Tags_Should_Serialize_With_Other_Properties()
+    public void SettingsSchema_With_Tags_Should_Serialize_With_Other_Properties()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
-            Language = "en",
-            Greeting = "Hello, I'm your agent",
-            Tags = new List<string> { "test-tag", "integration" },
-            MipOptOut = true
+            Experimental = true,
+            MipOptOut = true,
+            Tags = new List<string> { "test-tag", "integration" }
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
-            result.Should().Contain("language");
-            result.Should().Contain("greeting");
-            result.Should().Contain("tags");
+            result.Should().Contain("experimental");
             result.Should().Contain("mip_opt_out");
+            result.Should().Contain("tags");
 
             // Verify it's valid JSON by parsing it
             var parsed = JsonDocument.Parse(result);
-            parsed.RootElement.GetProperty("language").GetString().Should().Be("en");
-            parsed.RootElement.GetProperty("greeting").GetString().Should().Be("Hello, I'm your agent");
+            parsed.RootElement.GetProperty("experimental").GetBoolean().Should().BeTrue();
             parsed.RootElement.GetProperty("mip_opt_out").GetBoolean().Should().BeTrue();
 
             var tagsArray = parsed.RootElement.GetProperty("tags");
@@ -553,16 +550,16 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_Tags_Should_Support_Special_Characters()
+    public void SettingsSchema_Tags_Should_Support_Special_Characters()
     {
         // Arrange
-        var agent = new Agent
+        var settings = new SettingsSchema
         {
             Tags = new List<string> { "test-with-dashes", "test_with_underscores", "test with spaces", "test.with.dots" }
         };
 
         // Act
-        var result = agent.ToString();
+        var result = settings.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -588,17 +585,17 @@ public class AgentClientTests
     }
 
     [Test]
-    public void Agent_Tags_Schema_Should_Match_API_Specification()
+    public void SettingsSchema_Tags_Schema_Should_Match_API_Specification()
     {
         // Arrange - Test various scenarios as per API specification
-        var agentWithTags = new Agent { Tags = new List<string> { "search-filter", "analytics", "production" } };
-        var agentWithoutTags = new Agent { Tags = null };
-        var agentWithEmptyTags = new Agent { Tags = new List<string>() };
+        var settingsWithTags = new SettingsSchema { Tags = new List<string> { "search-filter", "analytics", "production" } };
+        var settingsWithoutTags = new SettingsSchema { Tags = null };
+        var settingsWithEmptyTags = new SettingsSchema { Tags = new List<string>() };
 
         // Act
-        var withTagsResult = agentWithTags.ToString();
-        var withoutTagsResult = agentWithoutTags.ToString();
-        var emptyTagsResult = agentWithEmptyTags.ToString();
+        var withTagsResult = settingsWithTags.ToString();
+        var withoutTagsResult = settingsWithoutTags.ToString();
+        var emptyTagsResult = settingsWithEmptyTags.ToString();
 
         // Assert
         using (new AssertionScope())
@@ -618,6 +615,31 @@ public class AgentClientTests
             var emptyTagsArray = emptyTagsParsed.RootElement.GetProperty("tags");
             emptyTagsArray.ValueKind.Should().Be(JsonValueKind.Array);
             emptyTagsArray.GetArrayLength().Should().Be(0);
+        }
+    }
+
+    [Test]
+    public void Agent_Should_Not_Have_Tags_Property()
+    {
+        // Arrange
+        var agent = new Agent
+        {
+            Language = "en",
+            Greeting = "Hello, I'm your agent"
+        };
+
+        // Act
+        var result = agent.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().NotContain("tags");
+
+            // Verify it's valid JSON by parsing it
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.TryGetProperty("tags", out _).Should().BeFalse();
         }
     }
 
