@@ -7,6 +7,7 @@ using Deepgram.Microphone;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using PortAudioSharp;
 
 namespace SampleApp
@@ -55,107 +56,38 @@ namespace SampleApp
                 DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
                 var agentClient = ClientFactory.CreateAgentWebSocketClient(apiKey: "", options: options);
 
-                // current time
-                var lastAudioTime = DateTime.Now;
-                var audioFileCount = 0;
+                // Initialize conversation
+                Console.WriteLine("🎤 Ready for conversation! Speak into your microphone...");
 
                 // Subscribe to the EventResponseReceived event
                 await agentClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e.Type} received");
                 }));
-                await agentClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
+                                                await agentClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e.Type} received");
 
-                    // if the last audio response is more than 5 seconds ago, add a wav header
-                    if (DateTime.Now.Subtract(lastAudioTime).TotalSeconds > 7)
+                    if (e.Stream != null && e.Stream.Length > 0)
                     {
-                        audioFileCount = audioFileCount + 1; // increment the audio file count
+                        var audioData = e.Stream.ToArray();
+                        Console.WriteLine($"🔊 Queueing {audioData.Length} bytes of agent speech for playback");
 
-                        // delete the file if it exists
-                        if (File.Exists($"output_{audioFileCount}.wav"))
-                        {
-                            File.Delete($"output_{audioFileCount}.wav");
-                        }
-
-                        using (BinaryWriter writer = new BinaryWriter(File.Open($"output_{audioFileCount}.wav", FileMode.Append)))
-                        {
-                            Console.WriteLine("Adding WAV header to output.wav");
-                            byte[] wavHeader = new byte[44];
-                            int sampleRate = 48000;
-                            short bitsPerSample = 16;
-                            short channels = 1;
-                            int byteRate = sampleRate * channels * (bitsPerSample / 8);
-                            short blockAlign = (short)(channels * (bitsPerSample / 8));
-
-                            wavHeader[0] = 0x52; // R
-                            wavHeader[1] = 0x49; // I
-                            wavHeader[2] = 0x46; // F
-                            wavHeader[3] = 0x46; // F
-                            wavHeader[4] = 0x00; // Placeholder for file size (will be updated later)
-                            wavHeader[5] = 0x00; // Placeholder for file size (will be updated later)
-                            wavHeader[6] = 0x00; // Placeholder for file size (will be updated later)
-                            wavHeader[7] = 0x00; // Placeholder for file size (will be updated later)
-                            wavHeader[8] = 0x57; // W
-                            wavHeader[9] = 0x41; // A
-                            wavHeader[10] = 0x56; // V
-                            wavHeader[11] = 0x45; // E
-                            wavHeader[12] = 0x66; // f
-                            wavHeader[13] = 0x6D; // m
-                            wavHeader[14] = 0x74; // t
-                            wavHeader[15] = 0x20; // Space
-                            wavHeader[16] = 0x10; // Subchunk1Size (16 for PCM)
-                            wavHeader[17] = 0x00; // Subchunk1Size
-                            wavHeader[18] = 0x00; // Subchunk1Size
-                            wavHeader[19] = 0x00; // Subchunk1Size
-                            wavHeader[20] = 0x01; // AudioFormat (1 for PCM)
-                            wavHeader[21] = 0x00; // AudioFormat
-                            wavHeader[22] = (byte)channels; // NumChannels
-                            wavHeader[23] = 0x00; // NumChannels
-                            wavHeader[24] = (byte)(sampleRate & 0xFF); // SampleRate
-                            wavHeader[25] = (byte)((sampleRate >> 8) & 0xFF); // SampleRate
-                            wavHeader[26] = (byte)((sampleRate >> 16) & 0xFF); // SampleRate
-                            wavHeader[27] = (byte)((sampleRate >> 24) & 0xFF); // SampleRate
-                            wavHeader[28] = (byte)(byteRate & 0xFF); // ByteRate
-                            wavHeader[29] = (byte)((byteRate >> 8) & 0xFF); // ByteRate
-                            wavHeader[30] = (byte)((byteRate >> 16) & 0xFF); // ByteRate
-                            wavHeader[31] = (byte)((byteRate >> 24) & 0xFF); // ByteRate
-                            wavHeader[32] = (byte)blockAlign; // BlockAlign
-                            wavHeader[33] = 0x00; // BlockAlign
-                            wavHeader[34] = (byte)bitsPerSample; // BitsPerSample
-                            wavHeader[35] = 0x00; // BitsPerSample
-                            wavHeader[36] = 0x64; // d
-                            wavHeader[37] = 0x61; // a
-                            wavHeader[38] = 0x74; // t
-                            wavHeader[39] = 0x61; // a
-                            wavHeader[40] = 0x00; // Placeholder for data chunk size (will be updated later)
-                            wavHeader[41] = 0x00; // Placeholder for data chunk size (will be updated later)
-                            wavHeader[42] = 0x00; // Placeholder for data chunk size (will be updated later)
-                            wavHeader[43] = 0x00; // Placeholder for data chunk size (will be updated later)
-
-                            writer.Write(wavHeader);
-                        }
+                        // Play audio through speakers
+                        PlayAudioThroughSpeakers(audioData);
                     }
-
-                    if (e.Stream != null)
+                    else
                     {
-                        using (BinaryWriter writer = new BinaryWriter(File.Open($"output_{audioFileCount}.wav", FileMode.Append)))
-                        {
-                            writer.Write(e.Stream.ToArray());
-                        }
+                        Console.WriteLine($"⚠️ Received empty audio stream");
                     }
-
-                    // record the last audio time
-                    lastAudioTime = DateTime.Now;
                 }));
-                await agentClient.Subscribe(new EventHandler<AgentAudioDoneResponse>((sender, e) =>
+                                await agentClient.Subscribe(new EventHandler<AgentAudioDoneResponse>((sender, e) =>
                 {
-                    Console.WriteLine($"----> {e} received");
+                    Console.WriteLine($"----> {e} received - Agent finished speaking 🎤");
                 }));
                 await agentClient.Subscribe(new EventHandler<AgentStartedSpeakingResponse>((sender, e) =>
                 {
-                    Console.WriteLine($"----> {e} received");
+                    Console.WriteLine($"----> {e} received - Agent is speaking 🗣️");
                 }));
                 await agentClient.Subscribe(new EventHandler<AgentThinkingResponse>((sender, e) =>
                 {
@@ -171,7 +103,7 @@ namespace SampleApp
                 }));
                 await agentClient.Subscribe(new EventHandler<UserStartedSpeakingResponse>((sender, e) =>
                 {
-                    Console.WriteLine($"----> {e} received");
+                    Console.WriteLine($"----> {e} received - User is speaking 👤");
                 }));
                 await agentClient.Subscribe(new EventHandler<WelcomeResponse>((sender, e) =>
                 {
@@ -210,10 +142,15 @@ namespace SampleApp
                 var settingsConfiguration = new SettingsSchema();
                 settingsConfiguration.Agent.Think.Provider.Type = "open_ai";
                 settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini";
-                settingsConfiguration.Audio.Output.SampleRate = 16000;
-                settingsConfiguration.Audio.Output.Container = "wav";
-                settingsConfiguration.Audio.Input.SampleRate = 44100;
-                settingsConfiguration.Agent.Greeting = "Hello, how can I help you today?";
+
+                // Configure audio settings - keep your input format, fix output
+                settingsConfiguration.Audio.Input.Encoding = "linear16";
+                settingsConfiguration.Audio.Input.SampleRate = 24000;
+                settingsConfiguration.Audio.Output.Encoding = "linear16";  // Use linear16 for output too
+                settingsConfiguration.Audio.Output.SampleRate = 24000;
+                settingsConfiguration.Audio.Output.Container = "none";
+
+                settingsConfiguration.Agent.Greeting = "Hello! How can I help you today?";
                 settingsConfiguration.Agent.Listen.Provider.Type = "deepgram";
                 settingsConfiguration.Agent.Listen.Provider.Model = "nova-3";
                 settingsConfiguration.Agent.Listen.Provider.Keyterms = new List<string> { "Deepgram" };
@@ -236,18 +173,42 @@ namespace SampleApp
                     return;
                 }
 
-                // Microphone streaming
+                // Microphone streaming with debugging
                 Console.WriteLine("Starting microphone...");
                 Microphone microphone = null;
-                try
+                int audioDataCounter = 0;
+
+                                try
                 {
-                    microphone = new Microphone(agentClient.SendBinary);
+                                    // Create microphone with proper sample rate and debugging
+                                microphone = new Microphone(
+                    push_callback: (audioData, length) =>
+                    {
+                        audioDataCounter++;
+                        Console.WriteLine($"[MIC] Captured audio chunk #{audioDataCounter}: {length} bytes");
+
+                        // Create array with actual length
+                        byte[] actualData = new byte[length];
+                        Array.Copy(audioData, actualData, length);
+
+                        // Send to agent
+                        agentClient.SendBinary(actualData);
+                    },
+                    rate: 24000,        // Match the agent's expected input rate (24kHz)
+                    chunkSize: 8192,    // Standard chunk size
+                    channels: 1,        // Mono
+                    device_index: PortAudio.DefaultInputDevice,
+                    format: SampleFormat.Int16
+                );
+
                     microphone.Start();
-                    Console.WriteLine("Microphone started successfully. Waiting for audio input...");
+                    Console.WriteLine("Microphone started successfully. Speak into your microphone now!");
+                    Console.WriteLine("You should see '[MIC] Captured audio chunk' messages when speaking...");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error starting microphone: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
                     return;
                 }
 
@@ -271,6 +232,133 @@ namespace SampleApp
             {
                 Console.WriteLine($"Exception: {ex.Message}");
             }
+        }
+
+                // Audio playback queue and position tracking
+        private static Queue<byte[]> audioQueue = new Queue<byte[]>();
+        private static byte[]? currentAudioBuffer = null;
+        private static int audioPosition = 0;
+        private static readonly object audioLock = new object();
+
+        /// <summary>
+        /// Plays audio data through the system's default output device (speakers)
+        /// </summary>
+        /// <param name="audioData">PCM audio data to play</param>
+        static void PlayAudioThroughSpeakers(byte[] audioData)
+        {
+            try
+            {
+                lock (audioLock)
+                {
+                    // Add to queue for playback
+                    audioQueue.Enqueue(audioData);
+                }
+
+                // Start playback stream if not already running
+                StartAudioPlayback();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error queuing audio: {ex.Message}");
+            }
+        }
+
+        private static PortAudioSharp.Stream? _outputStream = null;
+
+        private static void StartAudioPlayback()
+        {
+            if (_outputStream != null)
+                return; // Already playing
+
+            try
+            {
+                // Get default output device
+                int outputDevice = PortAudio.DefaultOutputDevice;
+                if (outputDevice == PortAudio.NoDevice)
+                {
+                    Console.WriteLine("⚠️ No default output device found for audio playback");
+                    return;
+                }
+
+                var deviceInfo = PortAudio.GetDeviceInfo(outputDevice);
+                Console.WriteLine($"🔊 Playing through: {deviceInfo.name}");
+
+                // Set up output stream parameters
+                var outputParams = new PortAudioSharp.StreamParameters
+                {
+                    device = outputDevice,
+                    channelCount = 1, // mono
+                    sampleFormat = PortAudioSharp.SampleFormat.Int16,
+                    suggestedLatency = deviceInfo.defaultLowOutputLatency,
+                    hostApiSpecificStreamInfo = IntPtr.Zero
+                };
+
+                // Create and start the output stream
+                _outputStream = new PortAudioSharp.Stream(
+                    inParams: null,
+                    outParams: outputParams,
+                    sampleRate: 24000, // Match agent output (24kHz)
+                    framesPerBuffer: 512,
+                    streamFlags: PortAudioSharp.StreamFlags.ClipOff,
+                    callback: OutputCallback,
+                    userData: IntPtr.Zero
+                );
+
+                _outputStream.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Error starting audio playback: {ex.Message}");
+                _outputStream = null;
+            }
+        }
+
+                private static PortAudioSharp.StreamCallbackResult OutputCallback(nint input, nint output, uint frameCount, ref PortAudioSharp.StreamCallbackTimeInfo timeInfo, PortAudioSharp.StreamCallbackFlags statusFlags, nint userDataPtr)
+        {
+            lock (audioLock)
+            {
+                int bytesToWrite = (int)(frameCount * sizeof(Int16)); // 16-bit samples
+                byte[] outputBuffer = new byte[bytesToWrite];
+
+                int bytesWritten = 0;
+                while (bytesWritten < bytesToWrite)
+                {
+                    // Get next buffer if current one is exhausted
+                    if (currentAudioBuffer == null || audioPosition >= currentAudioBuffer.Length)
+                    {
+                        if (audioQueue.Count > 0)
+                        {
+                            currentAudioBuffer = audioQueue.Dequeue();
+                            audioPosition = 0;
+                            Console.WriteLine($"🔊 Playing new audio buffer: {currentAudioBuffer.Length} bytes (Queue: {audioQueue.Count} remaining)");
+                        }
+                        else
+                        {
+                            // No more audio, fill with silence but KEEP stream running for next audio
+                            for (int i = bytesWritten; i < bytesToWrite; i++)
+                                outputBuffer[i] = 0;
+
+                            Marshal.Copy(outputBuffer, 0, output, bytesToWrite);
+                            // DON'T stop the stream - keep it running for next conversation
+                            return PortAudioSharp.StreamCallbackResult.Continue;
+                        }
+                    }
+
+                    // Copy data from current buffer
+                    int remainingInBuffer = currentAudioBuffer.Length - audioPosition;
+                    int remainingToWrite = bytesToWrite - bytesWritten;
+                    int bytesToCopy = Math.Min(remainingInBuffer, remainingToWrite);
+
+                    Array.Copy(currentAudioBuffer, audioPosition, outputBuffer, bytesWritten, bytesToCopy);
+                    audioPosition += bytesToCopy;
+                    bytesWritten += bytesToCopy;
+                }
+
+                // Copy to output
+                Marshal.Copy(outputBuffer, 0, output, bytesToWrite);
+            }
+
+            return PortAudioSharp.StreamCallbackResult.Continue;
         }
     }
 }
