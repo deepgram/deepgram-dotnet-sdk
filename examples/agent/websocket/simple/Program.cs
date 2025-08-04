@@ -224,6 +224,14 @@ namespace SampleApp
                 // Stop the connection
                 await agentClient.Stop();
 
+                // Stop and dispose PortAudio output stream
+                if (_outputStream != null)
+                {
+                    _outputStream.Stop();
+                    _outputStream.Dispose();
+                    _outputStream = null;
+                }
+
                 // Terminate Libraries
                 Deepgram.Microphone.Library.Terminate();
                 Deepgram.Library.Terminate();
