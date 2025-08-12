@@ -663,7 +663,6 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         byte[] data = Encoding.UTF8.GetBytes(historyFunctionCalls.ToString());
         await SendMessageImmediately(data);
     }
-
     /// <summary>
     /// Sends a function call response back to the agent
     /// </summary>
