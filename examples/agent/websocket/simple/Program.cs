@@ -248,6 +248,9 @@ namespace SampleApp
         private static int audioPosition = 0;
         private static readonly object audioLock = new object();
 
+        // Preallocated buffer for OutputCallback to avoid per-callback allocations
+        private static readonly byte[] PreallocatedOutputBuffer = new byte[8192]; // Max buffer size
+
         /// <summary>
         /// Plays audio data through the system's default output device (speakers)
         /// </summary>
@@ -326,7 +329,6 @@ namespace SampleApp
             lock (audioLock)
             {
                 int bytesToWrite = (int)(frameCount * sizeof(Int16)); // 16-bit samples
-                byte[] outputBuffer = new byte[bytesToWrite];
 
                 int bytesWritten = 0;
                 while (bytesWritten < bytesToWrite)
@@ -338,32 +340,31 @@ namespace SampleApp
                         {
                             currentAudioBuffer = audioQueue.Dequeue();
                             audioPosition = 0;
-                            Console.WriteLine($"🔊 Playing new audio buffer: {currentAudioBuffer.Length} bytes (Queue: {audioQueue.Count} remaining)");
+                            // Removed Console.WriteLine to avoid blocking real-time thread
                         }
                         else
                         {
-                            // No more audio, fill with silence but KEEP stream running for next audio
-                            for (int i = bytesWritten; i < bytesToWrite; i++)
-                                outputBuffer[i] = 0;
+                            // No more audio, fill remaining output with silence
+                            int remainingBytes = bytesToWrite - bytesWritten;
 
-                            Marshal.Copy(outputBuffer, 0, output, bytesToWrite);
-                            // DON'T stop the stream - keep it running for next conversation
+                            // Clear the preallocated buffer for silence
+                            Array.Clear(PreallocatedOutputBuffer, 0, remainingBytes);
+                            Marshal.Copy(PreallocatedOutputBuffer, 0, output + bytesWritten, remainingBytes);
+
                             return PortAudioSharp.StreamCallbackResult.Continue;
                         }
                     }
 
-                    // Copy data from current buffer
+                    // Copy data directly from current buffer to output
                     int remainingInBuffer = currentAudioBuffer.Length - audioPosition;
                     int remainingToWrite = bytesToWrite - bytesWritten;
                     int bytesToCopy = Math.Min(remainingInBuffer, remainingToWrite);
 
-                    Array.Copy(currentAudioBuffer, audioPosition, outputBuffer, bytesWritten, bytesToCopy);
+                    // Direct memory copy to output buffer
+                    Marshal.Copy(currentAudioBuffer, audioPosition, output + bytesWritten, bytesToCopy);
                     audioPosition += bytesToCopy;
                     bytesWritten += bytesToCopy;
                 }
-
-                // Copy to output
-                Marshal.Copy(outputBuffer, 0, output, bytesToWrite);
             }
 
             return PortAudioSharp.StreamCallbackResult.Continue;

@@ -104,8 +104,9 @@ namespace SampleApp
                     }
                 };
 
-                // Example function call history (optional - showing previous weather check)
-                var functionCallHistory = new HistoryFunctionCalls
+                // Example function call history structure (for reference - not sent in this demo)
+                // This shows developers what function call history looks like when implementing real apps
+                var functionCallHistoryExample = new HistoryFunctionCalls
                 {
                     FunctionCalls = new List<HistoryFunctionCall>
                     {
@@ -119,6 +120,8 @@ namespace SampleApp
                         }
                     }
                 };
+                // Note: In real applications, you would send this via:
+                // await agentClient.SendHistoryFunctionCalls(functionCallHistoryExample);
 
                 // Subscribe to the EventResponseReceived event
                 await agentClient.Subscribe(new EventHandler<OpenResponse>((sender, e) =>
@@ -273,7 +276,7 @@ namespace SampleApp
                 // Agent configuration with context
                 settingsConfiguration.Agent.Language = "en";
 
-                // Provide conversation context/history
+                                                // Provide conversation context/history
                 settingsConfiguration.Agent.Context = new Context
                 {
                     Messages = conversationHistory
