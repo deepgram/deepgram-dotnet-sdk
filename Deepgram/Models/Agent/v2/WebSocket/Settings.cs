@@ -33,6 +33,11 @@ public class SettingsSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; } = false;
+    /// Agent flags configuration
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("flags")]
+    public Flags? Flags { get; set; } = new Flags();
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("audio")]

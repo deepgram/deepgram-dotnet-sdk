@@ -45,6 +45,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<InjectionRefusedResponse>? _injectionRefusedReceived;
     private event EventHandler<PromptUpdatedResponse>? _promptUpdatedReceived;
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
+    private event EventHandler<HistoryResponse>? _historyReceived;
     #endregion
 
     /// <summary>
@@ -384,6 +385,24 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     }
 
     /// <summary>
+    /// Subscribe to a History event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public async Task<bool> Subscribe(EventHandler<HistoryResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _historyReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Subscribe to an Close event from the Deepgram API
     /// </summary>
     /// <param name="eventHandler"></param>
@@ -540,6 +559,131 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
         ControlMessage message = new ControlMessage(AgentClientTypes.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent
+    /// </summary>
+    /// <param name="role">The role (user or assistant) who spoke the statement</param>
+    /// <param name="content">The actual statement that was spoken</param>
+    public async Task SendHistoryConversationText(string role, string content)
+    {
+        if (string.IsNullOrWhiteSpace(role))
+        {
+            Log.Warning("SendHistoryConversationText", "Role cannot be null or empty");
+            throw new ArgumentException("Role cannot be null or empty", nameof(role));
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            Log.Warning("SendHistoryConversationText", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(content));
+        }
+
+        var historyMessage = new HistoryConversationText
+        {
+            Role = role,
+            Content = content
+        };
+
+        await SendHistoryConversationText(historyMessage);
+    }
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyConversationText">The history conversation text schema containing the message details</param>
+    public async Task SendHistoryConversationText(HistoryConversationText historyConversationText)
+    {
+        if (historyConversationText == null)
+        {
+            Log.Warning("SendHistoryConversationText", "HistoryConversationText cannot be null");
+            throw new ArgumentNullException(nameof(historyConversationText));
+        }
+
+        if (string.IsNullOrWhiteSpace(historyConversationText.Role))
+        {
+            Log.Warning("SendHistoryConversationText", "Role cannot be null or empty");
+            throw new ArgumentException("Role cannot be null or empty", nameof(historyConversationText.Role));
+        }
+
+        if (string.IsNullOrWhiteSpace(historyConversationText.Content))
+        {
+            Log.Warning("SendHistoryConversationText", "Content cannot be null or empty");
+            throw new ArgumentException("Content cannot be null or empty", nameof(historyConversationText.Content));
+        }
+
+        Log.Debug("SendHistoryConversationText", $"Sending History Conversation Text: {historyConversationText.Role} - {historyConversationText.Content}");
+
+        byte[] data = Encoding.UTF8.GetBytes(historyConversationText.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends a history function calls message to the agent
+    /// </summary>
+    /// <param name="functionCalls">List of function call objects to send as history</param>
+    public async Task SendHistoryFunctionCalls(List<HistoryFunctionCall> functionCalls)
+    {
+        if (functionCalls == null || functionCalls.Count == 0)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "FunctionCalls cannot be null or empty");
+            throw new ArgumentException("FunctionCalls cannot be null or empty", nameof(functionCalls));
+        }
+
+        var historyMessage = new HistoryFunctionCalls
+        {
+            FunctionCalls = functionCalls
+        };
+
+        await SendHistoryFunctionCalls(historyMessage);
+    }
+
+    /// <summary>
+    /// Sends a history function calls message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyFunctionCalls">The history function calls schema containing the function call details</param>
+    public async Task SendHistoryFunctionCalls(HistoryFunctionCalls historyFunctionCalls)
+    {
+        if (historyFunctionCalls == null)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "HistoryFunctionCalls cannot be null");
+            throw new ArgumentNullException(nameof(historyFunctionCalls));
+        }
+
+        if (historyFunctionCalls.FunctionCalls == null || historyFunctionCalls.FunctionCalls.Count == 0)
+        {
+            Log.Warning("SendHistoryFunctionCalls", "FunctionCalls cannot be null or empty");
+            throw new ArgumentException("FunctionCalls cannot be null or empty", nameof(historyFunctionCalls.FunctionCalls));
+        }
+
+        Log.Debug("SendHistoryFunctionCalls", $"Sending History Function Calls: {historyFunctionCalls.FunctionCalls.Count} calls");
+
+        byte[] data = Encoding.UTF8.GetBytes(historyFunctionCalls.ToString());
+        await SendMessageImmediately(data);
+    }
+    /// <summary>
+    /// Sends a function call response back to the agent
+    /// </summary>
+    /// <param name="functionCallResponse">The function call response schema</param>
+    public async Task SendFunctionCallResponse(FunctionCallResponseSchema functionCallResponse)
+    {
+        if (functionCallResponse == null)
+        {
+            Log.Warning("SendFunctionCallResponse", "FunctionCallResponse cannot be null");
+            throw new ArgumentNullException(nameof(functionCallResponse));
+        }
+
+        if (string.IsNullOrWhiteSpace(functionCallResponse.Id))
+        {
+            Log.Warning("SendFunctionCallResponse", "Id cannot be null or empty");
+            throw new ArgumentException("Id cannot be null or empty", nameof(functionCallResponse.Id));
+        }
+
+        Log.Debug("SendFunctionCallResponse", $"Sending Function Call Response: {functionCallResponse.Id}");
+
+        byte[] data = Encoding.UTF8.GetBytes(functionCallResponse.ToString());
         await SendMessageImmediately(data);
     }
     #endregion
@@ -848,6 +992,24 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
                     Log.Debug("ProcessTextMessage", $"Invoking SpeakUpdatedResponse. event: {speakUpdatedResponse}");
                     InvokeParallel(_speakUpdatedReceived, speakUpdatedResponse);
+                    break;
+                case AgentType.History:
+                    var historyResponse = data.Deserialize<HistoryResponse>();
+                    if (_historyReceived == null)
+                    {
+                        Log.Debug("ProcessTextMessage", "_historyReceived has no listeners");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    if (historyResponse == null)
+                    {
+                        Log.Warning("ProcessTextMessage", "HistoryResponse is invalid");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+
+                    Log.Debug("ProcessTextMessage", $"Invoking HistoryResponse. event: {historyResponse}");
+                    InvokeParallel(_historyReceived, historyResponse);
                     break;
                 default:
                     Log.Debug("ProcessTextMessage", "Calling base.ProcessTextMessage...");

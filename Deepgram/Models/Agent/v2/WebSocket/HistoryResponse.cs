@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -9,26 +9,36 @@ using Deepgram.Utilities;
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class FunctionCallResponseSchema
+public record HistoryResponse
 {
     /// <summary>
-    /// SettingsConfiguration event type.
+    /// History event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; } = AgentClientTypes.FunctionCallResponse;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AgentType? Type { get; } = AgentType.History;
 
+    /// <summary>
+    /// Identifies who spoke the statement (for conversation history)
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
-
+    /// <summary>
+    /// The actual statement that was spoken (for conversation history)
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("content")]
     public string? Content { get; set; }
+
+    /// <summary>
+    /// List of function call objects (for function call history)
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("function_calls")]
+    public List<HistoryFunctionCall>? FunctionCalls { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
