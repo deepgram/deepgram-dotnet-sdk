@@ -2,6 +2,11 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using Deepgram.Utilities;
+
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
 public record FunctionCallRequestResponse
@@ -14,7 +19,12 @@ public record FunctionCallRequestResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AgentType? Type { get; } = AgentType.FunctionCallRequest;
 
-    // TODO: this needs to be defined
+    /// <summary>
+    /// List of function calls in this request
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("functions")]
+    public List<HistoryFunctionCall>? Functions { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

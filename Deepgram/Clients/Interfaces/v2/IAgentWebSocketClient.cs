@@ -123,6 +123,12 @@ public interface IAgentWebSocketClient
     /// </summary>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler);
+
+    /// <summary>
+    /// Subscribe to a History event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<HistoryResponse> eventHandler);
     #endregion
 
     #region Send Functions
@@ -177,6 +183,37 @@ public interface IAgentWebSocketClient
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
     /// /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>
     public Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null);
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent
+    /// </summary>
+    /// <param name="role">The role (user or assistant) who spoke the statement</param>
+    /// <param name="content">The actual statement that was spoken</param>
+    public Task SendHistoryConversationText(string role, string content);
+
+    /// <summary>
+    /// Sends a history conversation text message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyConversationText">The history conversation text schema containing the message details</param>
+    public Task SendHistoryConversationText(HistoryConversationText historyConversationText);
+
+    /// <summary>
+    /// Sends a history function calls message to the agent
+    /// </summary>
+    /// <param name="functionCalls">List of function call objects to send as history</param>
+    public Task SendHistoryFunctionCalls(List<HistoryFunctionCall> functionCalls);
+
+    /// <summary>
+    /// Sends a history function calls message to the agent using a schema object
+    /// </summary>
+    /// <param name="historyFunctionCalls">The history function calls schema containing the function call details</param>
+    public Task SendHistoryFunctionCalls(HistoryFunctionCalls historyFunctionCalls);
+
+    /// <summary>
+    /// Sends a function call response back to the agent
+    /// </summary>
+    /// <param name="functionCallResponse">The function call response schema</param>
+    public Task SendFunctionCallResponse(FunctionCallResponseSchema functionCallResponse);
     #endregion
 
     #region Helpers
