@@ -40,7 +40,6 @@ internal static class HttpRequestUtil
     {
         body.Seek(0, SeekOrigin.Begin);
         HttpContent httpContent = new StreamContent(body);
-        httpContent.Headers.Add("Content-Length", body.Length.ToString());
         return httpContent;
     }
 
