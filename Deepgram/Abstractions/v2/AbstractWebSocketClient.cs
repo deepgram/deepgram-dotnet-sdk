@@ -115,7 +115,16 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Debug("Connect", $"uri: {uri}");
 
             Log.Debug("Connect", "Connecting to Deepgram API...");
+#if NET5_0_OR_GREATER
+            // Use SocketsHttpHandler via HttpMessageInvoker to prevent Content-Length: 0 from
+            // being added to the WebSocket upgrade request, which violates WebSocket protocol
+            // and causes failures with strict proxies such as Azure API Management (APIM).
+            using var socketHandler = new System.Net.Http.SocketsHttpHandler();
+            using var invoker = new System.Net.Http.HttpMessageInvoker(socketHandler);
+            await _clientWebSocket.ConnectAsync(myUri, invoker, cancelToken.Token).ConfigureAwait(false);
+#else
             await _clientWebSocket.ConnectAsync(myUri, cancelToken.Token).ConfigureAwait(false);
+#endif
 
             if (!IsConnected())
             {
