@@ -66,7 +66,9 @@ await speakClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
 {
     if (e.Stream != null)
     {
-        using (var writer = new BinaryWriter(File.Open("output.wav", FileMode.Append)))
+        // Streaming Speak (Encoding = "linear16") delivers raw PCM — no WAV header.
+        // Save as .raw, or prepend a valid WAV header (see examples/text-to-speech/websocket/simple/Program.cs).
+        using (var writer = new BinaryWriter(File.Open("output.raw", FileMode.Append)))
         {
             writer.Write(e.Stream.ToArray());
         }

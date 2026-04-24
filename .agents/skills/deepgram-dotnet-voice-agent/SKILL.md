@@ -51,7 +51,9 @@ await agentClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
 {
     if (e.Stream != null)
     {
-        using (var writer = new BinaryWriter(File.Open("output.wav", FileMode.Append)))
+        // WebSocket audio frames are raw linear16 PCM, not a WAV container.
+        // Save as .raw, or write a WAV header first (see examples/agent/websocket/no_mic/Program.cs).
+        using (var writer = new BinaryWriter(File.Open("output.raw", FileMode.Append)))
         {
             writer.Write(e.Stream.ToArray());
         }
