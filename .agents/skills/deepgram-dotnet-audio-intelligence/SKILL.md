@@ -29,6 +29,8 @@ Library.Initialize();
 var client = ClientFactory.CreateListenRESTClient();
 ```
 
+`ClientFactory` reads credentials from the `DEEPGRAM_API_KEY` (or `DEEPGRAM_ACCESS_TOKEN`) environment variable by default. To pass them explicitly, use `ClientFactory.CreateListenRESTClient(apiKey: "...", options: ...)` / `CreateListenWebSocketClient(apiKey: "...", options: ...)`. `DeepgramHttpClientOptions` / `DeepgramWsClientOptions` throw if neither the env var nor an explicit credential is provided.
+
 ## Feature availability: REST vs WebSocket
 
 | Feature | REST (`PreRecordedSchema`) | WebSocket (`LiveSchema`) |

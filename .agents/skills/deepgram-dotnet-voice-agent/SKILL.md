@@ -32,6 +32,10 @@ using Deepgram.Models.Authenticate.v1;
 Deepgram.Library.Initialize();
 
 var options = new DeepgramWsClientOptions(null, null, true);
+// Pass a real API key here (or use CreateAgentWebSocketClient() with the DEEPGRAM_API_KEY
+// env var set). An empty string is shown only to make the signature explicit; the
+// underlying DeepgramWsClientOptions throws if neither apiKey/accessToken nor the
+// DEEPGRAM_API_KEY/DEEPGRAM_ACCESS_TOKEN env var is available.
 var agentClient = ClientFactory.CreateAgentWebSocketClient(apiKey: "", options: options);
 ```
 

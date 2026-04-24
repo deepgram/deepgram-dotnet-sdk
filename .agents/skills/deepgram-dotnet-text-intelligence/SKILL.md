@@ -28,6 +28,8 @@ Library.Initialize();
 var client = ClientFactory.CreateAnalyzeClient();
 ```
 
+`ClientFactory` reads credentials from the `DEEPGRAM_API_KEY` (or `DEEPGRAM_ACCESS_TOKEN`) environment variable by default. To pass them explicitly: `ClientFactory.CreateAnalyzeClient(apiKey: "...", options: ...)`. `DeepgramHttpClientOptions` throws if neither the env var nor an explicit credential is provided.
+
 ## Quick start — text
 
 ```csharp

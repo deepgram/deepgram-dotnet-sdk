@@ -32,6 +32,8 @@ var manageClient = ClientFactory.CreateManageClient();
 var authClient = ClientFactory.CreateAuthClient();
 ```
 
+Both factory calls read credentials from the `DEEPGRAM_API_KEY` (or `DEEPGRAM_ACCESS_TOKEN`) environment variable by default. To pass them explicitly: `ClientFactory.CreateManageClient(apiKey: "...", options: ...)` / `ClientFactory.CreateAuthClient(apiKey: "...", options: ...)`. `DeepgramHttpClientOptions` throws if neither the env var nor an explicit credential is provided.
+
 ## Quick start — projects and models
 
 ```csharp

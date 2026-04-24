@@ -43,6 +43,8 @@ Library.Initialize();
 var client = ClientFactory.CreateListenWebSocketClient();
 ```
 
+`ClientFactory` reads credentials from the `DEEPGRAM_API_KEY` (or `DEEPGRAM_ACCESS_TOKEN`) environment variable by default. To pass them explicitly: `ClientFactory.CreateListenWebSocketClient(apiKey: "...", options: ...)`. `DeepgramWsClientOptions` throws if neither the env var nor an explicit credential is provided.
+
 ## Closest supported code path today
 
 ```csharp
