@@ -135,3 +135,13 @@ Live (`LiveSchema`): `Diarize`, `Redact`, `UtteranceEnd`, `VadEvents`, `Punctuat
 - `examples/speech-to-text/rest/topic/Program.cs`
 - `examples/speech-to-text/rest/intent/Program.cs`
 - `examples/speech-to-text/rest/file/Program.cs`
+
+## Central product skills
+
+For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
+
+```bash
+npx skills add deepgram/skills
+```
+
+This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).

@@ -156,3 +156,13 @@ WebSocket `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `Channels`, `InterimR
 - `examples/speech-to-text/websocket/http/Program.cs`
 - `examples/speech-to-text/websocket/microphone/Program.cs`
 - `tests/edge_cases/stt_v1_client_example/`
+
+## Central product skills
+
+For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
+
+```bash
+npx skills add deepgram/skills
+```
+
+This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).
