@@ -1,5 +1,5 @@
 ---
-name: using-management-api
+name: deepgram-dotnet-management-api
 description: Use when writing or reviewing C# code in this repo that calls Deepgram Management APIs for projects, models, keys, members, invitations, usage, balances, and auth token grants. Covers `ClientFactory.CreateManageClient()` and `ClientFactory.CreateAuthClient()`. Unlike some other SDKs, this repo does not currently expose reusable Voice Agent configuration management endpoints.
 ---
 
@@ -15,7 +15,7 @@ Administrative REST endpoints for projects, models, API keys, members, invites, 
 - Mint short-lived bearer tokens with `GrantToken()`.
 
 **Use a different skill when:**
-- You want to run a live agent session → `using-voice-agent`.
+- You want to run a live agent session → `deepgram-dotnet-voice-agent`.
 - You want STT/TTS rather than project administration.
 
 ## Authentication

@@ -1,5 +1,5 @@
 ---
-name: using-conversational-stt
+name: deepgram-dotnet-conversational-stt
 description: Use when evaluating or extending conversational / Flux-style streaming STT support in this C# SDK. The repo has a latest WebSocket listen client under `Deepgram.Models.Listen.v2.WebSocket`, but it does not currently expose Flux-specific request params or turn-aware response types like `TurnInfo`. Use this skill to document that gap honestly and to guide work on the closest supported surface.
 ---
 
@@ -13,8 +13,8 @@ This repo does **not** currently expose a dedicated Flux / conversational STT AP
 - Use it when deciding whether the current `Listen.v2.WebSocket` client is sufficient for the task.
 
 **Use a different skill when:**
-- You only need standard streaming transcription with `ResultResponse`, `SpeechStartedResponse`, and `UtteranceEndResponse` → `using-speech-to-text`.
-- You need a full voice assistant instead of transcription-only → `using-voice-agent`.
+- You only need standard streaming transcription with `ResultResponse`, `SpeechStartedResponse`, and `UtteranceEndResponse` → `deepgram-dotnet-speech-to-text`.
+- You need a full voice assistant instead of transcription-only → `deepgram-dotnet-voice-agent`.
 
 ## Current repo status
 

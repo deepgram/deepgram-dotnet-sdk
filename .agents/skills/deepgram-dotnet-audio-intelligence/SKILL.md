@@ -1,6 +1,6 @@
 ---
-name: using-audio-intelligence
-description: Use when writing or reviewing C# code in this repo that enables Deepgram intelligence overlays on Speech-to-Text requests. Covers `PreRecordedSchema` analytics flags such as `Summarize`, `Topics`, `Intents`, `Sentiment`, `DetectLanguage`, `DetectEntities`, `Diarize`, and `Redact`, plus the smaller live-streaming subset on `LiveSchema`. Use `using-speech-to-text` for plain transcription and `using-text-intelligence` for analytics on already-transcribed text.
+name: deepgram-dotnet-audio-intelligence
+description: Use when writing or reviewing C# code in this repo that enables Deepgram intelligence overlays on Speech-to-Text requests. Covers `PreRecordedSchema` analytics flags such as `Summarize`, `Topics`, `Intents`, `Sentiment`, `DetectLanguage`, `DetectEntities`, `Diarize`, and `Redact`, plus the smaller live-streaming subset on `LiveSchema`. Use `deepgram-dotnet-speech-to-text` for plain transcription and `deepgram-dotnet-text-intelligence` for analytics on already-transcribed text.
 ---
 
 # Using Deepgram Audio Intelligence (.NET SDK)
@@ -13,8 +13,8 @@ Audio analytics live on top of the same STT clients. Turn features on through sc
 - REST is the main path for summaries, topics, intents, sentiment, and language detection.
 
 **Use a different skill when:**
-- You only need transcript text → `using-speech-to-text`.
-- You already have text and want `/read` → `using-text-intelligence`.
+- You only need transcript text → `deepgram-dotnet-speech-to-text`.
+- You already have text and want `/read` → `deepgram-dotnet-text-intelligence`.
 
 ## Authentication
 

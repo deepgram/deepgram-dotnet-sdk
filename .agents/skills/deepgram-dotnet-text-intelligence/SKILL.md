@@ -1,6 +1,6 @@
 ---
-name: using-text-intelligence
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Text Intelligence / Read (`/read`) for sentiment, summarization, topic detection, and intent recognition on text or hosted text URLs. Covers `ClientFactory.CreateAnalyzeClient()` with `AnalyzeText`, `AnalyzeUrl`, and `AnalyzeFile`. Use `using-audio-intelligence` when the source is audio instead of text.
+name: deepgram-dotnet-text-intelligence
+description: Use when writing or reviewing C# code in this repo that calls Deepgram Text Intelligence / Read (`/read`) for sentiment, summarization, topic detection, and intent recognition on text or hosted text URLs. Covers `ClientFactory.CreateAnalyzeClient()` with `AnalyzeText`, `AnalyzeUrl`, and `AnalyzeFile`. Use `deepgram-dotnet-audio-intelligence` when the source is audio instead of text.
 ---
 
 # Using Deepgram Text Intelligence (.NET SDK)
@@ -13,7 +13,7 @@ Analyze text input for sentiment, summary, topics, and intents.
 - You want REST-style analysis, not streaming.
 
 **Use a different skill when:**
-- The source is audio and you want analytics during transcription → `using-audio-intelligence`.
+- The source is audio and you want analytics during transcription → `deepgram-dotnet-audio-intelligence`.
 
 ## Authentication
 

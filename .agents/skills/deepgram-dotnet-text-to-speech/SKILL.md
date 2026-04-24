@@ -1,6 +1,6 @@
 ---
-name: using-text-to-speech
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Text-to-Speech. Covers `ClientFactory.CreateSpeakRESTClient()` with `ToStream` / `ToFile`, and `ClientFactory.CreateSpeakWebSocketClient()` with `Connect`, `SpeakWithText`, `Flush`, and streaming `AudioResponse` events. Use `using-voice-agent` for full-duplex assistants instead of one-way synthesis.
+name: deepgram-dotnet-text-to-speech
+description: Use when writing or reviewing C# code in this repo that calls Deepgram Text-to-Speech. Covers `ClientFactory.CreateSpeakRESTClient()` with `ToStream` / `ToFile`, and `ClientFactory.CreateSpeakWebSocketClient()` with `Connect`, `SpeakWithText`, `Flush`, and streaming `AudioResponse` events. Use `deepgram-dotnet-voice-agent` for full-duplex assistants instead of one-way synthesis.
 ---
 
 # Using Deepgram Text-to-Speech (.NET SDK)
@@ -13,7 +13,7 @@ Convert text to audio via REST or low-latency streaming WebSocket synthesis.
 - **WebSocket** — stream text into Deepgram and receive audio chunks back incrementally.
 
 **Use a different skill when:**
-- You need an agent that listens, thinks, and speaks in one session → `using-voice-agent`.
+- You need an agent that listens, thinks, and speaks in one session → `deepgram-dotnet-voice-agent`.
 
 ## Authentication
 

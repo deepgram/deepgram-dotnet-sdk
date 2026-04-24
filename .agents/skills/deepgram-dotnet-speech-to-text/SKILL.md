@@ -1,6 +1,6 @@
 ---
-name: using-speech-to-text
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Speech-to-Text for prerecorded or live transcription. Covers `ClientFactory.CreateListenRESTClient()` with `TranscribeUrl` / `TranscribeFile`, and `ClientFactory.CreateListenWebSocketClient()` with `Connect`, `Subscribe`, and `Send`. Use `using-audio-intelligence` for summaries/sentiment/topics overlays, `using-conversational-stt` for Flux-specific work (not fully surfaced in this SDK), and `using-voice-agent` for full-duplex assistants.
+name: deepgram-dotnet-speech-to-text
+description: Use when writing or reviewing C# code in this repo that calls Deepgram Speech-to-Text for prerecorded or live transcription. Covers `ClientFactory.CreateListenRESTClient()` with `TranscribeUrl` / `TranscribeFile`, and `ClientFactory.CreateListenWebSocketClient()` with `Connect`, `Subscribe`, and `Send`. Use `deepgram-dotnet-audio-intelligence` for summaries/sentiment/topics overlays, `deepgram-dotnet-conversational-stt` for Flux-specific work (not fully surfaced in this SDK), and `deepgram-dotnet-voice-agent` for full-duplex assistants.
 ---
 
 # Using Deepgram Speech-to-Text (.NET SDK)
@@ -13,9 +13,9 @@ Basic transcription for prerecorded audio (REST) or live audio (WebSocket).
 - **WebSocket** — continuous live transcription for microphone, file streaming, or relay streams.
 
 **Use a different skill when:**
-- You want summaries, sentiment, topics, intents, redaction, or diarization guidance on `/listen` → `using-audio-intelligence`.
-- You need Flux / conversational turn-taking semantics → `using-conversational-stt`.
-- You need STT + LLM + TTS over one socket → `using-voice-agent`.
+- You want summaries, sentiment, topics, intents, redaction, or diarization guidance on `/listen` → `deepgram-dotnet-audio-intelligence`.
+- You need Flux / conversational turn-taking semantics → `deepgram-dotnet-conversational-stt`.
+- You need STT + LLM + TTS over one socket → `deepgram-dotnet-voice-agent`.
 
 ## Authentication
 

@@ -1,6 +1,6 @@
 ---
-name: using-voice-agent
-description: Use when writing or reviewing C# code in this repo that builds an interactive Deepgram Voice Agent over WebSocket. Covers `ClientFactory.CreateAgentWebSocketClient()`, `SettingsSchema`, event subscriptions, microphone audio streaming, injected user messages, and function-call-related message types. Use `using-text-to-speech` for one-way synthesis and STT skills for transcription-only flows.
+name: deepgram-dotnet-voice-agent
+description: Use when writing or reviewing C# code in this repo that builds an interactive Deepgram Voice Agent over WebSocket. Covers `ClientFactory.CreateAgentWebSocketClient()`, `SettingsSchema`, event subscriptions, microphone audio streaming, injected user messages, and function-call-related message types. Use `deepgram-dotnet-text-to-speech` for one-way synthesis and STT skills for transcription-only flows.
 ---
 
 # Using Deepgram Voice Agent (.NET SDK)
@@ -14,9 +14,9 @@ Full-duplex voice agent sessions over a single WebSocket.
 - You may need injected user messages or function-call message handling.
 
 **Use a different skill when:**
-- One-way transcription → `using-speech-to-text` or `using-conversational-stt`.
-- One-way synthesis → `using-text-to-speech`.
-- Admin APIs → `using-management-api`.
+- One-way transcription → `deepgram-dotnet-speech-to-text` or `deepgram-dotnet-conversational-stt`.
+- One-way synthesis → `deepgram-dotnet-text-to-speech`.
+- Admin APIs → `deepgram-dotnet-management-api`.
 
 ## Authentication
 

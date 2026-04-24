@@ -1,5 +1,5 @@
 ---
-name: maintaining-dotnet-sdk
+name: deepgram-dotnet-maintaining-sdk
 description: Use when maintaining this hand-written Deepgram .NET SDK: editing client code, models, examples, tests, solution files, CI/CD packaging, or NuGet release flows. This repo is not Fern-generated. Covers `dotnet build`, `dotnet test`, `dotnet pack`, solution-file selection (`Deepgram.sln`, `Deepgram.Dev.sln`, `Deepgram.DevBuild.sln`), `clean-up.sh`, and NuGet publishing conventions from GitHub Actions.
 ---
 
