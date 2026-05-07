@@ -1,20 +1,15 @@
 ---
 name: deepgram-dotnet-conversational-stt
-description: Use when evaluating or extending conversational / Flux-style streaming STT support in this C# SDK. The repo has a latest WebSocket listen client under `Deepgram.Models.Listen.v2.WebSocket`, but it does not currently expose Flux-specific request params or turn-aware response types like `TurnInfo`. Use this skill to document that gap honestly and to guide work on the closest supported surface.
+description: "Use when evaluating, extending, or writing C# code for conversational speech-to-text, Flux-style real-time transcription, or turn-taking streaming in the Deepgram .NET SDK. Identifies missing Flux request parameters (language_hint, eot_threshold), maps existing WebSocket response types, provides the closest supported LiveSchema code path, and guides adding TurnInfo models and Flux examples. Use `deepgram-dotnet-speech-to-text` for standard streaming transcription without turn awareness."
 ---
 
 # Using Deepgram Conversational STT / Flux (.NET SDK)
 
 This repo does **not** currently expose a dedicated Flux / conversational STT API surface comparable to the Python SDK's `listen.v2.connect(...)` + `TurnInfo` flow.
 
-## When to use this product
-
-- Use this skill when someone asks for **Flux**, **conversational STT**, **turn-taking**, or `/v2/listen` support in the .NET SDK.
-- Use it when deciding whether the current `Listen.v2.WebSocket` client is sufficient for the task.
-
 **Use a different skill when:**
-- You only need standard streaming transcription with `ResultResponse`, `SpeechStartedResponse`, and `UtteranceEndResponse` → `deepgram-dotnet-speech-to-text`.
-- You need a full voice assistant instead of transcription-only → `deepgram-dotnet-voice-agent`.
+- You only need standard streaming transcription without turn awareness → `deepgram-dotnet-speech-to-text`.
+- You need a full voice assistant (STT + LLM + TTS) → `deepgram-dotnet-voice-agent`.
 
 ## Current repo status
 
@@ -30,26 +25,13 @@ What is **not** present in the current repo search:
 - No `language_hint`, `eager_eot_threshold`, `eot_threshold`, or similar Flux request properties.
 - No README/examples that mention conversational STT explicitly.
 
-## Authentication
-
-```bash
-dotnet add package Deepgram
-```
-
-```csharp
-using Deepgram;
-
-Library.Initialize();
-var client = ClientFactory.CreateListenWebSocketClient();
-```
-
-`ClientFactory` reads credentials from the `DEEPGRAM_API_KEY` (or `DEEPGRAM_ACCESS_TOKEN`) environment variable by default. To pass them explicitly: `ClientFactory.CreateListenWebSocketClient(apiKey: "...", options: ...)`. `DeepgramWsClientOptions` throws if neither the env var nor an explicit credential is provided.
-
 ## Closest supported code path today
 
 ```csharp
+using Deepgram;
 using Deepgram.Models.Listen.v2.WebSocket;
 
+Library.Initialize(); // reads DEEPGRAM_API_KEY env var
 var liveClient = ClientFactory.CreateListenWebSocketClient();
 
 await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
@@ -83,29 +65,21 @@ Treat this as **standard live STT**, not true Flux parity.
 
 On `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `InterimResults`, `UtteranceEnd`, `VadEvents`, `Endpointing`, `NoDelay`, `Punctuate`, `SmartFormat`, `Keywords`, `Keyterm`, `Diarize`, `Redact`.
 
-## API reference (layered)
+## Workflow: adding Flux support to the SDK
 
-1. **In-repo source of truth**:
-   - `Deepgram/ClientFactory.cs`
-   - `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`
-   - `Deepgram/Models/Listen/v2/WebSocket/LiveSchema.cs`
-   - `Deepgram/Models/Listen/v2/WebSocket/*.cs`
-2. **Canonical OpenAPI**: not the primary reference for this streaming gap
-3. **Canonical AsyncAPI (what the product can support, even if this SDK is incomplete)**: https://developers.deepgram.com/asyncapi.yaml
-4. **Context7**:
-   - repo mirror: `https://context7.com/deepgram/deepgram-dotnet-sdk`
-   - docs corpus: `/llmstxt/developers_deepgram_llms_txt`
-5. **Product docs**:
-   - https://developers.deepgram.com/reference/speech-to-text/listen-flux
-   - https://developers.deepgram.com/docs/flux/quickstart
-   - https://developers.deepgram.com/docs/flux/language-prompting
+If the task requires real Flux parity, follow these steps in order:
+
+1. **Add request params** — extend `Deepgram/Models/Listen/v2/WebSocket/LiveSchema.cs` with `LanguageHint`, `EagerEotThreshold`, `EotThreshold`, and other Flux-specific fields. Validate against the AsyncAPI spec.
+2. **Add response models** — create `TurnInfo` and any turn-aware event types under `Deepgram/Models/Listen/v2/WebSocket/`. Verify field names match the AsyncAPI spec.
+3. **Wire events in the client** — update `Deepgram/Clients/Listen/v2/WebSocket/Client.cs` to deserialize and dispatch new event types.
+4. **Write tests** — add unit tests covering serialization of new request params and deserialization of new response types.
+5. **Add an example** — create `examples/speech-to-text/websocket/flux/Program.cs` demonstrating a Flux session with turn-taking.
 
 ## Gotchas
 
-1. **Be honest: Flux is not first-class here yet.** Do not invent `TurnInfo`-style .NET models or `ConnectFluxAsync(...)` helpers.
-2. **The repo's `Listen.v2.WebSocket` naming is misleading if you expect Python parity.** It is the newest streaming client, but not a full conversational surface.
-3. **Default API version still resolves from shared options.** `DeepgramWsClientOptions` defaults `APIVersion` to `v1`, so inspect connection URIs before assuming `/v2/listen` behavior.
-4. **If the task requires real Flux parity, start by adding models, request params, examples, and tests.** Do not paper over the gap in docs or code.
+1. **Flux is not first-class here yet.** Do not invent `TurnInfo`-style .NET models or `ConnectFluxAsync(...)` helpers that are not backed by real implementation.
+2. **`Listen.v2.WebSocket` naming is misleading for Python-parity expectations.** It is the newest streaming client, but not a full conversational surface.
+3. **`DeepgramWsClientOptions` defaults `APIVersion` to `v1`.** Inspect connection URIs before assuming `/v2/listen` behavior.
 
 ## Example files in this repo
 
@@ -113,12 +87,8 @@ On `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `InterimResults`, `Utterance
 - `examples/speech-to-text/websocket/http/Program.cs`
 - `examples/speech-to-text/websocket/microphone/Program.cs`
 
-## Central product skills
+## References
 
-For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
-
-```bash
-npx skills add deepgram/skills
-```
-
-This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).
+- In-repo: `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`, `Deepgram/Models/Listen/v2/WebSocket/*.cs`
+- AsyncAPI (target spec): https://developers.deepgram.com/asyncapi.yaml
+- Product docs: https://developers.deepgram.com/reference/speech-to-text/listen-flux

@@ -1,6 +1,6 @@
 ---
 name: deepgram-dotnet-speech-to-text
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Speech-to-Text for prerecorded or live transcription. Covers `ClientFactory.CreateListenRESTClient()` with `TranscribeUrl` / `TranscribeFile`, and `ClientFactory.CreateListenWebSocketClient()` with `Connect`, `Subscribe`, and `Send`. Use `deepgram-dotnet-audio-intelligence` for summaries/sentiment/topics overlays, `deepgram-dotnet-conversational-stt` for Flux-specific work (not fully surfaced in this SDK), and `deepgram-dotnet-voice-agent` for full-duplex assistants.
+description: "Use when writing or reviewing C# code in this repo that calls Deepgram Speech-to-Text for prerecorded or live transcription. Covers `ClientFactory.CreateListenRESTClient()` with `TranscribeUrl` / `TranscribeFile`, and `ClientFactory.CreateListenWebSocketClient()` with `Connect`, `Subscribe`, and `Send`. Use `deepgram-dotnet-audio-intelligence` for summaries/sentiment/topics overlays, `deepgram-dotnet-conversational-stt` for Flux-specific work, and `deepgram-dotnet-voice-agent` for full-duplex assistants."
 ---
 
 # Using Deepgram Speech-to-Text (.NET SDK)
@@ -105,38 +105,31 @@ bool connected = await liveClient.Connect(new LiveSchema()
     VadEvents = true,
 });
 
-if (connected)
+if (!connected)
 {
-    var microphone = new Microphone(liveClient.Send);
-    microphone.Start();
-    Console.ReadKey();
-    microphone.Stop();
-    await liveClient.Stop();
+    Console.Error.WriteLine("WebSocket connection failed — check API key and network.");
+    return;
 }
+
+var microphone = new Microphone(liveClient.Send);
+microphone.Start();
+Console.ReadKey();
+microphone.Stop();
+await liveClient.Stop();
 ```
 
 ## Key params
 
-REST `PreRecordedSchema`: `Model`, `Language`, `Encoding`, `SampleRate`, `Punctuate`, `SmartFormat`, `Keywords`, `Keyterm`, `Utterances`, `Paragraphs`, `Numerals`, `MultiChannel`, `Replace`, `Search`, `Tag`, `Version`.
+REST `PreRecordedSchema`: `Model`, `Language`, `Encoding`, `SampleRate`, `Punctuate`, `SmartFormat`, `Keyterm`, `Utterances`, `Paragraphs`. Full list in `Deepgram/Models/Listen/v1/REST/PreRecordedSchema.cs`.
 
-WebSocket `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `Channels`, `InterimResults`, `UtteranceEnd`, `VadEvents`, `Punctuate`, `SmartFormat`, `Endpointing`, `Keywords`, `Keyterm`, `NoDelay`.
+WebSocket `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `InterimResults`, `UtteranceEnd`, `VadEvents`, `Endpointing`, `Keyterm`. Full list in `Deepgram/Models/Listen/v2/WebSocket/LiveSchema.cs`.
 
-## API reference (layered)
+## References
 
-1. **In-repo source of truth**:
-   - `Deepgram/ClientFactory.cs`
-   - `Deepgram/Clients/Listen/v1/REST/Client.cs`
-   - `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`
-   - `Deepgram/Models/Listen/v1/REST/PreRecordedSchema.cs`
-   - `Deepgram/Models/Listen/v2/WebSocket/LiveSchema.cs`
-2. **Canonical OpenAPI (REST)**: https://developers.deepgram.com/openapi.yaml
-3. **Canonical AsyncAPI (streaming / WSS)**: https://developers.deepgram.com/asyncapi.yaml
-4. **Context7**:
-   - repo mirror: `https://context7.com/deepgram/deepgram-dotnet-sdk`
-   - docs corpus: `/llmstxt/developers_deepgram_llms_txt`
-5. **Product docs**:
-   - https://developers.deepgram.com/reference/speech-to-text/listen-pre-recorded
-   - https://developers.deepgram.com/reference/speech-to-text/listen-streaming
+- In-repo: `Deepgram/Clients/Listen/v1/REST/Client.cs`, `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`
+- OpenAPI (REST): https://developers.deepgram.com/openapi.yaml
+- AsyncAPI (WSS): https://developers.deepgram.com/asyncapi.yaml
+- Product docs: https://developers.deepgram.com/reference/speech-to-text/listen-pre-recorded, https://developers.deepgram.com/reference/speech-to-text/listen-streaming
 
 ## Gotchas
 
@@ -157,12 +150,4 @@ WebSocket `LiveSchema`: `Model`, `Encoding`, `SampleRate`, `Channels`, `InterimR
 - `examples/speech-to-text/websocket/microphone/Program.cs`
 - `tests/edge_cases/stt_v1_client_example/`
 
-## Central product skills
-
-For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
-
-```bash
-npx skills add deepgram/skills
-```
-
-This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).
+Cross-language product knowledge (API reference, recipes, MCP setup): `npx skills add deepgram/skills`.
