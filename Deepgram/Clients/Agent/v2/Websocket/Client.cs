@@ -45,6 +45,7 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<InjectionRefusedResponse>? _injectionRefusedReceived;
     private event EventHandler<PromptUpdatedResponse>? _promptUpdatedReceived;
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
+    private event EventHandler<HistoryResponse>? _historyReceived;
     #endregion
 
     /// <summary>
@@ -375,6 +376,24 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         try
         {
             _speakUpdatedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a History event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public async Task<bool> Subscribe(EventHandler<HistoryResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _historyReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -848,6 +867,24 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
                     Log.Debug("ProcessTextMessage", $"Invoking SpeakUpdatedResponse. event: {speakUpdatedResponse}");
                     InvokeParallel(_speakUpdatedReceived, speakUpdatedResponse);
+                    break;
+                case AgentType.History:
+                    var historyResponse = data.Deserialize<HistoryResponse>();
+                    if (_historyReceived == null)
+                    {
+                        Log.Debug("ProcessTextMessage", "_historyReceived has no listeners");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    if (historyResponse == null)
+                    {
+                        Log.Warning("ProcessTextMessage", "HistoryResponse is invalid");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+
+                    Log.Debug("ProcessTextMessage", $"Invoking HistoryResponse. event: {historyResponse}");
+                    InvokeParallel(_historyReceived, historyResponse);
                     break;
                 default:
                     Log.Debug("ProcessTextMessage", "Calling base.ProcessTextMessage...");

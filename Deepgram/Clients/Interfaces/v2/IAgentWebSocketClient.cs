@@ -123,6 +123,12 @@ public interface IAgentWebSocketClient
     /// </summary>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler);
+
+    /// <summary>
+    /// Subscribe to a History event from the Deepgram API
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public Task<bool> Subscribe(EventHandler<HistoryResponse> eventHandler);
     #endregion
 
     #region Send Functions

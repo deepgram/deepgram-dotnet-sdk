@@ -644,4 +644,157 @@ public class AgentClientTests
     }
 
     #endregion
+
+    #region History Tests
+
+    [Test]
+    public void HistoryResponse_Should_Have_History_AgentType()
+    {
+        // Arrange & Act
+        var response = new HistoryResponse();
+
+        // Assert
+        response.Type.Should().Be(AgentType.History);
+    }
+
+    [Test]
+    public void HistoryResponse_With_Role_And_Content_Should_Serialize_Correctly()
+    {
+        // Arrange
+        var response = new HistoryResponse
+        {
+            Role = "user",
+            Content = "Hello, how are you?"
+        };
+
+        // Act
+        var result = response.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("History");
+            result.Should().Contain("user");
+            result.Should().Contain("Hello, how are you?");
+
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.GetProperty("type").GetString().Should().Be("History");
+            parsed.RootElement.GetProperty("role").GetString().Should().Be("user");
+            parsed.RootElement.GetProperty("content").GetString().Should().Be("Hello, how are you?");
+        }
+    }
+
+    [Test]
+    public void HistoryResponse_With_FunctionCalls_Should_Serialize_Correctly()
+    {
+        // Arrange
+        var response = new HistoryResponse
+        {
+            Role = "assistant",
+            FunctionCalls = new List<HistoryFunctionCall>
+            {
+                new HistoryFunctionCall
+                {
+                    Id = "call_123",
+                    Name = "get_weather",
+                    ClientSide = false,
+                    Arguments = "location=Seattle",
+                    Response = "temperature=55"
+                }
+            }
+        };
+
+        // Act
+        var result = response.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Should().Contain("function_calls");
+            result.Should().Contain("call_123");
+            result.Should().Contain("get_weather");
+
+            var parsed = JsonDocument.Parse(result);
+            var functionCalls = parsed.RootElement.GetProperty("function_calls");
+            functionCalls.ValueKind.Should().Be(JsonValueKind.Array);
+            functionCalls.GetArrayLength().Should().Be(1);
+
+            var call = functionCalls[0];
+            call.GetProperty("id").GetString().Should().Be("call_123");
+            call.GetProperty("name").GetString().Should().Be("get_weather");
+            call.GetProperty("client_side").GetBoolean().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void HistoryResponse_Null_Fields_Should_Not_Serialize()
+    {
+        // Arrange
+        var response = new HistoryResponse();
+
+        // Act
+        var result = response.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+
+            var parsed = JsonDocument.Parse(result);
+            parsed.RootElement.TryGetProperty("role", out _).Should().BeFalse();
+            parsed.RootElement.TryGetProperty("content", out _).Should().BeFalse();
+            parsed.RootElement.TryGetProperty("function_calls", out _).Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void HistoryFunctionCall_Should_Serialize_All_Fields()
+    {
+        // Arrange & Act
+        var response = new HistoryResponse
+        {
+            FunctionCalls = new List<HistoryFunctionCall>
+            {
+                new HistoryFunctionCall
+                {
+                    Id = "call_abc",
+                    Name = "search",
+                    ClientSide = true,
+                    Arguments = "query=test",
+                    Response = "results=none"
+                }
+            }
+        };
+        var result = response.ToString();
+
+        // Assert
+        using (new AssertionScope())
+        {
+            var parsed = JsonDocument.Parse(result);
+            var callJson = parsed.RootElement.GetProperty("function_calls")[0];
+            callJson.GetProperty("id").GetString().Should().Be("call_abc");
+            callJson.GetProperty("name").GetString().Should().Be("search");
+            callJson.GetProperty("client_side").GetBoolean().Should().BeTrue();
+            callJson.GetProperty("arguments").GetString().Should().Be("query=test");
+            callJson.GetProperty("response").GetString().Should().Be("results=none");
+        }
+    }
+
+    [Test]
+    public void AgentType_Should_Include_History()
+    {
+        // Assert
+        Enum.IsDefined(typeof(AgentType), AgentType.History).Should().BeTrue();
+    }
+
+    [Test]
+    public void AgentClientTypes_History_Constant_Should_Be_History()
+    {
+        // Assert
+        AgentClientTypes.History.Should().Be("History");
+    }
+
+    #endregion
 }
