@@ -33,9 +33,12 @@ public abstract class AbstractWebSocketClient : IDisposable
         options ??= new DeepgramWsClientOptions(apiKey);
         _deepgramClientOptions = options;
 
-        Log.Debug("AbstractWebSocketClient", $"APIVersion: {options.APIVersion}");
-        Log.Debug("AbstractWebSocketClient", $"BaseAddress: {options.BaseAddress}");
-        Log.Debug("AbstractWebSocketClient", $"OnPrem: {options.OnPrem}");
+        if (Log.IsEnabled(LogLevel.Debug))
+        {
+            Log.Debug("AbstractWebSocketClient", $"APIVersion: {options.APIVersion}");
+            Log.Debug("AbstractWebSocketClient", $"BaseAddress: {options.BaseAddress}");
+            Log.Debug("AbstractWebSocketClient", $"OnPrem: {options.OnPrem}");
+        }
         Log.Verbose("AbstractWebSocketClient", "LEAVE");
     }
 
@@ -57,7 +60,10 @@ public abstract class AbstractWebSocketClient : IDisposable
     public async Task<bool> Connect(string uri, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("AbstractWebSocketClient.Connect", "ENTER");
-        Log.Debug("Connect", $"headers: {headers}");
+        if (Log.IsEnabled(LogLevel.Debug))
+        {
+            Log.Debug("Connect", $"headers: {headers}");
+        }
 
         // check if the client is disposed
         if (_clientWebSocket != null)
@@ -112,9 +118,13 @@ public abstract class AbstractWebSocketClient : IDisposable
         try
         {
             var myUri = new Uri(uri);
-            Log.Debug("Connect", $"uri: {uri}");
 
-            Log.Debug("Connect", "Connecting to Deepgram API...");
+            if (Log.IsEnabled(LogLevel.Debug))
+            {
+                Log.Debug("Connect", $"uri: {uri}");
+
+                Log.Debug("Connect", "Connecting to Deepgram API...");
+            }
             await _clientWebSocket.ConnectAsync(myUri, cancelToken.Token).ConfigureAwait(false);
 
             if (!IsConnected())
@@ -443,7 +453,10 @@ public abstract class AbstractWebSocketClient : IDisposable
 
                     if (result.MessageType != WebSocketMessageType.Close)
                     {
-                        Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
+                        if (Log.IsEnabled(LogLevel.Verbose))
+                        {
+                            Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
+                        }
                         ProcessDataReceived(result, ms);
                     }
                 }
@@ -508,11 +521,17 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         try
         {
-            Log.Verbose("ProcessTextMessage", $"raw response: {response}");
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessTextMessage", $"raw response: {response}");
+            }
             var data = JsonDocument.Parse(response);
             var val = Enum.Parse(typeof(WebSocketType), data.RootElement.GetProperty("type").GetString()!);
 
-            Log.Verbose("ProcessTextMessage", $"Type: {val}");
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessTextMessage", $"Type: {val}");
+            }
 
             switch (val)
             {
@@ -531,7 +550,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking OpenResponse. event: {openResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking OpenResponse. event: {openResponse}");
+                    }
                     InvokeParallel(_openReceived, openResponse);
                     break;
                 case WebSocketType.Error:
@@ -549,7 +571,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking ErrorResponse. event: {errorResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking ErrorResponse. event: {errorResponse}");
+                    }
                     InvokeParallel(_errorReceived, errorResponse);
                     break;
                 default:
@@ -564,7 +589,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                     unhandledResponse.Type = WebSocketType.Unhandled;
                     unhandledResponse.Raw = response;
 
-                    Log.Debug("ProcessTextMessage", $"Invoking UnhandledResponse. event: {unhandledResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking UnhandledResponse. event: {unhandledResponse}");
+                    }
                     InvokeParallel(_unhandledReceived, unhandledResponse);
                     break;
             }
@@ -682,7 +710,10 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             return WebSocketState.None;
         }
-        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
+        if (Log.IsEnabled(LogLevel.Debug))
+        {
+            Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
+        }
         return _clientWebSocket.State;
     }
 
@@ -697,7 +728,10 @@ public abstract class AbstractWebSocketClient : IDisposable
             return false;
         }
 
-        Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
+        if (Log.IsEnabled(LogLevel.Debug))
+        {
+            Log.Debug("State", $"WebSocket State: {_clientWebSocket.State}");
+        }
         return _clientWebSocket.State == WebSocketState.Open;
     }
 

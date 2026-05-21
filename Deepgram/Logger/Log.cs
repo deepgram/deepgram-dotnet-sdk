@@ -58,6 +58,23 @@ public sealed class Log
     }
 
     /// <summary>
+    /// Returns whether a specific log level has been enabled
+    /// </summary>
+    public static bool IsEnabled(LogLevel level)
+    {
+         if (level == LogLevel.Disable)
+        {
+            // There is no equivalent of Disable
+            return false;
+        }
+
+        // This is safe because the values are directly referenced in LogLevel
+        LogEventLevel serilogLevel = (LogEventLevel)level;
+
+        return GetLogger().IsEnabled(serilogLevel);
+    }
+
+    /// <summary>
     /// Gets the logger instance
     /// </summary>
     public static Serilog.ILogger GetLogger()
@@ -74,6 +91,11 @@ public sealed class Log
     /// </summary>
     public static void Verbose(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Verbose))
+        {
+            return;
+        }
+
         GetLogger().Verbose($"{identifier}: {trace}");
     }
 
@@ -82,6 +104,11 @@ public sealed class Log
     /// </summary>
     public static void Debug(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Debug))
+        {
+            return;
+        }
+
         GetLogger().Debug($"{identifier}: {trace}");
     }
 
@@ -90,6 +117,11 @@ public sealed class Log
     /// </summary>
     public static void Information(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Information))
+        {
+            return;
+        }
+
         GetLogger().Information($"{identifier}: {trace}");
     }
 
@@ -98,6 +130,11 @@ public sealed class Log
     /// </summary>
     public static void Warning(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Warning))
+        {
+            return;
+        }
+
         GetLogger().Warning($"{identifier}: {trace}");
     }
 
@@ -106,6 +143,11 @@ public sealed class Log
     /// </summary>
     public static void Error(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Error))
+        {
+            return;
+        }
+
         GetLogger().Error($"{identifier}: {trace}");
     }
 
@@ -114,6 +156,11 @@ public sealed class Log
     /// </summary>
     public static void Fatal(string identifier, string trace)
     {
+        if (!IsEnabled(LogLevel.Fatal))
+        {
+            return;
+        }
+
         GetLogger().Fatal($"{identifier}: {trace}");
     }
 }
