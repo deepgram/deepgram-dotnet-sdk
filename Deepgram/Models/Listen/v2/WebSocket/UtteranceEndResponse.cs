@@ -18,7 +18,7 @@ public record UtteranceEndResponse
     /// Channel index information
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel_index")]
+	[JsonPropertyName("channel")]
     public int[]? Channel { get; set; }
 
     /// <summary>
