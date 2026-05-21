@@ -540,7 +540,10 @@ public class Client : IDisposable, IListenWebSocketClient
                     var deltaTicks = DateTime.Now - _lastReceived;
                     if (deltaTicks < diffTicks)
                     {
-                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
+                        if (Log.IsEnabled(LogLevel.Debug))
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
+                        }
                         continue;
                     }
 
@@ -652,12 +655,17 @@ public class Client : IDisposable, IListenWebSocketClient
 
         try
         {
-            Log.Verbose("ProcessDataReceived", $"raw response: {response}");
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessDataReceived", $"raw response: {response}");
+            }
             var data = JsonDocument.Parse(response);
             var val = Enum.Parse(typeof(ListenType), data.RootElement.GetProperty("type").GetString()!);
 
-            Log.Verbose("ProcessDataReceived", $"Type: {val}");
-
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessDataReceived", $"Type: {val}");
+            }
 
             if (_deepgramClientOptions.InspectListenMessage())
             {
@@ -682,7 +690,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking OpenResponse. event: {openResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking OpenResponse. event: {openResponse}");
+                    }
                     InvokeParallel(_openReceived, openResponse);
                     break;
                 case ListenType.Results:
@@ -700,7 +711,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking ResultsResponse. event: {resultResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking ResultsResponse. event: {resultResponse}");
+                    }
                     InvokeParallel(_resultsReceived, resultResponse);
                     break;
                 case ListenType.Metadata:
@@ -718,7 +732,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking MetadataResponse. event: {metadataResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking MetadataResponse. event: {metadataResponse}");
+                    }
                     InvokeParallel(_metadataReceived, metadataResponse);
                     break;
                 case ListenType.UtteranceEnd:
@@ -736,7 +753,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
+                    }
                     InvokeParallel(_utteranceEndReceived, utteranceEndResponse);
                     break;
                 case ListenType.SpeechStarted:
@@ -754,7 +774,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
+                    }
                     InvokeParallel(_speechStartedReceived, speechStartedResponse);
                     break;
                 case ListenType.Close:
@@ -772,7 +795,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking CloseResponse. event: {closeResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking CloseResponse. event: {closeResponse}");
+                    }
                     InvokeParallel(_closeReceived, closeResponse);
                     break;
                 case ListenType.Error:
@@ -790,7 +816,10 @@ public class Client : IDisposable, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessDataReceived", $"Invoking ErrorResponse. event: {errorResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking ErrorResponse. event: {errorResponse}");
+                    }
                     InvokeParallel(_errorReceived, errorResponse);
                     break;
                 default:
@@ -805,7 +834,10 @@ public class Client : IDisposable, IListenWebSocketClient
                     unhandledResponse.Type = ListenType.Unhandled;
                     unhandledResponse.Raw = response;
 
-                    Log.Debug("ProcessDataReceived", $"Invoking UnhandledResponse. event: {unhandledResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessDataReceived", $"Invoking UnhandledResponse. event: {unhandledResponse}");
+                    }
                     InvokeParallel(_unhandledReceived, unhandledResponse);
                     break;
             }
