@@ -293,6 +293,7 @@ also see [TranscribeSchema] which LiveSchema is derived from for more options
 | Callback               | string?                   | Callback URL to provide if you would like your submitted audio to be processed asynchronously                          |
 | Diarize                | bool?                     | Indicates whether to recognize speaker changes                                                                         |
 | DiarizeVersion         | string?                   |                                                                                                                        |
+| DiarizeModel           | string?                   | Batch diarization model version to use (latest, v1, v2). Supersedes the deprecated Diarize boolean                     |
 | Extra                  | Dictonary<string,string>? |  additonal values you want echoing bac                                                                                 |                                                                                                                        |
 | FillerWords            | int?                      | Whether to include words like "uh" and "um" in transcription output.                                                   |
 | Keywords               | List<string>?             | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context   |
