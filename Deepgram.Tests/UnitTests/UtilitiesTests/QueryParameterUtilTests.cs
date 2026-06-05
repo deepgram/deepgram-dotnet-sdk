@@ -182,4 +182,33 @@ public class QueryParameterUtilTests
         result.Should().Be($"https://{Defaults.DEFAULT_URI}");
     }
 
+    [Test]
+    public void GetParameters_Should_Return_String_When_Passing_DiarizeModel_Parameter()
+    {
+        // Input and Output - DiarizeModel surfaces Batch Diarization v2 (enum: latest, v1, v2)
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema() { DiarizeModel = "v2" };
+        var expected = "diarize_model=v2";
+
+        //Act
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        //Assert
+        result.Should().NotBeNull();
+        result.Should().Contain(expected);
+    }
+
+    [Test]
+    public void GetParameters_Should_Omit_DiarizeModel_When_Not_Set()
+    {
+        // Input and Output - additive/non-breaking: absent unless explicitly set
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema() { Model = "nova-2" };
+
+        //Act
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        //Assert
+        result.Should().NotBeNull();
+        result.Should().NotContain("diarize_model");
+    }
+
 }
