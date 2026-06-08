@@ -96,7 +96,7 @@ await liveClient.Connect(new LiveSchema()
 
 ## Key params
 
-REST (`PreRecordedSchema`): `Summarize`, `Topics`, `Intents`, `Sentiment`, `DetectLanguage`, `DetectEntities`, `CustomTopic`, `CustomTopicMode`, `CustomIntent`, `CustomIntentMode`, `Diarize`, `DiarizeVersion`, `Redact`, `Utterances`, plus the regular STT knobs.
+REST (`PreRecordedSchema`): `Summarize`, `Topics`, `Intents`, `Sentiment`, `DetectLanguage`, `DetectEntities`, `CustomTopic`, `CustomTopicMode`, `CustomIntent`, `CustomIntentMode`, `Diarize`, `DiarizeVersion`, `DiarizeModel`, `Redact`, `Utterances`, plus the regular STT knobs.
 
 Live (`LiveSchema`): `Diarize`, `Redact`, `UtteranceEnd`, `VadEvents`, `Punctuate`, `SmartFormat`, plus normal streaming STT settings.
 

@@ -91,6 +91,17 @@ public class PreRecordedSchema
 	[JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
 
+    /// <summary>
+    /// Select and enable a specific batch diarization model version, e.g. "latest", "v1", or "v2".
+    /// Supersedes the deprecated <see cref="Diarize"/> boolean; if set, do not also set Diarize.
+    /// Batch/pre-recorded only - not accepted on streaming requests.
+    /// <see href="https://developers.deepgram.com/docs/diarization">
+    /// default is null
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[JsonPropertyName("diarize_model")]
+    public string? DiarizeModel { get; set; }
+
     // <summary>
     /// <see href="https://developers.deepgram.com/docs/diarization">
     /// default is null, only applies if Diarize is set to true
