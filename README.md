@@ -21,6 +21,7 @@ Power your apps with world-class speech and Language AI models.
     - [Remote Files (Asynchronous)](#remote-files-asynchronous)
     - [Local Files (Asynchronous)](#local-files-asynchronous)
   - [Streaming Audio](#streaming-audio)
+  - [Flux - Conversational Speech Recognition (Preview)](#flux---conversational-speech-recognition-preview)
   - [Voice Agent](#voice-agent)
   - [Text to Speech REST](#text-to-speech-rest)
   - [Text to Speech Streaming](#text-to-speech-streaming)
@@ -267,6 +268,56 @@ await liveClient.Stop();
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text-api/listen-streaming).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
+
+## Flux - Conversational Speech Recognition (Preview)
+
+> Flux support is currently in preview. The API surface may change in a future release.
+
+Transcribe conversational audio with contextual turn detection using [Deepgram Flux](https://developers.deepgram.com/docs/flux/quickstart). Instead of interim/final results, Flux delivers `TurnInfo` events that track the turn lifecycle (`StartOfTurn`, `Update`, `EagerEndOfTurn`, `TurnResumed`, `EndOfTurn`) — ideal for voice agents that need to know when a speaker is done talking.
+
+Flux accepts only two control messages (`CloseStream` and `Configure`); the classic streaming `KeepAlive`/`Finalize` messages do not apply.
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.v2.WebSocket;
+
+// Initialize Library with default logging
+Library.Initialize();
+
+// Create Flux WebSocket client
+var fluxClient = ClientFactory.CreateFluxWebSocketClient();
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+
+// Subscribe to TurnInfo events
+await fluxClient.Subscribe(new EventHandler<TurnInfoResponse>((sender, e) =>
+{
+    if (e.EventType == TurnEvent.EndOfTurn)
+    {
+        Console.WriteLine($"Speaker finished: {e.Transcript}");
+    }
+}));
+
+// Connect to Deepgram Flux (model is required)
+var fluxSchema = new FluxSchema()
+{
+    Model = "flux-general-en",
+    Encoding = "linear16",
+    SampleRate = 16000,
+    EotThreshold = 0.7,
+};
+await fluxClient.Connect(fluxSchema);
+
+// Stream audio to Deepgram in ~80ms chunks (2560 bytes at 16kHz linear16)
+byte[] audioChunk = GetAudioChunk(); // Your audio source
+fluxClient.Send(audioChunk);
+
+// Stop the connection (sends CloseStream and waits for the final results)
+await fluxClient.Stop();
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text/listen-flux).
+
+[See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
 ## Voice Agent
 

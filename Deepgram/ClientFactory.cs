@@ -39,6 +39,18 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// (PREVIEW) Create a new FluxWebSocketClient for conversational speech-to-text with
+    /// contextual turn detection using the Flux (v2 listen) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxWebSocketClient CreateFluxWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
     /// Create a new ListenWebSocketClient using the latest version
     /// </summary>
     /// <param name="apiKey"></param>
