@@ -18,7 +18,10 @@ public class FluxLiveIntegrationTests
     [Test]
     public async Task Live_Flux_EndToEnd_Connect_Stream_TurnInfo_CloseStream()
     {
-        var apiKey = Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY");
+        // Read the startup snapshot: the authentication tests clear DEEPGRAM_API_KEY
+        // process-wide while exercising credential fallbacks (see GlobalTestEnvironment).
+        var apiKey = GlobalTestEnvironment.DeepgramApiKeyAtStartup
+            ?? Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             Assert.Ignore("DEEPGRAM_API_KEY is not set. Skipping live Flux integration test.");
@@ -72,6 +75,15 @@ public class FluxLiveIntegrationTests
             var chunk = new byte[length];
             Array.Copy(wav, offset, chunk, 0, length);
             client.Send(chunk);
+            await Task.Delay(80);
+        }
+
+        // Trailing silence so Flux detects the end of speech: turns end on detected silence
+        // (or eot_timeout_ms), not on CloseStream.
+        var silence = new byte[ChunkBytes];
+        for (var i = 0; i < 3000 / 80; i++)
+        {
+            client.Send(silence);
             await Task.Delay(80);
         }
 

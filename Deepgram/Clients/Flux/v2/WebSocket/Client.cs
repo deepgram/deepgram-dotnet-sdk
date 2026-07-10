@@ -34,6 +34,10 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     // Guards against the Close event being raised twice for one connection, which can happen
     // when a user-initiated Stop() and the receive loop's server-close handling overlap.
     private int _closeEventFired = 0;
+
+    // Guards against CloseStream being sent twice for one connection (a user-initiated Stop()
+    // calls SendClose, and the base Stop() would otherwise call it again).
+    private int _closeStreamSent = 0;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -86,6 +90,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         try
         {
             Interlocked.Exchange(ref _closeEventFired, 0);
+            Interlocked.Exchange(ref _closeStreamSent, 0);
 
             var myURI = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {myURI}");
@@ -359,6 +364,12 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             return;
         }
 
+        if (Interlocked.Exchange(ref _closeStreamSent, 1) == 1)
+        {
+            Log.Debug("SendClose", "CloseStream already sent for this connection. Skipping...");
+            return;
+        }
+
         ControlMessage message = new ControlMessage(Constants.CloseStream);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
@@ -385,6 +396,94 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         }
     }
     #endregion
+
+    /// <summary>
+    /// Closes the connection to the Deepgram Flux API: sends CloseStream, waits briefly for the
+    /// server to deliver the final turn results and close from its side, then completes the
+    /// teardown. When the server closes during that wait, the receive loop performs the full
+    /// teardown concurrently; this method coordinates with it instead of faulting on the
+    /// already-disposed socket.
+    /// </summary>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    public new async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
+    {
+        Log.Verbose("FluxWSClient.Stop", "ENTER");
+
+        if (_clientWebSocket == null)
+        {
+            Log.Information("Stop", "Client has already been disposed");
+            Log.Verbose("FluxWSClient.Stop", "LEAVE");
+            return true;
+        }
+
+        try
+        {
+            if (IsConnected())
+            {
+                // Sends {"type":"CloseStream"} and waits (up to the grace period) for the
+                // server-side close.
+                await SendClose(nullByte, cancelToken);
+            }
+
+            // If the server closed during the grace period, the receive loop is performing the
+            // full teardown (including raising the Close event). Give it a moment to finish.
+            var waited = 0;
+            while (waited < 2000)
+            {
+                var socket = _clientWebSocket;
+                if (socket == null)
+                {
+                    Log.Debug("Stop", "Receive loop completed the teardown");
+                    Log.Verbose("FluxWSClient.Stop", "LEAVE");
+                    return true;
+                }
+                try
+                {
+                    if (socket.State != WebSocketState.CloseReceived && socket.State != WebSocketState.CloseSent)
+                    {
+                        break;
+                    }
+                }
+                catch (ObjectDisposedException)
+                {
+                    // torn down concurrently; treat like the socket-null case on the next pass
+                }
+                await Task.Delay(50).ConfigureAwait(false);
+                waited += 50;
+            }
+
+            if (_clientWebSocket == null)
+            {
+                Log.Verbose("FluxWSClient.Stop", "LEAVE");
+                return true;
+            }
+
+            // Server did not close (or teardown stalled): fall back to the base teardown.
+            // SendClose will not re-send CloseStream (guarded by _closeStreamSent).
+            Log.Debug("Stop", "Falling back to base Stop...");
+            var result = await base.Stop(cancelToken, nullByte);
+            Log.Verbose("FluxWSClient.Stop", "LEAVE");
+            return result;
+        }
+        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException)
+        {
+            // The receive loop tore the connection down while we were stopping - the shutdown
+            // already happened, just not by us. Finish any remaining cleanup and report success.
+            Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
+            try
+            {
+                _cancellationTokenSource?.Dispose();
+            }
+            catch
+            {
+                // already disposed by the concurrent teardown
+            }
+            _cancellationTokenSource = null;
+            _clientWebSocket = null;
+            Log.Verbose("FluxWSClient.Stop", "LEAVE");
+            return true;
+        }
+    }
 
     internal override void ProcessBinaryMessage(WebSocketReceiveResult result, MemoryStream ms)
     {

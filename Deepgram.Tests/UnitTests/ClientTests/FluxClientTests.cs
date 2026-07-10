@@ -702,6 +702,16 @@ public class FluxClientTests
     }
 
     [Test]
+    public async Task Stop_When_Never_Connected_Should_Return_True()
+    {
+        var client = new FluxWebSocketClient(_apiKey, _options);
+
+        var result = await client.Stop();
+
+        result.Should().BeTrue();
+    }
+
+    [Test]
     public void State_And_IsConnected_Without_Socket_Should_Report_Disconnected()
     {
         var client = new FluxWebSocketClient(_apiKey, _options);
