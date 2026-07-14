@@ -1,0 +1,12 @@
+{
+  "_provenance": "Verbatim JSON control frames captured 2026-07-14 from the live wss://api.staging.deepgram.com/v2/speak?model=flux-alexis-en&encoding=linear16&sample_rate=24000 endpoint (client sent Speak -> Flush -> Close). The session also delivered 67 interleaved BINARY audio frames totalling 257280 bytes (= 5.36s of 24kHz mono linear16, matching audio_duration_ms below); the audio bytes are opaque and omitted here. These frames are replayed through the C# client's ProcessTextMessage in FluxSpeakParityTests.",
+  "audio_frame_count": 67,
+  "audio_total_bytes": 257280,
+  "frames": [
+    { "type": "Connected", "request_id": "019f60dc-5032-7fb1-87f8-8644d13ca13f", "model_name": "alexis", "model_version": "2026-07-02.2", "model_uuids": ["9fc7903e-7f81-4f9b-9145-1d8e76692dce", "9fc7903e-7f81-4f9b-9145-1d8e76692dce"] },
+    { "type": "SpeechStarted", "speech_id": "dg_sp_24682fee6658" },
+    { "type": "Flushed", "speech_id": "dg_sp_24682fee6658" },
+    { "type": "SpeechMetadata", "speech_id": "dg_sp_24682fee6658", "audio_duration_ms": 5360, "input_character_count": 94, "billable_character_count": 0, "controls_applied": { "pronunciations_applied": 0, "pronunciation_warnings": 0 } },
+    { "type": "SessionMetadata", "total_audio_duration_ms": 5360, "total_input_character_count": 94, "total_billable_character_count": 0 }
+  ]
+}

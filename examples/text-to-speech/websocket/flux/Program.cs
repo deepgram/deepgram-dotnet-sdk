@@ -30,6 +30,10 @@ namespace SampleApp
                 // rate requested below; write it to a file you can play back.
                 var audioOut = new FileStream("output.raw", FileMode.Create);
 
+                // Signals the turn's audio is complete (SpeechMetadata fires after all of a turn's
+                // audio has been sent). Wait on this before closing so audio is not truncated.
+                var turnComplete = new TaskCompletionSource();
+
                 await speakClient.Subscribe(new EventHandler<ConnectedResponse>((sender, e) =>
                 {
                     Console.WriteLine($"Connected. Request ID: {e.RequestId} (model {e.ModelName})");
@@ -59,6 +63,7 @@ namespace SampleApp
                 await speakClient.Subscribe(new EventHandler<SpeechMetadataResponse>((sender, e) =>
                 {
                     Console.WriteLine($"Turn metadata: {e.AudioDurationMs}ms audio, {e.BillableCharacterCount} billable chars");
+                    turnComplete.TrySetResult();
                 }));
 
                 await speakClient.Subscribe(new EventHandler<SessionMetadataResponse>((sender, e) =>
@@ -102,11 +107,12 @@ namespace SampleApp
                 // Flushed, then SpeechMetadata once the turn's audio has been sent.
                 await speakClient.SendFlush();
 
-                // Give the audio a moment to arrive, then close.
-                await Task.Delay(2000);
+                // Wait for the turn's audio to finish arriving before closing, so it isn't
+                // truncated. (Closing mid-turn only drains up to the client's close grace period.)
+                await Task.WhenAny(turnComplete.Task, Task.Delay(30000));
 
                 // Clean shutdown: sends {"type":"Close"} and waits briefly for the server to drain
-                // remaining/queued audio and emit a final SessionMetadata before teardown.
+                // any remaining/queued audio and emit a final SessionMetadata before teardown.
                 await speakClient.Stop();
 
                 audioOut.Flush();
