@@ -7,12 +7,12 @@ using System.Globalization;
 using Deepgram.Abstractions.v2;
 using Abstract = Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Flux.v2.WebSocket;
+using Deepgram.Models.Flux.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Models.Exceptions.v1;
 
-namespace Deepgram.Clients.Flux.v2.WebSocket;
+namespace Deepgram.Clients.Flux.WebSocket;
 
 /// <summary>
 /// (PREVIEW) Implements the Flux (v2 listen) WebSocket Client for conversational

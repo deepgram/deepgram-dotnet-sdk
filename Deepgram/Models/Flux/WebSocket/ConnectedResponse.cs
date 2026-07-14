@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Flux.v2.WebSocket;
+namespace Deepgram.Models.Flux.WebSocket;
 
 /// <summary>
 /// (PREVIEW) Sent by the Deepgram Flux (v2 listen) API when the WebSocket connection is established.

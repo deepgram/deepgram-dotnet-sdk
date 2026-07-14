@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Flux.v2.WebSocket;
+namespace Deepgram.Models.Flux.WebSocket;
 
 /// <summary>
 /// (PREVIEW) Turn lifecycle events reported in the "event" property of a Flux <see cref="TurnInfoResponse"/>.

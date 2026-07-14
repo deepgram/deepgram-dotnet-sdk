@@ -6,7 +6,7 @@ using System.Net.WebSockets;
 using System.Text.Json.Serialization;
 
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Flux.v2.WebSocket;
+using Deepgram.Models.Flux.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

@@ -279,7 +279,7 @@ Flux accepts only two control messages (`CloseStream` and `Configure`); the clas
 
 ```csharp
 using Deepgram;
-using Deepgram.Models.Flux.v2.WebSocket;
+using Deepgram.Models.Flux.WebSocket;
 
 // Initialize Library with default logging
 Library.Initialize();

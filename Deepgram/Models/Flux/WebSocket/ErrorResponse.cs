@@ -2,30 +2,22 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Flux.v2.WebSocket;
+namespace Deepgram.Models.Flux.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Sent by the Deepgram Flux (v2 listen) API when a Configure message could not be
-/// applied. The session continues with its previous configuration.
-/// All properties are optional: the AsyncAPI spec defines {type, request_id, sequence_id} while
-/// the docs show {type, sequence_id, code, description}. // [verify] spec/docs disagree; this type accepts both
+/// (PREVIEW) Fatal error sent by the Deepgram Flux (v2 listen) API. The wire value of the
+/// "type" property is literally "Error" (the AsyncAPI schema names this message FatalError).
+/// The server closes the connection after sending it.
 /// </summary>
-public record ConfigureFailureResponse
+public record ErrorResponse
 {
     /// <summary>
-    /// ConfigureFailure event type.
+    /// Error event type. The wire value is "Error".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public FluxType? Type { get; set; } = FluxType.ConfigureFailure;
-
-    /// <summary>
-    /// The unique identifier of the request.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("request_id")]
-    public string? RequestId { get; set; }
+    public FluxType? Type { get; set; } = FluxType.Error;
 
     /// <summary>
     /// Starts at 0 and increments for each message the server sends to the client,
@@ -36,14 +28,14 @@ public record ConfigureFailureResponse
     public int? SequenceId { get; set; }
 
     /// <summary>
-    /// A string code describing the failure, when provided by the API.
+    /// A string code describing the error, e.g. INTERNAL_SERVER_ERROR.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("code")]
     public string? Code { get; set; }
 
     /// <summary>
-    /// Prose description of the failure, when provided by the API.
+    /// Prose description of the error.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("description")]

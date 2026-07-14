@@ -2,22 +2,23 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Flux.v2.WebSocket;
+namespace Deepgram.Models.Flux.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Sent by the Deepgram Flux (v2 listen) API when a Configure message was applied
-/// successfully. Echoes the currently active configuration.
-/// <see href="https://developers.deepgram.com/docs/flux/configure"/>
+/// (PREVIEW) Sent by the Deepgram Flux (v2 listen) API when a Configure message could not be
+/// applied. The session continues with its previous configuration.
+/// All properties are optional: the AsyncAPI spec defines {type, request_id, sequence_id} while
+/// the docs show {type, sequence_id, code, description}. // [verify] spec/docs disagree; this type accepts both
 /// </summary>
-public record ConfigureSuccessResponse
+public record ConfigureFailureResponse
 {
     /// <summary>
-    /// ConfigureSuccess event type.
+    /// ConfigureFailure event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public FluxType? Type { get; set; } = FluxType.ConfigureSuccess;
+    public FluxType? Type { get; set; } = FluxType.ConfigureFailure;
 
     /// <summary>
     /// The unique identifier of the request.
@@ -35,27 +36,18 @@ public record ConfigureSuccessResponse
     public int? SequenceId { get; set; }
 
     /// <summary>
-    /// The currently active end-of-turn thresholds.
+    /// A string code describing the failure, when provided by the API.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("thresholds")]
-    public ConfigureThresholds? Thresholds { get; set; }
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
 
     /// <summary>
-    /// The currently active keyterms. The API may send a single string or an array of strings;
-    /// both are read into a list.
+    /// Prose description of the failure, when provided by the API.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("keyterms")]
-    [JsonConverter(typeof(StringOrStringListConverter))]
-    public List<string>? Keyterms { get; set; }
-
-    /// <summary>
-    /// The currently active language hints. Only applicable to the flux-general-multi model.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("language_hints")]
-    public List<string>? LanguageHints { get; set; }
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
