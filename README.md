@@ -22,6 +22,7 @@ Power your apps with world-class speech and Language AI models.
     - [Local Files (Asynchronous)](#local-files-asynchronous)
   - [Streaming Audio](#streaming-audio)
   - [Flux - Conversational Speech Recognition (Preview)](#flux---conversational-speech-recognition-preview)
+  - [Flux Text to Speech (Preview)](#flux-text-to-speech-preview)
   - [Voice Agent](#voice-agent)
   - [Text to Speech REST](#text-to-speech-rest)
   - [Text to Speech Streaming](#text-to-speech-streaming)
@@ -318,6 +319,72 @@ await fluxClient.Stop();
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text/listen-flux).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
+
+## Flux Text to Speech (Preview)
+
+> Flux text-to-speech support is currently in preview. The API surface may change in a future release.
+
+Synthesize speech with [Deepgram Flux](https://developers.deepgram.com/docs/flux/quickstart) TTS, available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
+
+Streaming sends exactly three client messages at Early Access — `Speak`, `Flush`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `Flushed`, `SessionMetadata`, `Warning`, `Error`).
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.Speak.WebSocket;
+
+// Initialize Library with default logging
+Library.Initialize();
+
+// Create Flux TTS WebSocket client
+var speakClient = ClientFactory.CreateFluxSpeakWebSocketClient();
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+
+// Subscribe to synthesized audio chunks (raw bytes in the requested encoding)
+await speakClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
+{
+    if (e.Stream is not null) { /* play or persist e.Stream */ }
+}));
+
+// Connect to Deepgram Flux TTS (model is required)
+var schema = new SpeakSchema()
+{
+    Model = "flux-alexis-en",
+    Encoding = "linear16",
+    SampleRate = 24000,
+};
+await speakClient.Connect(schema);
+
+// Stream text into the active turn, then flush to generate the remaining audio
+await speakClient.SendText("Sure, I can help you cancel your subscription.");
+await speakClient.SendFlush();
+
+// Stop the connection (sends Close and waits for the server to drain the audio)
+await speakClient.Stop();
+```
+
+For batch (REST) synthesis of a complete block of text:
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.Speak.REST;
+
+var speakClient = ClientFactory.CreateFluxSpeakRESTClient();
+
+// Synchronous: get the audio back and write it to a file
+await speakClient.ToFile(
+    new TextSource("Your appointment is confirmed for 3pm tomorrow."),
+    "output.mp3",
+    new SpeakSchema() { Model = "flux-alexis-en", Encoding = "mp3", BitRate = 48000 });
+
+// Asynchronous: supply a callback URL and receive a request_id ack; the audio is
+// delivered to your callback
+// await speakClient.StreamCallBack(new TextSource("..."), "https://example.com/webhook",
+//     new SpeakSchema() { Model = "flux-alexis-en" });
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech).
+
+[See the Examples for more info](./examples/text-to-speech/websocket/flux/) - and the [batch (REST) example](./examples/text-to-speech/rest/flux/).
 
 ## Voice Agent
 
