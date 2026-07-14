@@ -713,6 +713,27 @@ public class FluxSpeakClientTests
             client.IsConnected().Should().BeFalse();
         }
     }
+
+    [Test]
+    public async Task Open_Wire_Message_Should_Be_Forwarded_And_Wire_Close_Should_Not_Raise_Close()
+    {
+        // Open/Close text frames delegate to the base; a wire "Close" is not a real close event
+        // (those come from connection teardown), so it must not reach Close subscribers.
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+        OpenResponse? open = null;
+        var closeCount = 0;
+        await client.Subscribe(new EventHandler<OpenResponse>((sender, e) => open = e));
+        await client.Subscribe(new EventHandler<CloseResponse>((sender, e) => Interlocked.Increment(ref closeCount)));
+
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream("""{ "type": "Open" }"""));
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream("""{ "type": "Close" }"""));
+
+        using (new AssertionScope())
+        {
+            open.Should().NotBeNull();
+            closeCount.Should().Be(0, "Close events come from connection teardown, not wire messages");
+        }
+    }
     #endregion
 
     #region Model serialization round-trips
