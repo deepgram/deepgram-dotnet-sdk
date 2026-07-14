@@ -51,6 +51,18 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// (PREVIEW) Create a new FluxSpeakWebSocketClient for streaming, turn-based text-to-speech
+    /// using the Flux (v2 speak) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxSpeakWebSocketClient CreateFluxSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxSpeakWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
     /// Create a new ListenWebSocketClient using the latest version
     /// </summary>
     /// <param name="apiKey"></param>
