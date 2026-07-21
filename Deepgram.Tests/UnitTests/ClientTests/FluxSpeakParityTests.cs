@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Net.WebSockets;
+using System.Text.Json.Serialization;
 
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.Speak.WebSocket;
@@ -107,5 +108,139 @@ public class FluxSpeakParityTests
         var bytes = doc.RootElement.GetProperty("audio_total_bytes").GetInt32();
         var durationMs = bytes / 2.0 / 24000.0 * 1000.0;
         durationMs.Should().BeApproximately(5360, 1);
+    }
+
+    // ---- Independent golden parity (mirrors the STT FluxParityTests) --------------------------
+    //
+    // Fixtures/FluxSpeak/golden.json holds the events the official Deepgram PYTHON SDK produced
+    // when its typed model classes (SpeakV2Connected, ...) parsed the identical frames.json.
+    // This decouples the expected values from our own capture: the C# client must match the
+    // Python SDK, not itself. The golden is produced by the capture harness (make_golden.py,
+    // which feeds these frames through the Python SDK's SpeakV2* model classes — the same
+    // approach as the STT golden). Until golden.json is present the test self-skips, exactly
+    // like the STT parity test does when its fixtures are absent.
+
+    private record GoldenEvent(
+        [property: JsonPropertyName("kind")] string? Kind,
+        [property: JsonPropertyName("request_id")] string? RequestId,
+        [property: JsonPropertyName("model_name")] string? ModelName,
+        [property: JsonPropertyName("model_version")] string? ModelVersion,
+        [property: JsonPropertyName("model_uuids")] List<string>? ModelUuids,
+        [property: JsonPropertyName("speech_id")] string? SpeechId,
+        [property: JsonPropertyName("audio_duration_ms")] int? AudioDurationMs,
+        [property: JsonPropertyName("input_character_count")] int? InputCharacterCount,
+        [property: JsonPropertyName("billable_character_count")] int? BillableCharacterCount,
+        [property: JsonPropertyName("pronunciations_applied")] int? PronunciationsApplied,
+        [property: JsonPropertyName("pronunciation_warnings")] int? PronunciationWarnings,
+        [property: JsonPropertyName("total_audio_duration_ms")] int? TotalAudioDurationMs,
+        [property: JsonPropertyName("total_input_character_count")] int? TotalInputCharacterCount,
+        [property: JsonPropertyName("total_billable_character_count")] int? TotalBillableCharacterCount,
+        [property: JsonPropertyName("code")] string? Code,
+        [property: JsonPropertyName("description")] string? Description,
+        [property: JsonPropertyName("raw_type")] string? RawType);
+
+    private record GoldenFile([property: JsonPropertyName("events")] List<GoldenEvent> Events);
+
+    private static async Task<List<GoldenEvent>> ReplayThroughCSharpClient(List<string> frames)
+    {
+        var client = new FluxSpeakWebSocketClient(new Faker().Random.Guid().ToString(),
+            new DeepgramWsClientOptions(new Faker().Random.Guid().ToString()) { OnPrem = true });
+        var received = new List<GoldenEvent>();
+        var mutex = new object();
+
+        void Add(GoldenEvent e) { lock (mutex) { received.Add(e); } }
+
+        await client.Subscribe(new EventHandler<ConnectedResponse>((_, e) =>
+            Add(new GoldenEvent("Connected", e.RequestId, e.ModelName, e.ModelVersion,
+                e.ModelUuids?.ToList(), null, null, null, null, null, null, null, null, null, null, null, null))));
+        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, e) =>
+            Add(new GoldenEvent("SpeechStarted", null, null, null, null, e.SpeechId, null, null, null, null, null,
+                null, null, null, null, null, null))));
+        await client.Subscribe(new EventHandler<FlushedResponse>((_, e) =>
+            Add(new GoldenEvent("Flushed", null, null, null, null, e.SpeechId, null, null, null, null, null,
+                null, null, null, null, null, null))));
+        await client.Subscribe(new EventHandler<SpeechMetadataResponse>((_, e) =>
+            Add(new GoldenEvent("SpeechMetadata", null, null, null, null, e.SpeechId, e.AudioDurationMs,
+                e.InputCharacterCount, e.BillableCharacterCount,
+                e.ControlsApplied?.PronunciationsApplied, e.ControlsApplied?.PronunciationWarnings,
+                null, null, null, null, null, null))));
+        await client.Subscribe(new EventHandler<SessionMetadataResponse>((_, e) =>
+            Add(new GoldenEvent("SessionMetadata", null, null, null, null, null, null, null, null, null, null,
+                e.TotalAudioDurationMs, e.TotalInputCharacterCount, e.TotalBillableCharacterCount,
+                null, null, null))));
+        await client.Subscribe(new EventHandler<WarningResponse>((_, e) =>
+            Add(new GoldenEvent("Warning", null, null, null, null, null, null, null, null, null, null,
+                null, null, null, e.Code, e.Description, null))));
+        await client.Subscribe(new EventHandler<ErrorResponse>((_, e) =>
+            Add(new GoldenEvent("Error", null, null, null, null, null, null, null, null, null, null,
+                null, null, null, e.Code, e.Description, null))));
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, e) =>
+            Add(new GoldenEvent("Unhandled", null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, RawTypeOf(e.Raw)))));
+
+        var wsr = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
+        foreach (var frame in frames)
+        {
+            client.ProcessTextMessage(wsr, ToStream(frame));
+        }
+
+        return received;
+    }
+
+    private static string? RawTypeOf(string? raw)
+    {
+        if (raw is null)
+        {
+            return null;
+        }
+        using var doc = JsonDocument.Parse(raw);
+        return doc.RootElement.TryGetProperty("type", out var t) ? t.GetString() : null;
+    }
+
+    [Test]
+    public async Task CSharp_Client_Should_Emit_Events_Equivalent_To_Python_SDK_Golden()
+    {
+        var goldenPath = Path.Combine(FixtureDir, "golden.json");
+        if (!File.Exists(goldenPath))
+        {
+            Assert.Ignore("Fixtures/FluxSpeak/golden.json not present. Run the capture harness " +
+                          "(flux-speak-capture/make_golden.py) against the Python SDK to generate it.");
+        }
+
+        var frames = LoadFrames();
+        var golden = JsonSerializer.Deserialize<GoldenFile>(File.ReadAllText(goldenPath))!.Events;
+
+        var actual = await ReplayThroughCSharpClient(frames);
+
+        actual.Count.Should().Be(golden.Count,
+            "the C# client must raise exactly one event per captured frame, like the Python SDK");
+
+        using (new AssertionScope())
+        {
+            for (var i = 0; i < golden.Count; i++)
+            {
+                var g = golden[i];
+                var a = actual[i];
+                var ctx = $"frame {i} ({g.Kind})";
+
+                a.Kind.Should().Be(g.Kind, ctx);
+                a.RequestId.Should().Be(g.RequestId, ctx);
+                a.ModelName.Should().Be(g.ModelName, ctx);
+                a.ModelVersion.Should().Be(g.ModelVersion, ctx);
+                (a.ModelUuids ?? new List<string>()).Should().Equal(g.ModelUuids ?? new List<string>(), ctx);
+                a.SpeechId.Should().Be(g.SpeechId, ctx);
+                a.AudioDurationMs.Should().Be(g.AudioDurationMs, ctx);
+                a.InputCharacterCount.Should().Be(g.InputCharacterCount, ctx);
+                a.BillableCharacterCount.Should().Be(g.BillableCharacterCount, ctx);
+                a.PronunciationsApplied.Should().Be(g.PronunciationsApplied, ctx);
+                a.PronunciationWarnings.Should().Be(g.PronunciationWarnings, ctx);
+                a.TotalAudioDurationMs.Should().Be(g.TotalAudioDurationMs, ctx);
+                a.TotalInputCharacterCount.Should().Be(g.TotalInputCharacterCount, ctx);
+                a.TotalBillableCharacterCount.Should().Be(g.TotalBillableCharacterCount, ctx);
+                a.Code.Should().Be(g.Code, ctx);
+                a.Description.Should().Be(g.Description, ctx);
+                a.RawType.Should().Be(g.RawType, ctx);
+            }
+        }
     }
 }
