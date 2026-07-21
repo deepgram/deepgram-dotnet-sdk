@@ -515,6 +515,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
 
             var data = JsonDocument.Parse(response);
             if (!data.RootElement.TryGetProperty("type", out var typeElement) ||
+                typeElement.ValueKind != JsonValueKind.String ||
                 !Enum.TryParse<FluxType>(typeElement.GetString(), out var val))
             {
                 Log.Debug("ProcessTextMessage", "Message type is missing or unknown. Invoking UnhandledResponse...");

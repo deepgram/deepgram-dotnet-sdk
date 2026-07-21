@@ -583,6 +583,29 @@ public class FluxClientTests
     }
 
     [Test]
+    public async Task ProcessTextMessage_Should_Raise_Unhandled_Event_For_NonString_Type()
+    {
+        // Forward compatibility: a future frame whose "type" is a number or object must not throw
+        // (GetString() would otherwise raise InvalidOperationException and be swallowed, silently
+        // dropping the frame). It must be surfaced on the Unhandled event, never the error event.
+        var client = new FluxWebSocketClient(_apiKey, _options);
+        UnhandledResponse? unhandled = null;
+        ErrorResponse? error = null;
+        await client.Subscribe(new EventHandler<UnhandledResponse>((sender, e) => unhandled = e));
+        await client.Subscribe(new EventHandler<ErrorResponse>((sender, e) => error = e));
+
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream("""{ "type": 5 }"""));
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream("""{ "type": { "nested": true } }"""));
+
+        using (new AssertionScope())
+        {
+            unhandled.Should().NotBeNull("a non-string type must be surfaced, not dropped");
+            unhandled!.Type.Should().Be(Common.WebSocketType.Unhandled);
+            error.Should().BeNull("a non-string type must never route to the error event");
+        }
+    }
+
+    [Test]
     public async Task ProcessTextMessage_Should_Not_Throw_For_Invalid_Json()
     {
         var client = new FluxWebSocketClient(_apiKey, _options);
