@@ -20,8 +20,9 @@ namespace SampleApp
                 // environment variable. Flux TTS also accepts an access token.
                 var speakClient = ClientFactory.CreateFluxSpeakWebSocketClient();
 
-                // To target the staging endpoint (where /v2/speak is available today), construct
-                // the client with a base-address override instead:
+                // Defaults to production (api.deepgram.com), which serves /v2/speak. To target a
+                // non-prod endpoint (e.g. staging), construct the client with a base-address
+                // override instead:
                 //
                 //   var options = new DeepgramWsClientOptions(baseAddress: "wss://api.staging.deepgram.com");
                 //   var speakClient = ClientFactory.CreateFluxSpeakWebSocketClient("", options);
