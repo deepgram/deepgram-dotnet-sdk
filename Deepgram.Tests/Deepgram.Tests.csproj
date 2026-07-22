@@ -30,6 +30,9 @@
 		<ProjectReference Include="..\Deepgram\Deepgram.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Include="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+	<ItemGroup>
 		<AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
 	</ItemGroup>
 </Project>

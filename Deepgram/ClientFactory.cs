@@ -39,6 +39,43 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// (PREVIEW) Create a new FluxWebSocketClient for conversational speech-to-text with
+    /// contextual turn detection using the Flux (v2 listen) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxWebSocketClient CreateFluxWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// (PREVIEW) Create a new FluxSpeakWebSocketClient for streaming, turn-based text-to-speech
+    /// using the Flux (v2 speak) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxSpeakWebSocketClient CreateFluxSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxSpeakWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// (PREVIEW) Create a new FluxSpeakRESTClient for batch (single-request) text-to-speech
+    /// using the Flux (v2 speak) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static V2.IFluxSpeakRESTClient CreateFluxSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new FluxSpeakRESTClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new ListenWebSocketClient using the latest version
     /// </summary>
     /// <param name="apiKey"></param>
