@@ -11,6 +11,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       matrix:
         dotnet-version: ["8.0.x"]
@@ -24,7 +27,26 @@ jobs:
       - name: Install dependencies
         run: dotnet restore Deepgram.sln
       - name: Run tests
-        run: dotnet test Deepgram.sln
+        run: dotnet test Deepgram.sln --collect:"XPlat Code Coverage" --results-directory ./coverage
+      - name: Generate code coverage summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage/**/coverage.cobertura.xml
+          badge: true
+          format: markdown
+          hide_complexity: true
+          indicators: true
+          output: both
+      - name: Add coverage PR comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: code-coverage
+          recreate: true
+          path: code-coverage-results.md
+      - name: Write coverage to job summary
+        if: always()
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
   build:
     runs-on: ubuntu-latest
     steps:
