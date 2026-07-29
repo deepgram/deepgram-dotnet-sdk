@@ -20,6 +20,12 @@ public abstract class AbstractWebSocketClient : IDisposable
     protected ClientWebSocket? _clientWebSocket;
     protected CancellationTokenSource? _cancellationTokenSource;
 
+    // A per-connection correlation id. All log entries emitted for a single WebSocket
+    // connection carry it (via a logging scope), so they can be grouped and later tied
+    // back to the server's request_id.
+    protected string? _connectionId;
+    private IDisposable? _connectionScope;
+
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
     #endregion
@@ -114,6 +120,13 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         // internal cancellation token for internal threads
         _cancellationTokenSource = new CancellationTokenSource();
+
+        // open a connection-scoped correlation id so every log entry for this connection
+        // (including those from the sender/receiver background threads started below) can
+        // be grouped together. See #305.
+        _connectionId = Guid.NewGuid().ToString("N");
+        _connectionScope = Log.BeginScope("AbstractWebSocketClient",
+            new Dictionary<string, object> { ["dg.connection_id"] = _connectionId });
 
         try
         {
@@ -677,6 +690,11 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Debug("Stop", "Disposing WebSocket socket...");
             _clientWebSocket = null;
 
+            // close the connection-scoped correlation id
+            _connectionScope?.Dispose();
+            _connectionScope = null;
+            _connectionId = null;
+
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
@@ -820,6 +838,10 @@ public abstract class AbstractWebSocketClient : IDisposable
             _clientWebSocket.Dispose();
             _clientWebSocket = null;
         }
+
+        _connectionScope?.Dispose();
+        _connectionScope = null;
+        _connectionId = null;
 
         GC.SuppressFinalize(this);
     }
