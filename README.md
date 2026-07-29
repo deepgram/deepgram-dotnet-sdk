@@ -1133,9 +1133,10 @@ Console.WriteLine($"Delete result: {response.Message}");
 
 ## Logging
 
-This SDK uses [Serilog](https://github.com/serilog/serilog) to perform all of its
-logging tasks. By default, this SDK will enable `Information` level messages and
-higher (ie `Warning`, `Error`, etc.) when you initialize the library as follows:
+This SDK logs through [`Microsoft.Extensions.Logging`](https://learn.microsoft.com/en-us/dotnet/core/extensions/logging),
+the standard .NET logging abstraction. By default it writes to the console at
+`Information` level and higher (ie `Warning`, `Error`, etc.) when you initialize the
+library as follows:
 
 ```csharp
 // Default logging level is "Information"
@@ -1143,11 +1144,54 @@ Library.Initialize();
 ```
 
 To increase the logging output/verbosity for debug or troubleshooting purposes,
-you can set the `Debug` level but using this code:
+set the `Debug` level:
 
 ```csharp
 Library.Initialize(LogLevel.Debug);
 ```
+
+### Using your own logger
+
+Because the SDK uses `Microsoft.Extensions.Logging`, you can route SDK logs through
+your own logging pipeline (Serilog, NLog, OpenTelemetry, JSON for Kibana, etc.) by
+supplying your own `ILoggerFactory`. The SDK only consumes the factory you give it —
+it never reconfigures your application's global logging.
+
+```csharp
+using Microsoft.Extensions.Logging;
+
+// Any ILoggerFactory you already build in your app
+var factory = LoggerFactory.Create(builder =>
+{
+    builder.SetMinimumLevel(LogLevel.Debug);
+    builder.AddJsonConsole();   // or AddSerilog(), AddOpenTelemetry(), etc.
+});
+
+Library.Configure(factory);   // route SDK logs through your factory
+```
+
+Each SDK component logs under its own category (for example `"ListenWSClient"` or
+`"ManageClient"`), so you can filter and format SDK logs per category with your own
+provider.
+
+If you use dependency injection, register logging and hand the SDK the container's
+factory once the provider is built:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+services.AddDeepgramLogging();                 // ensures an ILoggerFactory is available
+// ... after building the provider ...
+serviceProvider.UseDeepgramLogging();          // routes SDK logs through it
+```
+
+### Correlating logs for a connection
+
+For WebSocket clients, every log entry emitted for a single connection carries a
+generated `dg.connection_id` (via a logging scope), so you can group all of a
+connection's log entries together and later tie them back to the server's
+`request_id`. Enable scope output in your provider (for example
+`options.IncludeScopes = true` on the console logger) to surface it.
 
 ## Testing
 

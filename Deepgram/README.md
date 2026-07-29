@@ -683,30 +683,40 @@ var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremC
 
 # Logging
 
-The Library uses Microsoft.Extensions.Logging to preform all of its logging tasks. To configure
-logging for your app simply create a new `ILoggerFactory` and call the `LogProvider.SetLogFactory()`
-method to tell the Deepgram library how to log. For example, to log to the console with Serilog, you'd need to install the Serilog package with `dotnet add package Serilog` and then do the following:
+The Library uses `Microsoft.Extensions.Logging` to perform all of its logging tasks.
+
+By default it logs to the console. Use `Library.Initialize` for a quick start:
+
+```csharp
+using Deepgram;
+using Deepgram.Logger;
+
+Library.Initialize();                 // console, Information level
+Library.Initialize(LogLevel.Debug);   // more verbose
+```
+
+To route SDK logs through your own logging pipeline, create an `ILoggerFactory` and
+hand it to the SDK with `Library.Configure`. The SDK only consumes the factory — it
+never reconfigures your application's global logging. For example, to log to the
+console with Serilog, install the `Serilog.Extensions.Logging` package and do:
 
 ```csharp
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Deepgram.Logger;
+using Deepgram;
 using Serilog;
 
-var log = new LoggerConfiguration()
+var serilog = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}]: {Message}\n")
     .CreateLogger();
-var factory = new LoggerFactory();
-factory.AddSerilog(log);
-LogProvider.SetLogFactory(factory);
-```
-The sdk will generate loggers with the cateroryName of the client being used for example 
- to get the logger for the ManageClient you would call
 
-```csharp
-LogProvider.GetLogger(nameof(ManageClient));
+var factory = LoggerFactory.Create(builder => builder.AddSerilog(serilog));
+Library.Configure(factory);
 ```
+
+The SDK generates a logger per component, using the component name as the logger's
+category (for example `ManageClient` or `ListenWSClient`), so you can filter and
+format SDK logs per category with your own provider.
 
 
 
