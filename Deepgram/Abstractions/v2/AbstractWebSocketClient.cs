@@ -145,6 +145,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Error("Connect", "Failed to connect to Deepgram API");
                 Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
+                CloseConnectionScope();
                 return false;
             }
 
@@ -174,6 +175,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
+            CloseConnectionScope();
             return false;
         }
         catch (Exception ex)
@@ -181,12 +183,24 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+
+            CloseConnectionScope();
             throw;
         }
 
         void StartSenderBackgroundThread() => Task.Run(() => ProcessSendQueue());
 
         void StartReceiverBackgroundThread() => Task.Run(() => ProcessReceiveQueue());
+    }
+
+    /// <summary>
+    /// Closes the per-connection logging scope opened in <see cref="Connect"/>, if any.
+    /// </summary>
+    private void CloseConnectionScope()
+    {
+        _connectionScope?.Dispose();
+        _connectionScope = null;
+        _connectionId = null;
     }
 
     #region Subscribe Event
@@ -691,9 +705,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             _clientWebSocket = null;
 
             // close the connection-scoped correlation id
-            _connectionScope?.Dispose();
-            _connectionScope = null;
-            _connectionId = null;
+            CloseConnectionScope();
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
@@ -839,9 +851,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             _clientWebSocket = null;
         }
 
-        _connectionScope?.Dispose();
-        _connectionScope = null;
-        _connectionId = null;
+        CloseConnectionScope();
 
         GC.SuppressFinalize(this);
     }
