@@ -279,10 +279,19 @@ public abstract class AbstractWebSocketClient : IDisposable
         var flushSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         EnqueueSendMessage(WebSocketMessage.CreateFlushMarker(flushSignal));
 
-        // Unblock if the connection is torn down before the marker is reached.
-        using (cts.Token.Register(static state => ((TaskCompletionSource<bool>)state!).TrySetResult(false), flushSignal))
+        // Unblock if the connection is torn down before the marker is reached. Registering on an
+        // already-cancelled token runs the callback immediately; if the token was disposed by a
+        // concurrent teardown between the guard above and here, treat it as "connection gone".
+        try
         {
-            await flushSignal.Task.ConfigureAwait(false);
+            using (cts.Token.Register(static state => ((TaskCompletionSource<bool>)state!).TrySetResult(false), flushSignal))
+            {
+                await flushSignal.Task.ConfigureAwait(false);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            Log.Debug("Flush", "Connection was torn down while flushing. Nothing to flush.");
         }
     }
 
@@ -712,6 +721,12 @@ public abstract class AbstractWebSocketClient : IDisposable
             if (_cancellationTokenSource != null)
             {
                 Log.Debug("Stop", "Disposing internal token...");
+                // Cancel before disposing (as Dispose() does): disposing alone does not run
+                // registered callbacks, which would leave a concurrent Flush() awaiter hung.
+                if (!_cancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    _cancellationTokenSource.Cancel();
+                }
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = null;
             }
@@ -781,8 +796,10 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// Handle channel options
     /// </summary> 
+    // SingleWriter is false: audio can be enqueued (SendBinary) concurrently with a flush marker
+    // (Flush/SendFinalize) from a different thread. A single background reader drains the queue.
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
-       .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
+       .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false, });
 
     internal void InvokeParallel<T>(EventHandler<T>? eventHandler, T e)
     {
