@@ -279,16 +279,19 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>, 
     public virtual async Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
-        if (!IsConnected())
+        // Snapshot the socket so a concurrent Stop()/Dispose() nulling the field can't NRE the
+        // SendAsync below (this runs on the Stop -> SendClose path). See #390.
+        var socket = _clientWebSocket;
+        if (socket == null || !IsConnected())
         {
             Log.Debug("SendBinaryImmediately", "WebSocket is not connected. Exiting...");
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+        // provide a cancellation token, or use the teardown-safe one in the class
+        var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
 
-        await _mutexSend.WaitAsync(_cancelToken.Token);
+        await _mutexSend.WaitAsync(token);
         try
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately...");
@@ -296,7 +299,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 length = data.Length;
             }
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, _cancelToken.Token)
+            await socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, token)
                 .ConfigureAwait(false);
         }
         finally
@@ -310,16 +313,19 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     public virtual async Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
-        if (!IsConnected())
+        // Snapshot the socket so a concurrent Stop()/Dispose() nulling the field can't NRE the
+        // SendAsync below (this runs on the Stop -> SendClose path). See #390.
+        var socket = _clientWebSocket;
+        if (socket == null || !IsConnected())
         {
-            Log.Debug("SendBinaryImmediately", "WebSocket is not connected. Exiting...");
+            Log.Debug("SendMessageImmediately", "WebSocket is not connected. Exiting...");
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+        // provide a cancellation token, or use the teardown-safe one in the class
+        var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
 
-        await _mutexSend.WaitAsync(_cancelToken.Token);
+        await _mutexSend.WaitAsync(token);
         try
         {
             Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
@@ -327,7 +333,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 length = data.Length;
             }
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancelToken.Token)
+            await socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, token)
                 .ConfigureAwait(false);
         }
         finally
@@ -365,14 +371,19 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         try
         {
-            while (await _sendChannel.Reader.WaitToReadAsync(_cancellationTokenSource.Token))
+            // snapshot the token to avoid a teardown race nulling the field mid-loop (#390);
+            // cancel-before-dispose guarantees a torn-down source is observed as cancelled here.
+            var token = GetInternalCancellationToken();
+            while (await _sendChannel.Reader.WaitToReadAsync(token))
             {
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                token = GetInternalCancellationToken();
+                if (token.IsCancellationRequested)
                 {
                     Log.Information("ProcessSendQueue", "ProcessSendQueue cancelled");
                     break;
                 }
-                if (!IsConnected())
+                var socket = _clientWebSocket;
+                if (socket == null || !IsConnected())
                 {
                     Log.Debug("ProcessSendQueue", "WebSocket is not connected. Exiting...");
                     break;
@@ -383,10 +394,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                 {
                     // TODO: Add logging for message capturing for possible playback
                     Log.Verbose("ProcessSendQueue", "Sending message...");
-                    await _mutexSend.WaitAsync(_cancellationTokenSource.Token);
+                    await _mutexSend.WaitAsync(token);
                     try
                     {
-                        await _clientWebSocket.SendAsync(message.Message, message.MessageType, true, _cancellationTokenSource.Token)
+                        await socket.SendAsync(message.Message, message.MessageType, true, token)
                             .ConfigureAwait(false);
                     }
                     finally
@@ -421,14 +432,18 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             try
             {
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                // snapshot token and socket to avoid a teardown race nulling the fields mid-loop (#390)
+                var token = GetInternalCancellationToken();
+                var socket = _clientWebSocket;
+
+                if (token.IsCancellationRequested)
                 {
                     Log.Information("ProcessReceiveQueue", "ReceiveThread cancelled");
                     await Stop();
                     Log.Verbose("ProcessReceiveQueue", "LEAVE");
                     return;
                 }
-                if (!IsConnected())
+                if (socket == null || !IsConnected())
                 {
                     Log.Debug("ProcessReceiveQueue", "WebSocket is not connected. Exiting...");
                     return;
@@ -442,7 +457,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                     do
                     {
                         // get the result of the receive operation
-                        result = await _clientWebSocket.ReceiveAsync(buffer, _cancellationTokenSource.Token);
+                        result = await socket.ReceiveAsync(buffer, token);
 
                         ms.Write(
                             buffer.Array ?? throw new InvalidOperationException("buffer cannot be null"),
@@ -644,10 +659,21 @@ public abstract class AbstractWebSocketClient : IDisposable
             cancelToken = new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
         }
 
+        // Snapshot the socket so a concurrent Stop() (e.g. one triggered by a server-initiated
+        // Close while the caller also calls Stop) that nulls the field can't cause a
+        // NullReferenceException on the derefs after the awaits below. See #390.
+        var socket = _clientWebSocket;
+        if (socket == null)
+        {
+            Log.Information("Stop", "Client has already been disposed");
+            Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
+            return true;
+        }
+
         try
         {
             // if websocket is open, send a close message
-            if (_clientWebSocket!.State == WebSocketState.Open)
+            if (socket.State == WebSocketState.Open)
             {
                 Log.Debug("Stop", "Sending Close message...");
                 await SendClose(nullByte, cancelToken);
@@ -665,21 +691,33 @@ public abstract class AbstractWebSocketClient : IDisposable
                 InvokeParallel(_closeReceived, data);
             }
 
-            // attempt to stop the connection
-            if (_clientWebSocket!.State != WebSocketState.Closed && _clientWebSocket!.State != WebSocketState.Aborted)
+            // attempt to stop the connection — serialize via the send mutex and re-check state so a
+            // concurrent Stop (user Stop racing the server-close-triggered Stop) can't issue two
+            // overlapping CloseOutputAsync calls on the same socket (ClientWebSocket allows only one
+            // outstanding send). See #390.
+            await _mutexSend.WaitAsync(cancelToken.Token).ConfigureAwait(false);
+            try
             {
-                Log.Debug("Stop", "Closing WebSocket connection...");
-                await _clientWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancelToken.Token)
-                    .ConfigureAwait(false);
+                // CloseOutputAsync is only valid from Open/CloseReceived; a positive check avoids an
+                // InvalidOperationException if Stop() runs while Connect() is still handshaking
+                // (socket in Connecting/None). See #390 (R1).
+                if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
+                {
+                    Log.Debug("Stop", "Closing WebSocket connection...");
+                    await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancelToken.Token)
+                        .ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                _mutexSend.Release();
             }
 
-            // clean up internal token
-            if (_cancellationTokenSource != null)
-            {
-                Log.Debug("Stop", "Disposing internal token...");
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
-            }
+            // clean up internal token — cancel-before-dispose so background loops
+            // (keepalive/autoflush/send/receive) observe cancellation and exit cleanly, and
+            // atomic-claim so a concurrent Stop()/Dispose() can't race on the field. See #390.
+            Log.Debug("Stop", "Disposing internal token...");
+            DisposeCancellationTokenSource();
 
             // release the socket
             Log.Debug("Stop", "Disposing WebSocket socket...");
@@ -690,10 +728,24 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             return true;
         }
-        catch (TaskCanceledException ex)
+        catch (OperationCanceledException ex)
         {
+            // Covers both Task.Delay's TaskCanceledException and CloseOutputAsync's bare
+            // OperationCanceledException if the disconnect-timeout token fires during teardown.
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
+            Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
+
+            return true;
+        }
+        catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException)
+        {
+            // A concurrent Stop()/Dispose() already tore down the socket (disposed stream, or the
+            // remote closed without a handshake). The connection is gone, which is the goal of
+            // Stop, so treat it as an already-completed stop rather than a teardown-race error.
+            // Mirrors the Flux client's own Stop() catch set. See #390.
+            Log.Debug("Stop", "Stop raced with another teardown; already stopped.");
+            Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
             return true;
@@ -708,6 +760,68 @@ public abstract class AbstractWebSocketClient : IDisposable
     }
 
     #region Helpers
+    /// <summary>
+    /// Returns the current internal cancellation token in a way that is safe against
+    /// teardown races. Stop()/Dispose() null and dispose <see cref="_cancellationTokenSource"/>,
+    /// which previously caused NullReference/ObjectDisposedException in long-running background
+    /// loops (keepalive/autoflush). If the source has been torn down, an already-cancelled token
+    /// is returned so callers exit cleanly. See #390.
+    /// </summary>
+    protected CancellationToken GetInternalCancellationToken()
+    {
+        // Snapshot the reference to avoid it being nulled between the check and the read.
+        var cts = _cancellationTokenSource;
+        if (cts == null)
+        {
+            return new CancellationToken(true);
+        }
+
+        try
+        {
+            return cts.Token;
+        }
+        catch (ObjectDisposedException)
+        {
+            return new CancellationToken(true);
+        }
+    }
+
+    /// <summary>
+    /// Cancels and disposes the internal cancellation token source exactly once, safely against
+    /// concurrent Stop()/Dispose() calls. A plain "if (field != null) { field.Cancel(); ... }" is a
+    /// check-then-act race: a second caller can null the field between the re-reads, throwing
+    /// NullReferenceException, or dispose it first, throwing ObjectDisposedException from .Token.
+    /// Interlocked.Exchange lets exactly one caller claim the instance; the loser gets null. See #390.
+    /// </summary>
+    protected void DisposeCancellationTokenSource()
+    {
+        var cts = Interlocked.Exchange(ref _cancellationTokenSource, null);
+        if (cts == null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                cts.Cancel();
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // already disposed by a concurrent teardown; nothing to cancel
+        }
+        catch (AggregateException)
+        {
+            // a cancellation callback threw; the token is still cancelled, so dispose anyway
+        }
+        finally
+        {
+            cts.Dispose();
+        }
+    }
+
     /// <summary>
     /// Retrieves the connection state of the WebSocket
     /// </summary>
@@ -808,19 +922,12 @@ public abstract class AbstractWebSocketClient : IDisposable
             return;
         }
 
-        if (_cancellationTokenSource != null)
-        {
-            if (!_cancellationTokenSource.Token.IsCancellationRequested)
-            {
-                _cancellationTokenSource.Cancel();
-            }
-            _cancellationTokenSource.Dispose();
-            _cancellationTokenSource = null;
-        }
+        // atomic-claim teardown; safe against a concurrent Stop()/Dispose(). See #390.
+        DisposeCancellationTokenSource();
 
         if (_sendChannel != null)
         {
-            _sendChannel.Writer.Complete();
+            _sendChannel.Writer.TryComplete(); // TryComplete: idempotent under concurrent Dispose() (#390 R3)
         }
 
         if (_clientWebSocket != null)

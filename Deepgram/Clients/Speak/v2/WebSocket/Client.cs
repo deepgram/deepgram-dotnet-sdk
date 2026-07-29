@@ -408,10 +408,13 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;

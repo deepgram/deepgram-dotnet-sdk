@@ -337,12 +337,15 @@ public class Client : IDisposable, IListenWebSocketClient
     public void SendClose(bool nullByte = false)
     {
         Log.Debug("SendFinalize", "Sending Close Message Immediately...");
-        if (nullByte && _clientWebSocket != null)
+        // snapshot socket + teardown-safe token so a concurrent Stop()/Dispose() can't NRE this
+        // (SendClose is called synchronously from Stop). See #390 (R2).
+        var socket = _clientWebSocket;
+        if (nullByte && socket != null)
         {
             // send a close to Deepgram
             lock (_mutexSend)
             {
-                _clientWebSocket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                socket.SendAsync(new ArraySegment<byte>([0]), WebSocketMessageType.Binary, true, GetInternalCancellationToken())
                     .ConfigureAwait(false);
             }
             return;
@@ -376,6 +379,12 @@ public class Client : IDisposable, IListenWebSocketClient
     /// </summary>
     public void SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
+        // snapshot socket + teardown-safe token to avoid a concurrent-teardown NRE. See #390 (R2).
+        var socket = _clientWebSocket;
+        if (socket == null)
+        {
+            return;
+        }
         lock (_mutexSend)
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately..");  // TODO: dump this message
@@ -383,7 +392,7 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 length = data.Length;
             }
-            _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+            socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, GetInternalCancellationToken())
                 .ConfigureAwait(false);
         }
     }
@@ -393,6 +402,13 @@ public class Client : IDisposable, IListenWebSocketClient
     /// </summary>
     public void SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend)
     {
+        // snapshot socket + teardown-safe token to avoid a concurrent-teardown NRE (called from
+        // Stop() via SendClose). See #390 (R2).
+        var socket = _clientWebSocket;
+        if (socket == null)
+        {
+            return;
+        }
         lock (_mutexSend)
         {
             Log.Verbose("SendBinaryImmediately", "Sending binary message immediately..");  // TODO: dump this message
@@ -400,7 +416,7 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 length = data.Length;
             }
-            _clientWebSocket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, _cancellationTokenSource.Token)
+            socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, GetInternalCancellationToken())
                 .ConfigureAwait(false);
         }
     }
@@ -472,6 +488,63 @@ public class Client : IDisposable, IListenWebSocketClient
         }
     }
 
+    /// <summary>
+    /// Returns the current internal cancellation token in a way that is safe against teardown races.
+    /// Stop()/Dispose() null and dispose the source, which previously caused NullReference/
+    /// ObjectDisposedException in background loops. Returns an already-cancelled token if torn down. See #390.
+    /// </summary>
+    private CancellationToken GetInternalCancellationToken()
+    {
+        var cts = _cancellationTokenSource;
+        if (cts == null)
+        {
+            return new CancellationToken(true);
+        }
+
+        try
+        {
+            return cts.Token;
+        }
+        catch (ObjectDisposedException)
+        {
+            return new CancellationToken(true);
+        }
+    }
+
+    /// <summary>
+    /// Cancels and disposes the internal cancellation token source exactly once, safely against
+    /// concurrent Stop()/Dispose() calls. Interlocked.Exchange lets one caller claim the instance;
+    /// the loser gets null, avoiding the check-then-act NRE/ODE on the shared field. See #390.
+    /// </summary>
+    private void DisposeCancellationTokenSource()
+    {
+        var cts = Interlocked.Exchange(ref _cancellationTokenSource, null);
+        if (cts == null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!cts.IsCancellationRequested)
+            {
+                cts.Cancel();
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // already disposed by a concurrent teardown; nothing to cancel
+        }
+        catch (AggregateException)
+        {
+            // a cancellation callback threw; the token is still cancelled, so dispose anyway
+        }
+        finally
+        {
+            cts.Dispose();
+        }
+    }
+
     internal async void ProcessKeepAlive()
     {
         Log.Verbose("ListenWSClient.ProcessKeepAlive", "ENTER");
@@ -480,10 +553,13 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
+                await Task.Delay(5000, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
@@ -520,10 +596,13 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;
@@ -881,10 +960,21 @@ public class Client : IDisposable, IListenWebSocketClient
             cancelToken = new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
         }
 
+        // Snapshot the socket so a concurrent Stop() (e.g. one triggered by a server-initiated
+        // Close while the caller also calls Stop) that nulls the field can't cause a
+        // NullReferenceException on the derefs after the awaits below. See #390.
+        var socket = _clientWebSocket;
+        if (socket == null)
+        {
+            Log.Information("Stop", "Client has already been disposed");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
+            return;
+        }
+
         try
         {
             // if websocket is open, send a close message
-            if (_clientWebSocket!.State == WebSocketState.Open)
+            if (socket.State == WebSocketState.Open)
             {
                 Log.Debug("Stop", "Sending Close message...");
                 SendClose(nullByte);
@@ -902,21 +992,25 @@ public class Client : IDisposable, IListenWebSocketClient
                 InvokeParallel(_closeReceived, data);
             }
 
-            // attempt to stop the connection
-            if (_clientWebSocket!.State != WebSocketState.Closed && _clientWebSocket!.State != WebSocketState.Aborted)
+            // attempt to stop the connection. NOTE: this v1 client guards its sends with
+            // lock(_mutexSend) (Monitor), not _mutexSend.WaitAsync (the semaphore count) as v2 does,
+            // so we cannot cleanly serialize this async CloseOutputAsync against an in-flight
+            // ProcessSendQueue send. A concurrent Stop or send can therefore overlap on the socket
+            // (ClientWebSocket allows one outstanding send) and surface an InvalidOperationException;
+            // that is handled as benign teardown by the catch below rather than prevented. See #390.
+            // CloseOutputAsync is only valid from Open/CloseReceived; a positive check avoids an
+            // InvalidOperationException if Stop() runs while Connect() is still handshaking. See #390 (R1).
+            if (socket.State == WebSocketState.Open || socket.State == WebSocketState.CloseReceived)
             {
                 Log.Debug("Stop", "Closing WebSocket connection...");
-                await _clientWebSocket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancelToken.Token)
+                await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancelToken.Token)
                     .ConfigureAwait(false);
             }
 
-            // clean up internal token
-            if (_cancellationTokenSource != null)
-            {
-                Log.Debug("Stop", "Disposing internal token...");
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
-            }
+            // clean up internal token — cancel-before-dispose so background loops observe
+            // cancellation, and atomic-claim so a concurrent Stop()/Dispose() can't race. See #390.
+            Log.Debug("Stop", "Disposing internal token...");
+            DisposeCancellationTokenSource();
 
             // release the socket
             Log.Debug("Stop", "Disposing WebSocket socket...");
@@ -925,10 +1019,21 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("ListenWSClient.Stop", "LEAVE");
         }
-        catch (TaskCanceledException ex)
+        catch (OperationCanceledException ex)
         {
+            // Covers Task.Delay's TaskCanceledException and CloseOutputAsync's bare
+            // OperationCanceledException if the disconnect-timeout token fires.
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
+            Log.Verbose("ListenWSClient.Stop", "LEAVE");
+        }
+        catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException || ex is InvalidOperationException)
+        {
+            // A concurrent Stop()/Dispose() or an in-flight send already tore down / is racing the
+            // socket (disposed stream, remote closed without handshake, or overlapping send). The
+            // connection is gone, which is the goal of Stop. Mirrors the Flux client's catch set. See #390.
+            Log.Debug("Stop", "Stop raced with another teardown; already stopped.");
+            Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("ListenWSClient.Stop", "LEAVE");
         }
         catch (Exception ex)
@@ -1116,19 +1221,12 @@ public class Client : IDisposable, IListenWebSocketClient
             return;
         }
 
-        if (_cancellationTokenSource != null)
-        {
-            if (!_cancellationTokenSource.Token.IsCancellationRequested)
-            {
-                _cancellationTokenSource.Cancel();
-            }
-            _cancellationTokenSource.Dispose();
-            _cancellationTokenSource = null;
-        }
+        // atomic-claim teardown; safe against a concurrent Stop()/Dispose(). See #390.
+        DisposeCancellationTokenSource();
 
         if (_sendChannel != null)
         {
-            _sendChannel.Writer.Complete();
+            _sendChannel.Writer.TryComplete(); // TryComplete: idempotent under concurrent Dispose() (#390 R3)
         }
 
         if (_clientWebSocket != null)
