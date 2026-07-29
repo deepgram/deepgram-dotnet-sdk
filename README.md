@@ -505,6 +505,31 @@ For a complete implementation, you would need to:
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
 
+### Defining function-call parameters
+
+`Function.Parameters` is a JSON Schema expressed as a `Dictionary<string, object>`, so a function
+can declare **any number of parameters** with custom names — set `properties` to a dictionary keyed
+by each parameter name:
+
+```csharp
+var function = new Function
+{
+    Name = "get_weather",
+    Description = "Get the weather for a city on a date",
+    Parameters = new Dictionary<string, object>
+    {
+        ["type"] = "object",
+        ["properties"] = new Dictionary<string, object>
+        {
+            ["city"]  = new Dictionary<string, object> { ["type"] = "string", ["description"] = "City name" },
+            ["date"]  = new Dictionary<string, object> { ["type"] = "string", ["description"] = "ISO 8601 date" },
+            ["units"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "metric or imperial" },
+        },
+        ["required"] = new List<string> { "city", "date" },
+    },
+};
+```
+
 ## Text to Speech REST
 
 Convert text into speech using the REST API.

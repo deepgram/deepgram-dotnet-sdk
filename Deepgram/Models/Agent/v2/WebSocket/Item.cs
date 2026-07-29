@@ -4,6 +4,12 @@
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
+/// <summary>
+/// Vestigial type from an older function-parameter model. It is not used by <see cref="Function"/>,
+/// whose <c>Parameters</c> is a <see cref="System.Collections.Generic.Dictionary{TKey,TValue}"/> you
+/// populate with a JSON Schema (see #367). Kept only for source compatibility.
+/// </summary>
+[Obsolete("Function.Parameters is a Dictionary<string, object>; build a JSON Schema there with as many named properties as you need. See #367.")]
 public record Item
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
