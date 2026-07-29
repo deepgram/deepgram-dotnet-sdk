@@ -639,7 +639,17 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         {
             Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(AgentType), data.RootElement.GetProperty("type").GetString()!);
+            var typeString = data.RootElement.GetProperty("type").GetString();
+            // Use TryParse so Agent message types unknown to this SDK version (e.g. new server
+            // messages like "History"/"Warning") are routed to the base handler and surfaced as
+            // Unhandled instead of throwing an ArgumentException. See #395.
+            if (!Enum.TryParse<AgentType>(typeString, out var val))
+            {
+                Log.Debug("ProcessTextMessage", $"Unknown Agent message type '{typeString}'. Routing to base handler...");
+                base.ProcessTextMessage(result, ms);
+                Log.Verbose("AgentWSClient.ProcessTextMessage", "LEAVE");
+                return;
+            }
 
             Log.Verbose("ProcessTextMessage", $"Type: {val}");
 

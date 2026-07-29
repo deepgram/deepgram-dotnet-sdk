@@ -526,7 +526,15 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             }
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(WebSocketType), data.RootElement.GetProperty("type").GetString()!);
+            var typeString = data.RootElement.GetProperty("type").GetString();
+            // Use TryParse so message types unknown to this SDK version are surfaced as
+            // Unhandled instead of throwing. This keeps the SDK forward-compatible with new
+            // server message types. See #395.
+            if (!Enum.TryParse<WebSocketType>(typeString, out var val))
+            {
+                Log.Debug("ProcessTextMessage", $"Unknown message type '{typeString}'. Treating as Unhandled.");
+                val = WebSocketType.Unhandled;
+            }
 
             if (Log.IsEnabled(LogLevel.Verbose))
             {
