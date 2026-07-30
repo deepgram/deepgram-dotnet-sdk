@@ -1150,6 +1150,32 @@ set the `Debug` level:
 Library.Initialize(LogLevel.Debug);
 ```
 
+### Upgrading from 6.x (Serilog → Microsoft.Extensions.Logging)
+
+Version 7.0 replaces Serilog with `Microsoft.Extensions.Logging`. Most code is
+unaffected — `Library.Initialize()`, `Library.Initialize(LogLevel.Debug)`, and the
+`Deepgram.Logger.LogLevel` enum (member names *and* values) are unchanged. The
+following Serilog-coupled members on `Deepgram.Logger.Log` are the only breaking
+changes:
+
+| 6.x (Serilog) | 7.0 replacement |
+| --- | --- |
+| `Log.Initialize(Serilog.ILogger)` | `Library.Configure(ILoggerFactory)` — see below. To keep using Serilog, register it as a provider (`builder.AddSerilog(...)`). |
+| `Log.GetLogger()` returning `Serilog.ILogger` | now returns `Microsoft.Extensions.Logging.ILogger` |
+| `Log.Initialize(LogLevel, string?)` returning `Serilog.ILogger` | now returns `Microsoft.Extensions.Logging.ILogger` |
+
+If you previously handed the SDK a Serilog logger, route it through an
+`ILoggerFactory` instead (Serilog remains fully usable as an MEL provider):
+
+```csharp
+using Microsoft.Extensions.Logging;
+using Serilog;
+
+var serilog = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+var factory = LoggerFactory.Create(b => b.AddSerilog(serilog, dispose: true));
+Library.Configure(factory);
+```
+
 ### Using your own logger
 
 Because the SDK uses `Microsoft.Extensions.Logging`, you can route SDK logs through

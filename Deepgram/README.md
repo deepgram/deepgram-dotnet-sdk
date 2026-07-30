@@ -685,6 +685,13 @@ var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremC
 
 The Library uses `Microsoft.Extensions.Logging` to perform all of its logging tasks.
 
+> **Upgrading from 6.x:** v7.0 replaced Serilog with `Microsoft.Extensions.Logging`.
+> `Library.Initialize(...)` and the `LogLevel` enum are unchanged; the only breaking
+> changes are the Serilog-typed members on `Deepgram.Logger.Log`
+> (`Log.Initialize(Serilog.ILogger)`, and the `Serilog.ILogger` return types of
+> `Log.GetLogger()` / `Log.Initialize(LogLevel, string?)`). Route Serilog through an
+> `ILoggerFactory` and `Library.Configure` instead — see below.
+
 By default it logs to the console. Use `Library.Initialize` for a quick start:
 
 ```csharp
