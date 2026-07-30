@@ -115,4 +115,50 @@ public class SpeakLiveIntegrationTests
                 $"iteration {i}: concurrent Stop()/Dispose() must not race on the token source (#390)");
         }
     }
+
+    [Test]
+    public async Task Live_Speak_WebSocket_Concurrent_Stop_NullByte_And_Dispose_Do_Not_Throw()
+    {
+        // End-to-end guard for the SendClose(nullByte:true) fast-path missed by the initial #390
+        // hardening. Stop(nullByte:true) routes through SendClose(true), which sends a raw null byte
+        // outside the base SendMessageImmediately helper; before the fix it dereferenced
+        // _clientWebSocket and _cancellationTokenSource.Token AFTER awaiting _mutexSend, so a
+        // concurrent Dispose() nulling those fields threw NullReferenceException. An NRE is not in
+        // Stop()'s benign catch set, so it escaped Stop(); the fix makes SendClose teardown-safe so
+        // any surviving exception is a benign cancellation that Stop() already absorbs.
+        var apiKey = ResolveApiKey();
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            Assert.Ignore("DEEPGRAM_API_KEY is not set. Skipping live Speak null-byte teardown-race test.");
+        }
+
+        for (var i = 0; i < 5; i++)
+        {
+            var client = ClientFactory.CreateSpeakWebSocketClient(apiKey!);
+
+            var connected = await client.Connect(new SpeakSchema
+            {
+                Model = "aura-2-thalia-en",
+                Encoding = "linear16",
+                SampleRate = 24000,
+            });
+            connected.Should().BeTrue();
+
+            client.SpeakWithText("Concurrent null-byte close test.");
+            client.Flush();
+
+            using var gate = new ManualResetEventSlim(false);
+            var teardowns = new List<Task>
+            {
+                Task.Run(() => { gate.Wait(); return client.Stop(nullByte: true); }),
+                Task.Run(() => { gate.Wait(); return client.Stop(nullByte: true); }),
+                Task.Run(() => { gate.Wait(); ((IDisposable)client).Dispose(); }),
+            };
+            gate.Set();
+
+            Func<Task> act = () => Task.WhenAll(teardowns);
+            await act.Should().NotThrowAsync(
+                $"iteration {i}: concurrent Stop(nullByte:true)/Dispose() must not NRE on the null-byte fast-path (#390)");
+        }
+    }
 }

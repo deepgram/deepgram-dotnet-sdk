@@ -341,17 +341,26 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
-
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
+            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
+            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
+            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
+            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
+            var socket = _clientWebSocket;
+            if (socket == null || !IsConnected())
+            {
+                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
+                return;
+            }
+            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
+
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancelToken.Token);
+            await _mutexSend.WaitAsync(token);
             try
             {
-                await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
                     .ConfigureAwait(false);
             }
             finally
@@ -363,7 +372,9 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 
         ControlMessage controlMessage = new ControlMessage(Constants.Close);
         byte[] data = Encoding.UTF8.GetBytes(controlMessage.ToString());
-        await SendMessageImmediately(data, Constants.UseArrayLengthForSend, _cancelToken);
+        // Pass the caller token through; when null, SendMessageImmediately falls back to the
+        // teardown-safe GetInternalCancellationToken() rather than a possibly-disposed field.
+        await SendMessageImmediately(data, Constants.UseArrayLengthForSend, _cancellationToken);
     }
 
     /// <summary>
