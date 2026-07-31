@@ -195,12 +195,14 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     /// <summary>
     /// Closes the per-connection logging scope opened in <see cref="Connect"/>, if any.
+    /// atomic-claim teardown; safe against a concurrent Stop()/Dispose() racing on the field.
+    /// Interlocked.Exchange lets exactly one caller claim the instance; the loser gets null. See #390.
     /// </summary>
     private void CloseConnectionScope()
     {
-        _connectionScope?.Dispose();
-        _connectionScope = null;
+        var scope = Interlocked.Exchange(ref _connectionScope, null);
         _connectionId = null;
+        scope?.Dispose();
     }
 
     #region Subscribe Event
