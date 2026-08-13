@@ -1,10 +1,11 @@
 {
-  "_provenance": "Hand-authored from developers.deepgram.com/reference/text-to-speech/speak-flux, 2026-08-13 [verify: replace with a staging/production capture when available]. Unlike frames.json (a verbatim capture of the EA Speak/Flush/Close surface), this fixture exercises the GA-only additions: Configure/ConfigureSuccess and Interrupt/SpeechInterrupted. The sequence models a client that connects, adjusts speed mid-session, starts a turn, and barges in on itself before the turn completes.",
+  "_provenance": "Verbatim JSON control frames captured 2026-08-13 from the live wss://api.deepgram.com/v2/speak?model=flux-alexis-en&encoding=linear16&sample_rate=24000 endpoint (client sent Configure -> Speak -> Interrupt -> Close). Captured via a standalone raw-WebSocket script independent of the SDK's own parser (see the Flux TTS GA delta PR). Exercises the GA-only additions: Configure/ConfigureSuccess and Interrupt/SpeechInterrupted.",
+  "audio_total_bytes": 30432,
   "frames": [
-    { "type": "Connected", "request_id": "550e8400-e29b-41d4-a716-446655440000", "model_name": "flux-alexis-en", "model_version": "2026.06.01", "model_uuids": ["b3e47c20-9f81-4a2e-bd15-8d7c6e2a1f09"] },
-    { "type": "ConfigureSuccess", "applied": { "speed": 1.05 } },
-    { "type": "SpeechStarted", "speech_id": "dg_sp_a1b2c3d4e5f6" },
-    { "type": "SpeechInterrupted", "audio_played_ms": 2340, "text_spoken": "Sure, I can help you cancel your subscription.", "text_remaining": " Let me pull up your account.", "metadata": { "speech_id": "dg_sp_a1b2c3d4e5f6", "audio_duration_ms": 2340, "input_character_count": 75, "billable_character_count": 75, "controls_applied": { "pronunciations_applied": 0, "breaks_applied": 0, "pronunciation_warnings": 0 } } },
-    { "type": "SessionMetadata", "total_audio_duration_ms": 2340, "total_input_character_count": 75, "total_billable_character_count": 75 }
+    {"type":"Connected","request_id":"019ffcda-bebd-7273-a625-66fa54f1f101","model_name":"alexis","model_version":"2026-08-11.0","model_uuids":["9c3cc12c-c0a2-4966-8676-f9fa22ab5401","9c3cc12c-c0a2-4966-8676-f9fa22ab5401"]},
+    {"type":"ConfigureSuccess","applied":{"speed":1.05}},
+    {"type":"SpeechStarted","speech_id":"dg_sp_c78f63c65fa2"},
+    {"type":"SpeechInterrupted","audio_played_ms":554,"text_spoken":"Sure,","text_remaining":" I can help you cancel your subscription. Let me pull up your account and check on that for you right away.","metadata":{"speech_id":"dg_sp_c78f63c65fa2","audio_duration_ms":554,"input_character_count":112,"billable_character_count":46,"controls_applied":{"pronunciations_applied":0,"breaks_applied":0,"pronunciation_warnings":0}}},
+    {"type":"SessionMetadata","total_audio_duration_ms":554,"total_input_character_count":46,"total_billable_character_count":46}
   ]
 }
