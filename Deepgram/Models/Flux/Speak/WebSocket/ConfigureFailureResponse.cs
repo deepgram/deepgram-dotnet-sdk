@@ -5,47 +5,48 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// Sent immediately by the Deepgram Flux (v2 speak) API on a successful connection.
-/// Successor to the /v1/speak Metadata message.
+/// Emitted by the Deepgram Flux (v2 speak) API rejecting a client Configure message. Non-fatal —
+/// the connection stays open. <see cref="Code"/> is an open, growable set of values (e.g.
+/// SPEED_OUT_OF_RANGE); do not assume it is limited to any known list.
 /// </summary>
-public record ConnectedResponse
+public record ConfigureFailureResponse
 {
     /// <summary>
-    /// Connected event type.
+    /// ConfigureFailure event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public SpeakType? Type { get; set; } = SpeakType.Connected;
+    public SpeakType? Type { get; set; } = SpeakType.ConfigureFailure;
 
     /// <summary>
-    /// The unique identifier of the /v2/speak request.
+    /// A code identifying why the configuration was rejected, e.g. SPEED_OUT_OF_RANGE. Open set —
+    /// the server may introduce new codes without notice.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("request_id")]
-    public string? RequestId { get; set; }
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
 
     /// <summary>
-    /// Resolved model name, e.g. "flux-alexis-en".
+    /// Prose description of why the configuration was rejected.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model_name")]
-    public string? ModelName { get; set; }
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
 
     /// <summary>
-    /// Resolved model version, e.g. "2026.06.01".
+    /// The rejected field's name, e.g. "speed".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model_version")]
-    public string? ModelVersion { get; set; }
+    [JsonPropertyName("field")]
+    public string? Field { get; set; }
 
     /// <summary>
-    /// Resolved model UUIDs. A list, because a resolved model may be backed by more than one
-    /// underlying model.
+    /// The rejected value, echoed back verbatim. Untyped because the field it names may vary.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("model_uuids")]
-    public List<string>? ModelUuids { get; set; }
+    [JsonPropertyName("value")]
+    public JsonElement? Value { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

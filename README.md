@@ -22,7 +22,7 @@ Power your apps with world-class speech and Language AI models.
     - [Local Files (Asynchronous)](#local-files-asynchronous)
   - [Streaming Audio](#streaming-audio)
   - [Flux - Conversational Speech Recognition (Preview)](#flux---conversational-speech-recognition-preview)
-  - [Flux Text to Speech (Preview)](#flux-text-to-speech-preview)
+  - [Flux Text to Speech](#flux-text-to-speech)
   - [Voice Agent](#voice-agent)
   - [Text to Speech REST](#text-to-speech-rest)
   - [Text to Speech Streaming](#text-to-speech-streaming)
@@ -320,13 +320,11 @@ await fluxClient.Stop();
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
-## Flux Text to Speech (Preview)
+## Flux Text to Speech
 
-> Flux text-to-speech support is currently in preview. The API surface may change in a future release.
+Synthesize speech with [Deepgram Flux TTS](https://developers.deepgram.com/docs/flux-tts/overview), available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
 
-Synthesize speech with [Deepgram Flux](https://developers.deepgram.com/docs/flux/quickstart) TTS, available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
-
-Streaming sends exactly three client messages at Early Access — `Speak`, `Flush`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `Flushed`, `SessionMetadata`, `Warning`, `Error`).
+Streaming sends five client messages — `Speak`, `Flush`, `Interrupt`, `Configure`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `SpeechInterrupted`, `Flushed`, `ConfigureSuccess`/`ConfigureFailure`, `SessionMetadata`, `Warning`, `Error`).
 
 ```csharp
 using Deepgram;
@@ -351,15 +349,43 @@ var schema = new SpeakSchema()
     Model = "flux-alexis-en",
     Encoding = "linear16",
     SampleRate = 24000,
+    Speed = 1.0,          // optional: 0.85–1.15 in 0.05 steps
+    // Expressivity = 1,  // optional (beta): -2 (calmer) to 2 (more animated)
 };
 await speakClient.Connect(schema);
 
-// Stream text into the active turn, then flush to generate the remaining audio
+// Stream text into the active turn, then flush to mark the end of the turn.
+// The turn's SpeechMetadata (billing, timing) is your end-of-turn signal.
 await speakClient.SendText("Sure, I can help you cancel your subscription.");
 await speakClient.SendFlush();
 
 // Stop the connection (sends Close and waits for the server to drain the audio)
 await speakClient.Stop();
+```
+
+### Barge-in and mid-stream controls
+
+When the user speaks over the agent, stop your local playback immediately — don't wait for the server — then send `Interrupt` with how many milliseconds of audio the user actually heard. The server cancels the active turn and answers with `SpeechInterrupted`, splitting the turn's text into what was spoken and what wasn't, so you can feed exactly what the user heard back into your LLM context.
+
+```csharp
+await speakClient.Subscribe(new EventHandler<SpeechInterruptedResponse>((sender, e) =>
+{
+    Console.WriteLine($"Heard:  {e.TextSpoken}");
+    Console.WriteLine($"Unsaid: {e.TextRemaining}");
+}));
+
+// The offset is cumulative across the whole session (not per turn), and each
+// interrupt must advance past the previous one. Report your audio player's
+// actual position — not bytes received, which arrive much faster than realtime.
+await speakClient.SendInterrupt(playbackOffsetMs);
+```
+
+Omit the offset (`SendInterrupt()`) and the turn still stops, but the server can't compute the split — `TextSpoken`/`TextRemaining` come back empty.
+
+`Configure` changes the speaking rate mid-session without reconnecting. The server acknowledges with `ConfigureSuccess`, or rejects with a typed `ConfigureFailure` — the SDK does not range-check `speed` locally, so an out-of-range value comes back as `SPEED_OUT_OF_RANGE` rather than throwing.
+
+```csharp
+await speakClient.SendConfigure(new ConfigureSchema() { Speed = 1.05 });
 ```
 
 For batch (REST) synthesis of a complete block of text:
@@ -374,7 +400,7 @@ var speakClient = ClientFactory.CreateFluxSpeakRESTClient();
 await speakClient.ToFile(
     new TextSource("Your appointment is confirmed for 3pm tomorrow."),
     "output.mp3",
-    new SpeakSchema() { Model = "flux-alexis-en", Encoding = "mp3", BitRate = 48000 });
+    new SpeakSchema() { Model = "flux-alexis-en", Encoding = "mp3", BitRate = 48000, Speed = 1.05 });
 
 // Asynchronous: supply a callback URL and receive a request_id ack; the audio is
 // delivered to your callback
@@ -382,7 +408,7 @@ await speakClient.ToFile(
 //     new SpeakSchema() { Model = "flux-alexis-en" });
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech).
+[See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech/speak-flux).
 
 [See the Examples for more info](./examples/text-to-speech/websocket/flux/) - and the [batch (REST) example](./examples/text-to-speech/rest/flux/).
 

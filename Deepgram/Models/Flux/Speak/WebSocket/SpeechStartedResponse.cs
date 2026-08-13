@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Emitted by the Deepgram Flux (v2 speak) API at the start of each new turn, before
+/// Emitted by the Deepgram Flux (v2 speak) API at the start of each new turn, before
 /// audio streaming begins. Carries the server-assigned speech_id that identifies the turn. Fires
 /// once per turn, not on internal auto-flush boundaries.
 /// </summary>

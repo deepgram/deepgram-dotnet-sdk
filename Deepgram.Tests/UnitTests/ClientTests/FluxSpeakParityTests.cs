@@ -99,6 +99,68 @@ public class FluxSpeakParityTests
         }
     }
 
+    // ---- GA additions replay (Configure/ConfigureSuccess, Interrupt/SpeechInterrupted) ---------
+    //
+    // frames.json/golden.json above are EA captures and stay untouched as a regression fixture.
+    // frames-ga.json is a separate, hand-authored (not yet staging-captured - see its
+    // _provenance field) sequence exercising the GA-only messages this change adds.
+
+    private static List<string> LoadGaFrames()
+    {
+        var path = Path.Combine(FixtureDir, "frames-ga.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        var frames = new List<string>();
+        foreach (var el in doc.RootElement.GetProperty("frames").EnumerateArray())
+        {
+            frames.Add(el.GetRawText());
+        }
+        return frames;
+    }
+
+    [Test]
+    public async Task GA_Frames_Should_Replay_Through_The_Client_In_Order()
+    {
+        var client = new FluxSpeakWebSocketClient(new Faker().Random.Guid().ToString(),
+            new DeepgramWsClientOptions(new Faker().Random.Guid().ToString()) { OnPrem = true });
+
+        var events = new List<object>();
+        await client.Subscribe(new EventHandler<ConnectedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ConfigureSuccessResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SpeechInterruptedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SessionMetadataResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ConfigureFailureResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => events.Add(e)));
+
+        var wsr = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
+        foreach (var frame in LoadGaFrames())
+        {
+            client.ProcessTextMessage(wsr, ToStream(frame));
+        }
+
+        using (new AssertionScope())
+        {
+            events.Select(e => e.GetType().Name).Should().Equal(
+                nameof(ConnectedResponse),
+                nameof(ConfigureSuccessResponse),
+                nameof(SpeechStartedResponse),
+                nameof(SpeechInterruptedResponse),
+                nameof(SessionMetadataResponse));
+
+            ((ConfigureSuccessResponse)events[1]).Applied!.Speed.Should().Be(1.05);
+            ((SpeechStartedResponse)events[2]).SpeechId.Should().Be("dg_sp_a1b2c3d4e5f6");
+
+            var interrupted = (SpeechInterruptedResponse)events[3];
+            interrupted.AudioPlayedMs.Should().Be(2340);
+            interrupted.TextSpoken.Should().Be("Sure, I can help you cancel your subscription.");
+            interrupted.TextRemaining.Should().Be(" Let me pull up your account.");
+            interrupted.Metadata!.ControlsApplied!.BreaksApplied.Should().Be(0);
+
+            var session = (SessionMetadataResponse)events[4];
+            session.TotalAudioDurationMs.Should().Be(2340);
+        }
+    }
+
     [Test]
     public void Captured_Audio_Byte_Count_Matches_Reported_Duration()
     {

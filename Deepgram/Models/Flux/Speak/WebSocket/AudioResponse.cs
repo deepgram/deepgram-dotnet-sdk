@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) A binary audio chunk received from the Deepgram Flux (v2 speak) API, in the encoding
+/// A binary audio chunk received from the Deepgram Flux (v2 speak) API, in the encoding
 /// and sample rate requested on the connection. Correlate audio with a turn via the surrounding
 /// SpeechStarted / Flushed / SpeechMetadata events; audio chunks carry no envelope of their own.
 /// </summary>

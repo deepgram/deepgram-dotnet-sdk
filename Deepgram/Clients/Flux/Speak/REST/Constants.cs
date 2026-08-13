@@ -5,7 +5,7 @@
 namespace Deepgram.Clients.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) Response headers of interest from the Deepgram Flux (v2 speak) batch REST API.
+/// Response headers of interest from the Deepgram Flux (v2 speak) batch REST API.
 /// </summary>
 // [verify] The exact /v2/speak response header set is not enumerated in the OpenAPI spec; these
 // mirror /v1/speak (the batch handler reuses v1's audio-format machinery) and are confirmed or

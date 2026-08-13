@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Final server message from the Deepgram Flux (v2 speak) API before the WebSocket
+/// Final server message from the Deepgram Flux (v2 speak) API before the WebSocket
 /// closes. Reports cumulative session totals across all turns.
 /// </summary>
 public record SessionMetadataResponse

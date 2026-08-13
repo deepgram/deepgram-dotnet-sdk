@@ -5,28 +5,21 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// Emitted by the Deepgram Flux (v2 speak) API at turn boundaries (manual Flush), after
-/// all audio for the turn has been sent. Reports billing and timing for the completed turn.
+/// Per-turn billing and timing for an interrupted turn, nested inside
+/// <see cref="SpeechInterruptedResponse"/>. Same shape as the metadata carried by
+/// <see cref="SpeechMetadataResponse"/>.
 /// </summary>
-public record SpeechMetadataResponse
+public record SpeechInterruptedMetadata
 {
     /// <summary>
-    /// SpeechMetadata event type.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public SpeakType? Type { get; set; } = SpeakType.SpeechMetadata;
-
-    /// <summary>
-    /// Server-assigned turn identifier.
+    /// Server-assigned identifier of the interrupted turn.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("speech_id")]
     public string? SpeechId { get; set; }
 
     /// <summary>
-    /// Total audio duration produced for this turn, in milliseconds.
+    /// Total audio duration produced for this turn before it was cut off, in milliseconds.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("audio_duration_ms")]
@@ -40,15 +33,14 @@ public record SpeechMetadataResponse
     public int? InputCharacterCount { get; set; }
 
     /// <summary>
-    /// Billable character count for this turn (input character count with stripped control
-    /// characters removed). Always less than or equal to InputCharacterCount.
+    /// Billable character count for this turn. Always less than or equal to InputCharacterCount.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("billable_character_count")]
     public int? BillableCharacterCount { get; set; }
 
     /// <summary>
-    /// Controls applied during the turn. Currently always reports 0 (coming-soon fast-follow).
+    /// Controls applied during the turn before it was interrupted.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("controls_applied")]

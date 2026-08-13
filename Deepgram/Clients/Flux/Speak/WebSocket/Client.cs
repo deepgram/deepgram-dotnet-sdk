@@ -14,17 +14,17 @@ using Deepgram.Models.Exceptions.v1;
 namespace Deepgram.Clients.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Implements the Flux (v2 speak) text-to-speech WebSocket Client: stream text in and
+/// Implements the Flux (v2 speak) text-to-speech WebSocket Client: stream text in and
 /// receive synthesized audio out, turn by turn, for voice-agent pipelines.
 ///
-/// The Early Access surface sends exactly three client messages — Speak, Flush, and Close.
+/// Sends five client messages — Speak, Flush, Interrupt, Configure, and Close.
 /// Audio arrives as interleaved binary chunks (the Audio event) alongside JSON control messages
-/// (Connected, SpeechStarted, SpeechMetadata, Flushed, SessionMetadata, Warning, Error). There is
-/// no speed/Interrupt/Configure surface yet (GA-only).
+/// (Connected, SpeechStarted, SpeechMetadata, SpeechInterrupted, Flushed, ConfigureSuccess,
+/// ConfigureFailure, SessionMetadata, Warning, Error).
 ///
 /// Note: event handlers are invoked from the receive loop; a slow handler delays delivery of
 /// subsequent messages, including audio chunks. Keep handlers fast and offload heavy work.
-/// <see href="https://developers.deepgram.com/docs/flux/quickstart"/>
+/// <see href="https://developers.deepgram.com/docs/flux-tts/quickstart"/>
 /// </summary>
 public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 {
@@ -59,9 +59,12 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     private event EventHandler<ConnectedResponse>? _connectedReceived;
     private event EventHandler<SpeechStartedResponse>? _speechStartedReceived;
     private event EventHandler<SpeechMetadataResponse>? _speechMetadataReceived;
+    private event EventHandler<SpeechInterruptedResponse>? _speechInterruptedReceived;
     private event EventHandler<FlushedResponse>? _flushedReceived;
     private event EventHandler<SessionMetadataResponse>? _sessionMetadataReceived;
     private event EventHandler<WarningResponse>? _warningReceived;
+    private event EventHandler<ConfigureSuccessResponse>? _configureSuccessReceived;
+    private event EventHandler<ConfigureFailureResponse>? _configureFailureReceived;
     private event EventHandler<ErrorResponse>? _speakErrorReceived;
     private event EventHandler<UnhandledResponse>? _speakUnhandledReceived;
     #endregion
@@ -220,6 +223,25 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     }
 
     /// <summary>
+    /// Subscribe to a SpeechInterrupted event from the Deepgram API, sent in response to a client
+    /// Interrupt.
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public async Task<bool> Subscribe(EventHandler<SpeechInterruptedResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _speechInterruptedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Subscribe to a Flushed event from the Deepgram API
     /// </summary>
     /// <returns>True if successful</returns>
@@ -266,6 +288,44 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         try
         {
             _warningReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a ConfigureSuccess event from the Deepgram API, acknowledging a client
+    /// Configure message.
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public async Task<bool> Subscribe(EventHandler<ConfigureSuccessResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _configureSuccessReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Subscribe to a ConfigureFailure event from the Deepgram API, rejecting a client
+    /// Configure message. Non-fatal — the connection stays open.
+    /// </summary>
+    /// <returns>True if successful</returns>
+    public async Task<bool> Subscribe(EventHandler<ConfigureFailureResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _configureFailureReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -366,6 +426,60 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         var message = new ControlMessage(Constants.Flush);
         Log.Debug("SendFlush", "Sending Flush Message Immediately...");
         byte[] data = Encoding.UTF8.GetBytes(message.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends an Interrupt message to cancel the currently active turn (barge-in). Stopping local
+    /// audio playback is the caller's responsibility - Interrupt is for reconciling the server's
+    /// record of what was spoken, not for stopping audio. The server replies with
+    /// SpeechInterrupted, or a Warning if it cannot act on the interrupt (no audio generated yet,
+    /// an earlier interrupt still in flight, a non-advancing offset, or no active turn).
+    /// </summary>
+    /// <param name="interrupt">
+    /// The interrupt to send. Include <see cref="InterruptSchema.PlaybackOffset"/> so the server
+    /// can compute the text_spoken/text_remaining split; omit it (or pass null for a bare
+    /// interrupt) and the turn still cancels, but that split comes back empty.
+    /// </param>
+    public async Task SendInterrupt(InterruptSchema? interrupt = null)
+    {
+        interrupt ??= new InterruptSchema();
+        interrupt.Type ??= Constants.Interrupt;
+
+        Log.Debug("SendInterrupt", $"Sending Interrupt Message Immediately... {interrupt}");
+        byte[] data = Encoding.UTF8.GetBytes(interrupt.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends an Interrupt message carrying a playback offset. Convenience overload of
+    /// <see cref="SendInterrupt(InterruptSchema?)"/> for the common case.
+    /// </summary>
+    /// <param name="playbackOffsetMs">
+    /// Milliseconds of audio played, cumulative from the start of the session (not the current
+    /// turn). Each interrupt's offset must advance past the position established by the previous
+    /// interrupt. Report your audio player's actual position - not bytes received, which arrive
+    /// much faster than realtime.
+    /// </param>
+    public Task SendInterrupt(long playbackOffsetMs) =>
+        SendInterrupt(new InterruptSchema { PlaybackOffset = new PlaybackOffset(playbackOffsetMs) });
+
+    /// <summary>
+    /// Sends a Configure message to change the speaking rate mid-session, without reconnecting.
+    /// The server responds with ConfigureSuccess (echoing what it applied) or ConfigureFailure
+    /// (e.g. code SPEED_OUT_OF_RANGE) - speed is not range-checked client-side.
+    /// </summary>
+    /// <param name="configure">The configuration update to send</param>
+    public async Task SendConfigure(ConfigureSchema configure)
+    {
+        if (configure is null)
+        {
+            throw new ArgumentNullException(nameof(configure));
+        }
+        configure.Type ??= Constants.Configure;
+
+        Log.Debug("SendConfigure", $"Sending Configure Message Immediately... {configure}");
+        byte[] data = Encoding.UTF8.GetBytes(configure.ToString());
         await SendMessageImmediately(data);
     }
 
@@ -654,6 +768,22 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
                     }
                     InvokeParallel(_speechMetadataReceived, speechMetadataResponse);
                     break;
+                case SpeakType.SpeechInterrupted:
+                    var speechInterruptedResponse = data.Deserialize<SpeechInterruptedResponse>();
+                    if (_speechInterruptedReceived == null)
+                    {
+                        Log.Debug("ProcessTextMessage", "_speechInterruptedReceived has no listeners");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    if (speechInterruptedResponse == null)
+                    {
+                        Log.Warning("ProcessTextMessage", "SpeechInterruptedResponse is invalid");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    InvokeParallel(_speechInterruptedReceived, speechInterruptedResponse);
+                    break;
                 case SpeakType.Flushed:
                     var flushedResponse = data.Deserialize<FlushedResponse>();
                     if (_flushedReceived == null)
@@ -701,6 +831,39 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
                         return;
                     }
                     InvokeParallel(_warningReceived, warningResponse);
+                    break;
+                case SpeakType.ConfigureSuccess:
+                    var configureSuccessResponse = data.Deserialize<ConfigureSuccessResponse>();
+                    if (_configureSuccessReceived == null)
+                    {
+                        Log.Debug("ProcessTextMessage", "_configureSuccessReceived has no listeners");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    if (configureSuccessResponse == null)
+                    {
+                        Log.Warning("ProcessTextMessage", "ConfigureSuccessResponse is invalid");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    InvokeParallel(_configureSuccessReceived, configureSuccessResponse);
+                    break;
+                case SpeakType.ConfigureFailure:
+                    // Non-fatal - like Warning, NOT the error path. The connection stays open.
+                    var configureFailureResponse = data.Deserialize<ConfigureFailureResponse>();
+                    if (_configureFailureReceived == null)
+                    {
+                        Log.Debug("ProcessTextMessage", "_configureFailureReceived has no listeners");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    if (configureFailureResponse == null)
+                    {
+                        Log.Warning("ProcessTextMessage", "ConfigureFailureResponse is invalid");
+                        Log.Verbose("ProcessTextMessage", "LEAVE");
+                        return;
+                    }
+                    InvokeParallel(_configureFailureReceived, configureFailureResponse);
                     break;
                 case SpeakType.Error:
                     // Flux fatal errors use the wire type "Error" but carry a different shape

@@ -5,14 +5,15 @@
 namespace Deepgram.Clients.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Constants for the Flux (v2 speak) text-to-speech WebSocket client.
+/// Constants for the Flux (v2 speak) text-to-speech WebSocket client.
 /// </summary>
 public static class Constants
 {
-    // Client message types. The Early Access surface sends exactly three: Speak, Flush, Close.
-    // (Interrupt and Configure are GA-only and not yet available on /v2/speak.)
+    // Client message types.
     public const string Speak = "Speak";
     public const string Flush = "Flush";
+    public const string Interrupt = "Interrupt";
+    public const string Configure = "Configure";
     public const string Close = "Close";
 
     /// <summary>

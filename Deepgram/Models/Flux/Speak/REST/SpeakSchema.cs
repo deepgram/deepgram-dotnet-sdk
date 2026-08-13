@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) Query options for the Deepgram Flux (v2 speak) batch text-to-speech REST API
+/// Query options for the Deepgram Flux (v2 speak) batch text-to-speech REST API
 /// (POST /v2/speak). The text itself is sent in the request body via <see cref="TextSource"/>.
 /// </summary>
 public class SpeakSchema
@@ -87,6 +87,23 @@ public class SpeakSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("priority")]
     public string? Priority { get; set; }
+
+    /// <summary>
+    /// Speech-rate multiplier. Valid values are 0.85 through 1.15 in 0.05 increments. Not
+    /// range-checked client-side; the server rejects out-of-range values.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("speed")]
+    public double? Speed { get; set; }
+
+    /// <summary>
+    /// BETA. Delivery-register dial from -2 (calmer) to 2 (more animated). Default 0, the
+    /// tuned, production-validated setting.
+    /// <see href="https://developers.deepgram.com/docs/tts-expressivity"/>
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("expressivity")]
+    public int? Expressivity { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

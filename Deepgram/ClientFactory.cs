@@ -51,7 +51,7 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// (PREVIEW) Create a new FluxSpeakWebSocketClient for streaming, turn-based text-to-speech
+    /// Create a new FluxSpeakWebSocketClient for streaming, turn-based text-to-speech
     /// using the Flux (v2 speak) API
     /// </summary>
     /// <param name="apiKey"></param>
@@ -63,7 +63,7 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// (PREVIEW) Create a new FluxSpeakRESTClient for batch (single-request) text-to-speech
+    /// Create a new FluxSpeakRESTClient for batch (single-request) text-to-speech
     /// using the Flux (v2 speak) API
     /// </summary>
     /// <param name="apiKey"></param>

@@ -25,7 +25,8 @@ namespace SampleApp
             //   var speakClient = ClientFactory.CreateFluxSpeakRESTClient("", options);
 
             // Synthesize a complete block of text into a single audio file. Model is required and
-            // must be a flux-* voice.
+            // must be a flux-* voice. Speed (0.85-1.15 in 0.05 steps) and Expressivity (beta,
+            // -2 to 2) are optional GA params, available on both transports.
             var mp3 = await speakClient.ToFile(
                 new TextSource("Your appointment is confirmed for 3pm tomorrow."),
                 "output.mp3",
@@ -34,6 +35,7 @@ namespace SampleApp
                     Model = "flux-alexis-en",
                     Encoding = "mp3",
                     BitRate = 48000,
+                    Speed = 1.05,
                 });
             Console.WriteLine($"Wrote output.mp3 (request {mp3.RequestId}, {mp3.Characters} chars)");
 

@@ -5,7 +5,7 @@
 namespace Deepgram.Clients.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) URI segments for the Flux (v2 speak) batch text-to-speech REST client.
+/// URI segments for the Flux (v2 speak) batch text-to-speech REST client.
 /// </summary>
 public static class UriSegments
 {

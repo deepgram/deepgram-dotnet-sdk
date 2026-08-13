@@ -7,7 +7,7 @@ namespace Deepgram.Models.Flux.Speak.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Raised locally by the SDK when the Flux (v2 speak) WebSocket connection opens.
+/// Raised locally by the SDK when the Flux (v2 speak) WebSocket connection opens.
 /// </summary>
 public record OpenResponse : Common.OpenResponse
 {

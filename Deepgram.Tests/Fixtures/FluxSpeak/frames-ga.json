@@ -1,0 +1,10 @@
+{
+  "_provenance": "Hand-authored from developers.deepgram.com/reference/text-to-speech/speak-flux, 2026-08-13 [verify: replace with a staging/production capture when available]. Unlike frames.json (a verbatim capture of the EA Speak/Flush/Close surface), this fixture exercises the GA-only additions: Configure/ConfigureSuccess and Interrupt/SpeechInterrupted. The sequence models a client that connects, adjusts speed mid-session, starts a turn, and barges in on itself before the turn completes.",
+  "frames": [
+    { "type": "Connected", "request_id": "550e8400-e29b-41d4-a716-446655440000", "model_name": "flux-alexis-en", "model_version": "2026.06.01", "model_uuids": ["b3e47c20-9f81-4a2e-bd15-8d7c6e2a1f09"] },
+    { "type": "ConfigureSuccess", "applied": { "speed": 1.05 } },
+    { "type": "SpeechStarted", "speech_id": "dg_sp_a1b2c3d4e5f6" },
+    { "type": "SpeechInterrupted", "audio_played_ms": 2340, "text_spoken": "Sure, I can help you cancel your subscription.", "text_remaining": " Let me pull up your account.", "metadata": { "speech_id": "dg_sp_a1b2c3d4e5f6", "audio_duration_ms": 2340, "input_character_count": 75, "billable_character_count": 75, "controls_applied": { "pronunciations_applied": 0, "breaks_applied": 0, "pronunciation_warnings": 0 } } },
+    { "type": "SessionMetadata", "total_audio_duration_ms": 2340, "total_input_character_count": 75, "total_billable_character_count": 75 }
+  ]
+}

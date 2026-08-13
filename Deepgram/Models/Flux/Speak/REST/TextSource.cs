@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) The request body for the Deepgram Flux (v2 speak) batch REST API. Serializes to
+/// The request body for the Deepgram Flux (v2 speak) batch REST API. Serializes to
 /// {"text":"..."}. The server normalizes and preprocesses the text before synthesis.
 /// </summary>
 public class TextSource(string text)

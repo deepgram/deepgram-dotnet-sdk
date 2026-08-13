@@ -170,6 +170,39 @@ public class FluxSpeakClientTests
 
         query.Should().Be("model=flux-alexis-en");
     }
+
+    [Test]
+    public void BuildQueryString_Should_Format_Speed_And_Expressivity_Under_Comma_Decimal_Culture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            var schema = new SpeakSchema { Model = "flux-alexis-en", Speed = 1.05, Expressivity = -2 };
+
+            var query = Client.BuildQueryString(schema);
+
+            query.Should().Contain("speed=1.05");
+            query.Should().Contain("expressivity=-2");
+            query.Should().NotContain("1,05");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Test]
+    public void BuildQueryString_Should_Omit_Speed_And_Expressivity_When_Null()
+    {
+        var schema = new SpeakSchema { Model = "flux-alexis-en" };
+
+        var query = Client.BuildQueryString(schema);
+
+        query.Should().NotContain("speed=");
+        query.Should().NotContain("expressivity=");
+    }
     #endregion
 
     #region Client -> server message serialization
@@ -210,6 +243,77 @@ public class FluxSpeakClientTests
     }
 
     [Test]
+    public void InterruptSchema_Bare_Should_Serialize_To_Type_Only_Json()
+    {
+        var interrupt = new InterruptSchema();
+
+        using var doc = JsonDocument.Parse(interrupt.ToString());
+
+        doc.RootElement.GetProperty("type").GetString().Should().Be("Interrupt");
+        // The server rejects unknown fields on Interrupt; a bare interrupt must carry no extra keys.
+        doc.RootElement.EnumerateObject().Count().Should().Be(1);
+    }
+
+    [Test]
+    public void InterruptSchema_With_PlaybackOffset_Should_Serialize_Nested_Object()
+    {
+        var interrupt = new InterruptSchema { PlaybackOffset = new PlaybackOffset(1500) };
+
+        using var doc = JsonDocument.Parse(interrupt.ToString());
+
+        doc.RootElement.GetProperty("type").GetString().Should().Be("Interrupt");
+        var offset = doc.RootElement.GetProperty("playback_offset");
+        offset.GetProperty("type").GetString().Should().Be("time_ms");
+        offset.GetProperty("value").GetInt64().Should().Be(1500);
+    }
+
+    [Test]
+    public void ConfigureSchema_Should_Serialize_Speed()
+    {
+        var configure = new ConfigureSchema { Speed = 1.05 };
+
+        using var doc = JsonDocument.Parse(configure.ToString());
+
+        doc.RootElement.GetProperty("type").GetString().Should().Be("Configure");
+        doc.RootElement.GetProperty("speed").GetDouble().Should().Be(1.05);
+        doc.RootElement.EnumerateObject().Count().Should().Be(2);
+    }
+
+    [Test]
+    public void ConfigureSchema_Should_Serialize_Speed_Under_Comma_Decimal_Culture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+
+            var configure = new ConfigureSchema { Speed = 1.05 };
+
+            using var doc = JsonDocument.Parse(configure.ToString());
+
+            doc.RootElement.GetProperty("speed").GetDouble().Should().Be(1.05);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    [Test]
+    public void ConfigureSchema_With_OutOfRange_Speed_Should_Serialize_Without_Throwing()
+    {
+        // Pins "no local range-check": the SDK sends whatever is set and lets the server reject it
+        // via ConfigureFailure (e.g. SPEED_OUT_OF_RANGE).
+        var configure = new ConfigureSchema { Speed = 9.0 };
+
+        var act = () => configure.ToString();
+
+        act.Should().NotThrow();
+        using var doc = JsonDocument.Parse(configure.ToString());
+        doc.RootElement.GetProperty("speed").GetDouble().Should().Be(9.0);
+    }
+
+    [Test]
     public async Task SendText_Should_Send_Speak_Message()
     {
         var client = Substitute.For<Client>(_apiKey, _options);
@@ -234,6 +338,57 @@ public class FluxSpeakClientTests
     }
 
     [Test]
+    public async Task SendInterrupt_Bare_Should_Send_Interrupt_Message()
+    {
+        var client = Substitute.For<Client>(_apiKey, _options);
+        client.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
+              .DoNotCallBase();
+
+        await client.SendInterrupt();
+
+        await client.Received(1).SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>());
+    }
+
+    [Test]
+    public async Task SendInterrupt_With_PlaybackOffsetMs_Overload_Should_Produce_Same_Frame_As_Explicit_Schema()
+    {
+        byte[]? viaOverload = null;
+        byte[]? viaSchema = null;
+
+        var client = Substitute.For<Client>(_apiKey, _options);
+        client.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
+              .Do(call => viaOverload = call.Arg<byte[]>());
+        await client.SendInterrupt(1500L);
+
+        var client2 = Substitute.For<Client>(_apiKey, _options);
+        client2.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
+              .Do(call => viaSchema = call.Arg<byte[]>());
+        await client2.SendInterrupt(new InterruptSchema { PlaybackOffset = new PlaybackOffset(1500) });
+
+        Encoding.UTF8.GetString(viaOverload!).Should().Be(Encoding.UTF8.GetString(viaSchema!));
+    }
+
+    [Test]
+    public async Task SendConfigure_Should_Send_Configure_Message()
+    {
+        var client = Substitute.For<Client>(_apiKey, _options);
+        client.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
+              .DoNotCallBase();
+
+        await client.SendConfigure(new ConfigureSchema { Speed = 1.05 });
+
+        await client.Received(1).SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>());
+    }
+
+    [Test]
+    public void SendConfigure_With_Null_Should_Throw_ArgumentNullException()
+    {
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+
+        Assert.ThrowsAsync<ArgumentNullException>(async () => await client.SendConfigure(null!));
+    }
+
+    [Test]
     public void SendText_With_Null_Should_Throw_ArgumentNullException()
     {
         var client = new FluxSpeakWebSocketClient(_apiKey, _options);
@@ -247,6 +402,19 @@ public class FluxSpeakClientTests
         var client = new FluxSpeakWebSocketClient(_apiKey, _options);
 
         await client.SendClose();
+    }
+
+    [Test]
+    public async Task SendInterrupt_And_SendConfigure_When_Not_Connected_Should_Not_Throw()
+    {
+        // Mirrors SendFlush/SendClose: SendMessageImmediately no-ops (logs and returns) when the
+        // socket is not connected, rather than throwing. SendInterrupt/SendConfigure must behave
+        // identically - no bespoke pre-connect validation was introduced for the GA additions.
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+
+        await client.SendInterrupt();
+        await client.SendInterrupt(1000L);
+        await client.SendConfigure(new ConfigureSchema { Speed = 1.0 });
     }
     #endregion
 
@@ -316,6 +484,141 @@ public class FluxSpeakClientTests
             response.ControlsApplied!.PronunciationsApplied.Should().Be(0);
             response.ControlsApplied.PronunciationWarnings.Should().Be(0);
         }
+    }
+
+    [Test]
+    public void SpeechMetadataResponse_Should_Deserialize_BreaksApplied_When_Present()
+    {
+        var json = """
+        {
+            "type": "SpeechMetadata",
+            "speech_id": "s",
+            "controls_applied": { "pronunciations_applied": 2, "pronunciation_warnings": 0, "breaks_applied": 1 }
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<SpeechMetadataResponse>(json);
+
+        response!.ControlsApplied!.BreaksApplied.Should().Be(1);
+    }
+
+    [Test]
+    public void SpeechMetadataResponse_Should_Tolerate_Missing_BreaksApplied()
+    {
+        // Older (EA-era) frames omit breaks_applied entirely; it must parse as null, not throw.
+        var json = """
+        {
+            "type": "SpeechMetadata",
+            "speech_id": "s",
+            "controls_applied": { "pronunciations_applied": 0, "pronunciation_warnings": 0 }
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<SpeechMetadataResponse>(json);
+
+        response!.ControlsApplied!.BreaksApplied.Should().BeNull();
+    }
+
+    [Test]
+    public void SpeechInterruptedResponse_Should_Deserialize_With_Offset_And_Text_Split()
+    {
+        var json = """
+        {
+            "type": "SpeechInterrupted",
+            "audio_played_ms": 2340,
+            "text_spoken": "Sure, I can help you cancel your subscription.",
+            "text_remaining": " Let me pull up your account.",
+            "metadata": {
+                "speech_id": "dg_sp_a1b2c3d4e5f6",
+                "audio_duration_ms": 2340,
+                "input_character_count": 75,
+                "billable_character_count": 75,
+                "controls_applied": { "pronunciations_applied": 0, "pronunciation_warnings": 0, "breaks_applied": 0 }
+            }
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<SpeechInterruptedResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Type.Should().Be(SpeakType.SpeechInterrupted);
+            response.AudioPlayedMs.Should().Be(2340);
+            response.TextSpoken.Should().Be("Sure, I can help you cancel your subscription.");
+            response.TextRemaining.Should().Be(" Let me pull up your account.");
+            response.Metadata.Should().NotBeNull();
+            response.Metadata!.SpeechId.Should().Be("dg_sp_a1b2c3d4e5f6");
+            response.Metadata.ControlsApplied!.BreaksApplied.Should().Be(0);
+        }
+    }
+
+    [Test]
+    public void SpeechInterruptedResponse_Without_PlaybackOffset_Should_Omit_Text_Split()
+    {
+        // When the Interrupt carried no playback_offset, the server cannot compute the split.
+        var json = """
+        {
+            "type": "SpeechInterrupted",
+            "audio_played_ms": 4000,
+            "metadata": { "speech_id": "s", "audio_duration_ms": 4000 }
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<SpeechInterruptedResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.TextSpoken.Should().BeNull();
+            response.TextRemaining.Should().BeNull();
+            response.AudioPlayedMs.Should().Be(4000);
+        }
+    }
+
+    [Test]
+    public void ConfigureSuccessResponse_Should_Deserialize_Applied_Speed()
+    {
+        var response = JsonSerializer.Deserialize<ConfigureSuccessResponse>(
+            """{ "type": "ConfigureSuccess", "applied": { "speed": 1.05 } }""");
+
+        using (new AssertionScope())
+        {
+            response!.Type.Should().Be(SpeakType.ConfigureSuccess);
+            response.Applied!.Speed.Should().Be(1.05);
+        }
+    }
+
+    [Test]
+    public void ConfigureFailureResponse_Should_Deserialize_Known_Shape()
+    {
+        var json = """
+        {
+            "type": "ConfigureFailure",
+            "code": "SPEED_OUT_OF_RANGE",
+            "description": "speed must be between 0.85 and 1.15 in 0.05 increments",
+            "field": "speed",
+            "value": 3.5
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<ConfigureFailureResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Type.Should().Be(SpeakType.ConfigureFailure);
+            response.Code.Should().Be("SPEED_OUT_OF_RANGE");
+            response.Field.Should().Be("speed");
+            response.Value!.Value.GetDouble().Should().Be(3.5);
+        }
+    }
+
+    [Test]
+    public void ConfigureFailureResponse_Should_Tolerate_Unknown_Future_Code()
+    {
+        // Code is an open set - a code the SDK has never seen must still parse cleanly.
+        var response = JsonSerializer.Deserialize<ConfigureFailureResponse>(
+            """{ "type": "ConfigureFailure", "code": "SOME-FUTURE-CODE", "description": "d" }""");
+
+        response!.Code.Should().Be("SOME-FUTURE-CODE");
     }
 
     [Test]
@@ -458,6 +761,24 @@ public class FluxSpeakClientTests
     }
 
     [Test]
+    public async Task ProcessTextMessage_Should_Raise_SpeechInterrupted_Event()
+    {
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+        SpeechInterruptedResponse? received = null;
+        await client.Subscribe(new EventHandler<SpeechInterruptedResponse>((sender, e) => received = e));
+
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream(
+            """{ "type": "SpeechInterrupted", "audio_played_ms": 1200, "text_spoken": "Hello there", "text_remaining": "how are you?" }"""));
+
+        using (new AssertionScope())
+        {
+            received.Should().NotBeNull();
+            received!.AudioPlayedMs.Should().Be(1200);
+            received.TextSpoken.Should().Be("Hello there");
+        }
+    }
+
+    [Test]
     public async Task ProcessTextMessage_Should_Raise_Flushed_Event()
     {
         var client = new FluxSpeakWebSocketClient(_apiKey, _options);
@@ -497,6 +818,42 @@ public class FluxSpeakClientTests
 
         received.Should().NotBeNull();
         received!.Code.Should().Be("NO_ACTIVE_SPEECH");
+    }
+
+    [Test]
+    public async Task ProcessTextMessage_Should_Raise_ConfigureSuccess_Event()
+    {
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+        ConfigureSuccessResponse? received = null;
+        await client.Subscribe(new EventHandler<ConfigureSuccessResponse>((sender, e) => received = e));
+
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream(
+            """{ "type": "ConfigureSuccess", "applied": { "speed": 1.1 } }"""));
+
+        received.Should().NotBeNull();
+        received!.Applied!.Speed.Should().Be(1.1);
+    }
+
+    [Test]
+    public async Task ProcessTextMessage_Should_Raise_ConfigureFailure_Event_Not_Error_Event()
+    {
+        // ConfigureFailure is non-fatal (like Warning) and must never route to the fatal Error
+        // handler.
+        var client = new FluxSpeakWebSocketClient(_apiKey, _options);
+        ConfigureFailureResponse? failure = null;
+        ErrorResponse? error = null;
+        await client.Subscribe(new EventHandler<ConfigureFailureResponse>((sender, e) => failure = e));
+        await client.Subscribe(new EventHandler<ErrorResponse>((sender, e) => error = e));
+
+        client.ProcessTextMessage(_webSocketReceiveResult, ToStream(
+            """{ "type": "ConfigureFailure", "code": "SPEED_OUT_OF_RANGE", "description": "d", "field": "speed", "value": 9.0 }"""));
+
+        using (new AssertionScope())
+        {
+            failure.Should().NotBeNull();
+            failure!.Code.Should().Be("SPEED_OUT_OF_RANGE");
+            error.Should().BeNull("ConfigureFailure is non-fatal and must not route to the Error event");
+        }
     }
 
     [Test]
@@ -589,9 +946,12 @@ public class FluxSpeakClientTests
             """{ "type": "Connected", "request_id": "r", "model_name": "m", "model_version": "v", "model_uuids": [] }""",
             """{ "type": "SpeechStarted", "speech_id": "s" }""",
             """{ "type": "SpeechMetadata", "speech_id": "s" }""",
+            """{ "type": "SpeechInterrupted", "audio_played_ms": 1 }""",
             """{ "type": "Flushed", "speech_id": "s" }""",
             """{ "type": "SessionMetadata" }""",
             """{ "type": "Warning", "code": "X", "description": "y" }""",
+            """{ "type": "ConfigureSuccess", "applied": { "speed": 1.0 } }""",
+            """{ "type": "ConfigureFailure", "code": "X", "description": "y" }""",
             """{ "type": "Error", "code": "X", "description": "y" }""",
             """{ "type": "SomethingElse" }""",
             """{ "no_type": true }""",
@@ -632,27 +992,30 @@ public class FluxSpeakClientTests
     }
     #endregion
 
-    #region EA surface guarantees
+    #region GA surface guarantees
     [Test]
-    public void FluxSpeakClient_Should_Not_Expose_GA_Only_Or_V1_Members()
+    public void FluxSpeakClient_Should_Expose_GA_Members_But_Not_V1_Members()
     {
-        // KeepAlive/Finalize are v1-only; Interrupt/Configure/speed are GA-only. None are part of
-        // the EA text-to-speech surface.
+        // KeepAlive/Finalize are v1 (classic Speak)-only and never apply to Flux TTS.
+        // Interrupt/Configure/speed/expressivity are the GA additions this client must expose.
         using (new AssertionScope())
         {
             typeof(Client).GetMethod("SendKeepAlive").Should().BeNull();
             typeof(Client).GetMethod("SendFinalize").Should().BeNull();
-            typeof(Client).GetMethod("SendInterrupt").Should().BeNull();
-            typeof(Client).GetMethod("SendConfigure").Should().BeNull();
+            typeof(Client).GetMethod("SendInterrupt", new[] { typeof(InterruptSchema) }).Should().NotBeNull();
+            typeof(Client).GetMethod("SendInterrupt", new[] { typeof(long) }).Should().NotBeNull();
+            typeof(Client).GetMethod("SendConfigure").Should().NotBeNull();
 
             var iface = typeof(Deepgram.Clients.Interfaces.v2.IFluxSpeakWebSocketClient);
             iface.GetMethod("SendKeepAlive").Should().BeNull();
             iface.GetMethod("SendFinalize").Should().BeNull();
-            iface.GetMethod("SendInterrupt").Should().BeNull();
-            iface.GetMethod("SendConfigure").Should().BeNull();
+            iface.GetMethod("SendInterrupt", new[] { typeof(InterruptSchema) }).Should().NotBeNull();
+            iface.GetMethod("SendInterrupt", new[] { typeof(long) }).Should().NotBeNull();
+            iface.GetMethod("SendConfigure").Should().NotBeNull();
 
-            // No speed parameter on the streaming schema.
-            typeof(SpeakSchema).GetProperty("Speed").Should().BeNull();
+            // speed/expressivity are on the streaming schema.
+            typeof(SpeakSchema).GetProperty("Speed").Should().NotBeNull();
+            typeof(SpeakSchema).GetProperty("Expressivity").Should().NotBeNull();
         }
     }
 
@@ -776,7 +1139,15 @@ public class FluxSpeakClientTests
         var session = new SessionMetadataResponse { TotalAudioDurationMs = 1, TotalInputCharacterCount = 2, TotalBillableCharacterCount = 3 };
         var warning = new WarningResponse { Code = "X", Description = "y" };
         var error = new ErrorResponse { Code = "MESSAGE-0000", Description = "z" };
-        var schema = new SpeakSchema { Model = "flux-alexis-en", Encoding = "linear16", SampleRate = 44100, Tag = new List<string> { "a" } };
+        var schema = new SpeakSchema { Model = "flux-alexis-en", Encoding = "linear16", SampleRate = 44100, Speed = 1.05, Expressivity = 1, Tag = new List<string> { "a" } };
+        var speechInterrupted = new SpeechInterruptedResponse
+        {
+            AudioPlayedMs = 1200,
+            TextSpoken = "Hello there",
+            Metadata = new SpeechInterruptedMetadata { SpeechId = "s", ControlsApplied = new ControlsApplied { BreaksApplied = 1 } },
+        };
+        var configureSuccess = new ConfigureSuccessResponse { Applied = new ConfigureApplied { Speed = 1.1 } };
+        var configureFailure = new ConfigureFailureResponse { Code = "SPEED_OUT_OF_RANGE", Field = "speed" };
 
         using (new AssertionScope())
         {
@@ -787,6 +1158,10 @@ public class FluxSpeakClientTests
             JsonSerializer.Deserialize<WarningResponse>(warning.ToString())!.Code.Should().Be("X");
             JsonSerializer.Deserialize<ErrorResponse>(error.ToString())!.Code.Should().Be("MESSAGE-0000");
             JsonSerializer.Deserialize<SpeakSchema>(schema.ToString())!.SampleRate.Should().Be(44100);
+            JsonSerializer.Deserialize<SpeakSchema>(schema.ToString())!.Speed.Should().Be(1.05);
+            JsonSerializer.Deserialize<SpeechInterruptedResponse>(speechInterrupted.ToString())!.Metadata!.ControlsApplied!.BreaksApplied.Should().Be(1);
+            JsonSerializer.Deserialize<ConfigureSuccessResponse>(configureSuccess.ToString())!.Applied!.Speed.Should().Be(1.1);
+            JsonSerializer.Deserialize<ConfigureFailureResponse>(configureFailure.ToString())!.Field.Should().Be("speed");
         }
     }
     #endregion
