@@ -7,46 +7,52 @@ namespace Deepgram.Logger;
 /// <summary>
 /// Specifies the meaning and relative importance of a log event.
 /// </summary>
+/// <remarks>
+/// The values map one-to-one onto <see cref="Microsoft.Extensions.Logging.LogLevel"/>,
+/// which the SDK now uses under the hood. The member names are preserved from earlier
+/// releases so existing code that references <c>Deepgram.Logger.LogLevel</c> keeps compiling.
+/// </remarks>
 public enum LogLevel
 {
     /// <summary>
     /// Anything and everything you might want to know about
-    /// a running block of code.
+    /// a running block of code. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Trace"/>.
     /// </summary>
-    Verbose = Serilog.Events.LogEventLevel.Verbose,
+    Verbose = Microsoft.Extensions.Logging.LogLevel.Trace,
 
     /// <summary>
     /// Internal system events that aren't necessarily
-    /// observable from the outside.
+    /// observable from the outside. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Debug"/>.
     /// </summary>
-    Debug = Serilog.Events.LogEventLevel.Debug,
+    Debug = Microsoft.Extensions.Logging.LogLevel.Debug,
 
     /// <summary>
     /// The lifeblood of operational intelligence - things
-    /// happen.
+    /// happen. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Information"/>.
     /// </summary>
-    Information = Serilog.Events.LogEventLevel.Information,
-    Default = Serilog.Events.LogEventLevel.Information,
+    Information = Microsoft.Extensions.Logging.LogLevel.Information,
+    Default = Microsoft.Extensions.Logging.LogLevel.Information,
 
     /// <summary>
-    /// Service is degraded or endangered.
+    /// Service is degraded or endangered. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Warning"/>.
     /// </summary>
-    Warning = Serilog.Events.LogEventLevel.Warning,
+    Warning = Microsoft.Extensions.Logging.LogLevel.Warning,
 
     /// <summary>
     /// Functionality is unavailable, invariants are broken
-    /// or data is lost.
+    /// or data is lost. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Error"/>.
     /// </summary>
-    Error = Serilog.Events.LogEventLevel.Error,
+    Error = Microsoft.Extensions.Logging.LogLevel.Error,
 
     /// <summary>
     /// If you have a pager, it goes off when one of these
-    /// occurs.
+    /// occurs. Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.Critical"/>.
     /// </summary>
-    Fatal = Serilog.Events.LogEventLevel.Fatal,
+    Fatal = Microsoft.Extensions.Logging.LogLevel.Critical,
 
     /// <summary>
     /// Disable logging... Do so at your own peril.
+    /// Maps to <see cref="Microsoft.Extensions.Logging.LogLevel.None"/>.
     /// </summary>
-    Disable = Serilog.Events.LogEventLevel.Fatal + 1
+    Disable = Microsoft.Extensions.Logging.LogLevel.None
 }
