@@ -47,7 +47,6 @@ namespace SampleApp
                 // (not per turn), and each interrupt must advance past the previous one.
                 const long BytesPerMs = 48;
                 long audioBytesReceived = 0;
-                long audioBytesBeforeSecondTurn = 0;
                 var speechStartedCount = 0;
 
                 await speakClient.Subscribe(new EventHandler<ConnectedResponse>((sender, e) =>
@@ -163,13 +162,15 @@ namespace SampleApp
                 // GA: barge-in. Start a deliberately long second turn, then interrupt it partway
                 // through — in a real app, Interrupt fires the moment you detect the user
                 // speaking over the agent (e.g. Flux STT's StartOfTurn), not on a fixed delay.
-                audioBytesBeforeSecondTurn = Interlocked.Read(ref audioBytesReceived);
                 await speakClient.SendText(
                     "This sentence is deliberately long so that audio is still streaming when the " +
                     "interrupt is sent, which is what makes the barge-in observable.");
                 await Task.WhenAny(secondTurnStarted.Task, Task.Delay(10000));
                 await Task.Delay(500); // let some of the second turn's audio arrive before cutting it off
-                var playbackOffsetMs = (Interlocked.Read(ref audioBytesReceived) - audioBytesBeforeSecondTurn) / BytesPerMs;
+                // The offset sent to SendInterrupt is the SESSION total, not this turn's — it must
+                // keep growing across turns, or a later interrupt will fail the server's "must
+                // advance past the previous interrupt" check. Do not subtract a per-turn baseline.
+                var playbackOffsetMs = Interlocked.Read(ref audioBytesReceived) / BytesPerMs;
                 await speakClient.SendInterrupt(Math.Max(playbackOffsetMs, 1));
                 await Task.WhenAny(interruptAcked.Task, Task.Delay(10000));
 
