@@ -412,6 +412,18 @@ await speakClient.ToFile(
 
 [See the Examples for more info](./examples/text-to-speech/websocket/flux/) - and the [batch (REST) example](./examples/text-to-speech/rest/flux/).
 
+### Upgrading from 6.x (`IFluxSpeakWebSocketClient` interface members)
+
+Version 7.0 adds the GA barge-in/mid-stream controls above directly to the
+`IFluxSpeakWebSocketClient` interface: `SendInterrupt` (two overloads), `SendConfigure`, and
+`Subscribe` overloads for `SpeechInterruptedResponse`, `ConfigureSuccessResponse`, and
+`ConfigureFailureResponse`. If you use `FluxSpeakWebSocketClient`/`ClientFactory` as shipped, or a
+mocking framework (NSubstitute, Moq) to fake this interface in tests, nothing changes for you.
+
+This is a breaking change only if you have your own concrete class implementing
+`IFluxSpeakWebSocketClient` directly — add the six new members to keep it compiling. There is no
+old-API-to-new-API migration here (nothing was renamed or removed); it is a pure addition.
+
 ## Voice Agent
 
 Configure a Voice Agent.
