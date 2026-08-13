@@ -291,6 +291,40 @@ public abstract class AbstractWebSocketClient : IDisposable
     }
 
     /// <summary>
+    /// Waits until every message currently queued via <see cref="SendBinary"/> /
+    /// <see cref="SendMessage"/> has been written to the socket. Use this to guarantee buffered
+    /// audio has been flushed before sending a control message (for example Finalize or Close).
+    /// Returns immediately if the client is not connected.
+    /// </summary>
+    public async Task Flush()
+    {
+        var cts = _cancellationTokenSource;
+        if (!IsConnected() || cts == null)
+        {
+            Log.Debug("Flush", "WebSocket is not connected. Nothing to flush.");
+            return;
+        }
+
+        var flushSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        EnqueueSendMessage(WebSocketMessage.CreateFlushMarker(flushSignal));
+
+        // Unblock if the connection is torn down before the marker is reached. Registering on an
+        // already-cancelled token runs the callback immediately; if the token was disposed by a
+        // concurrent teardown between the guard above and here, treat it as "connection gone".
+        try
+        {
+            using (cts.Token.Register(static state => ((TaskCompletionSource<bool>)state!).TrySetResult(false), flushSignal))
+            {
+                await flushSignal.Task.ConfigureAwait(false);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            Log.Debug("Flush", "Connection was torn down while flushing. Nothing to flush.");
+        }
+    }
+
+    /// <summary>
     /// This method sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data"></param>
@@ -421,6 +455,15 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Verbose("ProcessSendQueue", "Reading message off queue...");
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
+                    // A flush marker carries no payload; reaching it in queue order means every
+                    // message enqueued before it has been sent, so just signal and move on.
+                    if (message.FlushSignal is not null)
+                    {
+                        Log.Verbose("ProcessSendQueue", "Reached flush marker; signaling flush.");
+                        message.FlushSignal.TrySetResult(true);
+                        continue;
+                    }
+
                     // TODO: Add logging for message capturing for possible playback
                     Log.Verbose("ProcessSendQueue", "Sending message...");
                     await _mutexSend.WaitAsync(token);
@@ -450,6 +493,15 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Error("ProcessSendQueue", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("ProcessSendQueue", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.ProcessSendQueue", "LEAVE");
+        }
+        finally
+        {
+            // The sender thread is stopping; unblock any callers awaiting a flush marker that
+            // will now never be reached, so Flush() cannot hang after a disconnect/teardown.
+            while (_sendChannel.Reader.TryRead(out var pending))
+            {
+                pending.FlushSignal?.TrySetResult(false);
+            }
         }
     }
 
@@ -892,8 +944,10 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// Handle channel options
     /// </summary> 
+    // SingleWriter is false: audio can be enqueued (SendBinary) concurrently with a flush marker
+    // (Flush/SendFinalize) from a different thread. A single background reader drains the queue.
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
-       .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = true, });
+       .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false, });
 
     internal void InvokeParallel<T>(EventHandler<T>? eventHandler, T e)
     {

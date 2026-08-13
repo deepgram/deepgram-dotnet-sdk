@@ -293,6 +293,11 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// </summary>
     public async Task SendFinalize()
     {
+        // Flush any buffered audio first so Finalize can't overtake audio still in the send
+        // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
+        Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
+        await Flush();
+
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.Finalize);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
