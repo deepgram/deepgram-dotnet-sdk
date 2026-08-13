@@ -316,17 +316,26 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
-
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
+            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
+            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
+            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
+            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
+            var socket = _clientWebSocket;
+            if (socket == null || !IsConnected())
+            {
+                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
+                return;
+            }
+            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
+
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancelToken.Token);
+            await _mutexSend.WaitAsync(token);
             try
             {
-                await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
                     .ConfigureAwait(false);
             }
             finally
@@ -350,10 +359,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
+                await Task.Delay(5000, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
@@ -394,10 +406,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;

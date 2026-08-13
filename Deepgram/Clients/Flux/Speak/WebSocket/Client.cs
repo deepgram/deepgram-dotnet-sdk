@@ -385,16 +385,26 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
+        // Use the teardown-safe token: a concurrent Stop()/Dispose() nulls _cancellationTokenSource
+        // outside _mutexSend, so dereferencing the raw field after an await could throw NRE - which
+        // is not in Stop()'s benign catch set and would escape (#390).
+        var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
 
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
-            await _mutexSend.WaitAsync(_cancelToken.Token);
+            // Snapshot the socket too - a concurrent Dispose() can null it while we hold the mutex.
+            var socket = _clientWebSocket;
+            if (socket == null || !IsConnected())
+            {
+                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
+                return;
+            }
+
+            await _mutexSend.WaitAsync(token);
             try
             {
-                await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
                     .ConfigureAwait(false);
             }
             finally
@@ -420,10 +430,14 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         try
         {
             var deadline = Constants.DefaultCloseGracePeriodMs;
-            while (deadline > 0 && _clientWebSocket != null && _clientWebSocket.State == WebSocketState.Open)
+            // Re-snapshot each iteration so a concurrent Dispose() nulling the field can't turn the
+            // condition into a check-then-act NRE (see #390).
+            var socket = _clientWebSocket;
+            while (deadline > 0 && socket != null && socket.State == WebSocketState.Open)
             {
-                await Task.Delay(50, _cancelToken.Token).ConfigureAwait(false);
+                await Task.Delay(50, token).ConfigureAwait(false);
                 deadline -= 50;
+                socket = _clientWebSocket;
             }
             Log.Debug("SendClose", deadline > 0 ? "Server closed the connection" : "Grace period elapsed");
         }

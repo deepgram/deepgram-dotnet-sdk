@@ -32,6 +32,6 @@ public class CredentialsSchema
     /// </summary>
     public override string ToString()
     {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
 }
