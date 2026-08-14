@@ -8,7 +8,7 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// (PREVIEW) Implements the latest supported version of the Flux (v2 speak) text-to-speech
+/// Implements the latest supported version of the Flux (v2 speak) text-to-speech
 /// WebSocket Client.
 /// </summary>
 public class FluxSpeakWebSocketClient : Client

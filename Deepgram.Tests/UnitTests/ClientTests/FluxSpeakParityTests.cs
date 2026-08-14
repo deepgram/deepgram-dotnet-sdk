@@ -99,6 +99,79 @@ public class FluxSpeakParityTests
         }
     }
 
+    // ---- GA additions replay (Configure/ConfigureSuccess, Interrupt/SpeechInterrupted) ---------
+    //
+    // frames.json/golden.json above are EA captures and stay untouched as a regression fixture.
+    // frames-ga.json is a separate, verbatim capture (see its _provenance field) exercising the
+    // GA-only messages this change adds: Configure/ConfigureSuccess and Interrupt/SpeechInterrupted,
+    // against the live production endpoint. Captured via a standalone raw-WebSocket script kept
+    // independent of the SDK's own parser (so this replay is checked against reality, not just
+    // against itself) - see the Flux TTS GA delta PR for the capture script.
+
+    private static List<string> LoadGaFrames()
+    {
+        var path = Path.Combine(FixtureDir, "frames-ga.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        var frames = new List<string>();
+        foreach (var el in doc.RootElement.GetProperty("frames").EnumerateArray())
+        {
+            frames.Add(el.GetRawText());
+        }
+        return frames;
+    }
+
+    [Test]
+    public async Task GA_Frames_Should_Replay_Through_The_Client_In_Order()
+    {
+        var client = new FluxSpeakWebSocketClient(new Faker().Random.Guid().ToString(),
+            new DeepgramWsClientOptions(new Faker().Random.Guid().ToString()) { OnPrem = true });
+
+        var events = new List<object>();
+        await client.Subscribe(new EventHandler<ConnectedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ConfigureSuccessResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SpeechInterruptedResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<SessionMetadataResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ConfigureFailureResponse>((_, e) => events.Add(e)));
+        await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => events.Add(e)));
+
+        var wsr = new WebSocketReceiveResult(1, WebSocketMessageType.Text, true);
+        foreach (var frame in LoadGaFrames())
+        {
+            client.ProcessTextMessage(wsr, ToStream(frame));
+        }
+
+        using (new AssertionScope())
+        {
+            events.Select(e => e.GetType().Name).Should().Equal(
+                nameof(ConnectedResponse),
+                nameof(ConfigureSuccessResponse),
+                nameof(SpeechStartedResponse),
+                nameof(SpeechInterruptedResponse),
+                nameof(SessionMetadataResponse));
+
+            var connected = (ConnectedResponse)events[0];
+            connected.ModelName.Should().Be("alexis", "the wire model_name is the bare voice name, not the full flux-{voice}-{lang} string");
+            connected.ModelUuids.Should().HaveCount(2, "the wire delivered model_uuids as a plural array, matching the EA capture's shape");
+
+            ((ConfigureSuccessResponse)events[1]).Applied!.Speed.Should().Be(1.05);
+            ((SpeechStartedResponse)events[2]).SpeechId.Should().Be("dg_sp_c78f63c65fa2");
+
+            var interrupted = (SpeechInterruptedResponse)events[3];
+            interrupted.AudioPlayedMs.Should().Be(554);
+            interrupted.TextSpoken.Should().Be("Sure,");
+            interrupted.TextRemaining.Should().Be(" I can help you cancel your subscription. Let me pull up your account and check on that for you right away.");
+            interrupted.Metadata!.ControlsApplied!.BreaksApplied.Should().Be(0);
+
+            var session = (SessionMetadataResponse)events[4];
+            session.TotalAudioDurationMs.Should().Be(554);
+            // Real-capture curiosity, not asserted here as "correct": for this interrupted turn the
+            // server's SessionMetadata.total_input_character_count (46) matched the turn's
+            // billable_character_count, not its full input_character_count (112). Left as observed
+            // behavior; a server-side accounting question, not something this client controls.
+        }
+    }
+
     [Test]
     public void Captured_Audio_Byte_Count_Matches_Reported_Duration()
     {

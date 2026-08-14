@@ -10,7 +10,7 @@ using Deepgram.Models.Flux.Speak.REST;
 namespace Deepgram.Clients.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) Implements the Flux (v2 speak) batch text-to-speech REST Client (POST /v2/speak):
+/// Implements the Flux (v2 speak) batch text-to-speech REST Client (POST /v2/speak):
 /// synthesize a complete block of text into a single audio response. Supply a callback URL to have
 /// the request processed asynchronously.
 /// </summary>

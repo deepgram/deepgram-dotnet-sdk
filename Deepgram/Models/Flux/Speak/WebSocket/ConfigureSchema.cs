@@ -5,25 +5,27 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// The Speak client message for the Deepgram Flux (v2 speak) API. Sends text to be
-/// synthesized into the active turn. Serializes to {"type":"Speak","text":"..."}. The server
-/// assigns the turn's speech_id; clients never specify one.
+/// Mid-stream reconfiguration message for the Deepgram Flux (v2 speak) API. Changes the speaking
+/// rate without reconnecting. Not validated client-side — an out-of-range value is rejected by the
+/// server via <see cref="ConfigureFailureResponse"/> (e.g. code SPEED_OUT_OF_RANGE), not thrown locally.
+/// <see href="https://developers.deepgram.com/docs/flux-tts/client-messages"/>
 /// </summary>
-public class SpeakMessage(string text)
+public class ConfigureSchema
 {
     /// <summary>
-    /// Message type identifier. Always "Speak".
+    /// Message type. Always "Configure".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; set; } = "Speak";
+    public string? Type { get; set; } = "Configure";
 
     /// <summary>
-    /// The input text to synthesize.
+    /// Speech-rate multiplier. Valid values are 0.85 through 1.15 in 0.05 increments. Applies at
+    /// the next segment boundary. Not range-checked client-side.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("text")]
-    public string? Text { get; set; } = text;
+    [JsonPropertyName("speed")]
+    public double? Speed { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

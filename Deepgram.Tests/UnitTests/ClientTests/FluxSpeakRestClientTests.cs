@@ -126,6 +126,34 @@ public class FluxSpeakRestClientTests
     }
 
     [Test]
+    public void Request_Url_Should_Contain_Speed_And_Expressivity_When_Set()
+    {
+        var schema = new SpeakSchema { Model = "flux-alexis-en", Speed = 1.05, Expressivity = -1 };
+
+        var url = QueryParameterUtil.FormatURL(Client.GetUri(_options), schema);
+
+        using (new AssertionScope())
+        {
+            url.Should().Contain("speed=1.05");
+            url.Should().Contain("expressivity=-1");
+        }
+    }
+
+    [Test]
+    public void Request_Url_Should_Omit_Speed_And_Expressivity_When_Null()
+    {
+        var schema = new SpeakSchema { Model = "flux-alexis-en" };
+
+        var url = QueryParameterUtil.FormatURL(Client.GetUri(_options), schema);
+
+        using (new AssertionScope())
+        {
+            url.Should().NotContain("speed=");
+            url.Should().NotContain("expressivity=");
+        }
+    }
+
+    [Test]
     public void TextSource_Should_Serialize_To_Text_Body()
     {
         var source = new TextSource("Your appointment is confirmed for 3pm tomorrow.");
@@ -200,11 +228,15 @@ public class FluxSpeakRestClientTests
     }
     #endregion
 
-    #region EA surface guarantees & factory
+    #region GA surface guarantees & factory
     [Test]
-    public void FluxSpeak_Rest_Schema_Should_Not_Expose_Speed()
+    public void FluxSpeak_Rest_Schema_Should_Expose_Speed_And_Expressivity()
     {
-        typeof(SpeakSchema).GetProperty("Speed").Should().BeNull();
+        using (new AssertionScope())
+        {
+            typeof(SpeakSchema).GetProperty("Speed").Should().NotBeNull();
+            typeof(SpeakSchema).GetProperty("Expressivity").Should().NotBeNull();
+        }
     }
 
     [Test]

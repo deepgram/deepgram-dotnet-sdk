@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) The synchronous response from the Deepgram Flux (v2 speak) batch REST API. The
+/// The synchronous response from the Deepgram Flux (v2 speak) batch REST API. The
 /// synthesized audio is exposed as a <see cref="Stream"/>; the remaining properties are populated
 /// from the response headers.
 /// </summary>

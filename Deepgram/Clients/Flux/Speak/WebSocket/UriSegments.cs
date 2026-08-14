@@ -5,7 +5,7 @@
 namespace Deepgram.Clients.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) URI segments for the Flux (v2 speak) text-to-speech WebSocket client.
+/// URI segments for the Flux (v2 speak) text-to-speech WebSocket client.
 /// </summary>
 public static class UriSegments
 {

@@ -5,14 +5,14 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Controls applied during a turn, nested inside <see cref="SpeechMetadataResponse"/>.
-/// Inline pronunciation and pause controls are not available during Early Access, so every count
-/// is currently 0.
+/// Controls applied during a turn, nested inside <see cref="SpeechMetadataResponse"/> and
+/// <see cref="SpeechInterruptedMetadata"/>. Inline pronunciation and pause controls are a coming-soon
+/// fast-follow, so every count is currently 0.
 /// </summary>
 public record ControlsApplied
 {
     /// <summary>
-    /// Pronunciation overrides successfully applied. Always 0 during Early Access.
+    /// Pronunciation overrides successfully applied. Currently always 0 (coming-soon fast-follow).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("pronunciations_applied")]
@@ -20,11 +20,19 @@ public record ControlsApplied
 
     /// <summary>
     /// Pronunciation entries that triggered a warning (invalid IPA, word too long).
-    /// Always 0 during Early Access.
+    /// Currently always 0 (coming-soon fast-follow).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("pronunciation_warnings")]
     public int? PronunciationWarnings { get; set; }
+
+    /// <summary>
+    /// Inline pause (break) controls successfully applied. Nullable because older server
+    /// responses predate this counter and omit the field entirely.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("breaks_applied")]
+    public int? BreaksApplied { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

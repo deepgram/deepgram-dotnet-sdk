@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Immediate echo from the Deepgram Flux (v2 speak) API on receipt of a manual Flush,
+/// Immediate echo from the Deepgram Flux (v2 speak) API on receipt of a manual Flush,
 /// confirming the server received it before synthesis completes. Not emitted for internal
 /// auto-flush boundaries.
 /// </summary>

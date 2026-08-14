@@ -5,7 +5,7 @@
 namespace Deepgram.Models.Flux.Speak.REST;
 
 /// <summary>
-/// (PREVIEW) The acknowledgement returned by the Deepgram Flux (v2 speak) batch REST API when a
+/// The acknowledgement returned by the Deepgram Flux (v2 speak) batch REST API when a
 /// callback URL is supplied; the audio is delivered asynchronously to that URL.
 /// </summary>
 public record AsyncResponse

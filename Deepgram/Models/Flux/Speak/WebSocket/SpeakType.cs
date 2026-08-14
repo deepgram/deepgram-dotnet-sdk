@@ -7,7 +7,7 @@ namespace Deepgram.Models.Flux.Speak.WebSocket;
 using Deepgram.Models.Common.v2.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Message types used by the Deepgram Flux (v2 speak) text-to-speech WebSocket API.
+/// Message types used by the Deepgram Flux (v2 speak) text-to-speech WebSocket API.
 /// </summary>
 public enum SpeakType
 {
@@ -25,7 +25,10 @@ public enum SpeakType
     Connected,
     SpeechStarted,
     SpeechMetadata,
+    SpeechInterrupted,
     Flushed,
     SessionMetadata,
     Warning,
+    ConfigureSuccess,
+    ConfigureFailure,
 }

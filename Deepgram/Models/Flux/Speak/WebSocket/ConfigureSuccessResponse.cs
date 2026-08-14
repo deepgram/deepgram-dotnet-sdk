@@ -5,17 +5,24 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// A simple type-only control message for the Deepgram Flux (v2 speak) API.
-/// Used for the Flush ({"type":"Flush"}) and Close ({"type":"Close"}) client messages.
+/// Emitted by the Deepgram Flux (v2 speak) API acknowledging a client Configure message.
 /// </summary>
-public class ControlMessage(string text)
+public record ConfigureSuccessResponse
 {
     /// <summary>
-    /// Gets or sets the type of control message.
+    /// ConfigureSuccess event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("type")]
-    public string? Type { get; set; } = text;
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public SpeakType? Type { get; set; } = SpeakType.ConfigureSuccess;
+
+    /// <summary>
+    /// The configuration the server applied.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("applied")]
+    public ConfigureApplied? Applied { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

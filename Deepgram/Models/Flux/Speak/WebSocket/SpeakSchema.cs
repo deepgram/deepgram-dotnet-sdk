@@ -5,9 +5,9 @@
 namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
-/// (PREVIEW) Connection options for the Deepgram Flux (v2 speak) text-to-speech WebSocket API.
+/// Connection options for the Deepgram Flux (v2 speak) text-to-speech WebSocket API.
 /// These are sent as query parameters on the wss://api.deepgram.com/v2/speak connection.
-/// <see href="https://developers.deepgram.com/docs/flux/quickstart"/>
+/// <see href="https://developers.deepgram.com/docs/flux-tts/quickstart"/>
 /// </summary>
 public class SpeakSchema
 {
@@ -53,6 +53,24 @@ public class SpeakSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
+
+    /// <summary>
+    /// Speech-rate multiplier. Valid values are 0.85 through 1.15 in 0.05 increments. Not
+    /// range-checked client-side; the server rejects out-of-range values. Can also be changed
+    /// mid-session with <see cref="Deepgram.Clients.Flux.Speak.WebSocket.Client.SendConfigure"/>.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("speed")]
+    public double? Speed { get; set; }
+
+    /// <summary>
+    /// BETA. Delivery-register dial from -2 (calmer) to 2 (more animated). Default 0, the
+    /// tuned, production-validated setting.
+    /// <see href="https://developers.deepgram.com/docs/tts-expressivity"/>
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("expressivity")]
+    public int? Expressivity { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object
