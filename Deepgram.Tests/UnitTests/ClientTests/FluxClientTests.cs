@@ -147,6 +147,24 @@ public class FluxClientTests
     }
 
     [Test]
+    public void BuildQueryString_Should_Accept_EotThreshold_Of_One()
+    {
+        // eot_threshold accepts up to 1.0 (previously documented ceiling was 0.9); 1.0 fully
+        // suppresses native end-of-turn detection for use with ForceEndTurn.
+        var schema = new FluxSchema
+        {
+            Model = "flux-general-en",
+            EotThreshold = 1.0,
+            EotTimeoutMs = 30000,
+        };
+
+        var query = Client.BuildQueryString(schema);
+
+        query.Should().Contain("eot_threshold=1");
+        query.Should().Contain("eot_timeout_ms=30000");
+    }
+
+    [Test]
     public void BuildQueryString_Should_Append_Addons()
     {
         var schema = new FluxSchema { Model = "flux-general-en" };
@@ -178,6 +196,40 @@ public class FluxClientTests
 
         doc.RootElement.GetProperty("type").GetString().Should().Be("CloseStream");
         doc.RootElement.EnumerateObject().Count().Should().Be(1);
+    }
+
+    [Test]
+    public void ControlMessage_ForceEndTurn_Should_Serialize_To_Type_Only_Json()
+    {
+        // The wire shape is exactly {"type":"ForceEndTurn"} — no additional fields.
+        var message = new ControlMessage(FluxConstants.ForceEndTurn);
+
+        using var doc = JsonDocument.Parse(message.ToString());
+
+        doc.RootElement.GetProperty("type").GetString().Should().Be("ForceEndTurn");
+        doc.RootElement.EnumerateObject().Count().Should().Be(1);
+    }
+
+    [Test]
+    public async Task SendForceEndTurn_Should_Send_ForceEndTurn_Message()
+    {
+        var fluxClient = Substitute.For<Client>(_apiKey, _options);
+        fluxClient.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
+                  .DoNotCallBase();
+
+        await fluxClient.SendForceEndTurn();
+
+        // The wire shape is {"type":"ForceEndTurn"} with no additional fields.
+        await fluxClient.Received(1).SendMessageImmediately(
+            Arg.Is<byte[]>(d => IsForceEndTurnMessage(d)),
+            Arg.Any<int>(), Arg.Any<CancellationTokenSource>());
+    }
+
+    private static bool IsForceEndTurnMessage(byte[] data)
+    {
+        using var doc = JsonDocument.Parse(Encoding.UTF8.GetString(data));
+        return doc.RootElement.GetProperty("type").GetString() == "ForceEndTurn"
+            && doc.RootElement.EnumerateObject().Count() == 1;
     }
 
     [Test]
@@ -272,6 +324,7 @@ public class FluxClientTests
                 { "word": "world.", "confidence": 0.92, "start": 2.1, "end": 2.6 }
             ],
             "end_of_turn_confidence": 0.91,
+            "trigger": "model",
             "languages": ["en"],
             "languages_hinted": ["en"]
         }
@@ -296,9 +349,63 @@ public class FluxClientTests
             response.Words[0].Start.Should().Be(1.5);
             response.Words[0].End.Should().Be(2.0);
             response.EndOfTurnConfidence.Should().Be(0.91);
+            response.Trigger.Should().Be("model");
             response.Languages.Should().ContainSingle().Which.Should().Be("en");
             response.LanguagesHinted.Should().ContainSingle().Which.Should().Be("en");
         }
+    }
+
+    [Test]
+    public void TurnInfoResponse_Should_Deserialize_Trigger_When_Present()
+    {
+        // trigger is present on EndOfTurn events only: "model", "manual" (ForceEndTurn), or
+        // "timeout" (eot_timeout_ms elapsed). It is an open set.
+        foreach (var trigger in new[] { "model", "manual", "timeout", "some_future_trigger" })
+        {
+            var json = $$"""
+            {
+                "type": "TurnInfo",
+                "request_id": "abc",
+                "sequence_id": 42,
+                "event": "EndOfTurn",
+                "turn_index": 3,
+                "audio_window_start": 4.2,
+                "audio_window_end": 6.8,
+                "transcript": "I need to cancel my subscription",
+                "words": [],
+                "end_of_turn_confidence": 0.35,
+                "trigger": "{{trigger}}"
+            }
+            """;
+
+            var response = JsonSerializer.Deserialize<TurnInfoResponse>(json);
+
+            response!.Trigger.Should().Be(trigger);
+        }
+    }
+
+    [Test]
+    public void TurnInfoResponse_Trigger_Should_Be_Null_When_Absent()
+    {
+        // Non-EndOfTurn events (and older servers) do not carry a trigger field.
+        var json = """
+        {
+            "type": "TurnInfo",
+            "request_id": "abc",
+            "sequence_id": 1,
+            "event": "Update",
+            "turn_index": 0,
+            "audio_window_start": 0.0,
+            "audio_window_end": 1.0,
+            "transcript": "hi",
+            "words": [],
+            "end_of_turn_confidence": 0.1
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<TurnInfoResponse>(json);
+
+        response!.Trigger.Should().BeNull();
     }
 
     [Test]

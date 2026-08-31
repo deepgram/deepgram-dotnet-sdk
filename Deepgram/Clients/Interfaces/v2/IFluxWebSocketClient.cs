@@ -10,9 +10,9 @@ namespace Deepgram.Clients.Interfaces.v2;
 /// (PREVIEW) Implements the Flux (v2 listen) WebSocket Client for conversational
 /// speech-to-text with contextual turn detection.
 ///
-/// Flux accepts only two client control messages: CloseStream and Configure. There are
-/// intentionally no SendKeepAlive or SendFinalize members: those are v1-only control messages
-/// and the v2 endpoint rejects them.
+/// Flux accepts only three client control messages: CloseStream, Configure, and ForceEndTurn.
+/// There are intentionally no SendKeepAlive or SendFinalize members: those are v1-only control
+/// messages and the v2 endpoint rejects them.
 /// </summary>
 public interface IFluxWebSocketClient
 {
@@ -89,6 +89,12 @@ public interface IFluxWebSocketClient
     /// language hints mid-stream
     /// </summary>
     public Task SendConfigure(ConfigureSchema configure);
+
+    /// <summary>
+    /// Sends a ForceEndTurn message to Deepgram to end the current turn immediately. Flux
+    /// emits a standard EndOfTurn TurnInfo with its Trigger property set to "manual".
+    /// </summary>
+    public Task SendForceEndTurn();
 
     /// <summary>
     /// Sends a CloseStream message to Deepgram and waits briefly for the final results

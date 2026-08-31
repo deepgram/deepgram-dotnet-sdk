@@ -27,6 +27,19 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
+    /// their template variables
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static V1.IAgentManageClient CreateAgentManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AgentManageClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new AnalyzeClient
     /// </summary>
     /// <param name="apiKey"></param>

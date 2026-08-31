@@ -2,21 +2,19 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Flux.WebSocket;
+namespace Deepgram.Models.AgentManage.v1;
 
 /// <summary>
-/// (PREVIEW) A simple type-only control message for the Deepgram Flux (v2 listen) API.
-/// Flux accepts two type-only control messages: CloseStream and ForceEndTurn. (KeepAlive and
-/// Finalize are v1-only and are rejected by the v2 endpoint.)
+/// The list of reusable agent configurations for a project.
 /// </summary>
-public class ControlMessage(string text)
+public record AgentConfigurationsResponse
 {
     /// <summary>
-    /// Gets or sets the type of control message.
+    /// A list of agent configurations for the project.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("type")]
-    public string? Type { get; set; } = text;
+    [JsonPropertyName("agents")]
+    public List<AgentConfigurationResponse>? Agents { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

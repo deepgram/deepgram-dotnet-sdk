@@ -10,11 +10,12 @@ namespace Deepgram.Clients.Flux.WebSocket;
 public static class Constants
 {
     // user message types.
-    // Flux accepts exactly two client control messages: CloseStream and Configure.
-    // KeepAlive and Finalize are v1-only and are rejected by the v2 endpoint
+    // Flux accepts exactly three client control messages: CloseStream, Configure, and
+    // ForceEndTurn. KeepAlive and Finalize are v1-only and are rejected by the v2 endpoint
     // with an UNPARSABLE_CLIENT_MESSAGE error.
     public const string CloseStream = "CloseStream";
     public const string Configure = "Configure";
+    public const string ForceEndTurn = "ForceEndTurn";
 
     /// <summary>
     /// After sending CloseStream, how long to wait (in milliseconds) for the server to deliver

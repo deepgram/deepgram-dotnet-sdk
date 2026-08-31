@@ -531,10 +531,95 @@ public abstract class AbstractRestClient
     }
 
     /// <summary>
+    /// Patch method call with separate query-parameter and body objects. Unlike
+    /// PatchAsync&lt;S, T&gt;, the body content is not repeated in the query string — use this
+    /// when the body carries values that do not belong in (or are too large for) a URL.
+    /// </summary>
+    /// <typeparam name="R">Class type of the request body</typeparam>
+    /// <typeparam name="S">Class type of the query-parameter schema</typeparam>
+    /// <typeparam name="T">Class type of what return type is expected</typeparam>
+    /// <param name="uriSegment">Uri for the api</param>
+    /// <returns>Instance of T</returns>
+    public virtual async Task<T> PatchAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+    {
+        Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "ENTER");
+        Log.Debug("PatchAsync<R, S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PatchAsync<R, S, T>", $"addons: {addons}");
+
+        try
+        {
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                Log.Information("PatchAsync<R, S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+#if NETSTANDARD2_0
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(content)
+            };
+#else
+            var request = new HttpRequestMessage(HttpMethod.Patch, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(content)
+            };
+#endif
+
+            // add custom headers
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    Log.Debug("PatchAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+
+            // do the request
+            Log.Verbose("PatchAsync<R, S, T>", "Calling _httpClient.SendAsync...");
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+
+            var resultStr = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PatchAsync<R, S, T>", response, resultStr);
+            }
+
+            Log.Verbose("PatchAsync<R, S, T>", $"Response:\n{resultStr}");
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+
+            Log.Debug("PatchAsync<R, S, T>", $"Succeeded");
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
+
+            return result;
+
+        }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PatchAsync<R, S, T>", "Task was cancelled.");
+            Log.Verbose("PatchAsync<R, S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("PatchAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("PatchAsync<R, S, T>", $"Excepton: {ex}");
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Put method call that takes a body object
     /// </summary>
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
-    /// <param name="uriSegment">Uri for the api</param>   
+    /// <param name="uriSegment">Uri for the api</param>
     /// <returns>Instance of T</returns>
     public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
