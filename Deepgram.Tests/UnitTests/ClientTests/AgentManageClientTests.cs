@@ -478,6 +478,134 @@ public class AgentManageClientTests
     }
 
     [Test]
+    public void AgentConfigurations_Should_Deserialize_From_Live_Bare_Array_Shape()
+    {
+        // Captured from the live API 2026-08-31: a bare array (not {"agents":[...]}), ids as
+        // agent_uuid (not agent_id), and config as the stored JSON-encoded STRING (not a
+        // parsed object). The SDK accepts this shape alongside the documented one.
+        var json = """
+        [{
+            "agent_uuid": "8f153566-fd4b-4ad4-bc13-09c66e0eed64",
+            "member_id": "43d2a494-32e3-40ba-9c6e-6ab030597ead",
+            "api_version": 1,
+            "config": "{\"language\":\"en\"}",
+            "metadata": { "name": "customer-service-agent" }
+        }]
+        """;
+
+        var response = JsonSerializer.Deserialize<AgentConfigurationsResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Agents.Should().ContainSingle();
+            var agent = response.Agents![0];
+            agent.AgentUuid.Should().Be("8f153566-fd4b-4ad4-bc13-09c66e0eed64");
+            // AgentId falls back to the live agent_uuid field.
+            agent.AgentId.Should().Be("8f153566-fd4b-4ad4-bc13-09c66e0eed64");
+            agent.ApiVersion.Should().Be(1);
+            agent.Config!.Value.ValueKind.Should().Be(JsonValueKind.String);
+            agent.Metadata!["name"].Should().Be("customer-service-agent");
+        }
+    }
+
+    [Test]
+    public void AgentConfigurations_Should_Deserialize_From_Documented_Object_Shape()
+    {
+        var json = """{ "agents": [ { "agent_id": "abc", "config": {} } ] }""";
+
+        var response = JsonSerializer.Deserialize<AgentConfigurationsResponse>(json);
+
+        response!.Agents.Should().ContainSingle().Which.AgentId.Should().Be("abc");
+    }
+
+    [Test]
+    public void AgentVariables_Should_Deserialize_From_Live_Bare_Array_Shape()
+    {
+        // Captured from the live API 2026-08-31: bare array, ids as agent_variable_uuid
+        // (not variable_id), plus is_sensitive.
+        var json = """
+        [{
+            "agent_variable_uuid": "ec490d38-3cfc-4452-8a75-40dd14e69a7e",
+            "member_id": "43d2a494-32e3-40ba-9c6e-6ab030597ead",
+            "api_version": 1,
+            "key": "DG_SMOKE_TEST",
+            "value": "hello",
+            "is_sensitive": false
+        }]
+        """;
+
+        var response = JsonSerializer.Deserialize<AgentVariablesResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Variables.Should().ContainSingle();
+            var variable = response.Variables![0];
+            variable.AgentVariableUuid.Should().Be("ec490d38-3cfc-4452-8a75-40dd14e69a7e");
+            // VariableId falls back to the live agent_variable_uuid field.
+            variable.VariableId.Should().Be("ec490d38-3cfc-4452-8a75-40dd14e69a7e");
+            variable.Key.Should().Be("DG_SMOKE_TEST");
+            variable.Value!.Value.GetString().Should().Be("hello");
+            variable.IsSensitive.Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void CreateAgent_Response_Should_Map_Live_AgentUuid_To_AgentId()
+    {
+        // Captured from the live API 2026-08-31: POST /agents returns only the uuid.
+        var response = JsonSerializer.Deserialize<AgentConfigurationResponse>(
+            """{ "agent_uuid": "28f134a8-0967-45cb-a792-8cf8f729e586" }""");
+
+        response!.AgentId.Should().Be("28f134a8-0967-45cb-a792-8cf8f729e586");
+    }
+
+    [Test]
+    public void Documented_Id_Should_Win_Over_Live_Uuid_When_Both_Present()
+    {
+        var agent = JsonSerializer.Deserialize<AgentConfigurationResponse>(
+            """{ "agent_id": "documented", "agent_uuid": "live" }""");
+        var variable = JsonSerializer.Deserialize<AgentVariableResponse>(
+            """{ "variable_id": "documented", "agent_variable_uuid": "live" }""");
+
+        using (new AssertionScope())
+        {
+            agent!.AgentId.Should().Be("documented");
+            variable!.VariableId.Should().Be("documented");
+        }
+    }
+
+    [Test]
+    public void AgentVariableSchema_Should_Serialize_IsSensitive_False_By_Default()
+    {
+        // The live API requires is_sensitive and currently only accepts false; omitting it
+        // rejects the request with "Sensitive template variables are not supported yet".
+        var schema = new AgentVariableSchema { Key = "DG_X", Value = "y" };
+
+        using var doc = JsonDocument.Parse(schema.ToString());
+
+        doc.RootElement.GetProperty("is_sensitive").GetBoolean().Should().BeFalse();
+    }
+
+    [Test]
+    public async Task UpdateAgentMetadata_Should_Return_Empty_Response_When_Body_Is_Empty()
+    {
+        // The live API answers PUT /agents/{id} with 200 and an empty body; the client must
+        // hand back an (empty) response object, not null and not an exception.
+        var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.AGENTS}/{_agentId}");
+        var metadataSchema = new AgentMetadataSchema { Metadata = new Dictionary<string, string> { ["a"] = "b" } };
+
+        var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
+        agentManageClient.When(x => x.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
+            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>())).DoNotCallBase();
+        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema)
+            .Returns((AgentConfigurationResponse?)null!);
+
+        var result = await agentManageClient.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);
+
+        result.Should().NotBeNull();
+    }
+
+    [Test]
     public void DeleteResponse_Should_Deserialize_From_Empty_And_NonEmpty_Objects()
     {
         var empty = JsonSerializer.Deserialize<DeleteResponse>("{}");

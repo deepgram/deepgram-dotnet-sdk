@@ -12,12 +12,24 @@ namespace Deepgram.Models.AgentManage.v1;
 /// </summary>
 public record AgentVariableResponse
 {
+    private string? _variableId;
+
     /// <summary>
-    /// The unique identifier of the variable.
+    /// The unique identifier of the variable. The documented field name is variable_id, but
+    /// the live API currently returns it as agent_variable_uuid; this property returns
+    /// whichever the API sent (variable_id preferred when both are present).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("variable_id")]
-    public string? VariableId { get; set; }
+    public string? VariableId { get => _variableId ?? AgentVariableUuid; set => _variableId = value; }
+
+    /// <summary>
+    /// The identifier as currently returned on the wire by the live API. Prefer
+    /// <see cref="VariableId"/>, which falls back to this value automatically.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("agent_variable_uuid")]
+    public string? AgentVariableUuid { get; set; }
 
     /// <summary>
     /// The variable name, following the DG_&lt;VARIABLE_NAME&gt; format.
@@ -35,14 +47,31 @@ public record AgentVariableResponse
     public JsonElement? Value { get; set; }
 
     /// <summary>
-    /// Timestamp when the variable was created.
+    /// Whether the variable is sensitive. Currently always false; sensitive variables are not
+    /// supported yet.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("is_sensitive")]
+    public bool? IsSensitive { get; set; }
+
+    /// <summary>
+    /// API version of the stored variable.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("api_version")]
+    public int? ApiVersion { get; set; }
+
+    /// <summary>
+    /// Timestamp when the variable was created. May be absent (the live API does not
+    /// currently return it).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("created_at")]
     public DateTime? CreatedAt { get; set; }
 
     /// <summary>
-    /// Timestamp when the variable was last updated.
+    /// Timestamp when the variable was last updated. May be absent (the live API does not
+    /// currently return it).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("updated_at")]

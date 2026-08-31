@@ -109,6 +109,8 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// <summary>
     /// Updates the metadata associated with an agent configuration. The config itself is
     /// immutable — to change the configuration, delete the existing agent and create a new one.
+    /// The live API currently returns an empty body for this call, in which case the returned
+    /// object has null fields; call GetAgent afterwards if you need the updated state.
     /// </summary>
     /// <param name="projectId">Id of Project</param>
     /// <param name="agentId">Id of the agent configuration</param>
@@ -133,7 +135,8 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("UpdateAgentMetadata", $"metadataSchema:\n{metadataSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        var result = await PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(uri, metadataSchema, cancellationToken, addons, headers);
+        var result = await PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(uri, metadataSchema, cancellationToken, addons, headers)
+            ?? new AgentConfigurationResponse();
 
         Log.Information("UpdateAgentMetadata", $"{uri} Succeeded");
         Log.Debug("UpdateAgentMetadata", $"result: {result}");
@@ -158,7 +161,8 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgent", $"agentId: {agentId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers);
+        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
+            ?? new DeleteResponse();
 
         Log.Information("DeleteAgent", $"{uri} Succeeded");
         Log.Debug("DeleteAgent", $"result: {result}");
@@ -253,7 +257,9 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     }
 
     /// <summary>
-    /// Updates the value of an existing template variable.
+    /// Updates the value of an existing template variable. The live API currently returns an
+    /// empty body for this call, in which case the returned object has null fields; call
+    /// GetAgentVariable afterwards if you need the updated state.
     /// </summary>
     /// <param name="projectId">Id of Project</param>
     /// <param name="variableId">Id of the template variable</param>
@@ -280,7 +286,8 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
         // The body-only overload keeps the arbitrary JSON value out of the query string.
         var result = await PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
-            uri, null, updateSchema, cancellationToken, addons, headers);
+            uri, null, updateSchema, cancellationToken, addons, headers)
+            ?? new AgentVariableResponse();
 
         Log.Information("UpdateAgentVariable", $"{uri} Succeeded");
         Log.Debug("UpdateAgentVariable", $"result: {result}");
@@ -303,7 +310,8 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgentVariable", $"variableId: {variableId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
-        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers);
+        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
+            ?? new DeleteResponse();
 
         Log.Information("DeleteAgentVariable", $"{uri} Succeeded");
         Log.Debug("DeleteAgentVariable", $"result: {result}");

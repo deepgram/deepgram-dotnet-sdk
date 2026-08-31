@@ -53,6 +53,12 @@ internal static class HttpRequestUtil
     internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
     {
         var content = await httpResponseMessage.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            // Some endpoints (e.g. agent management update/delete) return 200 with an empty
+            // body; deserializing "" would throw even though the request succeeded.
+            return default!;
+        }
         var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content);
         return deepgramResponse;
     }

@@ -27,6 +27,15 @@ public class AgentVariableSchema
     public object? Value { get; set; }
 
     /// <summary>
+    /// REQUIRED by the API and currently must be false — sensitive variables are not supported
+    /// yet (the API rejects true, and rejects the request when the field is omitted). Defaults
+    /// to false so requests work out of the box.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("is_sensitive")]
+    public bool? IsSensitive { get; set; } = false;
+
+    /// <summary>
     /// API version. Defaults to 1 when not set.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

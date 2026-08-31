@@ -36,14 +36,14 @@ namespace SampleApp
             Console.WriteLine($"Using project: {projectId}");
 
             // create a template variable. Value can be any valid JSON type - here a string.
-            // Do not store secrets in variables - they are visible to every member of the
-            // project.
+            // IsSensitive defaults to false (the only value the API accepts today). Do not
+            // store secrets in variables - they are visible to every member of the project.
             var createResp = await agentManageClient.CreateAgentVariable(projectId, new AgentVariableSchema
             {
                 Key = "DG_GREETING",
                 Value = "Hello! How can I help you today?",
             });
-            Console.WriteLine($"\nCreated agent variable: {createResp.VariableId} ({createResp.Key})");
+            Console.WriteLine($"\nCreated agent variable: {createResp.VariableId}");
             var variableId = createResp.VariableId!;
 
             // list all template variables for the project
@@ -58,12 +58,15 @@ namespace SampleApp
             var getResp = await agentManageClient.GetAgentVariable(projectId, variableId);
             Console.WriteLine($"\nFetched agent variable:\n{getResp}");
 
-            // update the value (the key cannot be changed after creation)
-            var updateResp = await agentManageClient.UpdateAgentVariable(projectId, variableId, new UpdateAgentVariableSchema
+            // update the value (the key cannot be changed after creation). The API currently
+            // returns an empty body for this call, so fetch the variable again to see the
+            // updated state.
+            await agentManageClient.UpdateAgentVariable(projectId, variableId, new UpdateAgentVariableSchema
             {
                 Value = "Welcome back! What can I do for you?",
             });
-            Console.WriteLine($"\nUpdated agent variable:\n{updateResp}");
+            var updated = await agentManageClient.GetAgentVariable(projectId, variableId);
+            Console.WriteLine($"\nUpdated agent variable:\n{updated}");
 
             // delete the variable
             await agentManageClient.DeleteAgentVariable(projectId, variableId);

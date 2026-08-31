@@ -11,17 +11,30 @@ namespace Deepgram.Models.AgentManage.v1;
 /// </summary>
 public record AgentConfigurationResponse
 {
+    private string? _agentId;
+
     /// <summary>
-    /// The unique identifier of the agent configuration.
+    /// The unique identifier of the agent configuration. The documented field name is
+    /// agent_id, but the live API currently returns it as agent_uuid; this property returns
+    /// whichever the API sent (agent_id preferred when both are present).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("agent_id")]
-    public string? AgentId { get; set; }
+    public string? AgentId { get => _agentId ?? AgentUuid; set => _agentId = value; }
 
     /// <summary>
-    /// The agent configuration object (the agent block of a Settings message). Returned in its
-    /// uninterpolated form: template variable placeholders appear as-is rather than with their
-    /// substituted values.
+    /// The identifier as currently returned on the wire by the live API. Prefer
+    /// <see cref="AgentId"/>, which falls back to this value automatically.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("agent_uuid")]
+    public string? AgentUuid { get; set; }
+
+    /// <summary>
+    /// The agent configuration (the agent block of a Settings message), in its uninterpolated
+    /// form: template variable placeholders appear as-is. The documented shape is a parsed JSON
+    /// object, but the live API currently returns the stored JSON-encoded string; check
+    /// <see cref="JsonElement.ValueKind"/> to see which arrived.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("config")]
@@ -35,14 +48,23 @@ public record AgentConfigurationResponse
     public Dictionary<string, string>? Metadata { get; set; }
 
     /// <summary>
-    /// Timestamp when the configuration was created. Not present on create responses.
+    /// API version of the stored configuration.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("api_version")]
+    public int? ApiVersion { get; set; }
+
+    /// <summary>
+    /// Timestamp when the configuration was created. May be absent (the live API does not
+    /// currently return it).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("created_at")]
     public DateTime? CreatedAt { get; set; }
 
     /// <summary>
-    /// Timestamp when the configuration was last updated. Not present on create responses.
+    /// Timestamp when the configuration was last updated. May be absent (the live API does not
+    /// currently return it).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("updated_at")]

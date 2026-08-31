@@ -73,8 +73,9 @@ namespace SampleApp
             Console.WriteLine($"\nFetched agent configuration:\n{getResp}");
 
             // update the metadata. The config itself is immutable - to change it, delete the
-            // agent and create a new one.
-            var updateResp = await agentManageClient.UpdateAgentMetadata(projectId, agentId, new AgentMetadataSchema
+            // agent and create a new one. The API currently returns an empty body for this
+            // call, so fetch the agent again to see the updated state.
+            await agentManageClient.UpdateAgentMetadata(projectId, agentId, new AgentMetadataSchema
             {
                 Metadata = new Dictionary<string, string>
                 {
@@ -82,7 +83,8 @@ namespace SampleApp
                     ["environment"] = "production",
                 },
             });
-            Console.WriteLine($"\nUpdated agent metadata:\n{updateResp}");
+            var updated = await agentManageClient.GetAgent(projectId, agentId);
+            Console.WriteLine($"\nUpdated agent metadata:\n{updated}");
 
             // delete the configuration. WARNING: deleting an agent configuration that live
             // sessions still reference can cause a production outage - migrate active sessions
