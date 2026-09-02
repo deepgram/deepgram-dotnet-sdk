@@ -276,7 +276,7 @@ await liveClient.Stop();
 
 Transcribe conversational audio with contextual turn detection using [Deepgram Flux](https://developers.deepgram.com/docs/flux/quickstart). Instead of interim/final results, Flux delivers `TurnInfo` events that track the turn lifecycle (`StartOfTurn`, `Update`, `EagerEndOfTurn`, `TurnResumed`, `EndOfTurn`) — ideal for voice agents that need to know when a speaker is done talking.
 
-Flux accepts only three control messages (`CloseStream`, `Configure`, and `ForceEndTurn`); the classic streaming `KeepAlive`/`Finalize` messages do not apply. Send `ForceEndTurn` (via `SendForceEndTurn()`) to end the current turn on your own signal — the resulting `EndOfTurn` carries `Trigger` = `"manual"` — and set `EotThreshold` to `1.0` to [bring your own turn detection](https://developers.deepgram.com/docs/speech-to-text/flux/guides/own-turn-detection).
+Flux accepts only three control messages (`CloseStream`, `Configure`, and `ForceEndTurn`); the classic streaming `KeepAlive`/`Finalize` messages do not apply. Send `ForceEndTurn` (via `SendForceEndTurn()` on the concrete `FluxWebSocketClient`) to end the current turn on your own signal — the resulting `EndOfTurn` carries `Trigger` = `"manual"` — and set `EotThreshold` to `1.0` to [bring your own turn detection](https://developers.deepgram.com/docs/flux/own-turn-detection).
 
 ```csharp
 using Deepgram;
@@ -285,8 +285,10 @@ using Deepgram.Models.Flux.WebSocket;
 // Initialize Library with default logging
 Library.Initialize();
 
-// Create Flux WebSocket client
-var fluxClient = ClientFactory.CreateFluxWebSocketClient();
+// Create Flux WebSocket client. The concrete type (rather than
+// ClientFactory.CreateFluxWebSocketClient(), which returns IFluxWebSocketClient) is used here
+// because SendForceEndTurn lives on the concrete client only until the 8.0 interface revision.
+var fluxClient = new FluxWebSocketClient();
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 
 // Subscribe to TurnInfo events
@@ -314,6 +316,8 @@ fluxClient.Send(audioChunk);
 
 // Optional: end the current turn on your own signal (push-to-talk release, DTMF,
 // your own VAD). The resulting EndOfTurn carries Trigger = "manual".
+// SendForceEndTurn first flushes any audio still queued by Send(), so the turn always
+// ends on the audio you actually sent — no extra ordering work is needed here.
 await fluxClient.SendForceEndTurn();
 
 // Stop the connection (sends CloseStream and waits for the final results)
@@ -324,13 +328,15 @@ await fluxClient.Stop();
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [bring-your-own-turn-detection version](./examples/speech-to-text/websocket/flux-force-end-turn/) and a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
-### Upgrading from 6.x (`IFluxWebSocketClient` interface members)
+### `SendForceEndTurn` availability (unreleased; next 7.x)
 
-Version 7.0 adds `SendForceEndTurn` to the `IFluxWebSocketClient` interface. If you use
-`FluxWebSocketClient`/`ClientFactory` as shipped, or a mocking framework (NSubstitute, Moq) to
-fake this interface in tests, nothing changes for you. This is a breaking change only if you have
-your own concrete class implementing `IFluxWebSocketClient` directly — add the new member to keep
-it compiling. Nothing was renamed or removed; it is a pure addition.
+`SendForceEndTurn` is new since the published 7.0.0 release and ships in the next 7.x version.
+It lives on the concrete `FluxWebSocketClient` class only — it is intentionally **not** on the
+`IFluxWebSocketClient` interface, because adding an interface member would source-break any
+third-party class implementing that interface in a 7.x release. The member will be added to the
+interface in 8.0. Until then, create the client as `new FluxWebSocketClient(...)` (or cast the
+`ClientFactory.CreateFluxWebSocketClient()` result to `FluxWebSocketClient`) to call it. No
+existing interface member was renamed, removed, or changed.
 
 ## Flux Text to Speech
 
@@ -584,7 +590,10 @@ var function = new Function
 
 Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of
 repeating the full configuration, with optional template variables (`DG_*`) for values shared
-across configurations. Managed via REST with the `AgentManageClient`:
+across configurations. A variable is referenced inside the JSON-encoded config as a bare,
+unquoted `DG_<VARIABLE_NAME>` token (e.g. `"greeting": DG_GREETING` — no quotes, no braces);
+the service substitutes the variable's JSON value when the configuration is used. Managed via
+REST with the `AgentManageClient`:
 
 ```csharp
 using Deepgram.Models.AgentManage.v1;
@@ -592,10 +601,19 @@ using Deepgram.Models.AgentManage.v1;
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var agentManageClient = ClientFactory.CreateAgentManageClient();
 
-// Create a reusable agent configuration (Config is a JSON-encoded string)
+// Create a template variable first (DG_* key, any JSON value) so configurations can
+// reference it.
+var variable = await agentManageClient.CreateAgentVariable(projectId,
+    new AgentVariableSchema { Key = "DG_GREETING", Value = "Hello! How can I help you today?" });
+await agentManageClient.UpdateAgentVariable(projectId, variable.VariableId!,
+    new UpdateAgentVariableSchema { Value = "Welcome back!" });
+
+// Create a reusable agent configuration (Config is a JSON-encoded string). The bare
+// DG_GREETING token references the template variable created above; it comes back
+// uninterpolated when you fetch the configuration.
 var created = await agentManageClient.CreateAgent(projectId, new AgentConfigurationSchema
 {
-    Config = """{"language":"en","listen":{"provider":{"type":"deepgram","model":"nova-3"}},"think":{"provider":{"type":"open_ai","model":"gpt-4o-mini"},"prompt":"You are a helpful agent."},"speak":{"provider":{"type":"deepgram","version":"v2","model":"flux-kit-en"}}}""",
+    Config = """{"language":"en","listen":{"provider":{"type":"deepgram","model":"nova-3"}},"think":{"provider":{"type":"open_ai","model":"gpt-4o-mini"},"prompt":"You are a helpful agent."},"greeting":DG_GREETING,"speak":{"provider":{"type":"deepgram","version":"v2","model":"flux-kit-en"}}}""",
     Metadata = new Dictionary<string, string> { ["name"] = "customer-service-agent" },
 });
 Console.WriteLine($"Agent ID: {created.AgentId}"); // pass this in place of the agent object in Settings
@@ -606,16 +624,10 @@ var agent = await agentManageClient.GetAgent(projectId, created.AgentId!);
 await agentManageClient.UpdateAgentMetadata(projectId, created.AgentId!,
     new AgentMetadataSchema { Metadata = new Dictionary<string, string> { ["environment"] = "production" } });
 await agentManageClient.DeleteAgent(projectId, created.AgentId!);
-
-// Template variables (DG_* keys, any JSON value)
-var variable = await agentManageClient.CreateAgentVariable(projectId,
-    new AgentVariableSchema { Key = "DG_GREETING", Value = "Hello! How can I help you today?" });
-await agentManageClient.UpdateAgentVariable(projectId, variable.VariableId!,
-    new UpdateAgentVariableSchema { Value = "Welcome back!" });
 await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 ```
 
-[See our docs for more info](https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations).
+[See our docs for more info](https://developers.deepgram.com/docs/reusable-agent-configurations).
 
 [See the Examples for more info](./examples/agent/manage/configurations/) - and the [template variables example](./examples/agent/manage/variables/).
 
