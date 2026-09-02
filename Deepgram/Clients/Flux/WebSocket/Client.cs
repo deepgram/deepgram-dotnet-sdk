@@ -330,10 +330,18 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// FORCE_END_TURN_NO_ACTIVE_TURN), which this SDK surfaces via the Unhandled event.
     /// Set <see cref="FluxSchema.EotThreshold"/> to 1.0 to suppress Flux's native end-of-turn
     /// detection entirely and drive every turn ending yourself.
-    /// <see href="https://developers.deepgram.com/docs/speech-to-text/flux/control-messages/force-end-turn"/>
+    /// Audio queued via <see cref="Send"/> before this call is flushed to the socket first, so
+    /// the turn always ends on the audio you actually sent.
+    /// <see href="https://developers.deepgram.com/docs/flux/force-end-turn"/>
     /// </summary>
     public async Task SendForceEndTurn()
     {
+        // Flush any buffered audio first so ForceEndTurn can't overtake audio still in the send
+        // queue (it is sent immediately and would otherwise race ahead, ending the turn before
+        // the final chunks reach Flux). Mirrors the SendFinalize fix in the v1 listen client.
+        Log.Debug("SendForceEndTurn", "Flushing buffered audio before ForceEndTurn...");
+        await Flush();
+
         ControlMessage message = new ControlMessage(Constants.ForceEndTurn);
 
         Log.Debug("SendForceEndTurn", "Sending ForceEndTurn Message Immediately...");
