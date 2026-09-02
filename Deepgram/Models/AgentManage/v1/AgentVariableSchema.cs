@@ -6,7 +6,7 @@ namespace Deepgram.Models.AgentManage.v1;
 
 /// <summary>
 /// Request body for creating a template variable.
-/// <see href="https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations"/>
+/// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 public class AgentVariableSchema
 {

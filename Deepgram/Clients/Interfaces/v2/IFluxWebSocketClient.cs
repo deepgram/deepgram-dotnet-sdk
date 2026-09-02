@@ -90,11 +90,10 @@ public interface IFluxWebSocketClient
     /// </summary>
     public Task SendConfigure(ConfigureSchema configure);
 
-    /// <summary>
-    /// Sends a ForceEndTurn message to Deepgram to end the current turn immediately. Flux
-    /// emits a standard EndOfTurn TurnInfo with its Trigger property set to "manual".
-    /// </summary>
-    public Task SendForceEndTurn();
+    // NOTE: SendForceEndTurn intentionally lives on the concrete
+    // Deepgram.Clients.Flux.WebSocket.Client only, not on this interface. This interface
+    // shipped in 7.0.0, and adding a member would source-break third-party implementations
+    // in a 7.x release; the member will be added here in 8.0.
 
     /// <summary>
     /// Sends a CloseStream message to Deepgram and waits briefly for the final results

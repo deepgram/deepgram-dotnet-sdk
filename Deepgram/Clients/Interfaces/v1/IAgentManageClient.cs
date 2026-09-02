@@ -10,7 +10,7 @@ namespace Deepgram.Clients.Interfaces.v1;
 /// Implements version 1 of the Agent Manage Client: REST management of reusable Voice Agent
 /// configurations (/v1/projects/{project_id}/agents) and their template variables
 /// (/v1/projects/{project_id}/agent-variables).
-/// <see href="https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations"/>
+/// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 public interface IAgentManageClient
 {

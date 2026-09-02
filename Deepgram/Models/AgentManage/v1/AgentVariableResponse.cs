@@ -8,7 +8,7 @@ namespace Deepgram.Models.AgentManage.v1;
 /// A template variable for reusable agent configurations. Variables follow the
 /// DG_&lt;VARIABLE_NAME&gt; naming format and can substitute any JSON value in an agent
 /// configuration.
-/// <see href="https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations"/>
+/// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 public record AgentVariableResponse
 {

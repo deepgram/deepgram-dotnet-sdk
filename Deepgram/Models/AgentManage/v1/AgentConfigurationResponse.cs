@@ -7,7 +7,7 @@ namespace Deepgram.Models.AgentManage.v1;
 /// <summary>
 /// A reusable agent configuration stored with Deepgram. The returned AgentId can be passed
 /// in place of the full agent object in a Voice Agent Settings message.
-/// <see href="https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations"/>
+/// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 public record AgentConfigurationResponse
 {
