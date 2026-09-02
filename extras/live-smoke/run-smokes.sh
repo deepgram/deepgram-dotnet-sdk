@@ -61,12 +61,13 @@ else
 fi
 
 # --- Run 2: Agent management CRUD round-trip --------------------------------------------
-# The configurations smoke performs: create variable (bare DG_GREETING token) -> create
+# The configurations smoke performs: create variable (bare DG_GREETING_<run> token; the live
+# API reserves deleted variable names forever, so the examples suffix each run) -> create
 # config referencing it -> list -> get (uninterpolated) -> update metadata -> re-fetch ->
 # delete config -> delete variable, all with cleanup in finally.
 if run_smoke agent-configurations-smoke agent-configurations-smoke.log; then
     for needle in \
-        "Created agent variable DG_GREETING:" \
+        "Created agent variable DG_GREETING_" \
         "Created agent configuration:" \
         "agent configuration(s):" \
         "Fetched agent configuration (uninterpolated):" \
@@ -78,9 +79,10 @@ if run_smoke agent-configurations-smoke agent-configurations-smoke.log; then
             fail=1
         fi
     done
-    # The fetched, uninterpolated config must still carry the bare DG_GREETING token.
-    if ! grep -q "DG_GREETING" agent-configurations-smoke.log; then
-        echo "FAIL [agent-config]: bare DG_GREETING token not visible in the fetched config." >&2
+    # The fetched, uninterpolated config must still carry the bare token, unquoted and
+    # unbraced, exactly as written: e.g.  \"greeting\": DG_GREETING_<run>
+    if ! grep -Eq '\\"greeting\\": DG_GREETING_[0-9]+' agent-configurations-smoke.log; then
+        echo "FAIL [agent-config]: bare DG_GREETING_<run> token not visible uninterpolated in the fetched config." >&2
         fail=1
     fi
 else
@@ -92,7 +94,7 @@ fi
 # (PATCH, empty-body success) -> re-fetch -> delete, with cleanup in finally.
 if run_smoke agent-variables-smoke agent-variables-smoke.log; then
     for needle in \
-        "Created agent variable:" \
+        "Created agent variable DG_GREETING_" \
         "agent variable(s):" \
         "Fetched agent variable:" \
         "Updated agent variable:" \

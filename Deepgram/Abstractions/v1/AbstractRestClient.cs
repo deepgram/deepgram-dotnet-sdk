@@ -585,7 +585,11 @@ public abstract class AbstractRestClient
             {
                 foreach (var header in headers)
                 {
-                    Log.Debug("PatchAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
+                    var tmp = header.Key.ToLower();
+                    if (!(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")))
+                    {
+                        Log.Debug("PatchAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
+                    }
                     request.Headers.Add(header.Key, header.Value);
                 }
             }

@@ -74,9 +74,11 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
     /// <summary>
     /// Creates a new reusable agent configuration. <see cref="AgentConfigurationSchema.Config"/>
-    /// must be a valid JSON string representing the agent block of a Voice Agent Settings
-    /// message. The returned AgentId can be passed in place of the full agent object in future
-    /// Settings messages.
+    /// is a JSON-encoded string representing the agent block of a Voice Agent Settings message;
+    /// it may contain bare, unquoted DG_&lt;VARIABLE_NAME&gt; template tokens (e.g.
+    /// "greeting": DG_GREETING), which make the string valid JSON only after the service
+    /// interpolates them. The returned AgentId can be passed in place of the full agent object
+    /// in future Settings messages.
     /// </summary>
     /// <param name="projectId">Id of Project</param>
     /// <param name="configurationSchema"><see cref="AgentConfigurationSchema"/> describing the configuration to create</param>
@@ -93,7 +95,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         }
         if (string.IsNullOrWhiteSpace(configurationSchema.Config))
         {
-            throw new DeepgramException("CreateAgent requires Config to be set to a JSON string representing the agent block of a Settings message.");
+            throw new DeepgramException("CreateAgent requires Config to be set to a JSON-encoded string representing the agent block of a Settings message (bare DG_* template tokens are allowed).");
         }
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}");

@@ -600,6 +600,7 @@ using Deepgram.Models.AgentManage.v1;
 
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var agentManageClient = ClientFactory.CreateAgentManageClient();
+// projectId: e.g. the first project from ClientFactory.CreateManageClient().GetProjects()
 
 // Create a template variable first (DG_* key, any JSON value) so configurations can
 // reference it.
@@ -626,6 +627,10 @@ await agentManageClient.UpdateAgentMetadata(projectId, created.AgentId!,
 await agentManageClient.DeleteAgent(projectId, created.AgentId!);
 await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 ```
+
+> Note: the live API currently reserves a deleted variable's name forever within a project —
+> re-creating `DG_GREETING` after deleting it fails with "This project already has a variable
+> with that name". Use a fresh key per experiment (the runnable examples add a per-run suffix).
 
 [See our docs for more info](https://developers.deepgram.com/docs/reusable-agent-configurations).
 

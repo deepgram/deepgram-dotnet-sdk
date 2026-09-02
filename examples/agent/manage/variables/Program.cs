@@ -45,13 +45,17 @@ namespace SampleApp
                 // create a template variable. Value can be any valid JSON type - here a string.
                 // IsSensitive defaults to false (the only value the API accepts today). Do not
                 // store secrets in variables - they are visible to every member of the project.
+                // The key gets a unique per-run suffix because the live API currently reserves a
+                // deleted variable's name forever within a project - a fixed key would make this
+                // example work exactly once.
+                var variableKey = $"DG_GREETING_{DateTime.UtcNow:yyyyMMddHHmmss}";
                 var createResp = await agentManageClient.CreateAgentVariable(projectId, new AgentVariableSchema
                 {
-                    Key = "DG_GREETING",
+                    Key = variableKey,
                     Value = "Hello! How can I help you today?",
                 });
                 variableId = createResp.VariableId;
-                Console.WriteLine($"\nCreated agent variable: {variableId}");
+                Console.WriteLine($"\nCreated agent variable {variableKey}: {variableId}");
 
                 // list all template variables for the project
                 var listResp = await agentManageClient.GetAgentVariables(projectId);

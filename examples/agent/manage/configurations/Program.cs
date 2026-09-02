@@ -43,23 +43,27 @@ namespace SampleApp
                 }
                 Console.WriteLine($"Using project: {projectId}");
 
-                // create the template variable the configuration below references
+                // create the template variable the configuration below references. The key gets
+                // a unique per-run suffix because the live API currently reserves a deleted
+                // variable's name forever within a project ("This project already has a variable
+                // with that name") - a fixed key would make this example work exactly once.
+                var variableKey = $"DG_GREETING_{DateTime.UtcNow:yyyyMMddHHmmss}";
                 var variableResp = await agentManageClient.CreateAgentVariable(projectId, new AgentVariableSchema
                 {
-                    Key = "DG_GREETING",
+                    Key = variableKey,
                     Value = "Hello! How can I help you today?",
                 });
                 variableId = variableResp.VariableId;
-                Console.WriteLine($"\nCreated agent variable DG_GREETING: {variableId}");
+                Console.WriteLine($"\nCreated agent variable {variableKey}: {variableId}");
 
                 // create an agent configuration. Config is a JSON-encoded STRING representing the
-                // agent block of a Settings message. The bare DG_GREETING token (unquoted, no
-                // braces) references the template variable created above; the service substitutes
-                // its value when the configuration is used. Do not store secrets in the config or
+                // agent block of a Settings message. The bare DG_* token (unquoted, no braces)
+                // references the template variable created above; the service substitutes its
+                // value when the configuration is used. Do not store secrets in the config or
                 // metadata - they are visible to every member of the project.
                 var createResp = await agentManageClient.CreateAgent(projectId, new AgentConfigurationSchema
                 {
-                    Config = """
+                    Config = $$"""
                     {
                         "language": "en",
                         "listen": { "provider": { "type": "deepgram", "model": "nova-3" } },
@@ -67,7 +71,7 @@ namespace SampleApp
                             "provider": { "type": "open_ai", "model": "gpt-4o-mini" },
                             "prompt": "You are a helpful customer service agent."
                         },
-                        "greeting": DG_GREETING,
+                        "greeting": {{variableKey}},
                         "speak": { "provider": { "type": "deepgram", "version": "v2", "model": "flux-kit-en" } }
                     }
                     """,

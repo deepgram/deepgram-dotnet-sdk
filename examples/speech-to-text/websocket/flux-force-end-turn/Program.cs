@@ -18,7 +18,29 @@ namespace SampleApp
     {
         // Flux works best with ~80ms audio chunks: 16000 Hz * 2 bytes * 0.080s = 2560 bytes.
         const int ChunkBytes = 2560;
-        const int WavHeaderBytes = 44;
+
+        /// <summary>
+        /// Returns the byte offset of the WAV "data" chunk's payload. Never assume a fixed
+        /// 44-byte header: WAV files can carry extra chunks before the audio (this example's
+        /// own fixture has a 4 KB FLLR filler chunk), and streaming those bytes as PCM sends
+        /// noise or silence to the model.
+        /// </summary>
+        static int FindWavDataOffset(byte[] wav)
+        {
+            // RIFF layout: 12-byte header, then [4-byte chunk id][4-byte little-endian size][payload].
+            var offset = 12;
+            while (offset + 8 <= wav.Length)
+            {
+                var chunkSize = BitConverter.ToInt32(wav, offset + 4);
+                if (wav[offset] == (byte)'d' && wav[offset + 1] == (byte)'a' &&
+                    wav[offset + 2] == (byte)'t' && wav[offset + 3] == (byte)'a')
+                {
+                    return offset + 8;
+                }
+                offset += 8 + chunkSize + (chunkSize & 1); // chunks are word-aligned
+            }
+            throw new InvalidDataException("No \"data\" chunk found in the WAV file.");
+        }
 
         static async Task<int> Main(string[] args)
         {
@@ -120,9 +142,9 @@ namespace SampleApp
                     return 1;
                 }
 
-                // Stream the raw PCM (skipping the 44-byte WAV header) in ~80ms chunks,
-                // paced like a live microphone.
-                for (var offset = WavHeaderBytes; offset < audioData.Length; offset += ChunkBytes)
+                // Stream the raw PCM (starting at the WAV "data" chunk payload) in ~80ms
+                // chunks, paced like a live microphone.
+                for (var offset = FindWavDataOffset(audioData); offset < audioData.Length; offset += ChunkBytes)
                 {
                     var length = Math.Min(ChunkBytes, audioData.Length - offset);
                     var chunk = new byte[length];
