@@ -163,16 +163,17 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods
+        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // operation (the live API answers this PUT with 200 and an empty body).
         agentManageClient.When(x => x.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
-            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>())).DoNotCallBase();
-        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema).Returns(expectedResponse);
+            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>(), Arg.Any<bool>())).DoNotCallBase();
+        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);
 
         // Assert
-        await agentManageClient.Received().PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema);
+        await agentManageClient.Received().PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -191,15 +192,16 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods
-        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>())).DoNotCallBase();
-        agentManageClient.DeleteAsync<DeleteResponse>(url).Returns(expectedResponse);
+        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // operation (the live API answers this DELETE with 200 and an empty body).
+        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>(), Arg.Any<bool>())).DoNotCallBase();
+        agentManageClient.DeleteAsync<DeleteResponse>(url, true).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.DeleteAgent(_projectId, _agentId);
 
         // Assert
-        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url);
+        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url, true);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -323,17 +325,18 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods
+        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // operation (the live API answers this PATCH with 200 and an empty body).
         agentManageClient.When(x => x.PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
-            Arg.Any<string>(), Arg.Any<NoopSchema>(), Arg.Any<UpdateAgentVariableSchema>())).DoNotCallBase();
-        agentManageClient.PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema)
+            Arg.Any<string>(), Arg.Any<NoopSchema>(), Arg.Any<UpdateAgentVariableSchema>(), Arg.Any<bool>())).DoNotCallBase();
+        agentManageClient.PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema, true)
             .Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.UpdateAgentVariable(_projectId, _variableId, updateSchema);
 
         // Assert
-        await agentManageClient.Received().PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema);
+        await agentManageClient.Received().PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema, true);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -352,15 +355,16 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods
-        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>())).DoNotCallBase();
-        agentManageClient.DeleteAsync<DeleteResponse>(url).Returns(expectedResponse);
+        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // operation (the live API answers this DELETE with 200 and an empty body).
+        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>(), Arg.Any<bool>())).DoNotCallBase();
+        agentManageClient.DeleteAsync<DeleteResponse>(url, true).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.DeleteAgentVariable(_projectId, _variableId);
 
         // Assert
-        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url);
+        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url, true);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -422,7 +426,7 @@ public class AgentManageClientTests
         var json = """
         {
             "agent_id": "9d4b6c9e-0000-0000-0000-000000000000",
-            "config": { "language": "en", "greeting": "{{DG_GREETING}}" },
+            "config": { "language": "en" },
             "metadata": { "name": "support-agent" },
             "created_at": "2026-08-28T12:34:56Z",
             "updated_at": "2026-08-29T01:02:03Z"
@@ -435,11 +439,37 @@ public class AgentManageClientTests
         {
             response!.AgentId.Should().Be("9d4b6c9e-0000-0000-0000-000000000000");
             response.Config!.Value.GetProperty("language").GetString().Should().Be("en");
-            // Uninterpolated form: template variable placeholders come back as-is.
-            response.Config!.Value.GetProperty("greeting").GetString().Should().Be("{{DG_GREETING}}");
             response.Metadata!["name"].Should().Be("support-agent");
             response.CreatedAt.Should().Be(new DateTime(2026, 8, 28, 12, 34, 56, DateTimeKind.Utc));
             response.UpdatedAt.Should().Be(new DateTime(2026, 8, 29, 1, 2, 3, DateTimeKind.Utc));
+        }
+    }
+
+    [Test]
+    public void Uninterpolated_Config_Should_Preserve_Bare_Template_Variable_Tokens()
+    {
+        // The documented template-variable syntax is a bare, unquoted DG_<VARIABLE_NAME> token
+        // inside the JSON-encoded config (e.g. "greeting": DG_GREETING — no quotes, no braces).
+        // The live API stores and returns the config as that JSON-encoded STRING, so the
+        // uninterpolated response must hand the bare token back exactly as written.
+        var json = """
+        {
+            "agent_uuid": "9d4b6c9e-0000-0000-0000-000000000000",
+            "config": "{ \"language\": \"en\", \"greeting\": DG_GREETING }",
+            "metadata": { "name": "support-agent" }
+        }
+        """;
+
+        var response = JsonSerializer.Deserialize<AgentConfigurationResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Config!.Value.ValueKind.Should().Be(JsonValueKind.String);
+            var storedConfig = response.Config!.Value.GetString();
+            storedConfig.Should().Contain("\"greeting\": DG_GREETING",
+                "the bare token must come back uninterpolated, unquoted, and unbraced");
+            storedConfig.Should().NotContain("{{",
+                "brace-wrapped placeholders are not a supported template variable syntax");
         }
     }
 
@@ -596,8 +626,8 @@ public class AgentManageClientTests
 
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
         agentManageClient.When(x => x.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
-            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>())).DoNotCallBase();
-        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema)
+            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>(), Arg.Any<bool>())).DoNotCallBase();
+        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true)
             .Returns((AgentConfigurationResponse?)null!);
 
         var result = await agentManageClient.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);
@@ -616,6 +646,118 @@ public class AgentManageClientTests
             empty.Should().NotBeNull();
             withMessage!.AdditionalProperties!["message"].GetString().Should().Be("deleted");
         }
+    }
+
+    // The list converters accept exactly the two known shapes (documented envelope, captured
+    // bare array). Every other successful-looking payload must throw JsonException so API
+    // contract drift is visible instead of silently becoming "a project with no resources".
+    [TestCase("""{ "items": [ { "agent_id": "abc" } ] }""", TestName = "AgentConfigurations_Unknown_Envelope_Should_Throw")]
+    [TestCase("""{ "agents": "not-an-array" }""", TestName = "AgentConfigurations_Wrong_Property_Type_Should_Throw")]
+    [TestCase("""{ "agents": null }""", TestName = "AgentConfigurations_Null_Property_Should_Throw")]
+    [TestCase("""{}""", TestName = "AgentConfigurations_Empty_Object_Should_Throw")]
+    [TestCase(""" "scalar" """, TestName = "AgentConfigurations_Scalar_Should_Throw")]
+    [TestCase("42", TestName = "AgentConfigurations_Number_Should_Throw")]
+    [TestCase("null", TestName = "AgentConfigurations_Null_Should_Throw")]
+    public void AgentConfigurations_Should_Throw_On_Unsupported_List_Shapes(string json)
+    {
+        var act = () => JsonSerializer.Deserialize<AgentConfigurationsResponse>(json);
+
+        act.Should().Throw<JsonException>();
+    }
+
+    [TestCase("""{ "items": [ { "variable_id": "abc" } ] }""", TestName = "AgentVariables_Unknown_Envelope_Should_Throw")]
+    [TestCase("""{ "variables": "not-an-array" }""", TestName = "AgentVariables_Wrong_Property_Type_Should_Throw")]
+    [TestCase("""{ "variables": null }""", TestName = "AgentVariables_Null_Property_Should_Throw")]
+    [TestCase("""{}""", TestName = "AgentVariables_Empty_Object_Should_Throw")]
+    [TestCase(""" "scalar" """, TestName = "AgentVariables_Scalar_Should_Throw")]
+    [TestCase("42", TestName = "AgentVariables_Number_Should_Throw")]
+    [TestCase("null", TestName = "AgentVariables_Null_Should_Throw")]
+    public void AgentVariables_Should_Throw_On_Unsupported_List_Shapes(string json)
+    {
+        var act = () => JsonSerializer.Deserialize<AgentVariablesResponse>(json);
+
+        act.Should().Throw<JsonException>();
+    }
+    #endregion
+
+    #region Empty-body transport contract
+    // These run the REAL request/deserialization pipeline (no NSubstitute) against a stubbed
+    // HTTP transport, proving the empty-body opt-in is scoped to exactly the four Agent
+    // management operations whose live success responses are empty — and that everything else
+    // keeps the fail-fast contract.
+    private static T WithEmptyBodyTransport<T>(T client) where T : AbstractRestClient
+    {
+        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult("", HttpStatusCode.OK);
+        return client;
+    }
+
+    [Test]
+    public async Task UpdateAgentMetadata_Should_Accept_Empty_Success_Body_Over_Transport()
+    {
+        var client = WithEmptyBodyTransport(new AgentManageClient(_apiKey, _options));
+        var metadataSchema = new AgentMetadataSchema { Metadata = new Dictionary<string, string> { ["a"] = "b" } };
+
+        var result = await client.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);
+
+        result.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task UpdateAgentVariable_Should_Accept_Empty_Success_Body_Over_Transport()
+    {
+        var client = WithEmptyBodyTransport(new AgentManageClient(_apiKey, _options));
+
+        var result = await client.UpdateAgentVariable(_projectId, _variableId, new UpdateAgentVariableSchema { Value = "x" });
+
+        result.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task DeleteAgent_Should_Accept_Empty_Success_Body_Over_Transport()
+    {
+        var client = WithEmptyBodyTransport(new AgentManageClient(_apiKey, _options));
+
+        var result = await client.DeleteAgent(_projectId, _agentId);
+
+        result.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task DeleteAgentVariable_Should_Accept_Empty_Success_Body_Over_Transport()
+    {
+        var client = WithEmptyBodyTransport(new AgentManageClient(_apiKey, _options));
+
+        var result = await client.DeleteAgentVariable(_projectId, _variableId);
+
+        result.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task Transcription_Should_Throw_On_Empty_Success_Body_Over_Transport()
+    {
+        // A required-body endpoint: a truncated 200 with no JSON must fail at the transport
+        // boundary, never surface as a successful null result.
+        var client = WithEmptyBodyTransport(new Deepgram.Clients.Listen.v1.REST.Client(_apiKey, _options));
+
+        var act = async () => await client.TranscribeUrl(
+            new Deepgram.Models.Listen.v1.REST.UrlSource("https://dpgr.am/bueller.wav"),
+            new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Model = "nova-3" });
+
+        await act.Should().ThrowAsync<JsonException>();
+    }
+
+    [Test]
+    public async Task Agent_Read_Operations_Should_Throw_On_Empty_Success_Body_Over_Transport()
+    {
+        // Only the update/delete operations opt in: the Agent GET/LIST/CREATE contracts
+        // require JSON, so an empty 200 still fails fast even inside this client.
+        var client = WithEmptyBodyTransport(new AgentManageClient(_apiKey, _options));
+
+        var actGet = async () => await client.GetAgent(_projectId, _agentId);
+        var actList = async () => await client.GetAgents(_projectId);
+
+        await actGet.Should().ThrowAsync<JsonException>();
+        await actList.Should().ThrowAsync<JsonException>();
     }
     #endregion
 }

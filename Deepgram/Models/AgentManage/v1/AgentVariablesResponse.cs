@@ -28,11 +28,18 @@ public record AgentVariablesResponse
 }
 
 /// <summary>
-/// Accepts both list shapes: the documented {"variables":[...]} object and the bare [...]
-/// array the live API currently returns. Always serializes to the documented object shape.
+/// Accepts exactly two list shapes: the documented {"variables":[...]} object and the bare
+/// [...] array the live API currently returns. Any other shape (unknown envelope, non-array
+/// "variables", scalar, null) throws <see cref="JsonException"/> so API contract drift fails
+/// visibly instead of silently looking like a project with no variables. Always serializes to
+/// the documented object shape.
 /// </summary>
 public class AgentVariablesResponseConverter : JsonConverter<AgentVariablesResponse>
 {
+    // Ensure Read is invoked for a JSON null so it throws rather than silently producing a
+    // null response that is indistinguishable from an empty project.
+    public override bool HandleNull => true;
+
     public override AgentVariablesResponse Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.StartArray)
@@ -43,18 +50,24 @@ public class AgentVariablesResponseConverter : JsonConverter<AgentVariablesRespo
             };
         }
 
-        using var doc = JsonDocument.ParseValue(ref reader);
-        if (doc.RootElement.ValueKind == JsonValueKind.Object &&
-            doc.RootElement.TryGetProperty("variables", out var variables) &&
-            variables.ValueKind == JsonValueKind.Array)
+        if (reader.TokenType == JsonTokenType.StartObject)
         {
-            return new AgentVariablesResponse
+            using var doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("variables", out var variables) &&
+                variables.ValueKind == JsonValueKind.Array)
             {
-                Variables = variables.Deserialize<List<AgentVariableResponse>>(options),
-            };
+                return new AgentVariablesResponse
+                {
+                    Variables = variables.Deserialize<List<AgentVariableResponse>>(options),
+                };
+            }
+
+            throw new JsonException(
+                "Unrecognized agent variables list shape: expected an object with a \"variables\" array or a bare array.");
         }
 
-        return new AgentVariablesResponse();
+        throw new JsonException(
+            $"Unrecognized agent variables list shape: expected an object with a \"variables\" array or a bare array, got {reader.TokenType}.");
     }
 
     public override void Write(Utf8JsonWriter writer, AgentVariablesResponse value, JsonSerializerOptions options)
