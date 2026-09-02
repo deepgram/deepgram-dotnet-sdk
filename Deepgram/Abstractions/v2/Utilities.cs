@@ -52,13 +52,9 @@ internal static class HttpRequestUtil
     /// <returns>instance of TResponse or a Exception</returns>
     internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
     {
+        // An empty or whitespace body fails fast here (JsonException): every v2 REST response
+        // contract requires JSON, and a truncated 200 must never become a successful null result.
         var content = await httpResponseMessage.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(content))
-        {
-            // Some endpoints (e.g. agent management update/delete) return 200 with an empty
-            // body; deserializing "" would throw even though the request succeeded.
-            return default!;
-        }
         var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content);
         return deepgramResponse;
     }

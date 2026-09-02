@@ -48,15 +48,27 @@ internal static class HttpRequestUtil
     /// method that deserializes DeepgramResponse and performs null checks on values
     /// </summary>
     /// <typeparam name="TResponse">Class Type of expected response</typeparam>
-    /// <param name="httpResponseMessage">Http Response to be deserialized</param>       
+    /// <param name="httpResponseMessage">Http Response to be deserialized</param>
     /// <returns>instance of TResponse or a Exception</returns>
-    internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
+    internal static Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
+        => DeserializeAsync<TResponse>(httpResponseMessage, allowEmptyBody: false);
+
+    /// <summary>
+    /// Deserializes a Deepgram response body. By default an empty or whitespace body is a
+    /// contract violation and fails fast with a <see cref="JsonException"/> (a truncated 200
+    /// must never become a successful null result). Operations documented to return an empty
+    /// success body (currently only the Agent management update/delete calls) opt in with
+    /// <paramref name="allowEmptyBody"/> = true and receive the type's default value.
+    /// </summary>
+    /// <typeparam name="TResponse">Class Type of expected response</typeparam>
+    /// <param name="httpResponseMessage">Http Response to be deserialized</param>
+    /// <param name="allowEmptyBody">True only for endpoints whose success contract permits an empty body</param>
+    /// <returns>instance of TResponse or a Exception</returns>
+    internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage, bool allowEmptyBody)
     {
         var content = await httpResponseMessage.Content.ReadAsStringAsync();
-        if (string.IsNullOrWhiteSpace(content))
+        if (allowEmptyBody && string.IsNullOrWhiteSpace(content))
         {
-            // Some endpoints (e.g. agent management update/delete) return 200 with an empty
-            // body; deserializing "" would throw even though the request succeeded.
             return default!;
         }
         var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content);

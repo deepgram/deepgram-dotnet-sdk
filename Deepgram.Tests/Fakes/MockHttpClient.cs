@@ -19,6 +19,20 @@ public static class MockHttpClient
         };
     }
 
+    public static HttpClient CreateHttpClientWithRawResult(
+        string rawBody, HttpStatusCode code = HttpStatusCode.OK, string? url = null)
+    {
+        if (string.IsNullOrEmpty(url))
+        {
+            url = $"https://{Defaults.DEFAULT_URI}";
+        }
+
+        return new HttpClient(new MockRawHttpMessageHandler(rawBody, code))
+        {
+            BaseAddress = new Uri(url)
+        };
+    }
+
     public static HttpClient CreateHttpClientWithException(Exception Exception)
     {
         return new HttpClient(new MockHttpMessageHandlerException(Exception))
