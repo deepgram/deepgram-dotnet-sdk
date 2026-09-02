@@ -14,7 +14,12 @@ namespace Deepgram.Clients.AgentManage.v1;
 /// Implements version 1 of the Agent Manage Client: REST management of reusable Voice Agent
 /// configurations (/v1/projects/{project_id}/agents) and their template variables
 /// (/v1/projects/{project_id}/agent-variables).
-/// <see href="https://developers.deepgram.com/docs/voice-agent/configuration/reusable-configurations"/>
+///
+/// Logging note: this client never logs request or response payloads. Agent configurations
+/// carry prompts, metadata, and function-endpoint headers, and variable values can carry
+/// arbitrary customer data — none of that belongs in default SDK logs. Only operation names
+/// and resource IDs are logged.
+/// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
@@ -24,7 +29,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     #region Agent Configurations
     /// <summary>
     /// Gets all reusable agent configurations for the project. Configurations are returned in
-    /// their uninterpolated form — template variable placeholders appear as-is rather than
+    /// their uninterpolated form — template variable references appear as-is rather than
     /// with their substituted values.
     /// </summary>
     /// <param name="projectId">Id of Project</param>
@@ -39,10 +44,10 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         var result = await GetAsync<AgentConfigurationsResponse>(uri, cancellationToken, addons, headers);
 
         Log.Information("GetAgents", $"{uri} Succeeded");
-        Log.Debug("GetAgents", $"result: {result}");
+        Log.Debug("GetAgents", $"returned {result?.Agents?.Count ?? 0} agent configuration(s)");
         Log.Verbose("AgentManageClient.GetAgents", "LEAVE");
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -62,7 +67,6 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         var result = await GetAsync<AgentConfigurationResponse>(uri, cancellationToken, addons, headers);
 
         Log.Information("GetAgent", $"{uri} Succeeded");
-        Log.Debug("GetAgent", $"result: {result}");
         Log.Verbose("AgentManageClient.GetAgent", "LEAVE");
 
         return result;
@@ -91,7 +95,6 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         {
             throw new DeepgramException("CreateAgent requires Config to be set to a JSON string representing the agent block of a Settings message.");
         }
-        Log.Information("CreateAgent", $"configurationSchema:\n{configurationSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}");
         // The body-only overload keeps the (potentially large) config JSON string out of the
@@ -100,10 +103,10 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
             uri, null, configurationSchema, cancellationToken, addons, headers);
 
         Log.Information("CreateAgent", $"{uri} Succeeded");
-        Log.Debug("CreateAgent", $"result: {result}");
+        Log.Debug("CreateAgent", $"created agentId: {result?.AgentId}");
         Log.Verbose("AgentManageClient.CreateAgent", "LEAVE");
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -132,14 +135,14 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         {
             throw new DeepgramException("UpdateAgentMetadata requires Metadata to be set.");
         }
-        Log.Information("UpdateAgentMetadata", $"metadataSchema:\n{metadataSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        var result = await PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(uri, metadataSchema, cancellationToken, addons, headers)
+        // allowEmptyResponseBody: the live API answers this PUT with 200 and an empty body.
+        var result = await PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
+            uri, metadataSchema, allowEmptyResponseBody: true, cancellationToken, addons, headers)
             ?? new AgentConfigurationResponse();
 
         Log.Information("UpdateAgentMetadata", $"{uri} Succeeded");
-        Log.Debug("UpdateAgentMetadata", $"result: {result}");
         Log.Verbose("AgentManageClient.UpdateAgentMetadata", "LEAVE");
 
         return result;
@@ -161,11 +164,11 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgent", $"agentId: {agentId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
+        // allowEmptyResponseBody: the live API answers this DELETE with 200 and an empty body.
+        var result = await DeleteAsync<DeleteResponse>(uri, allowEmptyResponseBody: true, cancellationToken, addons, headers)
             ?? new DeleteResponse();
 
         Log.Information("DeleteAgent", $"{uri} Succeeded");
-        Log.Debug("DeleteAgent", $"result: {result}");
         Log.Verbose("AgentManageClient.DeleteAgent", "LEAVE");
 
         return result;
@@ -188,10 +191,10 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         var result = await GetAsync<AgentVariablesResponse>(uri, cancellationToken, addons, headers);
 
         Log.Information("GetAgentVariables", $"{uri} Succeeded");
-        Log.Debug("GetAgentVariables", $"result: {result}");
+        Log.Debug("GetAgentVariables", $"returned {result?.Variables?.Count ?? 0} agent variable(s)");
         Log.Verbose("AgentManageClient.GetAgentVariables", "LEAVE");
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -211,7 +214,6 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         var result = await GetAsync<AgentVariableResponse>(uri, cancellationToken, addons, headers);
 
         Log.Information("GetAgentVariable", $"{uri} Succeeded");
-        Log.Debug("GetAgentVariable", $"result: {result}");
         Log.Verbose("AgentManageClient.GetAgentVariable", "LEAVE");
 
         return result;
@@ -242,7 +244,6 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         {
             throw new DeepgramException("CreateAgentVariable requires Value to be set.");
         }
-        Log.Information("CreateAgentVariable", $"variableSchema:\n{variableSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}");
         // The body-only overload keeps the arbitrary JSON value out of the query string.
@@ -250,10 +251,10 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
             uri, null, variableSchema, cancellationToken, addons, headers);
 
         Log.Information("CreateAgentVariable", $"{uri} Succeeded");
-        Log.Debug("CreateAgentVariable", $"result: {result}");
+        Log.Debug("CreateAgentVariable", $"created variableId: {result?.VariableId}");
         Log.Verbose("AgentManageClient.CreateAgentVariable", "LEAVE");
 
-        return result;
+        return result!;
     }
 
     /// <summary>
@@ -281,16 +282,15 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         {
             throw new DeepgramException("UpdateAgentVariable requires Value to be set.");
         }
-        Log.Information("UpdateAgentVariable", $"updateSchema:\n{updateSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
         // The body-only overload keeps the arbitrary JSON value out of the query string.
+        // allowEmptyResponseBody: the live API answers this PATCH with 200 and an empty body.
         var result = await PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
-            uri, null, updateSchema, cancellationToken, addons, headers)
+            uri, null, updateSchema, allowEmptyResponseBody: true, cancellationToken, addons, headers)
             ?? new AgentVariableResponse();
 
         Log.Information("UpdateAgentVariable", $"{uri} Succeeded");
-        Log.Debug("UpdateAgentVariable", $"result: {result}");
         Log.Verbose("AgentManageClient.UpdateAgentVariable", "LEAVE");
 
         return result;
@@ -310,11 +310,11 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgentVariable", $"variableId: {variableId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
-        var result = await DeleteAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
+        // allowEmptyResponseBody: the live API answers this DELETE with 200 and an empty body.
+        var result = await DeleteAsync<DeleteResponse>(uri, allowEmptyResponseBody: true, cancellationToken, addons, headers)
             ?? new DeleteResponse();
 
         Log.Information("DeleteAgentVariable", $"{uri} Succeeded");
-        Log.Debug("DeleteAgentVariable", $"result: {result}");
         Log.Verbose("AgentManageClient.DeleteAgentVariable", "LEAVE");
 
         return result;
