@@ -66,9 +66,44 @@ public class DeepgramExceptionTests
     {
         var exception = JsonSerializer.Deserialize<DeepgramRESTException>("{}");
 
-        // No useful body: Message falls back to the base exception message rather than
-        // throwing or returning the "Unknown ..." sentinels as if they were real content.
-        exception!.Message.Should().NotBeNullOrWhiteSpace();
+        using (new AssertionScope())
+        {
+            // No useful body: nothing throws, the "Unknown ..." sentinels are not surfaced as
+            // if they were real content, and Message keeps the historical empty value of a
+            // no-argument DeepgramRESTException.
+            exception.Should().NotBeNull();
+            exception!.Message.Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void RESTException_Should_Deserialize_With_AspNet_Web_Defaults()
+    {
+        // Regression: the overridden read-only Message property must carry [JsonIgnore].
+        // Under JsonSerializerDefaults.Web it would otherwise map to "message" and collide
+        // with ErrorMessage ([JsonPropertyName("message")]), making the public exception
+        // model undeserializable with standard ASP.NET serializer options.
+        var json = """
+        {
+            "category": "INSUFFICIENT_PERMISSIONS",
+            "message": "Your account does not have the required scope.",
+            "details": "Check that your account has the 'agent:write' scope.",
+            "request_id": "req-web-1"
+        }
+        """;
+        var webOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+        var exception = JsonSerializer.Deserialize<DeepgramRESTException>(json, webOptions);
+
+        using (new AssertionScope())
+        {
+            exception!.Category.Should().Be("INSUFFICIENT_PERMISSIONS");
+            exception.ErrorMessage.Should().Contain("required scope");
+            exception.Details.Should().Contain("agent:write");
+            exception.RequestId.Should().Be("req-web-1");
+            exception.Message.Should().Contain("INSUFFICIENT_PERMISSIONS");
+            exception.Message.Should().Contain("required scope");
+        }
     }
 
     [Test]
@@ -77,5 +112,9 @@ public class DeepgramExceptionTests
         // Back-compat: exceptions thrown with an explicit message keep exactly that message.
         new DeepgramException("boom").Message.Should().Be("boom");
         new DeepgramRESTException("boom").Message.Should().Be("boom");
+        new DeepgramRESTException("").Message.Should().Be("");
+        // The no-argument constructor historically bound to the optional errMsg = ""
+        // constructor and produced an empty Message; recompiled source must keep that.
+        new DeepgramRESTException().Message.Should().Be("");
     }
 }

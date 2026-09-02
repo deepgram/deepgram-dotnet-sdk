@@ -9,7 +9,10 @@ public class DeepgramRESTException : DeepgramException
     // Parameterless constructor used by JSON deserialization when an API error body is
     // rehydrated into this exception; the error content lands in the base-class properties
     // (Category/ErrorMessage/Details or ErrCode/ErrMsg, plus RequestId).
-    public DeepgramRESTException() : base()
+    // base(string.Empty) preserves the historical behavior of `new DeepgramRESTException()`,
+    // which bound to the optional errMsg = "" constructor and produced an empty Message —
+    // base() would instead surface the runtime-generated "Exception of type ..." text.
+    public DeepgramRESTException() : base(string.Empty)
     {
     }
 

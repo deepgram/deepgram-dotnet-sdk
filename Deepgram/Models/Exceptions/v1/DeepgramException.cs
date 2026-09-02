@@ -75,7 +75,11 @@ public class DeepgramException : Exception
     /// body carry the error in the properties above rather than the constructor message (which
     /// is empty on that path), so without this override a failed request surfaced as a bare
     /// exception type with no explanation.
+    /// [JsonIgnore] keeps this read-only override out of (de)serialization: under
+    /// JsonSerializerDefaults.Web it would otherwise map to "message" and collide with
+    /// ErrorMessage, making the model undeserializable with standard ASP.NET options.
     /// </summary>
+    [JsonIgnore]
     public override string Message
     {
         get
