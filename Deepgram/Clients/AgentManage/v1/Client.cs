@@ -15,10 +15,13 @@ namespace Deepgram.Clients.AgentManage.v1;
 /// configurations (/v1/projects/{project_id}/agents) and their template variables
 /// (/v1/projects/{project_id}/agent-variables).
 ///
-/// Logging note: this client never logs request or response payloads. Agent configurations
-/// carry prompts, metadata, and function-endpoint headers, and variable values can carry
-/// arbitrary customer data — none of that belongs in default SDK logs. Only operation names
-/// and resource IDs are logged.
+/// Logging note: this client never logs request or response payloads at ANY log level,
+/// Verbose/Trace included. Agent configurations carry prompts, metadata, and function-endpoint
+/// headers, and variable values can carry arbitrary customer data — none of that belongs in SDK
+/// logs. Request bodies are never logged by the shared REST layer; successful response bodies
+/// are suppressed for this client via <see cref="LogResponseBodies"/>; caller-supplied header
+/// values (e.g. Authorization) are never logged by any client. Only operation names, resource
+/// IDs, and header names are logged.
 /// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -26,6 +29,12 @@ namespace Deepgram.Clients.AgentManage.v1;
 public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
     : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IAgentManageClient
 {
+    /// <summary>
+    /// Agent responses are customer data (prompts, metadata, endpoint headers, variable values):
+    /// keep them out of the Verbose response-body log the other REST clients emit.
+    /// </summary>
+    protected override bool LogResponseBodies => false;
+
     #region Agent Configurations
     /// <summary>
     /// Gets all reusable agent configurations for the project. Configurations are returned in

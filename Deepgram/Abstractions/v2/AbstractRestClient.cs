@@ -69,15 +69,8 @@ public abstract class AbstractRestClient
             NoopSchema? parameter = null;
             var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("GetAsync<T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("GetAsync<T>", request, headers);
 
             // do the request
             Log.Verbose("GetAsync<T>", "Calling _httpClient.SendAsync...");
@@ -89,7 +82,7 @@ public abstract class AbstractRestClient
                 await ThrowException("GetAsync<T>", response, resultStr);
             }
 
-            Log.Verbose("GetAsync<T>", $"Response:\n{resultStr}");
+            LogResponse("GetAsync<T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<T>", "Succeeded");
@@ -132,15 +125,8 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("GetAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("GetAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("GetAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -152,7 +138,7 @@ public abstract class AbstractRestClient
                 await ThrowException("GetAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("GetAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("GetAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<S, T>", "Succeeded");
@@ -209,15 +195,8 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(content)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostRetrieveLocalFileAsync<R, S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Calling _httpClient.SendAsync...");
@@ -329,15 +308,8 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(parameter)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -349,7 +321,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PostAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PostAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("PostAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<S, T>", $"Succeeded");
@@ -406,15 +378,8 @@ public abstract class AbstractRestClient
                 request.Content = HttpRequestUtil.CreatePayload(content);
             }
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostAsync<R, S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostAsync<R, S, T>", "Calling _httpClient.SendAsync...");
@@ -426,7 +391,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PostAsync<R, S, T>", response, resultStr);
             }
 
-            Log.Verbose("PostAsync<R, S, T>", $"Response:\n{resultStr}");
+            LogResponse("PostAsync<R, S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<R, S, T>", $"Succeeded");
@@ -486,15 +451,8 @@ public abstract class AbstractRestClient
             };
 #endif
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PatchAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PatchAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PatchAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -506,7 +464,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PatchAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PatchAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("PatchAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PatchAsync<S, T>", $"Succeeded");
@@ -560,19 +518,8 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(parameter)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    var tmp = header.Key.ToLower();
-                    if ( !(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")) )
-                    {
-                        Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    }
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PutAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -584,7 +531,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PutAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PutAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("PutAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PutAsync<S, T>", $"Succeeded");
@@ -632,15 +579,8 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, new NoopSchema(), addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("DeleteAsync<T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("DeleteAsync<T>", request, headers);
 
             // do the request
             Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
@@ -652,7 +592,7 @@ public abstract class AbstractRestClient
                 await ThrowException("DeleteAsync<T>", response, resultStr);
             }
 
-            Log.Verbose("DeleteAsync<T>", $"Response:\n{resultStr}");
+            LogResponse("DeleteAsync<T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("DeleteAsync<T>", $"Succeeded");
@@ -702,15 +642,8 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("DeleteAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("DeleteAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("DeleteAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -722,7 +655,7 @@ public abstract class AbstractRestClient
                 await ThrowException("DeleteAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("DeleteAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("DeleteAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("DeleteAsync<S, T>", $"Succeeded");
@@ -743,6 +676,50 @@ public abstract class AbstractRestClient
             Log.Verbose("DeleteAsync<S, T>", $"Excepton: {ex}");
             Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Whether successful response bodies are written to the log at Verbose. The default keeps
+    /// the long-standing diagnostic behaviour for the transcription, synthesis, analysis and
+    /// management clients. Clients whose responses carry customer data (e.g. Agent management:
+    /// prompts, metadata, function-endpoint headers, variable values) override this to false so
+    /// that data never reaches any SDK log level.
+    /// </summary>
+    protected virtual bool LogResponseBodies => true;
+
+    /// <summary>
+    /// Adds caller-supplied headers to the request and logs only the header NAMES at Debug.
+    /// Header values are never logged at any level: they can carry Authorization tokens or
+    /// other credentials.
+    /// </summary>
+    protected static void AddHeaders(string module, HttpRequestMessage request, Dictionary<string, string>? headers)
+    {
+        if (headers == null)
+        {
+            return;
+        }
+
+        foreach (var header in headers)
+        {
+            Log.Debug(module, $"Add Header {header.Key}");
+            request.Headers.Add(header.Key, header.Value);
+        }
+    }
+
+    /// <summary>
+    /// Logs a successful response body at Verbose when <see cref="LogResponseBodies"/> is
+    /// enabled; otherwise logs only its size so the trace still shows the call completed.
+    /// </summary>
+    protected void LogResponse(string module, string body)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Verbose(module, $"Response:\n{body}");
+        }
+        else
+        {
+            Log.Verbose(module, $"Response: {body.Length} bytes (body logging disabled for this client)");
         }
     }
 

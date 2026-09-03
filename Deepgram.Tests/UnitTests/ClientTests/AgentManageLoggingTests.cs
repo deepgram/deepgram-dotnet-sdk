@@ -13,24 +13,36 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 /// <summary>
 /// Regression tests for the Agent management logging contract: agent configurations (prompts,
-/// metadata, function-endpoint headers) and variable values are customer data and must NEVER
-/// appear in default SDK logs — not at Information and not at Debug. Only operation names and
-/// resource IDs are logged. Verbose is the explicitly opt-in diagnostic level and is excluded
-/// from the assertion.
+/// metadata, function-endpoint headers), variable values, caller-supplied header values
+/// (Authorization included) and the client's own API key must NEVER appear in SDK logs at ANY
+/// level — Information, Debug and Verbose/Trace alike. Only operation names, resource IDs and
+/// header names are logged. Every one of the ten agent verbs is exercised with sentinels planted
+/// in the request, the stubbed response and the request headers.
+///
+/// A final test runs the same header/API-key assertion against a non-agent client to prove the
+/// protection comes from the centralized REST header helper, not just the Agent override.
 /// </summary>
 [NonParallelizable] // Log is a process-wide facade; recording must not interleave with other fixtures.
 public class AgentManageLoggingTests
 {
-    // Sentinels planted in request payloads and in the stubbed API responses. If any of these
-    // ever shows up at Information or Debug, payload logging has regressed.
+    // Sentinels planted in request payloads, request headers and the stubbed API responses. If
+    // any of these ever shows up at any level, payload or credential logging has regressed.
     private const string PromptSentinel = "SENTINEL_PROMPT_do_not_log_7f3a";
-    private const string HeaderSentinel = "SENTINEL_HEADER_VALUE_do_not_log_9b1c";
+    private const string EndpointHeaderSentinel = "SENTINEL_ENDPOINT_HEADER_do_not_log_9b1c";
     private const string MetadataSentinel = "SENTINEL_METADATA_do_not_log_2e8d";
     private const string VariableValueSentinel = "SENTINEL_VARIABLE_VALUE_do_not_log_5c4f";
+    private const string AuthorizationSentinel = "SENTINEL_AUTHORIZATION_do_not_log_4d2a";
+    private const string CustomHeaderSentinel = "SENTINEL_CUSTOM_HEADER_VALUE_do_not_log_8e6b";
+    private const string CustomHeaderName = "X-Sentinel-Header";
 
-    private static readonly string[] Sentinels =
+    private static readonly string[] PayloadSentinels =
     {
-        PromptSentinel, HeaderSentinel, MetadataSentinel, VariableValueSentinel,
+        PromptSentinel, EndpointHeaderSentinel, MetadataSentinel, VariableValueSentinel,
+    };
+
+    private static readonly string[] CredentialSentinels =
+    {
+        AuthorizationSentinel, CustomHeaderSentinel,
     };
 
     private RecordingLoggerProvider _provider = null!;
@@ -49,7 +61,7 @@ public class AgentManageLoggingTests
             builder.AddProvider(_provider);
         }));
 
-        _apiKey = new Faker().Random.Guid().ToString();
+        _apiKey = "SENTINEL_API_KEY_do_not_log_" + new Faker().Random.Guid().ToString("N");
         _options = new DeepgramHttpClientOptions(_apiKey) { OnPrem = true };
         _projectId = new Faker().Random.Guid().ToString();
     }
@@ -61,133 +73,227 @@ public class AgentManageLoggingTests
         _provider.Dispose();
     }
 
-    private AgentManageClient NewClientReturning(string rawResponseBody)
+    private AgentManageClient NewAgentClientReturning(string rawResponseBody)
     {
         var client = new AgentManageClient(_apiKey, _options);
         client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(rawResponseBody, HttpStatusCode.OK);
         return client;
     }
 
-    private void AssertNoSentinelAtInformationOrDebug()
+    /// <summary>
+    /// Caller-supplied headers carrying credential-shaped values, passed via the public
+    /// <c>headers:</c> parameter of every verb.
+    /// </summary>
+    private static Dictionary<string, string> SentinelHeaders() => new()
     {
-        var leaked = _provider.Entries
-            .Where(e => e.Level == MelLogLevel.Information || e.Level == MelLogLevel.Debug)
-            .Where(e => Sentinels.Any(s => e.Message.Contains(s)))
+        ["Authorization"] = $"Token {AuthorizationSentinel}",
+        [CustomHeaderName] = CustomHeaderSentinel,
+    };
+
+    private IEnumerable<string> AllMessages() => _provider.Entries.Select(e => e.Message);
+
+    private void AssertNoCredentialAtAnyLevel()
+    {
+        var leaked = AllMessages()
+            .Where(m => CredentialSentinels.Any(m.Contains) || m.Contains(_apiKey))
             .ToList();
 
         leaked.Should().BeEmpty(
-            "agent configurations, prompts, endpoint headers, metadata, and variable values must never be logged at Information or Debug");
+            "header values (Authorization included) and the API key must never be logged at any level");
     }
 
-    [Test]
-    public async Task CreateAgent_Should_Not_Log_Configuration_Payload()
+    private void AssertNoSentinelAtAnyLevel()
     {
-        // The stubbed response also carries the sentinels, covering response-payload logging.
-        var responseBody = """
+        AssertNoCredentialAtAnyLevel();
+
+        var leaked = AllMessages()
+            .Where(m => PayloadSentinels.Any(m.Contains))
+            .ToList();
+
+        leaked.Should().BeEmpty(
+            "agent configurations, prompts, endpoint headers, metadata and variable values must never be logged at any level, Trace included");
+
+        // Positive checks: the shared helpers ran (header NAMES are logged at Debug, and the
+        // response-body log took the suppressed path), so a silent no-op cannot pass this test.
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Debug && e.Message == $"Add Header {CustomHeaderName}",
+            "header names are still logged at Debug");
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Trace && e.Message.Contains("body logging disabled for this client"),
+            "the Agent client must take the size-only response log path");
+    }
+
+    private static string AgentBody(string uuid) => """
         {
-            "agent_uuid": "28f134a8-0967-45cb-a792-8cf8f729e586",
-            "config": "{\"think\":{\"prompt\":\"__PROMPT__\"}}",
+            "agent_uuid": "__UUID__",
+            "config": "{\"think\":{\"prompt\":\"__PROMPT__\",\"functions\":[{\"endpoint\":{\"headers\":{\"authorization\":\"__ENDPOINT_HEADER__\"}}}]}}",
             "metadata": { "team": "__METADATA__" }
         }
         """
-            .Replace("__PROMPT__", PromptSentinel)
-            .Replace("__METADATA__", MetadataSentinel);
-        var client = NewClientReturning(responseBody);
+        .Replace("__UUID__", uuid)
+        .Replace("__PROMPT__", PromptSentinel)
+        .Replace("__ENDPOINT_HEADER__", EndpointHeaderSentinel)
+        .Replace("__METADATA__", MetadataSentinel);
 
-        var config = """
+    private static string VariableBody(string uuid) => """
+        {
+            "agent_variable_uuid": "__UUID__",
+            "key": "DG_GREETING",
+            "value": "__VALUE__"
+        }
+        """
+        .Replace("__UUID__", uuid)
+        .Replace("__VALUE__", VariableValueSentinel);
+
+    private static string AgentConfig() => """
         {
             "think": {
                 "provider": { "type": "open_ai", "model": "gpt-4o-mini" },
                 "prompt": "__PROMPT__",
-                "functions": [ { "endpoint": { "url": "https://example.com", "headers": { "authorization": "__HEADER__" } } } ]
+                "functions": [ { "endpoint": { "url": "https://example.com", "headers": { "authorization": "__ENDPOINT_HEADER__" } } } ]
             }
         }
         """
-            .Replace("__PROMPT__", PromptSentinel)
-            .Replace("__HEADER__", HeaderSentinel);
+        .Replace("__PROMPT__", PromptSentinel)
+        .Replace("__ENDPOINT_HEADER__", EndpointHeaderSentinel);
 
-        await client.CreateAgent(_projectId, new AgentConfigurationSchema
-        {
-            Config = config,
-            Metadata = new Dictionary<string, string> { ["team"] = MetadataSentinel },
-        });
+    // ---- Agent configurations: 5 verbs -------------------------------------------------------
 
-        AssertNoSentinelAtInformationOrDebug();
+    [Test]
+    public async Task GetAgents_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        var client = NewAgentClientReturning($"[{AgentBody("8f153566-fd4b-4ad4-bc13-09c66e0eed64")}]");
+
+        await client.GetAgents(_projectId, headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
     }
 
     [Test]
-    public async Task UpdateAgentMetadata_Should_Not_Log_Metadata_Payload()
+    public async Task GetAgent_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewClientReturning("");
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
+
+        await client.GetAgent(_projectId, "agent-1", headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    [Test]
+    public async Task CreateAgent_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
+
+        await client.CreateAgent(_projectId, new AgentConfigurationSchema
+        {
+            Config = AgentConfig(),
+            Metadata = new Dictionary<string, string> { ["team"] = MetadataSentinel },
+        }, headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    [Test]
+    public async Task UpdateAgentMetadata_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        // The live API returns an empty body here; stub a populated one so the response path is
+        // exercised with sentinels too.
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
 
         await client.UpdateAgentMetadata(_projectId, "agent-1", new AgentMetadataSchema
         {
             Metadata = new Dictionary<string, string> { ["team"] = MetadataSentinel },
-        });
+        }, headers: SentinelHeaders());
 
-        AssertNoSentinelAtInformationOrDebug();
+        AssertNoSentinelAtAnyLevel();
     }
 
     [Test]
-    public async Task CreateAgentVariable_Should_Not_Log_Variable_Value()
+    public async Task DeleteAgent_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var responseBody = """
-        {
-            "agent_variable_uuid": "ec490d38-3cfc-4452-8a75-40dd14e69a7e",
-            "key": "DG_GREETING",
-            "value": "__VALUE__"
-        }
-        """.Replace("__VALUE__", VariableValueSentinel);
-        var client = NewClientReturning(responseBody);
+        var client = NewAgentClientReturning($$"""{ "message": "{{MetadataSentinel}}" }""");
+
+        await client.DeleteAgent(_projectId, "agent-1", headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    // ---- Agent variables: 5 verbs ------------------------------------------------------------
+
+    [Test]
+    public async Task GetAgentVariables_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        var client = NewAgentClientReturning($"[{VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e")}]");
+
+        await client.GetAgentVariables(_projectId, headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    [Test]
+    public async Task GetAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
+
+        await client.GetAgentVariable(_projectId, "variable-1", headers: SentinelHeaders());
+
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    [Test]
+    public async Task CreateAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
+    {
+        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
 
         await client.CreateAgentVariable(_projectId, new AgentVariableSchema
         {
             Key = "DG_GREETING",
             Value = VariableValueSentinel,
-        });
+        }, headers: SentinelHeaders());
 
-        AssertNoSentinelAtInformationOrDebug();
+        AssertNoSentinelAtAnyLevel();
     }
 
     [Test]
-    public async Task UpdateAgentVariable_Should_Not_Log_Variable_Value()
+    public async Task UpdateAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewClientReturning("");
+        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
 
         await client.UpdateAgentVariable(_projectId, "variable-1", new UpdateAgentVariableSchema
         {
             Value = VariableValueSentinel,
-        });
+        }, headers: SentinelHeaders());
 
-        AssertNoSentinelAtInformationOrDebug();
+        AssertNoSentinelAtAnyLevel();
     }
 
     [Test]
-    public async Task Get_Operations_Should_Not_Log_Response_Payloads()
+    public async Task DeleteAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var agentsBody = """
-        [{
-            "agent_uuid": "8f153566-fd4b-4ad4-bc13-09c66e0eed64",
-            "config": "{\"think\":{\"prompt\":\"__PROMPT__\"}}",
-            "metadata": { "team": "__METADATA__" }
-        }]
-        """
-            .Replace("__PROMPT__", PromptSentinel)
-            .Replace("__METADATA__", MetadataSentinel);
-        var listClient = NewClientReturning(agentsBody);
-        await listClient.GetAgents(_projectId);
+        var client = NewAgentClientReturning($$"""{ "message": "{{VariableValueSentinel}}" }""");
 
-        var variablesBody = """
-        [{
-            "agent_variable_uuid": "ec490d38-3cfc-4452-8a75-40dd14e69a7e",
-            "key": "DG_GREETING",
-            "value": "__VALUE__"
-        }]
-        """.Replace("__VALUE__", VariableValueSentinel);
-        var variablesClient = NewClientReturning(variablesBody);
-        await variablesClient.GetAgentVariables(_projectId);
+        await client.DeleteAgentVariable(_projectId, "variable-1", headers: SentinelHeaders());
 
-        AssertNoSentinelAtInformationOrDebug();
+        AssertNoSentinelAtAnyLevel();
+    }
+
+    // ---- Shared REST layer, non-agent client ---------------------------------------------------
+
+    [Test]
+    public async Task Shared_Rest_Client_Should_Log_Header_Names_But_Never_Values_Or_Api_Key()
+    {
+        // ManageClient does NOT suppress response bodies (that is the existing 7.0 diagnostic
+        // contract), so only credentials are asserted here. This proves the centralized header
+        // helper protects every REST client, not just the Agent override.
+        var client = new ManageClient(_apiKey, _options);
+        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(
+            """{ "projects": [ { "project_id": "p1", "name": "demo" } ] }""", HttpStatusCode.OK);
+
+        await client.GetProjects(headers: SentinelHeaders());
+
+        AssertNoCredentialAtAnyLevel();
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Debug && e.Message == $"Add Header {CustomHeaderName}",
+            "header names may be logged at Debug");
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Debug && e.Message == "Add Header Authorization",
+            "the Authorization header NAME may be logged, its value never");
     }
 
     private sealed class RecordingLoggerProvider : ILoggerProvider
