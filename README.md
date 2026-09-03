@@ -600,7 +600,10 @@ using Deepgram.Models.AgentManage.v1;
 
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var agentManageClient = ClientFactory.CreateAgentManageClient();
-// projectId: e.g. the first project from ClientFactory.CreateManageClient().GetProjects()
+// projectId: read it from DEEPGRAM_PROJECT_ID. Use a DISPOSABLE test project while experimenting:
+// these calls create and delete real resources, and a deleted variable's name stays reserved in
+// its project forever.
+var projectId = Environment.GetEnvironmentVariable("DEEPGRAM_PROJECT_ID")!;
 
 // Create a template variable first (DG_* key, any JSON value) so configurations can
 // reference it.

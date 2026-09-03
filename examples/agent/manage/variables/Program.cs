@@ -31,15 +31,22 @@ namespace SampleApp
 
             try
             {
-                // find the project to manage variables in (first project on the account)
-                var manageClient = ClientFactory.CreateManageClient();
-                var projectsResp = await manageClient.GetProjects();
-                projectId = projectsResp?.Projects is { Count: > 0 } projects ? projects[0].ProjectId : null;
-                if (string.IsNullOrEmpty(projectId))
+                // The project to manage variables in comes ONLY from DEEPGRAM_PROJECT_ID. This example
+                // creates, updates and deletes template variables in that project, and
+                // the live API reserves a deleted variable's name forever within its project, so
+                // every run leaves permanent (invisible) state behind even after cleanup. Point it
+                // at a DISPOSABLE test project - never a production one. There is deliberately no
+                // fallback to the account's first project.
+                var configuredProjectId = Environment.GetEnvironmentVariable("DEEPGRAM_PROJECT_ID");
+                if (string.IsNullOrWhiteSpace(configuredProjectId))
                 {
-                    Console.WriteLine("No projects found.");
+                    Console.Error.WriteLine("DEEPGRAM_PROJECT_ID is not set.");
+                    Console.Error.WriteLine("Set it to the id of a DISPOSABLE test project. This example creates, updates and deletes");
+                    Console.Error.WriteLine("template variables there, and deleted variable names stay reserved in");
+                    Console.Error.WriteLine("that project forever. Refusing to pick a project for you.");
                     return 1;
                 }
+                projectId = configuredProjectId;
                 Console.WriteLine($"Using project: {projectId}");
 
                 // create a template variable. Value can be any valid JSON type - here a string.

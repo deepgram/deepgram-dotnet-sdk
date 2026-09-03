@@ -1,6 +1,9 @@
 # Live-API smokes for the Flux ForceEndTurn and Agent management surfaces (PR #426).
-# Run via ./run-smokes.sh, which asserts on the output; DEEPGRAM_API_KEY must be set in the
-# host environment — it is passed through at run time and never stored in the image.
+# Run via ./run-smokes.sh, which validates the environment and asserts on the output.
+# DEEPGRAM_API_KEY and DEEPGRAM_PROJECT_ID must be set in the host environment — both are passed
+# through at run time and never stored in the image. DEEPGRAM_PROJECT_ID must identify a
+# DISPOSABLE test project (deleted variable names stay reserved in it forever) and is handed
+# only to the two agent services; the Flux smoke is project-agnostic and does not receive it.
 services:
   flux-smoke:
     build:
@@ -19,6 +22,7 @@ services:
     image: deepgram-dotnet-live-smoke
     environment:
       - DEEPGRAM_API_KEY
+      - DEEPGRAM_PROJECT_ID
     working_dir: /app/agent-configurations
     command: ["dotnet", "AgentConfigurations.dll"]
 
@@ -29,5 +33,6 @@ services:
     image: deepgram-dotnet-live-smoke
     environment:
       - DEEPGRAM_API_KEY
+      - DEEPGRAM_PROJECT_ID
     working_dir: /app/agent-variables
     command: ["dotnet", "AgentVariables.dll"]
