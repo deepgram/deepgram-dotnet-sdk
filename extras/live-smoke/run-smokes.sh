@@ -45,9 +45,9 @@ fi
 
 echo "==> Preflight: resolving project ${DEEPGRAM_PROJECT_ID}..."
 preflight_body=$(mktemp)
-preflight_code=$(curl -sS -o "$preflight_body" -w '%{http_code}' \
-    -H "Authorization: Token ${DEEPGRAM_API_KEY}" \
-    "https://api.deepgram.com/v1/projects/${DEEPGRAM_PROJECT_ID}")
+# The header is fed via stdin (-H @-) so the key never appears in the process argument list.
+preflight_code=$(printf 'Authorization: Token %s\n' "${DEEPGRAM_API_KEY}" | curl -sS -o "$preflight_body" -w '%{http_code}' \
+    -H @- "https://api.deepgram.com/v1/projects/${DEEPGRAM_PROJECT_ID}")
 if [ "$preflight_code" != "200" ]; then
     echo "FATAL: GET /v1/projects/${DEEPGRAM_PROJECT_ID} returned HTTP ${preflight_code}; refusing to run destructive smokes." >&2
     echo "       Check that the key can access the project and that the id is correct." >&2

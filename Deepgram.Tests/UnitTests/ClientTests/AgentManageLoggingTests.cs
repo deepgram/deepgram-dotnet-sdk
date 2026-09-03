@@ -160,7 +160,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task GetAgents_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning($"[{AgentBody("8f153566-fd4b-4ad4-bc13-09c66e0eed64")}]");
+        var client = NewAgentClientReturning($"[{AgentBody("8f153566-0000-0000-0000-000000000002")}]");
 
         await client.GetAgents(_projectId, headers: SentinelHeaders());
 
@@ -170,7 +170,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task GetAgent_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0000-0000-0000-000000000001"));
 
         await client.GetAgent(_projectId, "agent-1", headers: SentinelHeaders());
 
@@ -180,7 +180,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task CreateAgent_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0000-0000-0000-000000000001"));
 
         await client.CreateAgent(_projectId, new AgentConfigurationSchema
         {
@@ -196,7 +196,7 @@ public class AgentManageLoggingTests
     {
         // The live API returns an empty body here; stub a populated one so the response path is
         // exercised with sentinels too.
-        var client = NewAgentClientReturning(AgentBody("28f134a8-0967-45cb-a792-8cf8f729e586"));
+        var client = NewAgentClientReturning(AgentBody("28f134a8-0000-0000-0000-000000000001"));
 
         await client.UpdateAgentMetadata(_projectId, "agent-1", new AgentMetadataSchema
         {
@@ -221,7 +221,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task GetAgentVariables_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning($"[{VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e")}]");
+        var client = NewAgentClientReturning($"[{VariableBody("ec490d38-0000-0000-0000-000000000003")}]");
 
         await client.GetAgentVariables(_projectId, headers: SentinelHeaders());
 
@@ -231,7 +231,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task GetAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
+        var client = NewAgentClientReturning(VariableBody("ec490d38-0000-0000-0000-000000000003"));
 
         await client.GetAgentVariable(_projectId, "variable-1", headers: SentinelHeaders());
 
@@ -241,7 +241,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task CreateAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
+        var client = NewAgentClientReturning(VariableBody("ec490d38-0000-0000-0000-000000000003"));
 
         await client.CreateAgentVariable(_projectId, new AgentVariableSchema
         {
@@ -255,7 +255,7 @@ public class AgentManageLoggingTests
     [Test]
     public async Task UpdateAgentVariable_Should_Not_Log_Payload_Or_Credentials_At_Any_Level()
     {
-        var client = NewAgentClientReturning(VariableBody("ec490d38-3cfc-4452-8a75-40dd14e69a7e"));
+        var client = NewAgentClientReturning(VariableBody("ec490d38-0000-0000-0000-000000000003"));
 
         await client.UpdateAgentVariable(_projectId, "variable-1", new UpdateAgentVariableSchema
         {

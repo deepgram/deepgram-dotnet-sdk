@@ -106,7 +106,7 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 // header names only: values may be credentials and are never logged
 
-                Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}");
+                Log.Debug("Connect", $"Add Header {header.Key}");
                 _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
             }
         }
@@ -116,7 +116,7 @@ public class Client : IDisposable, IListenWebSocketClient
             {
                 // header names only: values may be credentials and are never logged
 
-                Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}");
+                Log.Debug("Connect", $"Add Header {header.Key}");
                 _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
             }
         }

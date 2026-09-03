@@ -515,8 +515,8 @@ public class AgentManageClientTests
         // parsed object). The SDK accepts this shape alongside the documented one.
         var json = """
         [{
-            "agent_uuid": "8f153566-fd4b-4ad4-bc13-09c66e0eed64",
-            "member_id": "43d2a494-32e3-40ba-9c6e-6ab030597ead",
+            "agent_uuid": "8f153566-0000-0000-0000-000000000002",
+            "member_id": "5a5a5a5a-0000-0000-0000-000000000005",
             "api_version": 1,
             "config": "{\"language\":\"en\"}",
             "metadata": { "name": "customer-service-agent" }
@@ -529,9 +529,9 @@ public class AgentManageClientTests
         {
             response!.Agents.Should().ContainSingle();
             var agent = response.Agents![0];
-            agent.AgentUuid.Should().Be("8f153566-fd4b-4ad4-bc13-09c66e0eed64");
+            agent.AgentUuid.Should().Be("8f153566-0000-0000-0000-000000000002");
             // AgentId falls back to the live agent_uuid field.
-            agent.AgentId.Should().Be("8f153566-fd4b-4ad4-bc13-09c66e0eed64");
+            agent.AgentId.Should().Be("8f153566-0000-0000-0000-000000000002");
             agent.ApiVersion.Should().Be(1);
             agent.Config!.Value.ValueKind.Should().Be(JsonValueKind.String);
             agent.Metadata!["name"].Should().Be("customer-service-agent");
@@ -555,8 +555,8 @@ public class AgentManageClientTests
         // (not variable_id), plus is_sensitive.
         var json = """
         [{
-            "agent_variable_uuid": "ec490d38-3cfc-4452-8a75-40dd14e69a7e",
-            "member_id": "43d2a494-32e3-40ba-9c6e-6ab030597ead",
+            "agent_variable_uuid": "ec490d38-0000-0000-0000-000000000003",
+            "member_id": "5a5a5a5a-0000-0000-0000-000000000005",
             "api_version": 1,
             "key": "DG_SMOKE_TEST",
             "value": "hello",
@@ -570,9 +570,9 @@ public class AgentManageClientTests
         {
             response!.Variables.Should().ContainSingle();
             var variable = response.Variables![0];
-            variable.AgentVariableUuid.Should().Be("ec490d38-3cfc-4452-8a75-40dd14e69a7e");
+            variable.AgentVariableUuid.Should().Be("ec490d38-0000-0000-0000-000000000003");
             // VariableId falls back to the live agent_variable_uuid field.
-            variable.VariableId.Should().Be("ec490d38-3cfc-4452-8a75-40dd14e69a7e");
+            variable.VariableId.Should().Be("ec490d38-0000-0000-0000-000000000003");
             variable.Key.Should().Be("DG_SMOKE_TEST");
             variable.Value!.Value.GetString().Should().Be("hello");
             variable.IsSensitive.Should().BeFalse();
@@ -584,9 +584,9 @@ public class AgentManageClientTests
     {
         // Captured from the live API 2026-08-31: POST /agents returns only the uuid.
         var response = JsonSerializer.Deserialize<AgentConfigurationResponse>(
-            """{ "agent_uuid": "28f134a8-0967-45cb-a792-8cf8f729e586" }""");
+            """{ "agent_uuid": "28f134a8-0000-0000-0000-000000000001" }""");
 
-        response!.AgentId.Should().Be("28f134a8-0967-45cb-a792-8cf8f729e586");
+        response!.AgentId.Should().Be("28f134a8-0000-0000-0000-000000000001");
     }
 
     [Test]
