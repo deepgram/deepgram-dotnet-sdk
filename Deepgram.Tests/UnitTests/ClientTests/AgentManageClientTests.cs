@@ -150,7 +150,7 @@ public class AgentManageClientTests
     }
 
     [Test]
-    public async Task UpdateAgentMetadata_Should_Call_PutAsync_Returning_AgentConfigurationResponse()
+    public async Task UpdateAgentMetadata_Should_Call_PutAllowingEmptyResponseAsync_Returning_AgentConfigurationResponse()
     {
         // Input and Output
         var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.AGENTS}/{_agentId}");
@@ -163,17 +163,17 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // Mock methods. The client uses the empty-body-tolerant helper for this
         // operation (the live API answers this PUT with 200 and an empty body).
-        agentManageClient.When(x => x.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
-            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>(), Arg.Any<bool>())).DoNotCallBase();
-        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true).Returns(expectedResponse);
+        agentManageClient.When(x => x.PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(
+            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>())).DoNotCallBase();
+        agentManageClient.PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);
 
         // Assert
-        await agentManageClient.Received().PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true);
+        await agentManageClient.Received().PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -183,7 +183,7 @@ public class AgentManageClientTests
     }
 
     [Test]
-    public async Task DeleteAgent_Should_Call_DeleteAsync_Returning_DeleteResponse()
+    public async Task DeleteAgent_Should_Call_DeleteAllowingEmptyResponseAsync_Returning_DeleteResponse()
     {
         // Input and Output
         var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.AGENTS}/{_agentId}");
@@ -192,16 +192,16 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // Mock methods. The client uses the empty-body-tolerant helper for this
         // operation (the live API answers this DELETE with 200 and an empty body).
-        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>(), Arg.Any<bool>())).DoNotCallBase();
-        agentManageClient.DeleteAsync<DeleteResponse>(url, true).Returns(expectedResponse);
+        agentManageClient.When(x => x.DeleteAllowingEmptyResponseAsync<DeleteResponse>(Arg.Any<string>())).DoNotCallBase();
+        agentManageClient.DeleteAllowingEmptyResponseAsync<DeleteResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.DeleteAgent(_projectId, _agentId);
 
         // Assert
-        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url, true);
+        await agentManageClient.Received().DeleteAllowingEmptyResponseAsync<DeleteResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -312,7 +312,7 @@ public class AgentManageClientTests
     }
 
     [Test]
-    public async Task UpdateAgentVariable_Should_Call_PatchAsync_Returning_AgentVariableResponse()
+    public async Task UpdateAgentVariable_Should_Call_PatchAllowingEmptyResponseAsync_Returning_AgentVariableResponse()
     {
         // Input and Output
         var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.AGENT_VARIABLES}/{_variableId}");
@@ -325,18 +325,18 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // Mock methods. The client uses the empty-body-tolerant helper for this
         // operation (the live API answers this PATCH with 200 and an empty body).
-        agentManageClient.When(x => x.PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
-            Arg.Any<string>(), Arg.Any<NoopSchema>(), Arg.Any<UpdateAgentVariableSchema>(), Arg.Any<bool>())).DoNotCallBase();
-        agentManageClient.PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema, true)
+        agentManageClient.When(x => x.PatchAllowingEmptyResponseAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
+            Arg.Any<string>(), Arg.Any<NoopSchema>(), Arg.Any<UpdateAgentVariableSchema>())).DoNotCallBase();
+        agentManageClient.PatchAllowingEmptyResponseAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema)
             .Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.UpdateAgentVariable(_projectId, _variableId, updateSchema);
 
         // Assert
-        await agentManageClient.Received().PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema, true);
+        await agentManageClient.Received().PatchAllowingEmptyResponseAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(url, null, updateSchema);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -346,7 +346,7 @@ public class AgentManageClientTests
     }
 
     [Test]
-    public async Task DeleteAgentVariable_Should_Call_DeleteAsync_Returning_DeleteResponse()
+    public async Task DeleteAgentVariable_Should_Call_DeleteAllowingEmptyResponseAsync_Returning_DeleteResponse()
     {
         // Input and Output
         var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.AGENT_VARIABLES}/{_variableId}");
@@ -355,16 +355,16 @@ public class AgentManageClientTests
         // Fake Client
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
 
-        // Mock methods. The client opts in to the empty-body-tolerant overload for this
+        // Mock methods. The client uses the empty-body-tolerant helper for this
         // operation (the live API answers this DELETE with 200 and an empty body).
-        agentManageClient.When(x => x.DeleteAsync<DeleteResponse>(Arg.Any<string>(), Arg.Any<bool>())).DoNotCallBase();
-        agentManageClient.DeleteAsync<DeleteResponse>(url, true).Returns(expectedResponse);
+        agentManageClient.When(x => x.DeleteAllowingEmptyResponseAsync<DeleteResponse>(Arg.Any<string>())).DoNotCallBase();
+        agentManageClient.DeleteAllowingEmptyResponseAsync<DeleteResponse>(url).Returns(expectedResponse);
 
         // Act
         var result = await agentManageClient.DeleteAgentVariable(_projectId, _variableId);
 
         // Assert
-        await agentManageClient.Received().DeleteAsync<DeleteResponse>(url, true);
+        await agentManageClient.Received().DeleteAllowingEmptyResponseAsync<DeleteResponse>(url);
         using (new AssertionScope())
         {
             result.Should().NotBeNull();
@@ -625,9 +625,9 @@ public class AgentManageClientTests
         var metadataSchema = new AgentMetadataSchema { Metadata = new Dictionary<string, string> { ["a"] = "b" } };
 
         var agentManageClient = Substitute.For<AgentManageClient>(_apiKey, _options, null);
-        agentManageClient.When(x => x.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
-            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>(), Arg.Any<bool>())).DoNotCallBase();
-        agentManageClient.PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema, true)
+        agentManageClient.When(x => x.PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(
+            Arg.Any<string>(), Arg.Any<AgentMetadataSchema>())).DoNotCallBase();
+        agentManageClient.PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(url, metadataSchema)
             .Returns((AgentConfigurationResponse?)null!);
 
         var result = await agentManageClient.UpdateAgentMetadata(_projectId, _agentId, metadataSchema);

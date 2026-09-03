@@ -139,9 +139,10 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         }
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        // allowEmptyResponseBody: the live API answers this PUT with 200 and an empty body.
-        var result = await PutAsync<AgentMetadataSchema, AgentConfigurationResponse>(
-            uri, metadataSchema, allowEmptyResponseBody: true, cancellationToken, addons, headers)
+        // The live API answers this PUT with 200 and an empty body, so use the empty-body-tolerant
+        // helper rather than the public PutAsync (which fails fast on an empty body by design).
+        var result = await PutAllowingEmptyResponseAsync<AgentMetadataSchema, AgentConfigurationResponse>(
+            uri, metadataSchema, cancellationToken, addons, headers)
             ?? new AgentConfigurationResponse();
 
         Log.Information("UpdateAgentMetadata", $"{uri} Succeeded");
@@ -166,8 +167,9 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgent", $"agentId: {agentId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENTS}/{agentId}");
-        // allowEmptyResponseBody: the live API answers this DELETE with 200 and an empty body.
-        var result = await DeleteAsync<DeleteResponse>(uri, allowEmptyResponseBody: true, cancellationToken, addons, headers)
+        // The live API answers this DELETE with 200 and an empty body, so use the empty-body-tolerant
+        // helper rather than the public DeleteAsync (which fails fast on an empty body by design).
+        var result = await DeleteAllowingEmptyResponseAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
             ?? new DeleteResponse();
 
         Log.Information("DeleteAgent", $"{uri} Succeeded");
@@ -286,10 +288,11 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         }
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
-        // The body-only overload keeps the arbitrary JSON value out of the query string.
-        // allowEmptyResponseBody: the live API answers this PATCH with 200 and an empty body.
-        var result = await PatchAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
-            uri, null, updateSchema, allowEmptyResponseBody: true, cancellationToken, addons, headers)
+        // The body-only (R, S, T) shape keeps the arbitrary JSON value out of the query string.
+        // The live API answers this PATCH with 200 and an empty body, so use the empty-body-tolerant
+        // helper rather than the public PatchAsync (which fails fast on an empty body by design).
+        var result = await PatchAllowingEmptyResponseAsync<UpdateAgentVariableSchema, NoopSchema, AgentVariableResponse>(
+            uri, null, updateSchema, cancellationToken, addons, headers)
             ?? new AgentVariableResponse();
 
         Log.Information("UpdateAgentVariable", $"{uri} Succeeded");
@@ -312,8 +315,9 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteAgentVariable", $"variableId: {variableId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.AGENT_VARIABLES}/{variableId}");
-        // allowEmptyResponseBody: the live API answers this DELETE with 200 and an empty body.
-        var result = await DeleteAsync<DeleteResponse>(uri, allowEmptyResponseBody: true, cancellationToken, addons, headers)
+        // The live API answers this DELETE with 200 and an empty body, so use the empty-body-tolerant
+        // helper rather than the public DeleteAsync (which fails fast on an empty body by design).
+        var result = await DeleteAllowingEmptyResponseAsync<DeleteResponse>(uri, cancellationToken, addons, headers)
             ?? new DeleteResponse();
 
         Log.Information("DeleteAgentVariable", $"{uri} Succeeded");

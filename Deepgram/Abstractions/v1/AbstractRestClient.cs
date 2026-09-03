@@ -540,18 +540,23 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api</param>
     /// <returns>Instance of T</returns>
-    public virtual Task<T> PatchAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
+    public virtual async Task<T> PatchAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
-        => PatchAsync<R, S, T>(uriSegment, parameter, content, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+        => await PatchCoreAsync<R, S, T>(uriSegment, parameter, content, allowEmptyResponseBody: false, cancellationToken, addons, headers);
 
     /// <summary>
-    /// Patch overload for endpoints whose success contract permits an empty response body
-    /// (currently only the Agent management update operation). Pass
-    /// <paramref name="allowEmptyResponseBody"/> = true to receive the type's default value for
-    /// an empty 200; every other endpoint keeps the fail-fast deserialization.
+    /// PATCH for endpoints whose success contract permits an empty response body (currently only
+    /// the Agent management variable update). An empty 200 yields the type's default value
+    /// instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="PatchAsync{R, S, T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
     /// </summary>
-    public virtual async Task<T> PatchAsync<R, S, T>(string uriSegment, S? parameter, R? content, bool allowEmptyResponseBody,
+    protected internal virtual Task<T> PatchAllowingEmptyResponseAsync<R, S, T>(string uriSegment, S? parameter, R? content,
         CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => PatchCoreAsync<R, S, T>(uriSegment, parameter, content, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> PatchCoreAsync<R, S, T>(string uriSegment, S? parameter, R? content, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
     {
         Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "ENTER");
         Log.Debug("PatchAsync<R, S, T>", $"uriSegment: {uriSegment}");
@@ -635,18 +640,23 @@ public abstract class AbstractRestClient
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
     /// <param name="uriSegment">Uri for the api</param>
     /// <returns>Instance of T</returns>
-    public virtual Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
+    public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
-        => PutAsync<S, T>(uriSegment, parameter, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+        => await PutCoreAsync<S, T>(uriSegment, parameter, allowEmptyResponseBody: false, cancellationToken, addons, headers);
 
     /// <summary>
-    /// Put overload for endpoints whose success contract permits an empty response body
-    /// (currently only the Agent management update operation). Pass
-    /// <paramref name="allowEmptyResponseBody"/> = true to receive the type's default value for
-    /// an empty 200; every other endpoint keeps the fail-fast deserialization.
+    /// PUT for endpoints whose success contract permits an empty response body (currently only
+    /// the Agent management metadata update). An empty 200 yields the type's default value
+    /// instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="PutAsync{S, T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
     /// </summary>
-    public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, bool allowEmptyResponseBody,
+    protected internal virtual Task<T> PutAllowingEmptyResponseAsync<S, T>(string uriSegment, S? parameter,
         CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => PutCoreAsync<S, T>(uriSegment, parameter, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> PutCoreAsync<S, T>(string uriSegment, S? parameter, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
     {
         Log.Verbose("AbstractRestClient.PutAsync<S, T>", "ENTER");
         Log.Debug("PutAsync<S, T>", $"uriSegment: {uriSegment}");
@@ -686,7 +696,7 @@ public abstract class AbstractRestClient
             Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
 
-            var resultStr = response.Content.ReadAsStringAsync().Result;
+            var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 await ThrowException("PutAsync<S, T>", response, resultStr);
@@ -720,18 +730,23 @@ public abstract class AbstractRestClient
     /// Delete Method for use with calls that do not expect a response
     /// </summary>
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
-    public virtual Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
+    public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
-        => DeleteAsync<T>(uriSegment, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+        => await DeleteCoreAsync<T>(uriSegment, allowEmptyResponseBody: false, cancellationToken, addons, headers);
 
     /// <summary>
-    /// Delete overload for endpoints whose success contract permits an empty response body
-    /// (currently only the Agent management delete operations). Pass
-    /// <paramref name="allowEmptyResponseBody"/> = true to receive the type's default value for
-    /// an empty 200; every other endpoint keeps the fail-fast deserialization.
+    /// DELETE for endpoints whose success contract permits an empty response body (currently
+    /// only the Agent management delete operations). An empty 200 yields the type's default
+    /// value instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="DeleteAsync{T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
     /// </summary>
-    public virtual async Task<T> DeleteAsync<T>(string uriSegment, bool allowEmptyResponseBody,
+    protected internal virtual Task<T> DeleteAllowingEmptyResponseAsync<T>(string uriSegment,
         CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => DeleteCoreAsync<T>(uriSegment, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> DeleteCoreAsync<T>(string uriSegment, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
     {
         Log.Verbose("AbstractRestClient.DeleteAsync<T>", "ENTER");
         Log.Debug("DeleteAsync<T>", $"uriSegment: {uriSegment}");
@@ -764,7 +779,7 @@ public abstract class AbstractRestClient
             Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
 
-            var resultStr = response.Content.ReadAsStringAsync().Result;
+            var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 await ThrowException("DeleteAsync<T>", response, resultStr);
