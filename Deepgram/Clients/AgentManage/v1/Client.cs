@@ -18,10 +18,11 @@ namespace Deepgram.Clients.AgentManage.v1;
 /// Logging note: this client never logs request or response payloads at ANY log level,
 /// Verbose/Trace included. Agent configurations carry prompts, metadata, and function-endpoint
 /// headers, and variable values can carry arbitrary customer data — none of that belongs in SDK
-/// logs. Request bodies are never logged by the shared REST layer; successful response bodies
-/// are suppressed for this client via <see cref="LogResponseBodies"/>; caller-supplied header
-/// values (e.g. Authorization) are never logged by any client. Only operation names, resource
-/// IDs, and header names are logged.
+/// logs. Request bodies are never logged by the shared REST layer; successful AND error response
+/// bodies (including exception messages, which carry the error body) are suppressed for this
+/// client via <see cref="LogResponseBodies"/>; caller-supplied header values (e.g. Authorization)
+/// are never logged by any client. Only operation names, resource IDs, header names, and API
+/// error codes / request ids are logged.
 /// <see href="https://developers.deepgram.com/docs/reusable-agent-configurations"/>
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -31,7 +32,9 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 {
     /// <summary>
     /// Agent responses are customer data (prompts, metadata, endpoint headers, variable values):
-    /// keep them out of the Verbose response-body log the other REST clients emit.
+    /// keep them out of the Verbose response-body log the other REST clients emit. This also
+    /// suppresses error bodies and exception messages on the failure path, since validation
+    /// errors can echo submitted data.
     /// </summary>
     protected override bool LogResponseBodies => false;
 

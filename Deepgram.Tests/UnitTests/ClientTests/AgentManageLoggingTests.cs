@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.AgentManage.v1;
+using Deepgram.Models.Exceptions.v1;
 using Microsoft.Extensions.Logging;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -17,7 +18,8 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 /// (Authorization included) and the client's own API key must NEVER appear in SDK logs at ANY
 /// level — Information, Debug and Verbose/Trace alike. Only operation names, resource IDs and
 /// header names are logged. Every one of the ten agent verbs is exercised with sentinels planted
-/// in the request, the stubbed response and the request headers.
+/// in the request, the stubbed response and the request headers, and the failure path is covered
+/// with sentinels planted in 4xx/5xx error bodies (which surface in exception messages).
 ///
 /// A final test runs the same header/API-key assertion against a non-agent client to prove the
 /// protection comes from the centralized REST header helper, not just the Agent override.
@@ -34,6 +36,7 @@ public class AgentManageLoggingTests
     private const string AuthorizationSentinel = "SENTINEL_AUTHORIZATION_do_not_log_4d2a";
     private const string CustomHeaderSentinel = "SENTINEL_CUSTOM_HEADER_VALUE_do_not_log_8e6b";
     private const string CustomHeaderName = "X-Sentinel-Header";
+    private const string ErrorBodySentinel = "SENTINEL_ERROR_BODY_do_not_log_1c9e";
 
     private static readonly string[] PayloadSentinels =
     {
@@ -73,11 +76,28 @@ public class AgentManageLoggingTests
         _provider.Dispose();
     }
 
-    private AgentManageClient NewAgentClientReturning(string rawResponseBody)
+    private AgentManageClient NewAgentClientReturning(string rawResponseBody, HttpStatusCode status = HttpStatusCode.OK)
     {
         var client = new AgentManageClient(_apiKey, _options);
-        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(rawResponseBody, HttpStatusCode.OK);
+        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(rawResponseBody, status);
         return client;
+    }
+
+    /// <summary>
+    /// Failure-path variant of <see cref="AssertNoSentinelAtAnyLevel"/>: the error body (and the
+    /// exception message built from it) must not appear at any level, while the suppressed-path
+    /// markers must, so a silent no-op cannot pass.
+    /// </summary>
+    private void AssertErrorBodySuppressedAtAnyLevel()
+    {
+        AssertNoCredentialAtAnyLevel();
+
+        AllMessages().Where(m => m.Contains(ErrorBodySentinel)).Should().BeEmpty(
+            "API error bodies can echo submitted agent data and must never be logged at any level for this client");
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Trace && e.Message.Contains("Deepgram Exception:") && e.Message.Contains("body logging disabled for this client"),
+            "the error body must take the size-only log path");
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Error && e.Message.Contains("message suppressed (body logging disabled for this client)"),
+            "the exception must be logged by type only, without its message");
     }
 
     /// <summary>
@@ -275,6 +295,51 @@ public class AgentManageLoggingTests
         AssertNoSentinelAtAnyLevel();
     }
 
+    // ---- Failure path: 4xx/5xx error bodies ----------------------------------------------------
+
+    [Test]
+    public async Task Failed_Agent_Call_Should_Not_Log_Structured_Error_Body_At_Any_Level()
+    {
+        // Management-style error body -> DeepgramRESTException whose Message is composed from it.
+        var client = NewAgentClientReturning(
+            $$"""{ "err_code": "BAD_REQUEST", "err_msg": "{{ErrorBodySentinel}}", "request_id": "req-1" }""",
+            HttpStatusCode.BadRequest);
+
+        await client.Invoking(c => c.CreateAgentVariable(_projectId, new AgentVariableSchema
+        {
+            Key = "DG_GREETING",
+            Value = VariableValueSentinel,
+        }, headers: SentinelHeaders())).Should().ThrowAsync<DeepgramException>();
+
+        AssertErrorBodySuppressedAtAnyLevel();
+        AllMessages().Where(m => m.Contains(VariableValueSentinel)).Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task Failed_Agent_Call_Should_Not_Log_Raw_Error_Body_At_Any_Level()
+    {
+        // Non-JSON error body -> generic DeepgramException whose Message IS the raw body.
+        var client = NewAgentClientReturning(ErrorBodySentinel, HttpStatusCode.InternalServerError);
+
+        await client.Invoking(c => c.GetAgents(_projectId, headers: SentinelHeaders()))
+            .Should().ThrowAsync<DeepgramException>();
+
+        AssertErrorBodySuppressedAtAnyLevel();
+    }
+
+    [Test]
+    public async Task Failed_Agent_Delete_Should_Not_Log_Error_Body_At_Any_Level()
+    {
+        // Covers the empty-body-tolerant helper path (DeleteAllowingEmptyResponseAsync) on failure.
+        var client = NewAgentClientReturning(
+            $$"""{ "err_code": "NOT_FOUND", "err_msg": "{{ErrorBodySentinel}}" }""", HttpStatusCode.NotFound);
+
+        await client.Invoking(c => c.DeleteAgentVariable(_projectId, "variable-1", headers: SentinelHeaders()))
+            .Should().ThrowAsync<DeepgramException>();
+
+        AssertErrorBodySuppressedAtAnyLevel();
+    }
+
     // ---- Shared REST layer, non-agent client ---------------------------------------------------
 
     [Test]
@@ -294,6 +359,26 @@ public class AgentManageLoggingTests
             "header names may be logged at Debug");
         _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Debug && e.Message == "Add Header Authorization",
             "the Authorization header NAME may be logged, its value never");
+    }
+
+    [Test]
+    public async Task Shared_Rest_Client_Still_Logs_Error_Body_At_Verbose_But_Never_Credentials()
+    {
+        // Control: for a non-agent client the error body stays in the Verbose log (existing 7.0
+        // diagnostic contract), proving the Agent behaviour is a per-client gate, not a blanket
+        // removal. Credentials are still never logged.
+        var client = new ManageClient(_apiKey, _options);
+        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(
+            $$"""{ "err_code": "BAD_REQUEST", "err_msg": "{{ErrorBodySentinel}}" }""", HttpStatusCode.BadRequest);
+
+        await client.Invoking(c => c.GetProjects(headers: SentinelHeaders()))
+            .Should().ThrowAsync<DeepgramException>();
+
+        AssertNoCredentialAtAnyLevel();
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Trace && e.Message.Contains(ErrorBodySentinel),
+            "non-agent clients keep the Verbose error-body log");
+        _provider.Entries.Should().Contain(e => e.Level == MelLogLevel.Error && e.Message.Contains(ErrorBodySentinel),
+            "non-agent clients keep the exception message at Error");
     }
 
     private sealed class RecordingLoggerProvider : ILoggerProvider

@@ -98,8 +98,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("GetAsync<T>", $"Excepton: {ex}");
+            LogException("GetAsync<T>", ex);
             Log.Verbose("AbstractRestClient.GetAsync<T>", "LEAVE");
             throw;
         }
@@ -155,8 +154,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("GetAsync<S, T>", $"Excepton: {ex}");
+            LogException("GetAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.GetAsync<S, T>", "LEAVE");
             throw;
         }
@@ -271,8 +269,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostRetrieveLocalFileAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", $"Excepton: {ex}");
+            LogException("PostRetrieveLocalFileAsync<R, S, T>", ex);
             Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
             throw;
         }
@@ -338,8 +335,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostAsync<S, T>", $"Excepton: {ex}");
+            LogException("PostAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
             throw;
         }
@@ -408,8 +404,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostAsync<R, S, T>", $"Excepton: {ex}");
+            LogException("PostAsync<R, S, T>", ex);
             Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
             throw;
         }
@@ -482,8 +477,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PatchAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PatchAsync<S, T>", $"Excepton: {ex}");
+            LogException("PatchAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
             throw;
         }
@@ -548,8 +542,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PutAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PutAsync<S, T>", $"Excepton: {ex}");
+            LogException("PutAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
             throw;
         }
@@ -609,8 +602,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("DeleteAsync<T>", $"Excepton: {ex}");
+            LogException("DeleteAsync<T>", ex);
             Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
             throw;
         }
@@ -672,8 +664,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("DeleteAsync<S, T>", $"Excepton: {ex}");
+            LogException("DeleteAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
             throw;
         }
@@ -723,7 +714,43 @@ public abstract class AbstractRestClient
         }
     }
 
-    private static async Task ThrowException(string module, HttpResponseMessage response, string errMsg)
+    /// <summary>
+    /// Logs a non-success response body at Verbose when <see cref="LogResponseBodies"/> is
+    /// enabled; otherwise only its size. Error bodies can echo back submitted data (validation
+    /// messages quote the offending field), so they follow the same gate as success bodies.
+    /// </summary>
+    protected void LogErrorResponse(string module, string body)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Verbose(module, $"Deepgram Exception: {body}");
+        }
+        else
+        {
+            Log.Verbose(module, $"Deepgram Exception: {body.Length} bytes (body logging disabled for this client)");
+        }
+    }
+
+    /// <summary>
+    /// Logs a failed request. With body logging enabled this is the long-standing behaviour: type
+    /// and message at Error, the full exception at Verbose. With it disabled, only the exception
+    /// type plus the API error code and request id are logged — never the message, which for
+    /// <see cref="DeepgramException"/> carries the response body.
+    /// </summary>
+    protected void LogException(string module, Exception ex)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Error(module, $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose(module, $"Exception: {ex}");
+            return;
+        }
+
+        var detail = ex is DeepgramException dg ? $" (err_code: {dg.ErrCode}, request_id: {dg.RequestId})" : "";
+        Log.Error(module, $"{ex.GetType()} thrown{detail}; message suppressed (body logging disabled for this client)");
+    }
+
+    private async Task ThrowException(string module, HttpResponseMessage response, string errMsg)
     {
         if (errMsg == null || errMsg.Length == 0)
         {
@@ -731,7 +758,7 @@ public abstract class AbstractRestClient
             response.EnsureSuccessStatusCode(); // this throws the exception
         }
 
-        Log.Verbose(module, $"Deepgram Exception: {errMsg}");
+        LogErrorResponse(module, errMsg);
         DeepgramRESTException? resException = null;
         try
         {
@@ -739,7 +766,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Verbose(module, $"DeserializeAsync Error Exception: {ex}");
+            Log.Verbose(module, LogResponseBodies ? $"DeserializeAsync Error Exception: {ex}" : $"DeserializeAsync Error Exception: {ex.GetType().Name} (details suppressed for this client)");
         }
 
         if (resException != null)
