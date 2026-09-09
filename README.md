@@ -328,9 +328,9 @@ await fluxClient.Stop();
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [bring-your-own-turn-detection version](./examples/speech-to-text/websocket/flux-force-end-turn/) and a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
-### `SendForceEndTurn` availability (unreleased; next 7.x)
+### `SendForceEndTurn` availability (7.1.0)
 
-`SendForceEndTurn` is new since the published 7.0.0 release and ships in the next 7.x version.
+`SendForceEndTurn` shipped in 7.1.0 (it is not in 7.0.0).
 It lives on the concrete `FluxWebSocketClient` class only — it is intentionally **not** on the
 `IFluxWebSocketClient` interface, because adding an interface member would source-break any
 third-party class implementing that interface in a 7.x release. The member will be added to the

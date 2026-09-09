@@ -18,18 +18,16 @@ jobs:
         dotnet-version: ["8.0.x"]
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.release.target_commitish }}
+      - uses: actions/checkout@v4
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Install dependencies
         run: dotnet restore Deepgram.DevBuild.sln
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
       - name: Build
         run: dotnet build Deepgram.DevBuild.sln --configuration Release --no-restore
       - name: Pack
