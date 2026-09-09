@@ -37,9 +37,12 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
+      # Fork PRs get a read-only GITHUB_TOKEN, so commenting is not possible there.
+      # The coverage report is still available in the job summary step below.
       - name: Add coverage PR comment
         uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+        continue-on-error: true
         with:
           header: code-coverage
           recreate: true
