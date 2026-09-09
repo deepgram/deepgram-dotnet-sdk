@@ -103,6 +103,16 @@ public record TurnInfoResponse
     public double? EndOfTurnConfidence { get; set; }
 
     /// <summary>
+    /// The cause of the turn ending. Present on every EndOfTurn event and only there:
+    /// "model" (Flux's native end-of-turn detection), "manual" (a ForceEndTurn message was
+    /// sent), or "timeout" (eot_timeout_ms elapsed). This is an open set — new values may be
+    /// added over time, so handle unrecognized values gracefully.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("trigger")]
+    public string? Trigger { get; set; }
+
+    /// <summary>
     /// Detected languages sorted by descending frequency. Only present when the
     /// flux-general-multi model detects languages in the audio.
     /// </summary>

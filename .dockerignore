@@ -1,0 +1,6 @@
+# Keep host build artifacts and secrets out of Docker build contexts (extras/live-smoke).
+**/bin/
+**/obj/
+**/log.txt
+.git/
+.vs/

@@ -21,7 +21,9 @@ public record ConfigureThresholds
     public double? EagerEotThreshold { get; set; }
 
     /// <summary>
-    /// End-of-turn confidence required to finish a turn. Valid values 0.5 - 0.9. Default 0.7.
+    /// End-of-turn confidence required to finish a turn. Valid values 0.5 - 1.0. Default 0.7.
+    /// Set to 1.0 to fully suppress Flux's native end-of-turn detection and drive turn endings
+    /// yourself with ForceEndTurn (the eot_timeout_ms backstop still applies).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("eot_threshold")]
@@ -29,7 +31,7 @@ public record ConfigureThresholds
 
     /// <summary>
     /// A turn will be finished when this much time (in milliseconds) has passed after speech,
-    /// regardless of end-of-turn confidence. Valid values 500 - 10000. Default 5000.
+    /// regardless of end-of-turn confidence. Valid values 500 - 60000. Default 5000.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("eot_timeout_ms")]

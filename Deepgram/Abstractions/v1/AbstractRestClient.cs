@@ -69,15 +69,8 @@ public abstract class AbstractRestClient
             NoopSchema? parameter = null;
             var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("GetAsync<T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("GetAsync<T>", request, headers);
 
             // do the request
             Log.Verbose("GetAsync<T>", "Calling _httpClient.SendAsync...");
@@ -89,7 +82,7 @@ public abstract class AbstractRestClient
                 await ThrowException("GetAsync<T>", response, resultStr);
             }
 
-            Log.Verbose("GetAsync<T>", $"Response:\n{resultStr}");
+            LogResponse("GetAsync<T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<T>", "Succeeded");
@@ -105,8 +98,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("GetAsync<T>", $"Excepton: {ex}");
+            LogException("GetAsync<T>", ex);
             Log.Verbose("AbstractRestClient.GetAsync<T>", "LEAVE");
             throw;
         }
@@ -132,15 +124,8 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Get, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("GetAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("GetAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("GetAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -152,7 +137,7 @@ public abstract class AbstractRestClient
                 await ThrowException("GetAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("GetAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("GetAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("GetAsync<S, T>", "Succeeded");
@@ -169,8 +154,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("GetAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("GetAsync<S, T>", $"Excepton: {ex}");
+            LogException("GetAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.GetAsync<S, T>", "LEAVE");
             throw;
         }
@@ -209,15 +193,8 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(content)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostRetrieveLocalFileAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostRetrieveLocalFileAsync<R, S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Calling _httpClient.SendAsync...");
@@ -291,8 +268,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostRetrieveLocalFileAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", $"Excepton: {ex}");
+            LogException("PostRetrieveLocalFileAsync<R, S, T>", ex);
             Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
             throw;
         }
@@ -328,15 +304,8 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(parameter)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -348,7 +317,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PostAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PostAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("PostAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<S, T>", $"Succeeded");
@@ -365,8 +334,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostAsync<S, T>", $"Excepton: {ex}");
+            LogException("PostAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PostAsync<S, T>", "LEAVE");
             throw;
         }
@@ -405,15 +373,8 @@ public abstract class AbstractRestClient
                 request.Content = HttpRequestUtil.CreatePayload(content);
             }
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PostAsync<R, S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PostAsync<R, S, T>", request, headers);
 
             // do the request
             Log.Verbose("PostAsync<R, S, T>", "Calling _httpClient.SendAsync...");
@@ -425,7 +386,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PostAsync<R, S, T>", response, resultStr);
             }
 
-            Log.Verbose("PostAsync<R, S, T>", $"Response:\n{resultStr}");
+            LogResponse("PostAsync<R, S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PostAsync<R, S, T>", $"Succeeded");
@@ -442,8 +403,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PostAsync<R, S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PostAsync<R, S, T>", $"Excepton: {ex}");
+            LogException("PostAsync<R, S, T>", ex);
             Log.Verbose("AbstractRestClient.PostAsync<R, S, T>", "LEAVE");
             throw;
         }
@@ -485,15 +445,8 @@ public abstract class AbstractRestClient
             };
 #endif
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("PatchAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PatchAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PatchAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -505,7 +458,7 @@ public abstract class AbstractRestClient
                 await ThrowException("PatchAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PatchAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("PatchAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("PatchAsync<S, T>", $"Succeeded");
@@ -523,9 +476,100 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PatchAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PatchAsync<S, T>", $"Excepton: {ex}");
+            LogException("PatchAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PatchAsync<S, T>", "LEAVE");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Patch method call with separate query-parameter and body objects. Unlike
+    /// PatchAsync&lt;S, T&gt;, the body content is not repeated in the query string — use this
+    /// when the body carries values that do not belong in (or are too large for) a URL.
+    /// </summary>
+    /// <typeparam name="R">Class type of the request body</typeparam>
+    /// <typeparam name="S">Class type of the query-parameter schema</typeparam>
+    /// <typeparam name="T">Class type of what return type is expected</typeparam>
+    /// <param name="uriSegment">Uri for the api</param>
+    /// <returns>Instance of T</returns>
+    public virtual async Task<T> PatchAsync<R, S, T>(string uriSegment, S? parameter, R? content, CancellationTokenSource? cancellationToken = null,
+        Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => await PatchCoreAsync<R, S, T>(uriSegment, parameter, content, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+
+    /// <summary>
+    /// PATCH for endpoints whose success contract permits an empty response body (currently only
+    /// the Agent management variable update). An empty 200 yields the type's default value
+    /// instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="PatchAsync{R, S, T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
+    /// </summary>
+    protected internal virtual Task<T> PatchAllowingEmptyResponseAsync<R, S, T>(string uriSegment, S? parameter, R? content,
+        CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => PatchCoreAsync<R, S, T>(uriSegment, parameter, content, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> PatchCoreAsync<R, S, T>(string uriSegment, S? parameter, R? content, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
+    {
+        Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "ENTER");
+        Log.Debug("PatchAsync<R, S, T>", $"uriSegment: {uriSegment}");
+        Log.Debug("PatchAsync<R, S, T>", $"addons: {addons}");
+
+        try
+        {
+            // if not defined, use default timeout
+            if (cancellationToken == null)
+            {
+                Log.Information("PatchAsync<R, S, T>", $"Using default timeout: {Constants.DefaultRESTTimeout}");
+                cancellationToken = new CancellationTokenSource();
+                cancellationToken.CancelAfter(Constants.DefaultRESTTimeout);
+            }
+
+            // create request message and add custom query parameters
+#if NETSTANDARD2_0
+            var request = new HttpRequestMessage(new HttpMethod("PATCH"), QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(content)
+            };
+#else
+            var request = new HttpRequestMessage(HttpMethod.Patch, QueryParameterUtil.FormatURL(uriSegment, parameter, addons))
+            {
+                Content = HttpRequestUtil.CreatePayload(content)
+            };
+#endif
+
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PatchAsync<R, S, T>", request, headers);
+
+            // do the request
+            Log.Verbose("PatchAsync<R, S, T>", "Calling _httpClient.SendAsync...");
+            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+
+            var resultStr = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                await ThrowException("PatchAsync<R, S, T>", response, resultStr);
+            }
+
+            LogResponse("PatchAsync<R, S, T>", resultStr);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response, allowEmptyResponseBody);
+
+            Log.Debug("PatchAsync<R, S, T>", $"Succeeded");
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
+
+            return result;
+
+        }
+        catch (OperationCanceledException ex)
+        {
+            Log.Information("PatchAsync<R, S, T>", "Task was cancelled.");
+            Log.Verbose("PatchAsync<R, S, T>", $"Connect cancelled. Info: {ex}");
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            LogException("PatchAsync<R, S, T>", ex);
+            Log.Verbose("AbstractRestClient.PatchAsync<R, S, T>", "LEAVE");
             throw;
         }
     }
@@ -534,10 +578,25 @@ public abstract class AbstractRestClient
     /// Put method call that takes a body object
     /// </summary>
     /// <typeparam name="T">Class type of what return type is expected</typeparam>
-    /// <param name="uriSegment">Uri for the api</param>   
+    /// <param name="uriSegment">Uri for the api</param>
     /// <returns>Instance of T</returns>
     public virtual async Task<T> PutAsync<S, T>(string uriSegment, S? parameter, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => await PutCoreAsync<S, T>(uriSegment, parameter, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+
+    /// <summary>
+    /// PUT for endpoints whose success contract permits an empty response body (currently only
+    /// the Agent management metadata update). An empty 200 yields the type's default value
+    /// instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="PutAsync{S, T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
+    /// </summary>
+    protected internal virtual Task<T> PutAllowingEmptyResponseAsync<S, T>(string uriSegment, S? parameter,
+        CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => PutCoreAsync<S, T>(uriSegment, parameter, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> PutCoreAsync<S, T>(string uriSegment, S? parameter, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
     {
         Log.Verbose("AbstractRestClient.PutAsync<S, T>", "ENTER");
         Log.Debug("PutAsync<S, T>", $"uriSegment: {uriSegment}");
@@ -559,32 +618,21 @@ public abstract class AbstractRestClient
                 Content = HttpRequestUtil.CreatePayload(parameter)
             };
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    var tmp = header.Key.ToLower();
-                    if (!(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")))
-                    {
-                        Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    }
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("PutAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
 
-            var resultStr = response.Content.ReadAsStringAsync().Result;
+            var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 await ThrowException("PutAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("PutAsync<S, T>", $"Response:\n{resultStr}");
-            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+            LogResponse("PutAsync<S, T>", resultStr);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response, allowEmptyResponseBody);
 
             Log.Debug("PutAsync<S, T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
@@ -600,8 +648,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("PutAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("PutAsync<S, T>", $"Excepton: {ex}");
+            LogException("PutAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.PutAsync<S, T>", "LEAVE");
             throw;
         }
@@ -613,6 +660,21 @@ public abstract class AbstractRestClient
     /// <param name="uriSegment">Uri for the api including the query parameters</param> 
     public virtual async Task<T> DeleteAsync<T>(string uriSegment, CancellationTokenSource? cancellationToken = null,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => await DeleteCoreAsync<T>(uriSegment, allowEmptyResponseBody: false, cancellationToken, addons, headers);
+
+    /// <summary>
+    /// DELETE for endpoints whose success contract permits an empty response body (currently
+    /// only the Agent management delete operations). An empty 200 yields the type's default
+    /// value instead of a <see cref="JsonException"/>. Deliberately NOT an overload of
+    /// <see cref="DeleteAsync{T}"/>: a same-named overload with a <c>bool</c> in the
+    /// cancellation slot makes existing positional-<c>default</c> calls ambiguous (CS0121).
+    /// </summary>
+    protected internal virtual Task<T> DeleteAllowingEmptyResponseAsync<T>(string uriSegment,
+        CancellationTokenSource? cancellationToken = null, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
+        => DeleteCoreAsync<T>(uriSegment, allowEmptyResponseBody: true, cancellationToken, addons, headers);
+
+    private async Task<T> DeleteCoreAsync<T>(string uriSegment, bool allowEmptyResponseBody,
+        CancellationTokenSource? cancellationToken, Dictionary<string, string>? addons, Dictionary<string, string>? headers)
     {
         Log.Verbose("AbstractRestClient.DeleteAsync<T>", "ENTER");
         Log.Debug("DeleteAsync<T>", $"uriSegment: {uriSegment}");
@@ -631,28 +693,21 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, new NoopSchema(), addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("DeleteAsync<T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("DeleteAsync<T>", request, headers);
 
             // do the request
             Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
             var response = await _httpClient.SendAsync(request, cancellationToken.Token);
 
-            var resultStr = response.Content.ReadAsStringAsync().Result;
+            var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
                 await ThrowException("DeleteAsync<T>", response, resultStr);
             }
 
-            Log.Verbose("DeleteAsync<T>", $"Response:\n{resultStr}");
-            var result = await HttpRequestUtil.DeserializeAsync<T>(response);
+            LogResponse("DeleteAsync<T>", resultStr);
+            var result = await HttpRequestUtil.DeserializeAsync<T>(response, allowEmptyResponseBody);
 
             Log.Debug("DeleteAsync<T>", $"Succeeded");
             Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
@@ -668,8 +723,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("DeleteAsync<T>", $"Excepton: {ex}");
+            LogException("DeleteAsync<T>", ex);
             Log.Verbose("AbstractRestClient.DeleteAsync<T>", "LEAVE");
             throw;
         }
@@ -701,15 +755,8 @@ public abstract class AbstractRestClient
             // create request message and add custom query parameters
             var request = new HttpRequestMessage(HttpMethod.Delete, QueryParameterUtil.FormatURL(uriSegment, parameter, addons));
 
-            // add custom headers
-            if (headers != null)
-            {
-                foreach (var header in headers)
-                {
-                    Log.Debug("DeleteAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                    request.Headers.Add(header.Key, header.Value);
-                }
-            }
+            // add custom headers (names only are logged; values may be credentials)
+            AddHeaders("DeleteAsync<S, T>", request, headers);
 
             // do the request
             Log.Verbose("DeleteAsync<S, T>", "Calling _httpClient.SendAsync...");
@@ -721,7 +768,7 @@ public abstract class AbstractRestClient
                 await ThrowException("DeleteAsync<S, T>", response, resultStr);
             }
 
-            Log.Verbose("DeleteAsync<S, T>", $"Response:\n{resultStr}");
+            LogResponse("DeleteAsync<S, T>", resultStr);
             var result = await HttpRequestUtil.DeserializeAsync<T>(response);
 
             Log.Debug("DeleteAsync<S, T>", $"Succeeded");
@@ -738,14 +785,93 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Error("DeleteAsync<S, T>", $"{ex.GetType()} thrown {ex.Message}");
-            Log.Verbose("DeleteAsync<S, T>", $"Excepton: {ex}");
+            LogException("DeleteAsync<S, T>", ex);
             Log.Verbose("AbstractRestClient.DeleteAsync<S, T>", "LEAVE");
             throw;
         }
     }
 
-    private static async Task ThrowException(string module, HttpResponseMessage response, string errMsg)
+    /// <summary>
+    /// Whether successful response bodies are written to the log at Verbose. The default keeps
+    /// the long-standing diagnostic behaviour for the transcription, synthesis, analysis and
+    /// management clients. Clients whose responses carry customer data (e.g. Agent management:
+    /// prompts, metadata, function-endpoint headers, variable values) override this to false so
+    /// that data never reaches any SDK log level.
+    /// </summary>
+    protected virtual bool LogResponseBodies => true;
+
+    /// <summary>
+    /// Adds caller-supplied headers to the request and logs only the header NAMES at Debug.
+    /// Header values are never logged at any level: they can carry Authorization tokens or
+    /// other credentials.
+    /// </summary>
+    protected static void AddHeaders(string module, HttpRequestMessage request, Dictionary<string, string>? headers)
+    {
+        if (headers == null)
+        {
+            return;
+        }
+
+        foreach (var header in headers)
+        {
+            Log.Debug(module, $"Add Header {header.Key}");
+            request.Headers.Add(header.Key, header.Value);
+        }
+    }
+
+    /// <summary>
+    /// Logs a successful response body at Verbose when <see cref="LogResponseBodies"/> is
+    /// enabled; otherwise logs only its size so the trace still shows the call completed.
+    /// </summary>
+    protected void LogResponse(string module, string body)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Verbose(module, $"Response:\n{body}");
+        }
+        else
+        {
+            Log.Verbose(module, $"Response: {body.Length} bytes (body logging disabled for this client)");
+        }
+    }
+
+    /// <summary>
+    /// Logs a non-success response body at Verbose when <see cref="LogResponseBodies"/> is
+    /// enabled; otherwise only its size. Error bodies can echo back submitted data (validation
+    /// messages quote the offending field), so they follow the same gate as success bodies.
+    /// </summary>
+    protected void LogErrorResponse(string module, string body)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Verbose(module, $"Deepgram Exception: {body}");
+        }
+        else
+        {
+            Log.Verbose(module, $"Deepgram Exception: {body.Length} bytes (body logging disabled for this client)");
+        }
+    }
+
+    /// <summary>
+    /// Logs a failed request. With body logging enabled this is the long-standing behaviour: type
+    /// and message at Error, the full exception at Verbose. With it disabled, only the exception
+    /// type plus the API error code and request id are logged — never the message, which for
+    /// <see cref="DeepgramException"/> carries the response body.
+    /// </summary>
+    protected void LogException(string module, Exception ex)
+    {
+        if (LogResponseBodies)
+        {
+            Log.Error(module, $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose(module, $"Exception: {ex}");
+            return;
+        }
+
+        var detail = ex is DeepgramException dg ? $" (err_code: {dg.ErrCode}, request_id: {dg.RequestId})" : "";
+        Log.Error(module, $"{ex.GetType()} thrown{detail}; message suppressed (body logging disabled for this client)");
+    }
+
+    private async Task ThrowException(string module, HttpResponseMessage response, string errMsg)
     {
         if (errMsg == null || errMsg.Length == 0)
         {
@@ -753,7 +879,7 @@ public abstract class AbstractRestClient
             response.EnsureSuccessStatusCode(); // this throws the exception
         }
 
-        Log.Verbose(module, $"Deepgram Exception: {errMsg}");
+        LogErrorResponse(module, errMsg);
         DeepgramRESTException? resException = null;
         try
         {
@@ -761,7 +887,7 @@ public abstract class AbstractRestClient
         }
         catch (Exception ex)
         {
-            Log.Verbose(module, $"DeserializeAsync Error Exception: {ex}");
+            Log.Verbose(module, LogResponseBodies ? $"DeserializeAsync Error Exception: {ex}" : $"DeserializeAsync Error Exception: {ex.GetType().Name} (details suppressed for this client)");
         }
 
         if (resException != null)

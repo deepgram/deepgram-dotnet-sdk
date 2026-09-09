@@ -52,6 +52,8 @@ internal static class HttpRequestUtil
     /// <returns>instance of TResponse or a Exception</returns>
     internal static async Task<TResponse> DeserializeAsync<TResponse>(HttpResponseMessage httpResponseMessage)
     {
+        // An empty or whitespace body fails fast here (JsonException): every v2 REST response
+        // contract requires JSON, and a truncated 200 must never become a successful null result.
         var content = await httpResponseMessage.Content.ReadAsStringAsync();
         var deepgramResponse = JsonSerializer.Deserialize<TResponse>(content);
         return deepgramResponse;

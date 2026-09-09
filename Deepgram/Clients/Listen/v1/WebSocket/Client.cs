@@ -104,11 +104,9 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             foreach (var header in _deepgramClientOptions.Headers)
             {
-                var tmp = header.Key.ToLower();
-                if (!(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")))
-                {
-                    Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                }
+                // header names only: values may be credentials and are never logged
+
+                Log.Debug("Connect", $"Add Header {header.Key}");
                 _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
             }
         }
@@ -116,11 +114,9 @@ public class Client : IDisposable, IListenWebSocketClient
         {
             foreach (var header in headers)
             {
-                var tmp = header.Key.ToLower();
-                if (!(tmp.Contains("password") || tmp.Contains("token") || tmp.Contains("authorization") || tmp.Contains("auth")))
-                {
-                    Log.Debug("PutAsync<S, T>", $"Add Header {header.Key}={header.Value}");
-                }
+                // header names only: values may be credentials and are never logged
+
+                Log.Debug("Connect", $"Add Header {header.Key}");
                 _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
             }
         }

@@ -21,8 +21,8 @@ namespace Deepgram.Clients.Flux.WebSocket;
 /// Flux differs from classic streaming transcription:
 /// results arrive as TurnInfo messages carrying a turn lifecycle event
 /// (StartOfTurn, Update, EagerEndOfTurn, TurnResumed, EndOfTurn), and the endpoint accepts
-/// only two client control messages: CloseStream and Configure. There is no KeepAlive and
-/// no Finalize; idle connections rely on WebSocket protocol-level ping/pong.
+/// only three client control messages: CloseStream, Configure, and ForceEndTurn. There is no
+/// KeepAlive and no Finalize; idle connections rely on WebSocket protocol-level ping/pong.
 ///
 /// Note: event handlers are invoked from the receive loop; a slow handler delays delivery of
 /// subsequent messages (including EndOfTurn). Keep handlers fast and offload heavy work.
@@ -318,6 +318,34 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
 
         Log.Debug("SendConfigure", $"Sending Configure Message Immediately... {configure}");
         byte[] data = Encoding.UTF8.GetBytes(configure.ToString());
+        await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Sends a ForceEndTurn message to Deepgram to end the current turn immediately, on your
+    /// own signal (push-to-talk release, DTMF, your own VAD). Flux ends the turn on the audio
+    /// transcribed so far and emits a standard EndOfTurn TurnInfo with
+    /// <see cref="TurnInfoResponse.Trigger"/> set to "manual". When no turn is active, the
+    /// server ignores the message and replies with a Warning (code
+    /// FORCE_END_TURN_NO_ACTIVE_TURN), which this SDK surfaces via the Unhandled event.
+    /// Set <see cref="FluxSchema.EotThreshold"/> to 1.0 to suppress Flux's native end-of-turn
+    /// detection entirely and drive every turn ending yourself.
+    /// Audio queued via <see cref="Send"/> before this call is flushed to the socket first, so
+    /// the turn always ends on the audio you actually sent.
+    /// <see href="https://developers.deepgram.com/docs/flux/force-end-turn"/>
+    /// </summary>
+    public async Task SendForceEndTurn()
+    {
+        // Flush any buffered audio first so ForceEndTurn can't overtake audio still in the send
+        // queue (it is sent immediately and would otherwise race ahead, ending the turn before
+        // the final chunks reach Flux). Mirrors the SendFinalize fix in the v1 listen client.
+        Log.Debug("SendForceEndTurn", "Flushing buffered audio before ForceEndTurn...");
+        await Flush();
+
+        ControlMessage message = new ControlMessage(Constants.ForceEndTurn);
+
+        Log.Debug("SendForceEndTurn", "Sending ForceEndTurn Message Immediately...");
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         await SendMessageImmediately(data);
     }
 

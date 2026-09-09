@@ -104,8 +104,8 @@ namespace SampleApp
 
                 // Clean shutdown: this sends {"type":"CloseStream"} and waits briefly so the
                 // server can flush the final turn results before the socket is torn down.
-                // (Flux has no KeepAlive or Finalize messages - CloseStream is the only
-                // type-only control message it accepts.)
+                // (Flux has no KeepAlive or Finalize messages - its client control messages
+                // are CloseStream, Configure, and ForceEndTurn.)
                 await fluxClient.Stop();
 
                 // Teardown Library
