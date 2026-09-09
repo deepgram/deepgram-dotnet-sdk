@@ -4,7 +4,8 @@ name: Daily Tests
 # tests (which Assert.Ignore when DEEPGRAM_API_KEY is unset) actually exercise the API.
 # Mirrors the tests-daily workflow in the Python and Java SDKs.
 #
-# Requires the repository secret DEEPGRAM_API_KEY (an org-owned key, not a personal one).
+# Requires the repository secret DEEPGRAM_API_KEY. Currently a maintainer's key scoped to a test
+# project; an org-owned key is the intended long-term owner. Rotating the key turns this run red.
 # The destructive agent CRUD smokes under extras/live-smoke are intentionally NOT run here;
 # they need a disposable project and leave permanent state behind.
 
@@ -19,6 +20,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
@@ -32,6 +34,7 @@ jobs:
 
   live-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: build
     # Skip on forks, which cannot see the secret.
     if: github.repository == 'deepgram/deepgram-dotnet-sdk'
