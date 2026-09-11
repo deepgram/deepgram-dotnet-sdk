@@ -1,0 +1,67 @@
+name: Daily Tests
+
+# Runs the full test suite once a day with a real Deepgram API key so the live integration
+# tests (which Assert.Ignore when DEEPGRAM_API_KEY is unset) actually exercise the API.
+# Mirrors the tests-daily workflow in the Python and Java SDKs.
+#
+# Requires the repository secret DEEPGRAM_API_KEY. Currently a maintainer's key scoped to a test
+# project; an org-owned key is the intended long-term owner. Rotating the key turns this run red.
+# The destructive agent CRUD smokes under extras/live-smoke are intentionally NOT run here;
+# they need a disposable project and leave permanent state behind.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore Deepgram.sln
+      - name: Build
+        run: dotnet build Deepgram.sln --configuration Release --no-restore
+
+  live-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build
+    # Skip on forks, which cannot see the secret.
+    if: github.repository == 'deepgram/deepgram-dotnet-sdk'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore Deepgram.sln
+      - name: Fail fast if the API key secret is missing
+        env:
+          DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+        run: |
+          if [ -z "$DEEPGRAM_API_KEY" ]; then
+            echo "::error::DEEPGRAM_API_KEY secret is not set; live tests would be silently skipped." >&2
+            exit 1
+          fi
+      - name: Run tests against the live API
+        env:
+          DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+        run: dotnet test Deepgram.sln --configuration Release --no-restore --logger "trx;LogFileName=daily.trx" --results-directory ./TestResults
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-test-results
+          path: ./TestResults
+          retention-days: 14
