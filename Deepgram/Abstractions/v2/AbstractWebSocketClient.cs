@@ -618,7 +618,18 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             }
             var data = JsonDocument.Parse(response);
-            var typeString = data.RootElement.GetProperty("type").GetString();
+            string? typeString;
+            if (data.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                typeString = data.RootElement.TryGetProperty("type", out var type)
+                    && type.ValueKind == JsonValueKind.String
+                    ? type.GetString()
+                    : null;
+            }
+            else
+            {
+                typeString = data.RootElement.GetProperty("type").GetString();
+            }
             // Use TryParse so message types unknown to this SDK version are surfaced as
             // Unhandled instead of throwing. This keeps the SDK forward-compatible with new
             // server message types. See #395.

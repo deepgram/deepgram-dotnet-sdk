@@ -89,4 +89,28 @@ public class ListenWebSocketClientTests
             unhandled!.Raw.Should().Be(json);
         }
     }
+
+    [TestCase("{}")]
+    [TestCase("{ \"type\": 5 }")]
+    public async Task ProcessTextMessage_With_Missing_Or_NonString_Type_Should_Raise_Unhandled_Without_Invoking_Typed_Listeners(string json)
+    {
+        var client = new Client(_apiKey, _options);
+        var speechStartedCount = 0;
+        var utteranceEndCount = 0;
+        Common.UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, _) => speechStartedCount++));
+        await client.Subscribe(new EventHandler<UtteranceEndResponse>((_, _) => utteranceEndCount++));
+        await client.Subscribe(new EventHandler<Common.UnhandledResponse>((_, response) => unhandled = response));
+
+        Action act = () => FeedTextMessage(client, json);
+
+        using (new AssertionScope())
+        {
+            act.Should().NotThrow("malformed object message types must remain non-fatal");
+            speechStartedCount.Should().Be(0);
+            utteranceEndCount.Should().Be(0);
+            unhandled.Should().NotBeNull();
+            unhandled!.Raw.Should().Be(json);
+        }
+    }
 }
