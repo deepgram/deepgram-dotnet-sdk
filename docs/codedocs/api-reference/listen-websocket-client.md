@@ -58,6 +58,7 @@ Task<bool> Subscribe(EventHandler<ErrorResponse> eventHandler)
 Task SendKeepAlive()
 Task SendFinalize()
 Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+Task Flush()
 void Send(byte[] data, int length = Constants.UseArrayLengthForSend)
 void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend)
 void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend)
@@ -85,10 +86,15 @@ bool IsConnected()
 
 ```csharp
 var client = ClientFactory.CreateListenWebSocketClient();
+var finalResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
 {
     Console.WriteLine(e.Channel?.Alternatives?[0].Transcript);
+    if (e.IsFinal == true && e.FromFinalize == true)
+    {
+        finalResult.TrySetResult();
+    }
 }));
 
 await client.Connect(new LiveSchema
@@ -98,6 +104,13 @@ await client.Connect(new LiveSchema
     SampleRate = 16000,
     InterimResults = true
 });
+
+client.Send(audioChunk);
+await client.SendFinalize();
+await finalResult.Task.WaitAsync(TimeSpan.FromSeconds(30));
+await client.Stop();
 ```
+
+`Flush()` waits for audio queued with `Send`, `SendBinary`, or `SendMessage` to reach the socket. You rarely call it directly: `SendFinalize()` calls it before it sends the `Finalize` control message, which prevents finalization from overtaking queued audio. `SendFinalize()` is a Nova Listen control message; Flux STT uses `Stop()`/`CloseStream` instead.
 
 Related pages: [Streaming Transcription](/docs/streaming-transcription), [Microphone](/docs/api-reference/microphone).

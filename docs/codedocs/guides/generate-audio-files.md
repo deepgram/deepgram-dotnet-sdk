@@ -53,6 +53,7 @@ await File.WriteAllBytesAsync("queued.mp3", streamResponse.Stream!.ToArray());
 using Deepgram.Models.Speak.v2.WebSocket;
 
 var wsClient = ClientFactory.CreateSpeakWebSocketClient();
+var flushed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await wsClient.Subscribe(new EventHandler<AudioResponse>((_, e) =>
 {
@@ -62,6 +63,8 @@ await wsClient.Subscribe(new EventHandler<AudioResponse>((_, e) =>
     }
 }));
 
+await wsClient.Subscribe(new EventHandler<FlushedResponse>((_, _) => flushed.TrySetResult()));
+
 await wsClient.Connect(new Deepgram.Models.Speak.v2.WebSocket.SpeakSchema
 {
     Encoding = "linear16",
@@ -70,6 +73,7 @@ await wsClient.Connect(new Deepgram.Models.Speak.v2.WebSocket.SpeakSchema
 
 wsClient.SpeakWithText("Hello from the streaming client.");
 wsClient.Flush();
+await flushed.Task.WaitAsync(TimeSpan.FromSeconds(30));
 await wsClient.Stop();
 ```
 
@@ -83,5 +87,6 @@ Practical advice:
 - `ToFile` is usually the right default for CLIs, batch jobs, and report-generation pipelines.
 - `ToStream` is better when your app uploads the generated audio somewhere else and you do not want an intermediate file on disk.
 - Streaming TTS is more interactive, but you need to decide how to wrap raw PCM output into a playable container such as WAV, exactly as the repository examples do.
+- Use `CreateFluxSpeakRESTClient` for complete Flux TTS v2 audio or `CreateFluxSpeakWebSocketClient` for turn-based Flux TTS; see the dedicated [Flux TTS REST](/docs/api-reference/flux-speak-rest-client) and [Flux TTS WebSocket](/docs/api-reference/flux-speak-websocket-client) references.
 
 If you are choosing between these modes for a user-facing feature, start with REST to validate content and voice selection, then move to WebSocket once latency becomes the bottleneck.

@@ -3,9 +3,9 @@ title: "Speech Synthesis"
 description: "How the SDK handles text-to-speech through file-oriented REST calls and low-latency WebSocket streaming."
 ---
 
-The SDK exposes two distinct text-to-speech models: `SpeakRESTClient` for one-shot synthesis into a file or stream, and `SpeakWebSocketClient` for incremental synthesis over a persistent socket. Both rely on typed `SpeakSchema` models, but the REST and WebSocket variants are different types in different namespaces.
+The SDK exposes Aura and Flux TTS clients. `SpeakRESTClient` and `SpeakWebSocketClient` use the v1 Speak API for Aura voices. `FluxSpeakRESTClient` and `FluxSpeakWebSocketClient` use the v2 Speak API for Flux TTS. Each transport has its own typed `SpeakSchema` model in a separate namespace.
 
-The core files are `Deepgram/Clients/Speak/v1/REST/Client.cs`, `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`, `Deepgram/Models/Speak/v1/REST/SpeakSchema.cs`, and `Deepgram/Models/Speak/v2/WebSocket/SpeakSchema.cs`.
+The core files are `Deepgram/Clients/Speak/v1/REST/Client.cs`, `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`, `Deepgram/Clients/Flux/Speak/REST/Client.cs`, `Deepgram/Clients/Flux/Speak/WebSocket/Client.cs`, and their matching models under `Deepgram/Models/Speak` and `Deepgram/Models/Flux/Speak`.
 
 ## Why this concept exists
 
@@ -58,6 +58,7 @@ var options = new DeepgramWsClientOptions(
     });
 
 var client = ClientFactory.CreateSpeakWebSocketClient(options: options);
+var flushed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await client.Subscribe(new EventHandler<AudioResponse>((_, e) =>
 {
@@ -66,6 +67,8 @@ await client.Subscribe(new EventHandler<AudioResponse>((_, e) =>
         File.AppendAllBytes("output.raw", e.Stream.ToArray());
     }
 }));
+
+await client.Subscribe(new EventHandler<FlushedResponse>((_, _) => flushed.TrySetResult()));
 
 await client.Connect(new SpeakSchema
 {
@@ -77,10 +80,17 @@ await client.Connect(new SpeakSchema
 client.SpeakWithText("This is the first sentence.");
 client.SpeakWithText("This is the second sentence.");
 client.Flush();
-
-Console.ReadKey();
+await flushed.Task.WaitAsync(TimeSpan.FromSeconds(30));
 await client.Stop();
 ```
+
+## Flux TTS
+
+Use `ClientFactory.CreateFluxSpeakRESTClient()` to synthesize a complete Flux TTS response with `POST /v2/speak`, or `ClientFactory.CreateFluxSpeakWebSocketClient()` for turn-based v2 streaming. Flux TTS requires a `flux-*` model, such as `flux-alexis-en`; Aura model names belong on the v1 clients. The REST client supports batch encodings and containers, while the Flux TTS WebSocket emits raw `linear16`, `mulaw`, or `alaw` audio.
+
+For WebSocket turns, `SendText()` adds text to the active turn and `await SendFlush()` ends that turn. The server emits `Flushed`, then `SpeechMetadata` after every audio chunk for the turn has been sent. Wait for `SpeechMetadata` before starting dependent work or closing the connection. See [FluxSpeakRESTClient](/docs/api-reference/flux-speak-rest-client) and [FluxSpeakWebSocketClient](/docs/api-reference/flux-speak-websocket-client).
+
+<Callout type="info">`Flush()` on the Aura streaming client and `SendFlush()` on the Flux TTS streaming client are different APIs. Both finish buffered text, but neither replaces awaiting the corresponding completion event before shutdown.</Callout>
 
 <Callout type="warn">For streaming TTS, prefer `SpeakWithText`, `Flush`, and `Clear` over immediate send methods. `Deepgram/Clients/Speak/v2/WebSocket/Client.cs` comments explicitly call out that these operations should stay queued so text and control messages preserve the intended order.</Callout>
 

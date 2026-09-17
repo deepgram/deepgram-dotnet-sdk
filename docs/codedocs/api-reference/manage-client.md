@@ -89,4 +89,4 @@ var key = await client.CreateKey(
     });
 ```
 
-Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [SelfHostedClient](/docs/api-reference/self-hosted-client).
+Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).

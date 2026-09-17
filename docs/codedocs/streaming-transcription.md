@@ -55,6 +55,7 @@ using Deepgram;
 using Deepgram.Models.Listen.v2.WebSocket;
 
 var client = ClientFactory.CreateListenWebSocketClient();
+var finalResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
 {
@@ -62,6 +63,11 @@ await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
     if (!string.IsNullOrWhiteSpace(transcript))
     {
         Console.WriteLine(transcript);
+    }
+
+    if (e.IsFinal == true && e.FromFinalize == true)
+    {
+        finalResult.TrySetResult();
     }
 }));
 
@@ -77,6 +83,8 @@ var connected = await client.Connect(new LiveSchema
 if (connected)
 {
     client.Send(File.ReadAllBytes("chunk.raw"));
+    await client.SendFinalize();
+    await finalResult.Task.WaitAsync(TimeSpan.FromSeconds(30));
     await client.Stop();
 }
 ```
@@ -100,6 +108,15 @@ var options = new DeepgramWsClientOptions(
     });
 
 var client = ClientFactory.CreateListenWebSocketClient(options: options);
+var finalResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
+{
+    if (e.IsFinal == true && e.FromFinalize == true)
+    {
+        finalResult.TrySetResult();
+    }
+}));
 
 await client.Subscribe(new EventHandler<UtteranceEndResponse>((_, e) =>
 {
@@ -121,6 +138,8 @@ microphone.Start();
 
 Console.ReadKey();
 microphone.Stop();
+await client.SendFinalize();
+await finalResult.Task.WaitAsync(TimeSpan.FromSeconds(30));
 await client.Stop();
 
 Deepgram.Microphone.Library.Terminate();
@@ -140,7 +159,7 @@ await client.SendMessageImmediately(controlBytes);
 
 </Accordion>
 <Accordion title="Autoflush convenience vs explicit lifecycle control">
-`AutoFlushReplyDelta` is useful when your app behaves like push-to-talk and wants the SDK to nudge the stream toward a final result after inactivity. That convenience comes with less explicit control, because the timing is now partly driven by background logic rather than your own call to `SendFinalize()`. If your product has a very clear speech boundary, calling `SendFinalize()` yourself can make behavior easier to debug and test. If your input timing is messy or user-driven, autoflush can remove a surprising amount of edge-case code from the app layer.
+`AutoFlushReplyDelta` is useful when your app behaves like push-to-talk and wants the SDK to nudge the stream toward a final result after inactivity. That convenience comes with less explicit control, because the timing is now partly driven by background logic rather than your own call to `SendFinalize()`. `SendFinalize()` first drains the SDK's queued audio and then sends the server `Finalize` control message; await a final `ResultResponse` before calling `Stop()` so the last transcript is not discarded. If your input timing is messy or user-driven, autoflush can remove a surprising amount of edge-case code from the app layer.
 
 ```csharp
 var options = new DeepgramWsClientOptions(addons: new Dictionary<string, string>

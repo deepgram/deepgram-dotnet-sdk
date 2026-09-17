@@ -28,6 +28,7 @@ Deepgram.Library.Initialize();
 var options = new DeepgramWsClientOptions(keepAlive: true);
 
 var client = ClientFactory.CreateListenWebSocketClient(options: options);
+var finalResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
 {
@@ -35,6 +36,11 @@ await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
     if (!string.IsNullOrWhiteSpace(transcript))
     {
         Console.WriteLine(transcript);
+    }
+
+    if (e.IsFinal == true && e.FromFinalize == true)
+    {
+        finalResult.TrySetResult();
     }
 }));
 ```
@@ -70,6 +76,8 @@ microphone.Start();
 Console.ReadKey();
 
 microphone.Stop();
+await client.SendFinalize();
+await finalResult.Task.WaitAsync(TimeSpan.FromSeconds(30));
 await client.Stop();
 
 Deepgram.Microphone.Library.Terminate();
@@ -83,7 +91,7 @@ Operational notes:
 
 - The microphone helper defaults to `linear16`, mono, 16 kHz, which is a natural fit for the example `LiveSchema`.
 - `DeepgramWsClientOptions(keepAlive: true)` turns on the background keepalive loop implemented by the listen WebSocket client.
-- If your app behaves like push-to-talk, set `auto_flush_reply_delta` in `DeepgramWsClientOptions.Addons` or call `SendFinalize()` yourself.
+- If your app behaves like push-to-talk, set `auto_flush_reply_delta` in `DeepgramWsClientOptions.Addons` or call `SendFinalize()` yourself. `SendFinalize()` drains queued audio before sending the server control message; wait for its final `ResultResponse` before `Stop()`.
 
 Troubleshooting:
 

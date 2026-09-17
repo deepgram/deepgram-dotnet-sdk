@@ -43,6 +43,8 @@ graph TD
 ```csharp
 using Deepgram;
 using Deepgram.Models.Agent.v2.WebSocket;
+using System.Text;
+using System.Text.Json;
 
 var client = ClientFactory.CreateAgentWebSocketClient();
 
@@ -100,10 +102,10 @@ await client.Subscribe(new EventHandler<FunctionCallRequestResponse>(async (_, e
     var result = new FunctionCallResponseSchema
     {
         FunctionCallId = e.FunctionCallId,
-        Output = "{"status":"open","priority":"high"}"
+        Output = JsonSerializer.Serialize(new { status = "open", priority = "high" })
     };
 
-    var payload = System.Text.Encoding.UTF8.GetBytes(result.ToString());
+    var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result));
     await client.SendMessageImmediately(payload);
 }));
 

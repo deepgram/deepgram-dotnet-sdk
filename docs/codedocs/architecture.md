@@ -3,7 +3,7 @@ title: "Architecture"
 description: "How the Deepgram .NET SDK composes shared REST and WebSocket abstractions into product-specific clients."
 ---
 
-The SDK is organized around a small public surface in the `Deepgram` namespace and a larger implementation surface in `Deepgram.Clients.*`, `Deepgram.Abstractions.*`, and `Deepgram.Models.*`. The public wrappers such as `ListenRESTClient`, `AnalyzeClient`, and `SpeakWebSocketClient` are intentionally thin; the actual behavior lives in the versioned client implementations and shared abstractions.
+The SDK is organized around a small public surface in the `Deepgram` namespace and a larger implementation surface in `Deepgram.Clients.*`, `Deepgram.Abstractions.*`, and `Deepgram.Models.*`. The public wrappers such as `ListenRESTClient`, `AnalyzeClient`, `SpeakWebSocketClient`, `FluxWebSocketClient`, `FluxSpeakRESTClient`, `FluxSpeakWebSocketClient`, and `AgentManageClient` are intentionally thin; the actual behavior lives in the versioned client implementations and shared abstractions.
 
 ```mermaid
 graph TD
@@ -29,7 +29,7 @@ graph TD
 
 ### Product wrappers stay thin
 
-The public classes in `Deepgram/ListenRESTClient.cs`, `Deepgram/AnalyzeClient.cs`, `Deepgram/SpeakWebSocketClient.cs`, and related files do almost nothing except inherit from the current versioned client implementation. That keeps application code stable while Deepgram can move implementation details forward behind those wrappers. The same pattern appears in `ClientFactory.cs`, where `CreateListenWebSocketClient()` returns the newest interface while overloads with an explicit version number preserve compatibility for older code.
+The public classes in `Deepgram/ListenRESTClient.cs`, `Deepgram/AnalyzeClient.cs`, `Deepgram/SpeakWebSocketClient.cs`, `Deepgram/FluxWebSocketClient.cs`, `Deepgram/FluxSpeakRESTClient.cs`, `Deepgram/FluxSpeakWebSocketClient.cs`, `Deepgram/AgentManageClient.cs`, and related files do almost nothing except inherit from the current versioned client implementation. That keeps application code stable while Deepgram can move implementation details forward behind those wrappers. The same pattern appears in `ClientFactory.cs`, where `CreateListenWebSocketClient()` returns the newest interface while overloads with an explicit version number preserve compatibility for older code.
 
 ### Shared REST behavior is centralized
 
@@ -37,7 +37,7 @@ The public classes in `Deepgram/ListenRESTClient.cs`, `Deepgram/AnalyzeClient.cs
 
 ### Shared WebSocket behavior is centralized
 
-`Deepgram/Abstractions/v2/AbstractWebSocketClient.cs` owns connection setup, authentication headers, subscription registration, send mutexes, receive loops, and queued or immediate message sending. Product clients such as `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`, `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`, and `Deepgram/Clients/Agent/v2/Websocket/Client.cs` extend that base to interpret product-specific events and start specialized background workers like keepalive or autoflush. The result is that event models differ by product, but the connection lifecycle stays consistent.
+`Deepgram/Abstractions/v2/AbstractWebSocketClient.cs` owns connection setup, authentication headers, subscription registration, send mutexes, receive loops, and queued or immediate message sending. Product clients such as `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`, `Deepgram/Clients/Flux/WebSocket/Client.cs`, `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`, `Deepgram/Clients/Flux/Speak/WebSocket/Client.cs`, and `Deepgram/Clients/Agent/v2/Websocket/Client.cs` extend that base to interpret product-specific events and start specialized background workers like keepalive or autoflush. The result is that event models differ by product, but the connection lifecycle stays consistent.
 
 ### Authentication is resolved once in options
 
@@ -45,7 +45,7 @@ The public classes in `Deepgram/ListenRESTClient.cs`, `Deepgram/AnalyzeClient.cs
 
 ### Versioning is explicit in namespaces
 
-REST transcription is still surfaced as `Deepgram.Models.Listen.v1.REST`, while live transcription currently uses `Deepgram.Models.Listen.v2.WebSocket`. The agent client also lives in `v2`. This is reflected directly in the folder structure and in `ClientFactory.cs`, where the factory can still instantiate older WebSocket versions for migration scenarios.
+REST transcription is surfaced as `Deepgram.Models.Listen.v1.REST`, Nova live transcription uses `Deepgram.Models.Listen.v2.WebSocket`, and Flux STT uses `Deepgram.Models.Flux.WebSocket`. Flux TTS has separate REST and WebSocket namespaces under `Deepgram.Models.Flux.Speak`. The agent WebSocket client lives in `v2`, while reusable agent configuration management uses `Deepgram.Models.AgentManage.v1`. This is reflected directly in the folder structure and in `ClientFactory.cs`.
 
 ## How The Pieces Fit Together
 
@@ -73,7 +73,7 @@ sequenceDiagram
 
 ## Request And Data Lifecycle
 
-In the transcription REST path, `ListenRESTClient.TranscribeUrl` and `TranscribeFile` validate callback usage, build the final URI using `GetUri`, then call `PostAsync` on `AbstractRestClient`. In the TTS REST path, `SpeakRESTClient.ToStream` uses `PostRetrieveLocalFileAsync` so it can combine response metadata headers with the returned audio bytes. In the management path, methods are almost one-to-one mappings to GET, POST, PATCH, and DELETE endpoints.
+In the transcription REST path, `ListenRESTClient.TranscribeUrl` and `TranscribeFile` validate callback usage, build the final URI using `GetUri`, then call `PostAsync` on `AbstractRestClient`. In the TTS REST path, `SpeakRESTClient.ToStream` and `FluxSpeakRESTClient.ToStream` use `PostRetrieveLocalFileAsync` so they can combine response metadata headers with the returned audio bytes. In the management path, methods are almost one-to-one mappings to GET, POST, PATCH, and DELETE endpoints. `AgentManageClient` separately manages reusable Voice Agent configurations and template variables under a project.
 
 Streaming clients add one more layer: stateful lifecycle management. `Listen` can optionally send keepalive frames and inspect the time since the last received message to trigger autoflush. `Speak` can queue text, `Flush`, `Clear`, or immediate close messages. `Agent` is more opinionated: after the socket opens, it cleans the serialized `SettingsSchema` JSON, removes empty nested provider objects, and sends the settings payload immediately so the server can start the conversation.
 

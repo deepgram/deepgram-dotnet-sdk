@@ -115,6 +115,22 @@ public class LiveSchema
 }
 ```
 
+`Deepgram.Models.Flux.WebSocket.FluxSchema` configures Flux STT on `/v2/listen`. `Model` is required (`flux-general-en` or `flux-general-multi`). For raw audio, set `Encoding` and `SampleRate`; optional turn controls are `EotThreshold`, `EagerEotThreshold`, and `EotTimeoutMs`. `LanguageHint` is only valid with `flux-general-multi`.
+
+```csharp
+public class FluxSchema
+{
+    public string? Model { get; set; }
+    public string? Encoding { get; set; }
+    public int? SampleRate { get; set; }
+    public double? EotThreshold { get; set; }
+    public double? EagerEotThreshold { get; set; }
+    public int? EotTimeoutMs { get; set; }
+    public List<string>? Keyterm { get; set; }
+    public List<string>? LanguageHint { get; set; }
+}
+```
+
 ## Text and speech models
 
 `Deepgram.Models.Speak.v1.REST.TextSource`
@@ -150,6 +166,19 @@ public class SpeakSchema
     public int? BitRate { get; set; }
     public string? Encoding { get; set; }
     public int? SampleRate { get; set; }
+}
+```
+
+`Deepgram.Models.Flux.Speak.REST.SpeakSchema` and `Deepgram.Models.Flux.Speak.WebSocket.SpeakSchema` configure Flux TTS on `/v2/speak`. Both require a `flux-*` model. The REST schema adds `Container`, `BitRate`, callback options, and `Priority`; the WebSocket schema emits raw audio and supports only `Encoding` and `SampleRate` output options. Both support `Speed` and beta `Expressivity`.
+
+```csharp
+public class SpeakSchema
+{
+    public string? Model { get; set; }
+    public string? Encoding { get; set; }
+    public int? SampleRate { get; set; }
+    public double? Speed { get; set; }
+    public int? Expressivity { get; set; }
 }
 ```
 
@@ -212,6 +241,27 @@ public class CredentialsSchema
     public string? Comment { get; set; }
     public List<string>? Scopes { get; set; }
     public string? Provider { get; set; }
+}
+```
+
+## Agent management models
+
+`Deepgram.Models.AgentManage.v1` contains request models for reusable Voice Agent configurations and their project-scoped template variables. `AgentConfigurationSchema.Config` is a JSON-encoded string containing the `agent` settings block. `AgentVariableSchema.Key` must use the `DG_<VARIABLE_NAME>` form, and `Value` may be any JSON value. Agent configuration metadata and template variables are visible to project members, so do not use them for secrets.
+
+```csharp
+public class AgentConfigurationSchema
+{
+    public string? Config { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
+    public int? ApiVersion { get; set; }
+}
+
+public class AgentVariableSchema
+{
+    public string? Key { get; set; }
+    public object? Value { get; set; }
+    public bool? IsSensitive { get; set; } = false;
+    public int? ApiVersion { get; set; }
 }
 ```
 

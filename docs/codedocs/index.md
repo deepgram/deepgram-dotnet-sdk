@@ -3,7 +3,7 @@ title: "Getting Started"
 description: "Use the Deepgram .NET SDK to call Deepgram speech, text, management, auth, and agent APIs from .NET applications."
 ---
 
-The Deepgram .NET SDK gives .NET applications a typed client for Deepgram REST and WebSocket APIs, including speech-to-text, text-to-speech, text analysis, management, auth, and voice agents.
+The Deepgram .NET SDK 7.1.1 gives .NET applications typed clients for Deepgram REST and WebSocket APIs, including Nova speech-to-text, Flux STT, Aura and Flux TTS, text analysis, project management, Voice Agent management, auth, and voice agents.
 
 ## The Problem
 
@@ -52,8 +52,8 @@ dotnet add package Deepgram.Microphone
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Deepgram" Version="*" ></PackageReference>
-  <PackageReference Include="Deepgram.Microphone" Version="*" ></PackageReference>
+  <PackageReference Include="Deepgram" Version="[7.1.1,8.0.0)" />
+  <PackageReference Include="Deepgram.Microphone" Version="[7.1.1,8.0.0)" />
 </ItemGroup>
 ```
 
@@ -109,7 +109,9 @@ Transcript: life moves pretty fast
 ## Key Features
 
 - Typed REST clients for transcription, text analysis, auth, management, and self-hosted credential APIs
-- Typed WebSocket clients for live transcription, streaming TTS, and agent conversations
+- Typed WebSocket clients for Nova live transcription, Flux STT, Aura streaming TTS, Flux TTS, and agent conversations
+- Typed Flux TTS REST client for complete v2 speech-generation requests
+- Typed Voice Agent management client for reusable agent configurations and template variables
 - Credential resolution that prefers explicit access tokens, then explicit API keys, then environment variables
 - Built-in retrying `HttpClient` configuration and shared request serialization
 - Optional keepalive and autoflush behavior for long-running WebSocket sessions
@@ -120,4 +122,7 @@ Transcript: life moves pretty fast
   <Card title="Architecture" href="/docs/architecture">See how REST abstractions, WebSocket abstractions, and concrete clients fit together.</Card>
   <Card title="Core Concepts" href="/docs/client-factory-and-options">Understand factory creation, authentication resolution, schemas, and event subscriptions.</Card>
   <Card title="API Reference" href="/docs/api-reference/library-and-client-factory">Jump to constructors, signatures, parameters, and source-file references.</Card>
+  <Card title="Flux STT" href="/docs/flux-transcription">Build turn-aware conversational transcription with the v2 Listen WebSocket API.</Card>
+  <Card title="Flux TTS" href="/docs/api-reference/flux-speak-websocket-client">Generate complete audio over REST or stream turn-based audio over WebSocket.</Card>
+  <Card title="Agent Management" href="/docs/api-reference/agent-manage-client">Manage reusable Voice Agent configurations and template variables.</Card>
 </Cards>

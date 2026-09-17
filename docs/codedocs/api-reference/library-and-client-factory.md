@@ -32,7 +32,11 @@ Primary signatures:
 public static class ClientFactory
 {
     public static IAgentWebSocketClient CreateAgentWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
+    public static IAgentManageClient CreateAgentManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
+    public static IFluxWebSocketClient CreateFluxWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
+    public static IFluxSpeakRESTClient CreateFluxSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
+    public static IFluxSpeakWebSocketClient CreateFluxSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
     public static IListenWebSocketClient CreateListenWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
     public static IAuthClient CreateAuthClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
@@ -123,4 +127,4 @@ var client = ClientFactory.CreateListenWebSocketClient(options: options);
 Library.Terminate();
 ```
 
-Related pages: [ListenRESTClient](/docs/api-reference/listen-rest-client), [ListenWebSocketClient](/docs/api-reference/listen-websocket-client), [AgentWebSocketClient](/docs/api-reference/agent-websocket-client).
+Related pages: [ListenRESTClient](/docs/api-reference/listen-rest-client), [ListenWebSocketClient](/docs/api-reference/listen-websocket-client), [FluxWebSocketClient](/docs/api-reference/flux-websocket-client), [FluxSpeakRESTClient](/docs/api-reference/flux-speak-rest-client), [FluxSpeakWebSocketClient](/docs/api-reference/flux-speak-websocket-client), [AgentManageClient](/docs/api-reference/agent-manage-client), and [AgentWebSocketClient](/docs/api-reference/agent-websocket-client).

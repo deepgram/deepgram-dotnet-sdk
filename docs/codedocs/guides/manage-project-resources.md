@@ -67,6 +67,8 @@ Important details from the SDK:
 
 This workflow is intentionally split across two clients because the repository separates general project administration from self-hosted credential operations. That separation is useful in larger codebases: you can keep management-only permissions in one service while placing self-hosted credential operations behind a smaller operational boundary.
 
+Reusable Voice Agent configurations and their `DG_*` template variables use the separate `AgentManageClient`, not `ManageClient`. See [AgentManageClient](/docs/api-reference/agent-manage-client) before creating or deleting those project-scoped resources.
+
 If you only need reporting, the same `ManageClient` also exposes `GetUsageRequests`, `GetUsageSummary`, `GetUsageFields`, `GetBalances`, and `GetBalance`. Those methods follow the same parameter conventions shown here.
 
 For production automation, a common pattern is:

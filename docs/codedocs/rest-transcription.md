@@ -16,6 +16,7 @@ Uploading or referencing prerecorded audio has different requirements from live 
 - It uses the same factory and option pattern described in [Client Factory and Options](/docs/client-factory-and-options).
 - It shares `AbstractRestClient` with analyze, auth, manage, and self-hosted clients.
 - It overlaps with [Streaming Transcription](/docs/streaming-transcription) in output shape, but not in transport model or lifecycle.
+- For turn-aware conversational streaming, use [Flux STT](/docs/flux-transcription) instead of this batch API.
 
 ## How it works internally
 

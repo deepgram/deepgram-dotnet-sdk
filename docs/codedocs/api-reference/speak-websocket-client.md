@@ -81,6 +81,7 @@ Behavior notes from `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`:
 
 ```csharp
 var client = ClientFactory.CreateSpeakWebSocketClient();
+var flushed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
 await client.Subscribe(new EventHandler<AudioResponse>((_, e) =>
 {
@@ -90,6 +91,8 @@ await client.Subscribe(new EventHandler<AudioResponse>((_, e) =>
     }
 }));
 
+await client.Subscribe(new EventHandler<FlushedResponse>((_, _) => flushed.TrySetResult()));
+
 await client.Connect(new SpeakSchema
 {
     Encoding = "linear16",
@@ -98,8 +101,10 @@ await client.Connect(new SpeakSchema
 
 client.SpeakWithText("This sentence will be synthesized.");
 client.Flush();
+await flushed.Task.WaitAsync(TimeSpan.FromSeconds(30));
+await client.Stop();
 ```
 
-In most applications you subscribe to `AudioResponse` and append the returned bytes to a file, memory buffer, or playback device. If ordering matters, prefer the queued methods rather than immediate send variants for normal text traffic.
+In most applications you subscribe to `AudioResponse` and append the returned bytes to a file, memory buffer, or playback device. `Flush()` tells the v1 Speak server to finish the text buffered so far; it does not close the session. Subscribe to `FlushedResponse`, wait for it after each `Flush()`, and only then call `Stop()` when the session is complete. If ordering matters, prefer the queued methods rather than immediate send variants for normal text traffic.
 
 Related pages: [Speech Synthesis](/docs/speech-synthesis), [SpeakRESTClient](/docs/api-reference/speak-rest-client).
