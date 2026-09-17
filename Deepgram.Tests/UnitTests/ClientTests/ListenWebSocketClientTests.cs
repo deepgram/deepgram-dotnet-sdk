@@ -7,6 +7,7 @@ using System.Net.WebSockets;
 using Deepgram.Clients.Listen.v2.WebSocket;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
+using Common = Deepgram.Models.Common.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -69,18 +70,23 @@ public class ListenWebSocketClientTests
     public async Task ProcessTextMessage_With_Unknown_Type_Should_Not_Invoke_Typed_Listeners()
     {
         var client = new Client(_apiKey, _options);
-        SpeechStartedResponse? speechStarted = null;
-        UtteranceEndResponse? utteranceEnd = null;
-        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, response) => speechStarted = response));
-        await client.Subscribe(new EventHandler<UtteranceEndResponse>((_, response) => utteranceEnd = response));
+        var speechStartedCount = 0;
+        var utteranceEndCount = 0;
+        Common.UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<SpeechStartedResponse>((_, _) => speechStartedCount++));
+        await client.Subscribe(new EventHandler<UtteranceEndResponse>((_, _) => utteranceEndCount++));
+        await client.Subscribe(new EventHandler<Common.UnhandledResponse>((_, response) => unhandled = response));
 
-        Action act = () => FeedTextMessage(client, """{ "type": "FutureMessage" }""");
+        var json = """{ "type": "FutureMessage" }""";
+        Action act = () => FeedTextMessage(client, json);
 
         using (new AssertionScope())
         {
             act.Should().NotThrow("unknown messages must remain non-fatal");
-            speechStarted.Should().BeNull();
-            utteranceEnd.Should().BeNull();
+            speechStartedCount.Should().Be(0);
+            utteranceEndCount.Should().Be(0);
+            unhandled.Should().NotBeNull();
+            unhandled!.Raw.Should().Be(json);
         }
     }
 }
