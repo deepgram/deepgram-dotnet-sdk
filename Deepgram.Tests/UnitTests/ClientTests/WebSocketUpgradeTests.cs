@@ -18,12 +18,14 @@ public class WebSocketUpgradeTests
         using var client = new TestWebSocketClient();
 
         var connected = await client.Connect($"ws://127.0.0.1:{port}/v1/listen");
+        var stopped = await client.Stop();
         var request = await requestTask;
 
         Assert.Multiple(() =>
         {
             Assert.That(connected, Is.True);
-            Assert.That(request, Does.Not.Contain("Content-Length:"));
+            Assert.That(stopped, Is.True);
+            Assert.That(request.Contains("Content-Length:", StringComparison.OrdinalIgnoreCase), Is.False);
         });
     }
 
@@ -50,11 +52,21 @@ public class WebSocketUpgradeTests
         await stream.WriteAsync(Encoding.ASCII.GetBytes(response));
         await stream.FlushAsync();
 
+        var closeFrame = new byte[8];
+        await stream.ReadExactlyAsync(closeFrame);
+        Assert.That(closeFrame[0], Is.EqualTo(0x88));
+
+        // Reply to the client's close frame so the receiver exits without an expected transport error.
+        await stream.WriteAsync(new byte[] { 0x88, 0x02, 0x03, 0xe8 });
+        await stream.FlushAsync();
+
         return request.ToString();
     }
 
     private sealed class TestWebSocketClient : AbstractWebSocketClient
     {
         public TestWebSocketClient() : base("test") { }
+
+        public override Task SendClose(bool nullByte = false, CancellationTokenSource? cancellationToken = null) => Task.CompletedTask;
     }
 }
