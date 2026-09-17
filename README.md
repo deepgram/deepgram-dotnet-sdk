@@ -266,6 +266,28 @@ await Task.Delay(TimeSpan.FromSeconds(30));
 await liveClient.Stop();
 ```
 
+### WebSocket handshake errors
+
+When a WebSocket upgrade is rejected with an HTTP response, `Connect` throws a
+`DeepgramWebSocketException` with the original `WebSocketException` as its inner exception.
+Use `HttpStatusCode` to handle an inspectable status such as a self-hosted rate-limit response;
+it is `null` when the connection fails without an HTTP response.
+
+```csharp
+using System.Net;
+using Deepgram.Models.Exceptions.v1;
+
+try
+{
+    await liveClient.Connect(liveSchema);
+}
+catch (DeepgramWebSocketException exception)
+    when (exception.HttpStatusCode == HttpStatusCode.TooManyRequests)
+{
+    // Back off or reduce concurrent self-hosted requests.
+}
+```
+
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text-api/listen-streaming).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
