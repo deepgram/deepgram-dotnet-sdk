@@ -27,6 +27,19 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
+    /// their template variables
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static V1.IAgentManageClient CreateAgentManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AgentManageClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new AnalyzeClient
     /// </summary>
     /// <param name="apiKey"></param>
@@ -36,6 +49,43 @@ public static class ClientFactory
     public static V1.IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new AnalyzeClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// (PREVIEW) Create a new FluxWebSocketClient for conversational speech-to-text with
+    /// contextual turn detection using the Flux (v2 listen) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxWebSocketClient CreateFluxWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// Create a new FluxSpeakWebSocketClient for streaming, turn-based text-to-speech
+    /// using the Flux (v2 speak) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static V2.IFluxSpeakWebSocketClient CreateFluxSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new FluxSpeakWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// Create a new FluxSpeakRESTClient for batch (single-request) text-to-speech
+    /// using the Flux (v2 speak) API
+    /// </summary>
+    /// <param name="apiKey"></param>
+    /// <param name="options"></param>
+    /// <param name="httpId"></param>
+    /// <returns></returns>
+    public static V2.IFluxSpeakRESTClient CreateFluxSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new FluxSpeakRESTClient(apiKey, options, httpId);
     }
 
     /// <summary>

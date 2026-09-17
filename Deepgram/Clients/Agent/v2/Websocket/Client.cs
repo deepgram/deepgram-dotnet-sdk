@@ -518,17 +518,26 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
-
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
+            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
+            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
+            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
+            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
+            var socket = _clientWebSocket;
+            if (socket == null || !IsConnected())
+            {
+                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
+                return;
+            }
+            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
+
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancelToken.Token);
+            await _mutexSend.WaitAsync(token);
             try
             {
-                await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
                     .ConfigureAwait(false);
             }
             finally
@@ -552,10 +561,13 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
+                await Task.Delay(5000, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
@@ -639,7 +651,17 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         {
             Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(AgentType), data.RootElement.GetProperty("type").GetString()!);
+            var typeString = data.RootElement.GetProperty("type").GetString();
+            // Use TryParse so Agent message types unknown to this SDK version (e.g. new server
+            // messages like "History"/"Warning") are routed to the base handler and surfaced as
+            // Unhandled instead of throwing an ArgumentException. See #395.
+            if (!Enum.TryParse<AgentType>(typeString, out var val))
+            {
+                Log.Debug("ProcessTextMessage", $"Unknown Agent message type '{typeString}'. Routing to base handler...");
+                base.ProcessTextMessage(result, ms);
+                Log.Verbose("AgentWSClient.ProcessTextMessage", "LEAVE");
+                return;
+            }
 
             Log.Verbose("ProcessTextMessage", $"Type: {val}");
 

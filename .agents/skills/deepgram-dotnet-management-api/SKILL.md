@@ -1,6 +1,6 @@
 ---
 name: deepgram-dotnet-management-api
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Management APIs for projects, models, keys, members, invitations, usage, balances, and auth token grants. Covers `ClientFactory.CreateManageClient()` and `ClientFactory.CreateAuthClient()`. Unlike some other SDKs, this repo does not currently expose reusable Voice Agent configuration management endpoints.
+description: "Use when writing or reviewing C# code in this repo that calls Deepgram Management APIs for projects, models, keys, members, invitations, usage, balances, and auth token grants. Covers `ClientFactory.CreateManageClient()` and `ClientFactory.CreateAuthClient()`. Unlike some other SDKs, this repo does not currently expose reusable Voice Agent configuration management endpoints."
 ---
 
 # Using Deepgram Management API (.NET SDK)
@@ -103,31 +103,40 @@ Auth:
 - `GrantToken()`
 - `GrantToken(GrantTokenSchema)`
 
-## API reference (layered)
+## References
 
-1. **In-repo source of truth**:
-   - `Deepgram/ClientFactory.cs`
-   - `Deepgram/Clients/Manage/v1/Client.cs`
-   - `Deepgram/Clients/Auth/v1/Client.cs`
-   - `Deepgram/Models/Manage/v1/*.cs`
-   - `Deepgram/Models/Auth/v1/*.cs`
-2. **Canonical OpenAPI (REST)**: https://developers.deepgram.com/openapi.yaml
-3. **AsyncAPI**: not applicable for these admin endpoints
-4. **Context7**:
-   - repo mirror: `https://context7.com/deepgram/deepgram-dotnet-sdk`
-   - docs corpus: `/llmstxt/developers_deepgram_llms_txt`
-5. **Product docs**:
-   - https://developers.deepgram.com/reference/manage/projects/list
-   - https://developers.deepgram.com/reference/manage/models/list
-   - https://developers.deepgram.com/reference/auth/grant-token
+- In-repo: `Deepgram/Clients/Manage/v1/Client.cs`, `Deepgram/Clients/Auth/v1/Client.cs`, `Deepgram/Models/Manage/v1/*.cs`, `Deepgram/Models/Auth/v1/*.cs`
+- OpenAPI: https://developers.deepgram.com/openapi.yaml
+- Product docs: https://developers.deepgram.com/reference/manage/projects/list, https://developers.deepgram.com/reference/auth/grant-token
+
+## Guard pattern for destructive operations
+
+```csharp
+// 1. Verify the resource exists
+var key = await client.GetKey(projectId, keyId);
+Console.WriteLine($"Found key: {key.ApiKey.Comment} ({keyId})");
+
+// 2. Delete
+await client.DeleteKey(projectId, keyId);
+
+// 3. Verify deletion succeeded
+try
+{
+    await client.GetKey(projectId, keyId);
+    Console.Error.WriteLine("ERROR: key still exists after deletion");
+}
+catch
+{
+    Console.WriteLine("Key deleted successfully.");
+}
+```
 
 ## Gotchas
 
 1. **This repo does not currently expose Voice Agent configuration CRUD.** Do not copy Python `client.voice_agent.configurations.*` examples into C#.
-2. **Management and auth are separate clients.** Use `CreateManageClient()` for admin APIs and `CreateAuthClient()` for `GrantToken()`.
-3. **Destructive methods are real.** `DeleteProject`, `DeleteKey`, `DeleteInvite`, and `RemoveMember` should stay commented or guarded in examples/tests unless you mean it.
-4. **Bearer-token auth is supported.** `DeepgramHttpClientOptions` prefers explicit `accessToken` over `apiKey`, then env vars in that order.
-5. **Current examples often fetch a project ID first.** Many sub-resources are project-scoped.
+2. **Destructive methods are irreversible.** `DeleteProject`, `DeleteKey`, `DeleteInvite`, and `RemoveMember` should always use the verify-delete-verify pattern above.
+3. **Bearer-token auth is supported.** `DeepgramHttpClientOptions` prefers explicit `accessToken` over `apiKey`, then env vars in that order.
+4. **Most sub-resources are project-scoped.** Fetch a project ID first via `GetProjects()` before calling key/member/usage methods.
 
 ## Example files in this repo
 
@@ -142,12 +151,4 @@ Auth:
 - `examples/auth/grant-token/Program.cs`
 - `examples/auth/bearer-token-workflow/Program.cs`
 
-## Central product skills
-
-For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
-
-```bash
-npx skills add deepgram/skills
-```
-
-This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).
+Cross-language product knowledge (API reference, recipes, MCP setup): `npx skills add deepgram/skills`.

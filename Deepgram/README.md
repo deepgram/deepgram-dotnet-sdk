@@ -293,6 +293,7 @@ also see [TranscribeSchema] which LiveSchema is derived from for more options
 | Callback               | string?                   | Callback URL to provide if you would like your submitted audio to be processed asynchronously                          |
 | Diarize                | bool?                     | Indicates whether to recognize speaker changes                                                                         |
 | DiarizeVersion         | string?                   |                                                                                                                        |
+| DiarizeModel           | string?                   | Batch diarization model version to use (latest, v1, v2). Supersedes the deprecated Diarize boolean                     |
 | Extra                  | Dictonary<string,string>? |  additonal values you want echoing bac                                                                                 |                                                                                                                        |
 | FillerWords            | int?                      | Whether to include words like "uh" and "um" in transcription output.                                                   |
 | Keywords               | List<string>?             | Keywords to which the model should pay particular attention to boosting or suppressing to help it understand context   |
@@ -682,30 +683,47 @@ var result = onPremClientCreateCredentialsAsync(string projectId,  createOnPremC
 
 # Logging
 
-The Library uses Microsoft.Extensions.Logging to preform all of its logging tasks. To configure
-logging for your app simply create a new `ILoggerFactory` and call the `LogProvider.SetLogFactory()`
-method to tell the Deepgram library how to log. For example, to log to the console with Serilog, you'd need to install the Serilog package with `dotnet add package Serilog` and then do the following:
+The Library uses `Microsoft.Extensions.Logging` to perform all of its logging tasks.
+
+> **Upgrading from 6.x:** v7.0 replaced Serilog with `Microsoft.Extensions.Logging`.
+> `Library.Initialize(...)` and the `LogLevel` enum are unchanged; the only breaking
+> changes are the Serilog-typed members on `Deepgram.Logger.Log`
+> (`Log.Initialize(Serilog.ILogger)`, and the `Serilog.ILogger` return types of
+> `Log.GetLogger()` / `Log.Initialize(LogLevel, string?)`). Route Serilog through an
+> `ILoggerFactory` and `Library.Configure` instead — see below.
+
+By default it logs to the console. Use `Library.Initialize` for a quick start:
+
+```csharp
+using Deepgram;
+using Deepgram.Logger;
+
+Library.Initialize();                 // console, Information level
+Library.Initialize(LogLevel.Debug);   // more verbose
+```
+
+To route SDK logs through your own logging pipeline, create an `ILoggerFactory` and
+hand it to the SDK with `Library.Configure`. The SDK only consumes the factory — it
+never reconfigures your application's global logging. For example, to log to the
+console with Serilog, install the `Serilog.Extensions.Logging` package and do:
 
 ```csharp
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Deepgram.Logger;
+using Deepgram;
 using Serilog;
 
-var log = new LoggerConfiguration()
+var serilog = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console(outputTemplate: "{Timestamp:HH:mm} [{Level}]: {Message}\n")
     .CreateLogger();
-var factory = new LoggerFactory();
-factory.AddSerilog(log);
-LogProvider.SetLogFactory(factory);
-```
-The sdk will generate loggers with the cateroryName of the client being used for example 
- to get the logger for the ManageClient you would call
 
-```csharp
-LogProvider.GetLogger(nameof(ManageClient));
+var factory = LoggerFactory.Create(builder => builder.AddSerilog(serilog));
+Library.Configure(factory);
 ```
+
+The SDK generates a logger per component, using the component name as the logger's
+category (for example `ManageClient` or `ListenWSClient`), so you can filter and
+format SDK logs per category with your own provider.
 
 
 

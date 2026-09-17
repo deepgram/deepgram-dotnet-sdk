@@ -1,0 +1,11 @@
+{
+  "_provenance": "Verbatim JSON control frames captured 2026-08-13 from the live wss://api.deepgram.com/v2/speak?model=flux-alexis-en&encoding=linear16&sample_rate=24000 endpoint (client sent Configure -> Speak -> Interrupt -> Close). Captured via a standalone raw-WebSocket script independent of the SDK's own parser (see the Flux TTS GA delta PR). Exercises the GA-only additions: Configure/ConfigureSuccess and Interrupt/SpeechInterrupted.",
+  "audio_total_bytes": 30432,
+  "frames": [
+    {"type":"Connected","request_id":"019ffcda-bebd-7273-a625-66fa54f1f101","model_name":"alexis","model_version":"2026-08-11.0","model_uuids":["9c3cc12c-c0a2-4966-8676-f9fa22ab5401","9c3cc12c-c0a2-4966-8676-f9fa22ab5401"]},
+    {"type":"ConfigureSuccess","applied":{"speed":1.05}},
+    {"type":"SpeechStarted","speech_id":"dg_sp_c78f63c65fa2"},
+    {"type":"SpeechInterrupted","audio_played_ms":554,"text_spoken":"Sure,","text_remaining":" I can help you cancel your subscription. Let me pull up your account and check on that for you right away.","metadata":{"speech_id":"dg_sp_c78f63c65fa2","audio_duration_ms":554,"input_character_count":112,"billable_character_count":46,"controls_applied":{"pronunciations_applied":0,"breaks_applied":0,"pronunciation_warnings":0}}},
+    {"type":"SessionMetadata","total_audio_duration_ms":554,"total_input_character_count":46,"total_billable_character_count":46}
+  ]
+}

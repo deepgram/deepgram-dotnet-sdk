@@ -7,6 +7,14 @@ namespace Deepgram.Models.Common.v2.WebSocket;
 public record ErrorResponse
 {
     /// <summary>
+    /// Machine-readable error code, e.g. CLIENT_MESSAGE_TIMEOUT. Sent by the Voice Agent API;
+    /// may be absent on other endpoints.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
+
+    /// <summary>
     /// Error Description
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -45,6 +53,7 @@ public record ErrorResponse
             return;
         }
 
+        Code = other.Code;
         Description = other.Description;
         Message = other.Message;
         Variant = other.Variant;
@@ -56,6 +65,6 @@ public record ErrorResponse
     /// </summary>
     public override string ToString()
     {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
 }

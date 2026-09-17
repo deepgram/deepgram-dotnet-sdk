@@ -293,6 +293,11 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// </summary>
     public async Task SendFinalize()
     {
+        // Flush any buffered audio first so Finalize can't overtake audio still in the send
+        // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
+        Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
+        await Flush();
+
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.Finalize);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
@@ -316,17 +321,26 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             return;
         }
 
-        // provide a cancellation token, or use the one in the class
-        var _cancelToken = _cancellationToken ?? _cancellationTokenSource;
-
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
+            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
+            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
+            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
+            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
+            var socket = _clientWebSocket;
+            if (socket == null || !IsConnected())
+            {
+                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
+                return;
+            }
+            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
+
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(_cancelToken.Token);
+            await _mutexSend.WaitAsync(token);
             try
             {
-                await _clientWebSocket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, _cancellationTokenSource.Token)
+                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
                     .ConfigureAwait(false);
             }
             finally
@@ -350,10 +364,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
+                await Task.Delay(5000, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
@@ -394,10 +411,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             while (true)
             {
-                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancellationTokenSource.Token);
+                // snapshot the token each iteration to avoid a teardown race (#390)
+                var _cancelToken = GetInternalCancellationToken();
 
-                if (_cancellationTokenSource.Token.IsCancellationRequested)
+                Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+
+                if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;
@@ -466,11 +486,17 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
 
         try
         {
-            Log.Verbose("ProcessTextMessage", $"raw response: {response}");
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessTextMessage", $"raw response: {response}");
+            }
             var data = JsonDocument.Parse(response);
             var val = Enum.Parse(typeof(ListenType), data.RootElement.GetProperty("type").GetString()!);
 
-            Log.Verbose("ProcessTextMessage", $"Type: {val}");
+            if (Log.IsEnabled(LogLevel.Verbose))
+            {
+                Log.Verbose("ProcessTextMessage", $"Type: {val}");
+            }
 
 
             if (_deepgramClientOptions.InspectListenMessage())
@@ -502,7 +528,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking ResultsResponse. event: {resultResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking ResultsResponse. event: {resultResponse}");
+                    }
                     InvokeParallel(_resultsReceived, resultResponse);
                     break;
                 case ListenType.Metadata:
@@ -520,7 +549,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking MetadataResponse. event: {metadataResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking MetadataResponse. event: {metadataResponse}");
+                    }
                     InvokeParallel(_metadataReceived, metadataResponse);
                     break;
                 case ListenType.UtteranceEnd:
@@ -538,7 +570,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking UtteranceEndResponse. event: {utteranceEndResponse}");
+                    }
                     InvokeParallel(_utteranceEndReceived, utteranceEndResponse);
                     break;
                 case ListenType.SpeechStarted:
@@ -556,7 +591,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         return;
                     }
 
-                    Log.Debug("ProcessTextMessage", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
+                    if (Log.IsEnabled(LogLevel.Debug))
+                    {
+                        Log.Debug("ProcessTextMessage", $"Invoking SpeechStartedResponse. event: {speechStartedResponse}");
+                    }
                     InvokeParallel(_speechStartedReceived, speechStartedResponse);
                     break;
                 default:

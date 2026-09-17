@@ -3,6 +3,11 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Authenticate.v1;
+#if NETSTANDARD2_0
+using Polly.Contrib.WaitAndRetry;
+#else
+using Microsoft.Extensions.Http.Resilience;
+#endif
 
 namespace Deepgram.Encapsulations;
 
@@ -19,9 +24,29 @@ internal class HttpClientFactory
         Log.Information("HttpClientFactory.Create", $"HttpClient ID: {httpId}");
 
         var services = new ServiceCollection();
+#if NETSTANDARD2_0
+        // Microsoft.Extensions.Http.Resilience does not support netstandard2.0, so this target
+        // keeps the Polly-based transient-error retry. See #359.
         services.AddHttpClient(httpId)
             .AddTransientHttpErrorPolicy(policyBuilder =>
             policyBuilder.WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 5)));
+#else
+        // Retry transient HTTP errors (5xx, 408, HttpRequestException) with exponential backoff +
+        // jitter. This is the Polly v8 equivalent of the previous AddTransientHttpErrorPolicy +
+        // DecorrelatedJitterBackoffV2(1s, 5) policy, now that Polly.Extensions.Http is deprecated.
+        // See #359.
+        services.AddHttpClient(httpId)
+            .AddResilienceHandler("deepgram-retry", builder =>
+            {
+                builder.AddRetry(new HttpRetryStrategyOptions
+                {
+                    MaxRetryAttempts = 5,
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                    Delay = TimeSpan.FromSeconds(1),
+                });
+            });
+#endif
         var sp = services.BuildServiceProvider();
 
         var client = sp.GetRequiredService<IHttpClientFactory>().CreateClient(httpId);

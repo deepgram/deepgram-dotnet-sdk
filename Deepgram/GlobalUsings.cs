@@ -16,4 +16,3 @@ global using Deepgram.Logger;
 global using Deepgram.Utilities;
 global using Microsoft.Extensions.DependencyInjection;
 global using Polly;
-global using Polly.Contrib.WaitAndRetry;

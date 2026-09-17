@@ -18,7 +18,7 @@ public record SpeechStartedResponse
     /// Channel index information
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel_index")]
+	[JsonPropertyName("channel")]
     public int[]? Channel { get; set; }
 
     /// <summary>
@@ -33,6 +33,6 @@ public record SpeechStartedResponse
     /// </summary>
     public override string ToString()
     {
-        return Regex.Unescape(JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions));
+        return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
 }

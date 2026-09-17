@@ -1,6 +1,6 @@
 ---
 name: deepgram-dotnet-text-to-speech
-description: Use when writing or reviewing C# code in this repo that calls Deepgram Text-to-Speech. Covers `ClientFactory.CreateSpeakRESTClient()` with `ToStream` / `ToFile`, and `ClientFactory.CreateSpeakWebSocketClient()` with `Connect`, `SpeakWithText`, `Flush`, and streaming `AudioResponse` events. Use `deepgram-dotnet-voice-agent` for full-duplex assistants instead of one-way synthesis.
+description: "Use when writing or reviewing C# code in this repo that calls Deepgram Text-to-Speech. Covers `ClientFactory.CreateSpeakRESTClient()` with `ToStream` / `ToFile`, and `ClientFactory.CreateSpeakWebSocketClient()` with `Connect`, `SpeakWithText`, `Flush`, and streaming `AudioResponse` events. Use `deepgram-dotnet-voice-agent` for full-duplex assistants instead of one-way synthesis."
 ---
 
 # Using Deepgram Text-to-Speech (.NET SDK)
@@ -81,13 +81,16 @@ bool connected = await speakClient.Connect(new SpeakSchema()
     SampleRate = 48000,
 });
 
-if (connected)
+if (!connected)
 {
-    speakClient.SpeakWithText("Hello World!");
-    speakClient.Flush();
-    Console.ReadKey();
-    await speakClient.Stop();
+    Console.Error.WriteLine("WebSocket connection failed — check API key and network.");
+    return;
 }
+
+speakClient.SpeakWithText("Hello World!");
+speakClient.Flush();
+Console.ReadKey();
+await speakClient.Stop();
 ```
 
 ## Key params
@@ -98,23 +101,12 @@ WebSocket `SpeakSchema`: `Model`, `BitRate`, `Encoding`, `SampleRate`.
 
 Streaming controls: `SpeakWithText`, `Flush`, `Clear`, `Close`, `SendMessageImmediately`.
 
-## API reference (layered)
+## References
 
-1. **In-repo source of truth**:
-   - `Deepgram/ClientFactory.cs`
-   - `Deepgram/Clients/Speak/v1/REST/Client.cs`
-   - `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`
-   - `Deepgram/Models/Speak/v1/REST/SpeakSchema.cs`
-   - `Deepgram/Models/Speak/v2/WebSocket/SpeakSchema.cs`
-2. **Canonical OpenAPI (REST)**: https://developers.deepgram.com/openapi.yaml
-3. **Canonical AsyncAPI (streaming / WSS)**: https://developers.deepgram.com/asyncapi.yaml
-4. **Context7**:
-   - repo mirror: `https://context7.com/deepgram/deepgram-dotnet-sdk`
-   - docs corpus: `/llmstxt/developers_deepgram_llms_txt`
-5. **Product docs**:
-   - https://developers.deepgram.com/reference/text-to-speech/speak-request
-   - https://developers.deepgram.com/reference/text-to-speech/speak-streaming
-   - https://developers.deepgram.com/docs/tts-models
+- In-repo: `Deepgram/Clients/Speak/v1/REST/Client.cs`, `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`, `Deepgram/Models/Speak/v1/REST/SpeakSchema.cs`, `Deepgram/Models/Speak/v2/WebSocket/SpeakSchema.cs`
+- OpenAPI (REST): https://developers.deepgram.com/openapi.yaml
+- AsyncAPI (WSS): https://developers.deepgram.com/asyncapi.yaml
+- Product docs: https://developers.deepgram.com/reference/text-to-speech/speak-request, https://developers.deepgram.com/docs/tts-models
 
 ## Gotchas
 
@@ -133,12 +125,4 @@ Streaming controls: `SpeakWithText`, `Flush`, `Clear`, `Close`, `SendMessageImme
 - `examples/text-to-speech/websocket/simple/Program.cs`
 - `tests/edge_cases/tts_v1_client_example/`
 
-## Central product skills
-
-For cross-language Deepgram product knowledge — the consolidated API reference, documentation finder, focused runnable recipes, third-party integration examples, and MCP setup — install the central skills:
-
-```bash
-npx skills add deepgram/skills
-```
-
-This SDK ships language-idiomatic code skills; `deepgram/skills` ships cross-language product knowledge (see `api`, `docs`, `recipes`, `examples`, `starters`, `setup-mcp`).
+Cross-language product knowledge (API reference, recipes, MCP setup): `npx skills add deepgram/skills`.

@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/deepgram)](https://www.nuget.org/packages/Deepgram)
 [![Build Status](https://github.com/deepgram-devs/deepgram-dotnet-sdk/workflows/CI/badge.svg)](https://github.com/deepgram-devs/deepgram-dotnet-sdk/actions?query=CI)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](./.github/CODE_OF_CONDUCT.md)
-[![Discord](https://dcbadge.vercel.app/api/server/xWRaCDBtW4?style=flat)](https://discord.gg/xWRaCDBtW4)
+[![Discord](https://img.shields.io/badge/Discord-Deepgram-5865F2?logo=discord&logoColor=white&style=flat)](https://discord.gg/deepgram)
 
 Official .NET SDK for [Deepgram](https://www.deepgram.com/).
 Power your apps with world-class speech and Language AI models.
@@ -21,6 +21,8 @@ Power your apps with world-class speech and Language AI models.
     - [Remote Files (Asynchronous)](#remote-files-asynchronous)
     - [Local Files (Asynchronous)](#local-files-asynchronous)
   - [Streaming Audio](#streaming-audio)
+  - [Flux - Conversational Speech Recognition (Preview)](#flux---conversational-speech-recognition-preview)
+  - [Flux Text to Speech](#flux-text-to-speech)
   - [Voice Agent](#voice-agent)
   - [Text to Speech REST](#text-to-speech-rest)
   - [Text to Speech Streaming](#text-to-speech-streaming)
@@ -268,6 +270,178 @@ await liveClient.Stop();
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
 
+## Flux - Conversational Speech Recognition (Preview)
+
+> Flux support is currently in preview. The API surface may change in a future release.
+
+Transcribe conversational audio with contextual turn detection using [Deepgram Flux](https://developers.deepgram.com/docs/flux/quickstart). Instead of interim/final results, Flux delivers `TurnInfo` events that track the turn lifecycle (`StartOfTurn`, `Update`, `EagerEndOfTurn`, `TurnResumed`, `EndOfTurn`) — ideal for voice agents that need to know when a speaker is done talking.
+
+Flux accepts only three control messages (`CloseStream`, `Configure`, and `ForceEndTurn`); the classic streaming `KeepAlive`/`Finalize` messages do not apply. Send `ForceEndTurn` (via `SendForceEndTurn()` on the concrete `FluxWebSocketClient`) to end the current turn on your own signal — the resulting `EndOfTurn` carries `Trigger` = `"manual"` — and set `EotThreshold` to `1.0` to [bring your own turn detection](https://developers.deepgram.com/docs/flux/own-turn-detection).
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.WebSocket;
+
+// Initialize Library with default logging
+Library.Initialize();
+
+// Create Flux WebSocket client. The concrete type (rather than
+// ClientFactory.CreateFluxWebSocketClient(), which returns IFluxWebSocketClient) is used here
+// because SendForceEndTurn lives on the concrete client only until the 8.0 interface revision.
+var fluxClient = new FluxWebSocketClient();
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+
+// Subscribe to TurnInfo events
+await fluxClient.Subscribe(new EventHandler<TurnInfoResponse>((sender, e) =>
+{
+    if (e.EventType == TurnEvent.EndOfTurn)
+    {
+        Console.WriteLine($"Speaker finished: {e.Transcript}");
+    }
+}));
+
+// Connect to Deepgram Flux (model is required)
+var fluxSchema = new FluxSchema()
+{
+    Model = "flux-general-en",
+    Encoding = "linear16",
+    SampleRate = 16000,
+    EotThreshold = 0.7,
+};
+await fluxClient.Connect(fluxSchema);
+
+// Stream audio to Deepgram in ~80ms chunks (2560 bytes at 16kHz linear16)
+byte[] audioChunk = GetAudioChunk(); // Your audio source
+fluxClient.Send(audioChunk);
+
+// Optional: end the current turn on your own signal (push-to-talk release, DTMF,
+// your own VAD). The resulting EndOfTurn carries Trigger = "manual".
+// SendForceEndTurn first flushes any audio still queued by Send(), so the turn always
+// ends on the audio you actually sent — no extra ordering work is needed here.
+await fluxClient.SendForceEndTurn();
+
+// Stop the connection (sends CloseStream and waits for the final results)
+await fluxClient.Stop();
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text/listen-flux).
+
+[See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [bring-your-own-turn-detection version](./examples/speech-to-text/websocket/flux-force-end-turn/) and a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
+
+### `SendForceEndTurn` availability (7.1.0)
+
+`SendForceEndTurn` shipped in 7.1.0 (it is not in 7.0.0).
+It lives on the concrete `FluxWebSocketClient` class only — it is intentionally **not** on the
+`IFluxWebSocketClient` interface, because adding an interface member would source-break any
+third-party class implementing that interface in a 7.x release. The member will be added to the
+interface in 8.0. Until then, create the client as `new FluxWebSocketClient(...)` (or cast the
+`ClientFactory.CreateFluxWebSocketClient()` result to `FluxWebSocketClient`) to call it. No
+existing interface member was renamed, removed, or changed.
+
+## Flux Text to Speech
+
+Synthesize speech with [Deepgram Flux TTS](https://developers.deepgram.com/docs/flux-tts/overview), available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
+
+Streaming sends five client messages — `Speak`, `Flush`, `Interrupt`, `Configure`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `SpeechInterrupted`, `Flushed`, `ConfigureSuccess`/`ConfigureFailure`, `SessionMetadata`, `Warning`, `Error`).
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.Speak.WebSocket;
+
+// Initialize Library with default logging
+Library.Initialize();
+
+// Create Flux TTS WebSocket client
+var speakClient = ClientFactory.CreateFluxSpeakWebSocketClient();
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+
+// Subscribe to synthesized audio chunks (raw bytes in the requested encoding)
+await speakClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
+{
+    if (e.Stream is not null) { /* play or persist e.Stream */ }
+}));
+
+// Connect to Deepgram Flux TTS (model is required)
+var schema = new SpeakSchema()
+{
+    Model = "flux-alexis-en",
+    Encoding = "linear16",
+    SampleRate = 24000,
+    Speed = 1.0,          // optional: 0.85–1.15 in 0.05 steps
+    // Expressivity = 1,  // optional (beta): -2 (calmer) to 2 (more animated)
+};
+await speakClient.Connect(schema);
+
+// Stream text into the active turn, then flush to mark the end of the turn.
+// The turn's SpeechMetadata (billing, timing) is your end-of-turn signal.
+await speakClient.SendText("Sure, I can help you cancel your subscription.");
+await speakClient.SendFlush();
+
+// Stop the connection (sends Close and waits for the server to drain the audio)
+await speakClient.Stop();
+```
+
+### Barge-in and mid-stream controls
+
+When the user speaks over the agent, stop your local playback immediately — don't wait for the server — then send `Interrupt` with how many milliseconds of audio the user actually heard. The server cancels the active turn and answers with `SpeechInterrupted`, splitting the turn's text into what was spoken and what wasn't, so you can feed exactly what the user heard back into your LLM context.
+
+```csharp
+await speakClient.Subscribe(new EventHandler<SpeechInterruptedResponse>((sender, e) =>
+{
+    Console.WriteLine($"Heard:  {e.TextSpoken}");
+    Console.WriteLine($"Unsaid: {e.TextRemaining}");
+}));
+
+// The offset is cumulative across the whole session (not per turn), and each
+// interrupt must advance past the previous one. Report your audio player's
+// actual position — not bytes received, which arrive much faster than realtime.
+await speakClient.SendInterrupt(playbackOffsetMs);
+```
+
+Omit the offset (`SendInterrupt()`) and the turn still stops, but the server can't compute the split — `TextSpoken`/`TextRemaining` come back empty.
+
+`Configure` changes the speaking rate mid-session without reconnecting. The server acknowledges with `ConfigureSuccess`, or rejects with a typed `ConfigureFailure` — the SDK does not range-check `speed` locally, so an out-of-range value comes back as `SPEED_OUT_OF_RANGE` rather than throwing.
+
+```csharp
+await speakClient.SendConfigure(new ConfigureSchema() { Speed = 1.05 });
+```
+
+For batch (REST) synthesis of a complete block of text:
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Flux.Speak.REST;
+
+var speakClient = ClientFactory.CreateFluxSpeakRESTClient();
+
+// Synchronous: get the audio back and write it to a file
+await speakClient.ToFile(
+    new TextSource("Your appointment is confirmed for 3pm tomorrow."),
+    "output.mp3",
+    new SpeakSchema() { Model = "flux-alexis-en", Encoding = "mp3", BitRate = 48000, Speed = 1.05 });
+
+// Asynchronous: supply a callback URL and receive a request_id ack; the audio is
+// delivered to your callback
+// await speakClient.StreamCallBack(new TextSource("..."), "https://example.com/webhook",
+//     new SpeakSchema() { Model = "flux-alexis-en" });
+```
+
+[See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech/speak-flux).
+
+[See the Examples for more info](./examples/text-to-speech/websocket/flux/) - and the [batch (REST) example](./examples/text-to-speech/rest/flux/).
+
+### Upgrading from 6.x (`IFluxSpeakWebSocketClient` interface members)
+
+Version 7.0 adds the GA barge-in/mid-stream controls above directly to the
+`IFluxSpeakWebSocketClient` interface: `SendInterrupt` (two overloads), `SendConfigure`, and
+`Subscribe` overloads for `SpeechInterruptedResponse`, `ConfigureSuccessResponse`, and
+`ConfigureFailureResponse`. If you use `FluxSpeakWebSocketClient`/`ClientFactory` as shipped, or a
+mocking framework (NSubstitute, Moq) to fake this interface in tests, nothing changes for you.
+
+This is a breaking change only if you have your own concrete class implementing
+`IFluxSpeakWebSocketClient` directly — add the six new members to keep it compiling. There is no
+old-API-to-new-API migration here (nothing was renamed or removed); it is a pure addition.
+
 ## Voice Agent
 
 Configure a Voice Agent.
@@ -386,6 +560,84 @@ For a complete implementation, you would need to:
 2. Implement audio playback for the agent's responses
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
+
+### Defining function-call parameters
+
+`Function.Parameters` is a JSON Schema expressed as a `Dictionary<string, object>`, so a function
+can declare **any number of parameters** with custom names — set `properties` to a dictionary keyed
+by each parameter name:
+
+```csharp
+var function = new Function
+{
+    Name = "get_weather",
+    Description = "Get the weather for a city on a date",
+    Parameters = new Dictionary<string, object>
+    {
+        ["type"] = "object",
+        ["properties"] = new Dictionary<string, object>
+        {
+            ["city"]  = new Dictionary<string, object> { ["type"] = "string", ["description"] = "City name" },
+            ["date"]  = new Dictionary<string, object> { ["type"] = "string", ["description"] = "ISO 8601 date" },
+            ["units"] = new Dictionary<string, object> { ["type"] = "string", ["description"] = "metric or imperial" },
+        },
+        ["required"] = new List<string> { "city", "date" },
+    },
+};
+```
+
+### Reusable Agent Configurations
+
+Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of
+repeating the full configuration, with optional template variables (`DG_*`) for values shared
+across configurations. A variable is referenced inside the JSON-encoded config as a bare,
+unquoted `DG_<VARIABLE_NAME>` token (e.g. `"greeting": DG_GREETING` — no quotes, no braces);
+the service substitutes the variable's JSON value when the configuration is used. Managed via
+REST with the `AgentManageClient`:
+
+```csharp
+using Deepgram.Models.AgentManage.v1;
+
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
+var agentManageClient = ClientFactory.CreateAgentManageClient();
+// projectId: read it from DEEPGRAM_PROJECT_ID. Use a DISPOSABLE test project while experimenting:
+// these calls create and delete real resources, and a deleted variable's name stays reserved in
+// its project forever.
+var projectId = Environment.GetEnvironmentVariable("DEEPGRAM_PROJECT_ID")!;
+
+// Create a template variable first (DG_* key, any JSON value) so configurations can
+// reference it.
+var variable = await agentManageClient.CreateAgentVariable(projectId,
+    new AgentVariableSchema { Key = "DG_GREETING", Value = "Hello! How can I help you today?" });
+await agentManageClient.UpdateAgentVariable(projectId, variable.VariableId!,
+    new UpdateAgentVariableSchema { Value = "Welcome back!" });
+
+// Create a reusable agent configuration (Config is a JSON-encoded string). The bare
+// DG_GREETING token references the template variable created above; it comes back
+// uninterpolated when you fetch the configuration.
+var created = await agentManageClient.CreateAgent(projectId, new AgentConfigurationSchema
+{
+    Config = """{"language":"en","listen":{"provider":{"type":"deepgram","model":"nova-3"}},"think":{"provider":{"type":"open_ai","model":"gpt-4o-mini"},"prompt":"You are a helpful agent."},"greeting":DG_GREETING,"speak":{"provider":{"type":"deepgram","version":"v2","model":"flux-kit-en"}}}""",
+    Metadata = new Dictionary<string, string> { ["name"] = "customer-service-agent" },
+});
+Console.WriteLine($"Agent ID: {created.AgentId}"); // pass this in place of the agent object in Settings
+
+// List / get / update metadata / delete
+var agents = await agentManageClient.GetAgents(projectId);
+var agent = await agentManageClient.GetAgent(projectId, created.AgentId!);
+await agentManageClient.UpdateAgentMetadata(projectId, created.AgentId!,
+    new AgentMetadataSchema { Metadata = new Dictionary<string, string> { ["environment"] = "production" } });
+await agentManageClient.DeleteAgent(projectId, created.AgentId!);
+await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
+```
+
+> Note: the live API currently reserves a deleted variable's name forever within a project —
+> re-creating `DG_GREETING` after deleting it fails with "This project already has a variable
+> with that name". Use a fresh key per experiment (the runnable examples add a per-run suffix).
+
+[See our docs for more info](https://developers.deepgram.com/docs/reusable-agent-configurations).
+
+[See the Examples for more info](./examples/agent/manage/configurations/) - and the [template variables example](./examples/agent/manage/variables/).
 
 ## Text to Speech REST
 
@@ -1015,9 +1267,10 @@ Console.WriteLine($"Delete result: {response.Message}");
 
 ## Logging
 
-This SDK uses [Serilog](https://github.com/serilog/serilog) to perform all of its
-logging tasks. By default, this SDK will enable `Information` level messages and
-higher (ie `Warning`, `Error`, etc.) when you initialize the library as follows:
+This SDK logs through [`Microsoft.Extensions.Logging`](https://learn.microsoft.com/en-us/dotnet/core/extensions/logging),
+the standard .NET logging abstraction. By default it writes to the console at
+`Information` level and higher (ie `Warning`, `Error`, etc.) when you initialize the
+library as follows:
 
 ```csharp
 // Default logging level is "Information"
@@ -1025,11 +1278,80 @@ Library.Initialize();
 ```
 
 To increase the logging output/verbosity for debug or troubleshooting purposes,
-you can set the `Debug` level but using this code:
+set the `Debug` level:
 
 ```csharp
 Library.Initialize(LogLevel.Debug);
 ```
+
+### Upgrading from 6.x (Serilog → Microsoft.Extensions.Logging)
+
+Version 7.0 replaces Serilog with `Microsoft.Extensions.Logging`. Most code is
+unaffected — `Library.Initialize()`, `Library.Initialize(LogLevel.Debug)`, and the
+`Deepgram.Logger.LogLevel` enum (member names *and* values) are unchanged. The
+following Serilog-coupled members on `Deepgram.Logger.Log` are the only breaking
+changes:
+
+| 6.x (Serilog) | 7.0 replacement |
+| --- | --- |
+| `Log.Initialize(Serilog.ILogger)` | `Library.Configure(ILoggerFactory)` — see below. To keep using Serilog, register it as a provider (`builder.AddSerilog(...)`). |
+| `Log.GetLogger()` returning `Serilog.ILogger` | now returns `Microsoft.Extensions.Logging.ILogger` |
+| `Log.Initialize(LogLevel, string?)` returning `Serilog.ILogger` | now returns `Microsoft.Extensions.Logging.ILogger` |
+
+If you previously handed the SDK a Serilog logger, route it through an
+`ILoggerFactory` instead (Serilog remains fully usable as an MEL provider):
+
+```csharp
+using Microsoft.Extensions.Logging;
+using Serilog;
+
+var serilog = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+var factory = LoggerFactory.Create(b => b.AddSerilog(serilog, dispose: true));
+Library.Configure(factory);
+```
+
+### Using your own logger
+
+Because the SDK uses `Microsoft.Extensions.Logging`, you can route SDK logs through
+your own logging pipeline (Serilog, NLog, OpenTelemetry, JSON for Kibana, etc.) by
+supplying your own `ILoggerFactory`. The SDK only consumes the factory you give it —
+it never reconfigures your application's global logging.
+
+```csharp
+using Microsoft.Extensions.Logging;
+
+// Any ILoggerFactory you already build in your app
+var factory = LoggerFactory.Create(builder =>
+{
+    builder.SetMinimumLevel(LogLevel.Debug);
+    builder.AddJsonConsole();   // or AddSerilog(), AddOpenTelemetry(), etc.
+});
+
+Library.Configure(factory);   // route SDK logs through your factory
+```
+
+Each SDK component logs under its own category (for example `"ListenWSClient"` or
+`"ManageClient"`), so you can filter and format SDK logs per category with your own
+provider.
+
+If you use dependency injection, register logging and hand the SDK the container's
+factory once the provider is built:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+services.AddDeepgramLogging();                 // ensures an ILoggerFactory is available
+// ... after building the provider ...
+serviceProvider.UseDeepgramLogging();          // routes SDK logs through it
+```
+
+### Correlating logs for a connection
+
+For WebSocket clients, every log entry emitted for a single connection carries a
+generated `dg.connection_id` (via a logging scope), so you can group all of a
+connection's log entries together and later tie them back to the server's
+`request_id`. Enable scope output in your provider (for example
+`options.IncludeScopes = true` on the console logger) to surface it.
 
 ## Testing
 

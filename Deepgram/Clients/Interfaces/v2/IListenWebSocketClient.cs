@@ -93,6 +93,13 @@ public interface IListenWebSocketClient
     public Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null);
 
     /// <summary>
+    /// Waits until every message queued via <see cref="Send"/> / <see cref="SendBinary"/> /
+    /// <see cref="SendMessage"/> has been written to the socket, so buffered audio is flushed
+    /// before a control message such as Finalize or Close. Returns immediately if not connected.
+    /// </summary>
+    public Task Flush();
+
+    /// <summary>
     /// Sends a binary message over the WebSocket connection.
     /// </summary>
     /// <param name="data">The data to be sent over the WebSocket.</param>
