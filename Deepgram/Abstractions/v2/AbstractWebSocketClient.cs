@@ -134,7 +134,14 @@ public abstract class AbstractWebSocketClient : IDisposable
 
                 Log.Debug("Connect", "Connecting to Deepgram API...");
             }
+#if NET8_0_OR_GREATER
+            // The default upgrade path adds Content-Length: 0, which strict WebSocket proxies reject.
+            using var socketHandler = new SocketsHttpHandler();
+            using var invoker = new HttpMessageInvoker(socketHandler);
+            await _clientWebSocket.ConnectAsync(myUri, invoker, cancelToken.Token).ConfigureAwait(false);
+#else
             await _clientWebSocket.ConnectAsync(myUri, cancelToken.Token).ConfigureAwait(false);
+#endif
 
             if (!IsConnected())
             {
