@@ -98,6 +98,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
 
         // create client
         _clientWebSocket = new ClientWebSocket();
+        DeepgramWebSocketException.EnableHttpResponseDetails(_clientWebSocket);
 
         // set headers
         SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
@@ -169,6 +170,16 @@ public class Client : IDisposable, ISpeakWebSocketClient
             Log.Debug("Connect", "Connect cancelled.");
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("SpeakWSClient.Connect", "LEAVE");
+        }
+        catch (WebSocketException ex)
+        {
+            Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Connect", $"Exception: {ex}");
+            Log.Verbose("SpeakWSClient.Connect", "LEAVE");
+            throw new DeepgramWebSocketException(
+                "Failed to connect to Deepgram API",
+                DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket),
+                ex);
         }
         catch (Exception ex)
         {

@@ -26,6 +26,13 @@ public class DeepgramException : Exception
         RequestId = UnknownRequestId;
     }
 
+    protected DeepgramException(string errMsg, Exception? innerException) : base(errMsg, innerException)
+    {
+        ErrMsg = errMsg;
+        ErrCode = UnknownErrCode;
+        RequestId = UnknownRequestId;
+    }
+
     /// <summary>
     /// Error code
     /// </summary>

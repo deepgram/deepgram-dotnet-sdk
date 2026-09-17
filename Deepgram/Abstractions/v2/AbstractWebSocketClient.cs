@@ -90,6 +90,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         // create client
         _clientWebSocket = new ClientWebSocket();
+        DeepgramWebSocketException.EnableHttpResponseDetails(_clientWebSocket);
 
         // set headers
         SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
@@ -173,6 +174,18 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             CloseConnectionScope();
             return false;
+        }
+        catch (WebSocketException ex)
+        {
+            Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Connect", $"Exception: {ex}");
+            Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+
+            CloseConnectionScope();
+            throw new DeepgramWebSocketException(
+                "Failed to connect to Deepgram API",
+                DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket),
+                ex);
         }
         catch (Exception ex)
         {
