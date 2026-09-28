@@ -75,6 +75,8 @@ Power your apps with world-class speech and Language AI models.
 
 You can learn more about the Deepgram API at [developers.deepgram.com](https://developers.deepgram.com/docs).
 
+The repository's maintained [code documentation corpus](docs/codedocs/README.md) covers the current SDK surface used by Context7.
+
 ## Requirements
 
 This SDK supports the following versions:
