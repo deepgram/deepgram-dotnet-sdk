@@ -268,14 +268,23 @@ await liveClient.Stop();
 
 ### WebSocket handshake errors
 
-When a WebSocket upgrade is rejected with an HTTP response, `Connect` throws a
-`DeepgramWebSocketException` with the original `WebSocketException` as its inner exception.
-Use `HttpStatusCode` to handle an inspectable status such as a self-hosted rate-limit response;
-it is `null` when the connection fails without an HTTP response.
+Set `ThrowDeepgramWebSocketExceptions` to `true` on `DeepgramWsClientOptions` to receive a
+`DeepgramWebSocketException`, with the original `WebSocketException` as its inner exception and
+an inspectable `HttpStatusCode`, when a WebSocket upgrade is rejected with an HTTP response. This
+flag defaults to `false` in 7.x, so `Connect` keeps throwing the raw `WebSocketException` unless
+you opt in.
 
 ```csharp
 using System.Net;
+using Deepgram;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Exceptions.v1;
+
+var options = new DeepgramWsClientOptions
+{
+    ThrowDeepgramWebSocketExceptions = true,
+};
+var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 
 try
 {

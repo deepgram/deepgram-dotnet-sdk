@@ -175,7 +175,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             CloseConnectionScope();
             return false;
         }
-        catch (WebSocketException ex)
+        catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true })
         {
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");

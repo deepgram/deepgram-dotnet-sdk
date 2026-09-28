@@ -176,7 +176,7 @@ public class Client : IDisposable, IListenWebSocketClient
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("ListenWSClient.Connect", "LEAVE");
         }
-        catch (WebSocketException ex)
+        catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true })
         {
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
