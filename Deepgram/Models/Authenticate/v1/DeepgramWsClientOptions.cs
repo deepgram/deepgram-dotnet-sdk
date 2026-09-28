@@ -59,7 +59,8 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     /// <summary>
     /// When true, rejected WebSocket upgrades throw a <see cref="Deepgram.Models.Exceptions.v1.DeepgramWebSocketException"/>
     /// with the original <see cref="System.Net.WebSockets.WebSocketException"/> as its inner exception.
-    /// Defaults to false to preserve the raw <see cref="System.Net.WebSockets.WebSocketException"/> behavior in 7.x.
+    /// Defaults to false to preserve the raw <see cref="System.Net.WebSockets.WebSocketException"/> behavior in 7.x;
+    /// the default changes in the next major version.
     /// </summary>
     public bool ThrowDeepgramWebSocketExceptions { get; set; } = false;
 

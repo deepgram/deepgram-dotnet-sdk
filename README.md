@@ -272,19 +272,24 @@ Set `ThrowDeepgramWebSocketExceptions` to `true` on `DeepgramWsClientOptions` to
 `DeepgramWebSocketException`, with the original `WebSocketException` as its inner exception and
 an inspectable `HttpStatusCode`, when a WebSocket upgrade is rejected with an HTTP response. This
 flag defaults to `false` in 7.x, so `Connect` keeps throwing the raw `WebSocketException` unless
-you opt in.
+you opt in; the default changes in the next major version.
 
 ```csharp
 using System.Net;
 using Deepgram;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Exceptions.v1;
+using Deepgram.Models.Listen.v2.WebSocket;
 
 var options = new DeepgramWsClientOptions
 {
     ThrowDeepgramWebSocketExceptions = true,
 };
 var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
+var liveSchema = new LiveSchema
+{
+    Model = "nova-3",
+};
 
 try
 {
