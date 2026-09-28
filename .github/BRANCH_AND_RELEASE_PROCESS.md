@@ -88,53 +88,12 @@ In scenarios where urgent issues arise, the `hotfix` branch comes into play. A h
 This dual approach of leveraging both **GitHub Flow** and **Git Flow** ensures that the project can iterate quickly while maintaining high standards of code stability and release management.
 ### Creating a Release
 
-Since the latest stable code is contained on `main` in a typical **GitHub Flow**, to create a release someone with write access to the repository needs to simply just `git tag` the release and then create a (draft) release using that tag in the [repository's release page](https://github.com/deepgram/deepgram-dotnet-sdk/releases).
+Stable releases are managed by [Release Please](https://github.com/googleapis/release-please). Every push to `main` or a supported `release-v*` maintenance branch runs `.github/workflows/release-please.yml` after compiling and testing the SDK. Release Please uses conventional commit messages to create or update one release PR containing the generated `CHANGELOG.md` entries and version manifest update.
 
-If you haven't done this before, these are the typicial commands to execute at the root of the repository assuming you are on your fork:
+When a maintainer merges that release PR, Release Please creates the GitHub release and a plain-SemVer tag (for example, `7.2.0`). The workflow checks out that release commit, builds and packs `Deepgram.sln` with the generated tag as `-p:Version`, then publishes `Deepgram` and `Deepgram.Microphone` to NuGet using the `NUGET_API_KEY` secret. It refreshes Context7 only after both packages publish successfully. Do not manually create stable release tags or GitHub releases.
 
-```bash
-# get the latest everything and update your fork
-git checkout main
-git pull --rebase upstream main
-git push
-git fetch upstream --tags
-git push origin --tags
-
-# create a new tag following semver
-git tag -m <version> <version>
-git push upstream  <version>
-```
-
-If the release you want to create is `4.5.0`, then this would look like:
-
-```bash
-# get the latest everything and update your fork
-git checkout main
-git pull --rebase upstream main
-git push
-git fetch upstream --tags
-git push origin --tags
-
-# create a new tag following semver
-git tag -m 4.5.0 4.5.0
-git push upstream 4.5.0
-```
+The repository's existing stable tags do not use a `v` prefix. `.github/release-please-config.json` deliberately preserves that public format.
 
 #### Creating a Release from a Release Branch
 
-While we don't have a formal requirement for supporting past releases (ie currently on `v3` but need a patch on `v2`), there are times when you need to provide a patch release for things like security fixes. To create that patch releases, you do something similar as you would have done on main, but on the `release-v[0-9]+/*` branch.
-
-If this were the `release-v3` branch for version `3.4.3` (note the `3` matches the `release-v3`), this would look like (again, assuming you are on your fork):
-
-```bash
-# get the latest everything and update your fork
-git checkout release-v3
-git pull --rebase upstream release-v3
-git push origin release-v3
-git fetch upstream --tags
-git push origin --tags
-
-# create a new tag following semver
-git tag -m 3.4.3 3.4.3
-git push upstream 3.4.3
-```
+While we don't have a formal requirement for supporting past releases (for example, currently on `v3` but need a patch on `v2`), there are times when you need to provide a patch release for things like security fixes. Create the fix on the appropriate `release-v[0-9]+` branch. Release Please opens and publishes that maintenance branch's release PR using the version manifest in that branch's history.
