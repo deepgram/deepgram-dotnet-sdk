@@ -71,6 +71,8 @@ await client.SendInjectUserMessage("Summarize today's support queue.");
 ```csharp
 using Deepgram;
 using Deepgram.Models.Agent.v2.WebSocket;
+using System.Text;
+using System.Text.Json;
 
 var client = ClientFactory.CreateAgentWebSocketClient();
 
@@ -99,14 +101,23 @@ settings.Agent.Think.Functions = new List<Function>
 
 await client.Subscribe(new EventHandler<FunctionCallRequestResponse>(async (_, e) =>
 {
-    var result = new FunctionCallResponseSchema
+    // One request can carry several calls; reply only to client-side calls.
+    foreach (var call in e.Functions ?? new List<FunctionCall>())
     {
-        FunctionCallId = e.FunctionCallId,
-        Output = JsonSerializer.Serialize(new { status = "open", priority = "high" })
-    };
+        if (call.ClientSide != true)
+        {
+            continue;
+        }
 
-    var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result));
-    await client.SendMessageImmediately(payload);
+        var result = new FunctionCallResponseSchema
+        {
+            FunctionCallId = call.Id,
+            Output = JsonSerializer.Serialize(new { status = "open", priority = "high" })
+        };
+
+        var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result));
+        await client.SendMessageImmediately(payload);
+    }
 }));
 
 await client.Connect(settings);

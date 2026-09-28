@@ -84,7 +84,7 @@ public class PreRecordedSchema
     public List<string>? Search { get; set; }
     public bool? Sentiment { get; set; }
     public bool? SmartFormat { get; set; }
-    public bool? Summarize { get; set; }
+    public string? Summarize { get; set; }
     public List<string>? Tag { get; set; }
     public bool? Topics { get; set; }
 }

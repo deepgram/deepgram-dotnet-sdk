@@ -105,7 +105,7 @@ Task<AsyncResponse> TranscribeFileCallBack(
 | `Keywords` | `List<string>?` | `null` | Keyword boosting or suppression. |
 | `DetectEntities` | `bool?` | `null` | Enable named entity extraction. |
 | `DetectTopics` | `bool?` | `null` | Enable topic detection. |
-| `Summarize` | `bool?` | `null` | Enable summarization in supported flows. |
+| `Summarize` | `string?` | `null` | Summarization version to run, for example `"v2"`. |
 | `CallBack` | `string?` | `null` | Callback URL for asynchronous processing. |
 
 ## Returns
