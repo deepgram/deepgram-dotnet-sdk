@@ -92,7 +92,12 @@ public class ListenWebSocketClientTests
 
     [TestCase("{}")]
     [TestCase("{ \"type\": 5 }")]
-    public async Task ProcessTextMessage_With_Missing_Or_NonString_Type_Should_Raise_Unhandled_Without_Invoking_Typed_Listeners(string json)
+    [TestCase("[]")]
+    [TestCase("\"SpeechStarted\"")]
+    [TestCase("5")]
+    [TestCase("false")]
+    [TestCase("null")]
+    public async Task ProcessTextMessage_With_Missing_NonString_Or_NonObject_Type_Should_Raise_Unhandled_Without_Invoking_Typed_Listeners(string json)
     {
         var client = new Client(_apiKey, _options);
         var speechStartedCount = 0;
@@ -106,7 +111,7 @@ public class ListenWebSocketClientTests
 
         using (new AssertionScope())
         {
-            act.Should().NotThrow("malformed object message types must remain non-fatal");
+            act.Should().NotThrow("malformed message types must remain non-fatal");
             speechStartedCount.Should().Be(0);
             utteranceEndCount.Should().Be(0);
             unhandled.Should().NotBeNull();
