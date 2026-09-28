@@ -128,13 +128,13 @@ Most examples end with `Console.ReadKey()`, so they need an interactive terminal
 
 ## Release process
 
-Release Please manages stable releases from `main` and supported `release-v*` maintenance branches; the full process is in `.github/BRANCH_AND_RELEASE_PROCESS.md`.
+Release Please manages stable releases from `main`; the full process is in `.github/BRANCH_AND_RELEASE_PROCESS.md`.
 
 1. `main` must stay releasable. Consumers install a tagged version from NuGet (`dotnet add package Deepgram --version 7.1.1`).
-2. Conventional commits merged to `main` or a supported `release-v*` branch cause `release-please.yml` to create or update a Release Please PR. Merging that PR creates a plain-SemVer tag, GitHub release, and changelog, then restores and builds `Deepgram.sln` with `-p:Version=<tag>`, packs both packages, and pushes them to nuget.org with the `NUGET_API_KEY` secret.
+2. Conventional commits merged to `main` cause `release-please.yml` to create or update a Release Please PR. Merging that PR creates a plain-SemVer tag, GitHub release, and changelog, then restores and builds `Deepgram.sln` with `-p:Version=<tag>`, packs both packages, and pushes them to nuget.org with the `NUGET_API_KEY` secret.
 3. Pre-release tags (`7.2.0-dev.1`, `-alpha.N`, `-beta.N`, `-rc.N`) run `CD-dev.yml`, which packs `Deepgram.DevBuild.sln` as `Deepgram.Unstable.SDK.Builds`.
 4. After a successful NuGet publication, the Release Please workflow requests a refresh of the Context7 repository index.
-5. A breaking change bumps the major version and gets a `release-v<N>` branch for patches to the previous major.
+5. Maintenance releases for previous majors are outside this Release Please setup's scope.
 
 ## Pull requests
 

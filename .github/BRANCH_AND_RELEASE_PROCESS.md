@@ -88,12 +88,10 @@ In scenarios where urgent issues arise, the `hotfix` branch comes into play. A h
 This dual approach of leveraging both **GitHub Flow** and **Git Flow** ensures that the project can iterate quickly while maintaining high standards of code stability and release management.
 ### Creating a Release
 
-Stable releases are managed by [Release Please](https://github.com/googleapis/release-please). Every push to `main` or a supported `release-v*` maintenance branch runs `.github/workflows/release-please.yml` after compiling and testing the SDK. Release Please uses conventional commit messages to create or update one release PR containing the generated `CHANGELOG.md` entries and updates to `version.txt` and the version manifest.
+Stable releases are managed by [Release Please](https://github.com/googleapis/release-please). Every push to `main` runs `.github/workflows/release-please.yml` after compiling and testing the SDK. Release Please uses conventional commit messages to create or update one release PR containing the generated `CHANGELOG.md` entries and updates to `version.txt` and the version manifest.
 
 When a maintainer merges that release PR, Release Please creates the GitHub release and a plain-SemVer tag (for example, `7.2.0`). The workflow checks out that release commit, builds and packs `Deepgram.sln` with the generated tag as `-p:Version`, then publishes `Deepgram` and `Deepgram.Microphone` to NuGet using the `NUGET_API_KEY` secret. It requests a Context7 repository-index refresh only after both packages publish successfully. Do not manually create stable release tags or GitHub releases.
 
 The repository's existing stable tags do not use a `v` prefix. `.github/release-please-config.json` deliberately preserves that public format.
 
-#### Creating a Release from a Release Branch
-
-While we don't have a formal requirement for supporting past releases (for example, currently on `v3` but need a patch on `v2`), there are times when you need to provide a patch release for things like security fixes. Create the fix on the appropriate `release-v[0-9]+` branch. Release Please opens and publishes that maintenance branch's release PR using the version manifest in that branch's history.
+Maintenance releases for previous majors are outside this Release Please setup's scope.
