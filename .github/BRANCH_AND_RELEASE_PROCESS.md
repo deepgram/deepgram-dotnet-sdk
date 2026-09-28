@@ -90,7 +90,7 @@ This dual approach of leveraging both **GitHub Flow** and **Git Flow** ensures t
 
 Stable releases are managed by [Release Please](https://github.com/googleapis/release-please). Every push to `main` or a supported `release-v*` maintenance branch runs `.github/workflows/release-please.yml` after compiling and testing the SDK. Release Please uses conventional commit messages to create or update one release PR containing the generated `CHANGELOG.md` entries and updates to `version.txt` and the version manifest.
 
-When a maintainer merges that release PR, Release Please creates the GitHub release and a plain-SemVer tag (for example, `7.2.0`). The workflow checks out that release commit, builds and packs `Deepgram.sln` with the generated tag as `-p:Version`, then publishes `Deepgram` and `Deepgram.Microphone` to NuGet using the `NUGET_API_KEY` secret. It refreshes Context7 only after both packages publish successfully. Do not manually create stable release tags or GitHub releases.
+When a maintainer merges that release PR, Release Please creates the GitHub release and a plain-SemVer tag (for example, `7.2.0`). The workflow checks out that release commit, builds and packs `Deepgram.sln` with the generated tag as `-p:Version`, then publishes `Deepgram` and `Deepgram.Microphone` to NuGet using the `NUGET_API_KEY` secret. It requests a Context7 repository-index refresh only after both packages publish successfully. Do not manually create stable release tags or GitHub releases.
 
 The repository's existing stable tags do not use a `v` prefix. `.github/release-please-config.json` deliberately preserves that public format.
 

@@ -101,10 +101,6 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout release
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.release-please.outputs.release_sha }}
       - name: Update Context7 Documentation
         uses: rennf93/upsert-context7@1.1
         with:

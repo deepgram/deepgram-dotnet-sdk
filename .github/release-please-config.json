@@ -8,6 +8,11 @@
       "include-component-in-tag": false,
       "include-v-in-tag": false,
       "changelog-path": "CHANGELOG.md",
+      "exclude-paths": [
+        ".github/**",
+        "AGENTS.md",
+        "version.txt"
+      ],
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": false,
       "draft": false
