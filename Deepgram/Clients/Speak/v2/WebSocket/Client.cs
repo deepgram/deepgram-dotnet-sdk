@@ -302,7 +302,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     ///  This method Flushes the text buffer on Deepgram to be converted to audio.
     ///  NOTE: These should never use the SendImmediately methods because they would by-pass the flow of text messages queued.
     /// </summary>
-    public void Flush()
+    public new void Flush()
     {
         ControlMessage controlMessage = new ControlMessage(Constants.Flush);
         byte[] byteArray = Encoding.UTF8.GetBytes(controlMessage.ToString());
