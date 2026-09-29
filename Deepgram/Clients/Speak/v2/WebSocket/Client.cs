@@ -530,7 +530,14 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 
             Log.Verbose("ProcessDataReceived", $"raw response: {response}");
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(SpeakType), data.RootElement.GetProperty("type").GetString()!);
+            var typeString = data.RootElement.TryGetProperty("type", out var typeProperty) &&
+                typeProperty.ValueKind == JsonValueKind.String
+                ? typeProperty.GetString()
+                : null;
+            if (!Enum.TryParse<SpeakType>(typeString, out var val))
+            {
+                val = SpeakType.Unhandled;
+            }
 
             Log.Verbose("ProcessDataReceived", $"Type: {val}");
 
