@@ -268,6 +268,42 @@ await Task.Delay(TimeSpan.FromSeconds(30));
 await liveClient.Stop();
 ```
 
+### WebSocket handshake errors
+
+Set `ThrowDeepgramWebSocketExceptions` to `true` on `DeepgramWsClientOptions` to receive a
+`DeepgramWebSocketException`, with the original `WebSocketException` as its inner exception and
+an inspectable `HttpStatusCode`, when a WebSocket upgrade is rejected with an HTTP response. This
+flag defaults to `false` in 7.x, so `Connect` keeps throwing the raw `WebSocketException` unless
+you opt in; the default changes in the next major version.
+
+```csharp
+using System.Net;
+using Deepgram;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
+using Deepgram.Models.Listen.v2.WebSocket;
+
+var options = new DeepgramWsClientOptions
+{
+    ThrowDeepgramWebSocketExceptions = true,
+};
+var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
+var liveSchema = new LiveSchema
+{
+    Model = "nova-3",
+};
+
+try
+{
+    await liveClient.Connect(liveSchema);
+}
+catch (DeepgramWebSocketException exception)
+    when (exception.HttpStatusCode == HttpStatusCode.TooManyRequests)
+{
+    // Back off or reduce concurrent self-hosted requests.
+}
+```
+
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text-api/listen-streaming).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
