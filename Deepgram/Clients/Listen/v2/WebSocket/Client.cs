@@ -491,7 +491,18 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                 Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             }
             var data = JsonDocument.Parse(response);
-            var val = Enum.Parse(typeof(ListenType), data.RootElement.GetProperty("type").GetString()!);
+            var typeString = data.RootElement.ValueKind == JsonValueKind.Object
+                && data.RootElement.TryGetProperty("type", out var type)
+                && type.ValueKind == JsonValueKind.String
+                ? type.GetString()
+                : null;
+
+            if (!Enum.TryParse<ListenType>(typeString, out var val))
+            {
+                Log.Debug("ProcessTextMessage", "Unknown message type. Calling base.ProcessTextMessage...");
+                base.ProcessTextMessage(result, ms);
+                return;
+            }
 
             if (Log.IsEnabled(LogLevel.Verbose))
             {
