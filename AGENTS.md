@@ -134,7 +134,7 @@ Release Please manages stable releases from `main`; the full process is in `.git
 2. Conventional commits merged to `main` cause `release-please.yml` to create or update a Release Please PR. Merging that PR creates a plain-SemVer tag, GitHub release, and changelog, then restores and builds `Deepgram.sln` with `-p:Version=<tag>`, packs both packages, and pushes them to nuget.org with the `NUGET_API_KEY` secret.
 3. Pre-release tags (`7.2.0-dev.1`, `-alpha.N`, `-beta.N`, `-rc.N`) run `CD-dev.yml`, which packs `Deepgram.DevBuild.sln` as `Deepgram.Unstable.SDK.Builds`.
 4. After a successful NuGet publication, the Release Please workflow requests a refresh of the Context7 repository index.
-5. Release Please decides the version from commit prefixes since the last tag: `fix:` bumps patch, `feat:` bumps minor, `feat!:` or a `BREAKING CHANGE:` footer bumps major. `docs:`, `ci:`, `chore:`, and `test:` commits do not create a release. Under squash merges the PR title is the commit message.
+5. Release Please decides the version from commit prefixes since the last tag: `fix:` bumps patch, `feat:` bumps minor, a `!` after any type (`feat!:`, `fix!:`) or a `BREAKING CHANGE:` footer bumps major. `docs:`, `ci:`, `chore:`, and `test:` commits do not create a release. Under squash merges the PR title is the commit message.
 6. Maintenance releases for previous majors are outside this Release Please setup's scope.
 
 ## Pull requests
