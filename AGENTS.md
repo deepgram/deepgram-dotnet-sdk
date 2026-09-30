@@ -6,7 +6,7 @@ Instructions for AI coding agents (Claude Code, Cursor, Codex, Copilot) and for 
 
 This is the official .NET SDK for the Deepgram API, published to NuGet as `Deepgram` (the SDK) and `Deepgram.Microphone` (a capture helper). The latest release tag is `7.1.1`. Both packages target `net8.0` and `netstandard2.0`. The SDK is hand-written: there is no code generator, no `fern/` folder, and no `.fernignore`. Edit the source directly.
 
-The package version is not stored in the repository. `Deepgram/Deepgram.csproj` has no `<Version>` element; the CD workflow passes the git tag as `-p:Version=<tag>` at pack time.
+The package version is not stored in either project file. `Deepgram/Deepgram.csproj` has no `<Version>` element; Release Please tracks the next stable version in `version.txt` and `.github/.release-please-manifest.json`, then passes its release tag as `-p:Version=<tag>` at pack time.
 
 Never hardcode API keys or access tokens. Every client constructor and every `ClientFactory.Create*` method takes an optional `apiKey` and falls back to the `DEEPGRAM_API_KEY` environment variable (`DEEPGRAM_ACCESS_TOKEN` for a bearer token). Examples and tests rely on that fallback.
 
@@ -27,7 +27,7 @@ Never hardcode API keys or access tokens. Every client constructor and every `Cl
 | `examples/` | One console project per scenario, grouped by product |
 | `tests/edge_cases/`, `tests/expected_failures/` | Console programs run by hand against the live API to reproduce reconnect, keepalive, timeout, and error paths |
 | `extras/live-smoke/` | Dockerized live smokes for Flux STT `ForceEndTurn` and the Voice Agent management endpoints; see its `README.md` |
-| `.github/workflows/` | `CI.yml`, `tests-daily.yml`, `CD.yml`, `CD-dev.yml`, `context7.yml` |
+| `.github/workflows/` | `CI.yml`, `tests-daily.yml`, `release-please.yml`, `CD-dev.yml`, `context7.yml` |
 | `.github/` | `CONTRIBUTING.md`, `CODE_CONTRIBUTIONS_GUIDE.md`, `GITHUB_WORKFLOW.md`, `BRANCH_AND_RELEASE_PROCESS.md`, `PULL_REQUEST_TEMPLATE.md` |
 | `.agents/skills/` | Agent-agnostic skills for using this SDK (speech-to-text, conversational STT, text-to-speech, voice agent, audio intelligence, text intelligence, management API) |
 
@@ -128,13 +128,14 @@ Most examples end with `Console.ReadKey()`, so they need an interactive terminal
 
 ## Release process
 
-Releases are git tags on `main`; there is no release-please. The full process is in `.github/BRANCH_AND_RELEASE_PROCESS.md`.
+Release Please manages stable releases from `main`; the full process is in `.github/BRANCH_AND_RELEASE_PROCESS.md`.
 
 1. `main` must stay releasable. Consumers install a tagged version from NuGet (`dotnet add package Deepgram --version 7.1.1`).
-2. A maintainer tags with plain semver and no `v` prefix (`git tag -m 7.2.0 7.2.0 && git push upstream 7.2.0`). `CD.yml` matches `[0-9]+.[0-9]+.[0-9]+`, restores and builds `Deepgram.sln` in Release, packs with `-p:Version=<tag>`, and pushes both packages to nuget.org with the `NUGET_API_KEY` secret.
+2. Conventional commits merged to `main` cause `release-please.yml` to create or update a Release Please PR. Merging that PR creates a plain-SemVer tag, GitHub release, and changelog, then restores and builds `Deepgram.sln` with `-p:Version=<tag>`, packs both packages, and pushes them to nuget.org with the `NUGET_API_KEY` secret.
 3. Pre-release tags (`7.2.0-dev.1`, `-alpha.N`, `-beta.N`, `-rc.N`) run `CD-dev.yml`, which packs `Deepgram.DevBuild.sln` as `Deepgram.Unstable.SDK.Builds`.
-4. The maintainer then publishes a GitHub release from the tag, titled with the version and a short summary of the headline changes (the 7.1.1 release names the Agent `FunctionCallRequest` functions and the error code work); `context7.yml` refreshes the Context7 index when the release is published.
-5. A breaking change bumps the major version and gets a `release-v<N>` branch for patches to the previous major.
+4. After a successful NuGet publication, the Release Please workflow requests a refresh of the Context7 repository index.
+5. Release Please decides the version from commit prefixes since the last tag: `fix:` bumps patch, `feat:` bumps minor, a `!` after any type (`feat!:`, `fix!:`) or a `BREAKING CHANGE:` footer bumps major. `docs:`, `ci:`, `chore:`, and `test:` commits do not create a release. Under squash merges the PR title is the commit message.
+6. Maintenance releases for previous majors are outside this Release Please setup's scope.
 
 ## Pull requests
 
