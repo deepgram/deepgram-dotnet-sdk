@@ -37,6 +37,8 @@ jobs:
           hide_complexity: true
           indicators: true
           output: both
+          fail_below_min: true
+          thresholds: '40 90'
       # Fork PRs get a read-only GITHUB_TOKEN, so commenting is not possible there.
       # The coverage report is still available in the job summary step below.
       - name: Add coverage PR comment
