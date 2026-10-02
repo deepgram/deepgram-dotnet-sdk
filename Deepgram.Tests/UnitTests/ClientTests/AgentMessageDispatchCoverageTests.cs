@@ -20,12 +20,14 @@ public class AgentMessageDispatchCoverageTests
         return new Client("test-api-key", options);
     }
 
-    private static void FeedTextMessage(Client client, string type)
+    private static void FeedTextMessage(Client client, string json)
     {
-        var bytes = Encoding.UTF8.GetBytes($$"""{"type":"{{type}}"}""");
+        var bytes = Encoding.UTF8.GetBytes(json);
         using var stream = new MemoryStream(bytes);
         client.ProcessTextMessage(new WebSocketReceiveResult(bytes.Length, WebSocketMessageType.Text, true), stream);
     }
+
+    private static void FeedTextMessageType(Client client, string type) => FeedTextMessage(client, $$"""{"type":"{{type}}"}""");
 
     [Test]
     public async Task ProcessTextMessage_Should_Dispatch_Each_Supported_Agent_Event()
@@ -60,37 +62,40 @@ public class AgentMessageDispatchCoverageTests
         await client.Subscribe(new EventHandler<PromptUpdatedResponse>((_, response) => promptUpdated = response));
         await client.Subscribe(new EventHandler<SpeakUpdatedResponse>((_, response) => speakUpdated = response));
 
-        foreach (var type in new[]
+        foreach (var json in new[]
                      {
-                         "Open",
-                         "Error",
-                         "AgentAudioDone",
-                         "AgentStartedSpeaking",
-                         "AgentThinking",
-                         "ConversationText",
-                         "FunctionCallRequest",
-                         "UserStartedSpeaking",
-                         "Welcome",
-                         "SettingsApplied",
-                         "InjectionRefused",
-                         "PromptUpdated",
-                         "SpeakUpdated",
+                         """{"type":"Open","request_id":"request-1"}""",
+                         """{"type":"Error","code":"CLIENT_MESSAGE_TIMEOUT","description":"timed out"}""",
+                         """{"type":"AgentAudioDone"}""",
+                         """{"type":"AgentStartedSpeaking","total_latency":1.2,"tts_latency":0.4,"ttt_latency":0.8}""",
+                         """{"type":"AgentThinking","content":"checking account"}""",
+                         """{"type":"ConversationText","role":"assistant","content":"Hello"}""",
+                         """{"type":"FunctionCallRequest","functions":[]}""",
+                         """{"type":"UserStartedSpeaking"}""",
+                         """{"type":"Welcome","request_id":"request-2"}""",
+                         """{"type":"SettingsApplied"}""",
+                         """{"type":"InjectionRefused"}""",
+                         """{"type":"PromptUpdated"}""",
+                         """{"type":"SpeakUpdated"}""",
                      })
         {
-            FeedTextMessage(client, type);
+            FeedTextMessage(client, json);
         }
 
         using (new AssertionScope())
         {
             opened.Should().NotBeNull();
-            error.Should().NotBeNull();
+            error!.Code.Should().Be("CLIENT_MESSAGE_TIMEOUT");
+            error.Description.Should().Be("timed out");
             audioDone.Should().NotBeNull();
-            startedSpeaking.Should().NotBeNull();
-            thinking.Should().NotBeNull();
-            conversationText.Should().NotBeNull();
+            startedSpeaking!.TotalLatency.Should().Be(1.2m);
+            startedSpeaking.TtsLatency.Should().Be(0.4m);
+            thinking!.Content.Should().Be("checking account");
+            conversationText!.Role.Should().Be("assistant");
+            conversationText.Content.Should().Be("Hello");
             functionCall.Should().NotBeNull();
             userStartedSpeaking.Should().NotBeNull();
-            welcome.Should().NotBeNull();
+            welcome!.RequestId.Should().Be("request-2");
             settingsApplied.Should().NotBeNull();
             injectionRefused.Should().NotBeNull();
             promptUpdated.Should().NotBeNull();
@@ -129,7 +134,7 @@ public class AgentMessageDispatchCoverageTests
     {
         var client = NewClient();
 
-        Action act = () => FeedTextMessage(client, type);
+        Action act = () => FeedTextMessageType(client, type);
 
         act.Should().NotThrow();
     }
