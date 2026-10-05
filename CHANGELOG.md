@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.1.3](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.2...7.1.3) (2026-10-05)
+
+
+### Bug Fixes
+
+* **listen:** allow Connect without a model on the v2 websocket client ([4fa3fe1](https://github.com/deepgram/deepgram-dotnet-sdk/commit/4fa3fe135148741cafce7f1c8ec768108fc6737c))
+
 ## [7.1.2](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.1...7.1.2) (2026-09-30)
 
 
