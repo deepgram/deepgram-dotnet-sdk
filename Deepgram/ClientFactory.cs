@@ -35,6 +35,14 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a Voice Agent settings catalog client.
+    /// </summary>
+    public static V1.IAgentCatalogClient CreateAgentCatalogClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AgentCatalogClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
     /// their template variables
     /// </summary>

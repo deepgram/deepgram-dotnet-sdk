@@ -91,6 +91,7 @@
     <Compile Remove="Models\Agent\v1\**" />
     <EmbeddedResource Remove="Models\Agent\v1\**" />
     <None Remove="Models\Agent\v1\**" />
+    <Compile Include="Models\Agent\v1\REST\**\*.cs" />
   </ItemGroup>
  
 

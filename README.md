@@ -663,6 +663,23 @@ await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 await agentClient.SendForceEndTurn(); // Requires a Flux listen provider and IAgentProtocolClient.
 ```
 
+### Available Think models
+
+Read the current Voice Agent Think-model catalog before configuring a session. The catalog is
+read-only and does not require a project ID.
+
+```csharp
+using Deepgram.Models.Agent.v1.REST;
+
+var catalogClient = ClientFactory.CreateAgentCatalogClient();
+var catalog = await catalogClient.GetThinkModels();
+
+foreach (var model in catalog.Models ?? new List<AgentThinkModel>())
+{
+    Console.WriteLine($"{model.Provider}: {model.Id} ({model.Name})");
+}
+```
+
 ### Reusable Agent Configurations
 
 Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of
