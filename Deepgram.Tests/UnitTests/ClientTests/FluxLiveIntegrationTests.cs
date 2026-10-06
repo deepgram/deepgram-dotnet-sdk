@@ -36,6 +36,7 @@ public class FluxLiveIntegrationTests
         var client = new FluxWebSocketClient(apiKey!);
 
         var connectedReceived = new TaskCompletionSource<ConnectedResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var configureSuccessReceived = new TaskCompletionSource<ConfigureSuccessResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
         var endOfTurnReceived = new TaskCompletionSource<TurnInfoResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
         var closeReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var turnInfoCount = 0;
@@ -43,6 +44,7 @@ public class FluxLiveIntegrationTests
         var errors = new List<ErrorResponse>();
 
         await client.Subscribe(new EventHandler<ConnectedResponse>((s, e) => connectedReceived.TrySetResult(e)));
+        await client.Subscribe(new EventHandler<ConfigureSuccessResponse>((s, e) => configureSuccessReceived.TrySetResult(e)));
         await client.Subscribe(new EventHandler<TurnInfoResponse>((s, e) =>
         {
             Interlocked.Increment(ref turnInfoCount);
@@ -63,8 +65,15 @@ public class FluxLiveIntegrationTests
             Model = "flux-general-en",
             Encoding = "linear16",
             SampleRate = 16000,
+            Numerals = true,
+            Redact = "numbers",
         });
         connected.Should().BeTrue("the client must connect to the live Flux endpoint");
+
+        // Confirm mid-session numeral formatting is accepted and echoed by the server.
+        await client.SendConfigure(new ConfigureSchema { Numerals = false });
+        (await Task.WhenAny(configureSuccessReceived.Task, Task.Delay(5000))).Should().Be(configureSuccessReceived.Task,
+            "the server must acknowledge a numerals Configure message");
 
         // Stream the raw PCM (skip the 44-byte WAV header) in ~80ms chunks, paced like a
         // real-time capture device.
@@ -102,6 +111,10 @@ public class FluxLiveIntegrationTests
             var connectedMsg = await connectedReceived.Task;
             connectedMsg.RequestId.Should().NotBeNullOrEmpty();
             connectedMsg.SequenceId.Should().Be(0);
+
+            var configureSuccess = await configureSuccessReceived.Task;
+            (configureSuccess.Numerals is null or false).Should().BeTrue(
+                "the server may omit the optional numerals echo, but must not report it as enabled after disabling it");
 
             var endOfTurn = await endOfTurnReceived.Task;
             endOfTurn.Transcript.Should().NotBeNullOrEmpty();

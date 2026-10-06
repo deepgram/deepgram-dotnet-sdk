@@ -82,6 +82,8 @@ namespace SampleApp
                     SampleRate = 16000,
                     EotThreshold = 0.7,
                     EagerEotThreshold = 0.5,
+                    // Flux supports only number redaction, not entity redaction.
+                    Redact = "numbers",
                 };
                 bool bConnected = await fluxClient.Connect(fluxSchema);
                 if (!bConnected)
@@ -89,6 +91,10 @@ namespace SampleApp
                     Console.WriteLine("Failed to connect to the server");
                     return;
                 }
+
+                // Numeral formatting can change during a session. This applies to subsequent
+                // transcripts only; the server confirms the active value with ConfigureSuccess.
+                await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true });
 
                 // Stream the raw PCM (skipping the 44-byte WAV header) in ~80ms chunks,
                 // paced like a live microphone.
