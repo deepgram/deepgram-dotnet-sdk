@@ -26,7 +26,7 @@ namespace SampleApp
 
                 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
                 DeepgramWsClientOptions options = new DeepgramWsClientOptions(null, null, true);
-                var agentClient = ClientFactory.CreateAgentWebSocketClient(apiKey: "", options: options);
+                var agentClient = ClientFactory.CreateAgentProtocolClient(apiKey: "", options: options);
 
                 // current time
                 var lastAudioTime = DateTime.Now;
@@ -279,6 +279,40 @@ namespace SampleApp
                 if (!subscribeResult)
                 {
                     Console.WriteLine("Failed to subscribe to SpeakUpdatedResponse event");
+                    return;
+                }
+
+                subscribeResult = await agentClient.Subscribe(new EventHandler<FunctionCallCancelledResponse>((sender, e) =>
+                {
+                    foreach (var function in e.Functions ?? new List<CancelledFunctionCall>())
+                    {
+                        Console.WriteLine($"----> Function call cancelled: {function.Id} ({function.Name})");
+                        // Never return a result for a cancelled client-side function call.
+                    }
+                }));
+                if (!subscribeResult)
+                {
+                    Console.WriteLine("Failed to subscribe to FunctionCallCancelledResponse event");
+                    return;
+                }
+
+                subscribeResult = await agentClient.Subscribe(new EventHandler<LatencyReportResponse>((sender, e) =>
+                {
+                    Console.WriteLine($"----> Total agent latency: {e.TotalLatency}s");
+                }));
+                if (!subscribeResult)
+                {
+                    Console.WriteLine("Failed to subscribe to LatencyReportResponse event");
+                    return;
+                }
+
+                subscribeResult = await agentClient.Subscribe(new EventHandler<AgentWarningResponse>((sender, e) =>
+                {
+                    Console.WriteLine($"----> Agent warning: {e.Code} - {e.Description}");
+                }));
+                if (!subscribeResult)
+                {
+                    Console.WriteLine("Failed to subscribe to AgentWarningResponse event");
                     return;
                 }
 
