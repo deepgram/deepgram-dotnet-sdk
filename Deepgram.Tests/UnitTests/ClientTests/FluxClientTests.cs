@@ -569,6 +569,25 @@ public class FluxClientTests
     }
 
     [Test]
+    public void ConfigureSuccessResponse_Should_Copy_Numerals()
+    {
+        var configured = new ConfigureSuccessResponse
+        {
+            RequestId = "req-1",
+            Numerals = true,
+        };
+
+        var updated = configured with { Numerals = false };
+
+        using (new AssertionScope())
+        {
+            configured.Numerals.Should().BeTrue();
+            updated.Numerals.Should().BeFalse();
+            updated.RequestId.Should().Be("req-1");
+        }
+    }
+
+    [Test]
     public void ConfigureFailureResponse_Should_Deserialize_Both_Documented_Shapes()
     {
         // The AsyncAPI spec defines {type, request_id, sequence_id}; the docs show
