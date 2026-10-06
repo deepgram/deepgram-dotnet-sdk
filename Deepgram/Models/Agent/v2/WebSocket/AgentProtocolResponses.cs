@@ -51,6 +51,18 @@ public record FunctionCallResponse
     public string? Content { get; set; }
 }
 
+/// <summary>
+/// An arbitrary JSON response forwarded from a custom Think provider.
+/// </summary>
+public record CustomFromThinkProviderResponse
+{
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
+    [JsonPropertyName("content")]
+    public JsonElement Content { get; set; }
+}
+
 public record CancelledFunctionCall
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

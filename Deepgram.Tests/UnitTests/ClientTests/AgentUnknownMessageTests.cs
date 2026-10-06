@@ -99,6 +99,24 @@ public class AgentUnknownMessageTests
         }
     }
 
+    [Test]
+    public async Task ProcessTextMessage_With_CustomThinkProvider_Frame_Without_Protocol_Subscriber_Should_Remain_Unhandled()
+    {
+        var client = new Client(_apiKey, _options);
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, e) => unhandled = e));
+
+        const string json = """{"type":"__customFromThinkProvider","content":{"result":[true,2]}}""";
+        FeedTextMessage(client, json);
+
+        using (new AssertionScope())
+        {
+            unhandled.Should().NotBeNull();
+            unhandled!.Type.Should().Be(WebSocketType.Unhandled);
+            unhandled.Raw.Should().Be(json);
+        }
+    }
+
     [TestCase("{}")]
     [TestCase("{\"type\":5}")]
     public async Task ProcessTextMessage_With_Missing_Or_NonString_Type_Should_Remain_Unhandled(string json)

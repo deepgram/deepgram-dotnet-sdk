@@ -18,6 +18,7 @@ public static class AgentWebSocketClientExtensions
     public static Task SendUpdatePrompt(this IAgentWebSocketClient client, AgentUpdatePromptSchema message) => Send(client, message);
     public static Task SendInjectAgentMessage(this IAgentWebSocketClient client, AgentInjectAgentMessageSchema message) => Send(client, message);
     public static Task SendFunctionCallResponse(this IAgentWebSocketClient client, AgentFunctionCallResponseSchema message) => Send(client, message);
+    public static Task SendCustomToThinkProvider(this IAgentWebSocketClient client, AgentCustomToThinkProviderSchema message) => Send(client, message);
     public static Task SendForceEndTurn(this IAgentWebSocketClient client)
     {
         if (client is null)
@@ -67,6 +68,8 @@ public static class AgentWebSocketClientExtensions
                 throw new ArgumentException("InjectAgentMessage requires Message.", nameof(message));
             case AgentFunctionCallResponseSchema functionResponse when string.IsNullOrWhiteSpace(functionResponse.Id) || string.IsNullOrWhiteSpace(functionResponse.Name) || functionResponse.Content is null:
                 throw new ArgumentException("FunctionCallResponse requires Id, Name, and Content.", nameof(message));
+            case AgentCustomToThinkProviderSchema customThink when customThink.Content.ValueKind == JsonValueKind.Undefined:
+                throw new ArgumentException("CustomToThinkProvider requires Content.", nameof(message));
         }
     }
 

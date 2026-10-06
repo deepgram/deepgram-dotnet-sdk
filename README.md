@@ -663,6 +663,25 @@ await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 await agentClient.SendForceEndTurn(); // Requires a Flux listen provider and IAgentProtocolClient.
 ```
 
+### Custom Think providers
+
+Experimental custom Think provider messages require a `wss://` endpoint in
+`settings.Agent.Think.Endpoint.Url`. The SDK forwards `JsonElement` content unchanged, including
+objects, arrays, scalar values, and JSON `null`.
+
+```csharp
+await agentClient.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, e) =>
+{
+    Console.WriteLine(e.Content.GetRawText());
+}));
+
+using var document = JsonDocument.Parse("""{"action":"continue"}""");
+await agentClient.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema
+{
+    Content = document.RootElement.Clone(),
+});
+```
+
 ### Available Think models
 
 Read the current Voice Agent Think-model catalog before configuring a session. The catalog is
