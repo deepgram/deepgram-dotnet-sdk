@@ -16,6 +16,16 @@ This roadmap was prepared against the current .NET 7.1.2 worktree, the current A
 - Do not change the type, name, or serialized behavior of an existing public option or method. Defer a correction requiring that change until a separately approved major-version plan exists. Expose a current wire contract through a new additive client or model when necessary.
 - Keep options nullable and omit unset values so server defaults remain authoritative.
 
+## Current Status
+
+The first three delivery slices are implemented and awaiting merge in this order:
+
+1. [Phase 0: Contract Corrections](https://github.com/deepgram/deepgram-dotnet-sdk/pull/445)
+2. [Phase 1: Flux STT Parity](https://github.com/deepgram/deepgram-dotnet-sdk/pull/446)
+3. [Phase 2A: Voice Agent WebSocket Protocol Parity](https://github.com/deepgram/deepgram-dotnet-sdk/pull/447)
+
+Phase 2A is based on the Phase 1 branch. After Phase 1 merges, retarget Phase 2A to `main` if GitHub does not do so automatically. The Agent Think-model catalog and custom Think-provider frames were deliberately deferred to Phase 2B; they are not part of the Phase 2A pull request.
+
 ## Phase 0: Contract Corrections
 
 ### Goal
@@ -66,7 +76,7 @@ Expose current Flux STT formatting and privacy controls as first-class options.
 
 This is additive and belongs in the next 7.x feature release. No interface change is necessary because `SendConfigure` already exists.
 
-## Phase 2: Voice Agent Protocol Parity
+## Phase 2A: Voice Agent WebSocket Protocol Parity
 
 ### Goal
 
@@ -78,12 +88,12 @@ Bring Voice Agent control messages and events to current protocol coverage, with
 2. Add typed request models and extension methods for `UpdateListen`, `UpdateThink`, `UpdateSpeak`, `UpdatePrompt`, `InjectAgentMessage`, `FunctionCallResponse`, and `ForceEndTurn`.
 3. Add new current-protocol request models rather than changing dormant schemas. The new InjectAgentMessage model serializes `message`, plus optional `behavior` (`default`, `queue`, or `interrupt`); the new FunctionCallResponse model serializes `id`, `name`, and `content`.
 4. Add typed inbound models, dispatch entries, and subscriptions for `FunctionCallCancelled`, `ListenUpdated`, `ThinkUpdated`, `LatencyReport`, `Warning`, and `History`.
-5. Add the Agent REST client for `GET /v1/agent/settings/think/models`.
-6. Add a Voice Agent example that demonstrates deferred client-side functions and cancellation handling.
+5. Add `IAgentProtocolClient` and `ClientFactory.CreateAgentProtocolClient()` for the new typed subscriptions and ordered `ForceEndTurn`, while preserving `IAgentWebSocketClient` unchanged.
+6. Update the no-microphone Voice Agent example to use the protocol client and handle cancellation, warning, and latency events.
 
 ### Sequencing
 
-Implement models and dispatcher support, then add extension methods over `IAgentWebSocketClient`. The extensions should serialize the typed control message and use the existing immediate-send path, so clients created through `ClientFactory.CreateAgentWebSocketClient()` retain a typed, discoverable surface without modifying the interface. Concrete-client convenience methods may forward to the extensions.
+Implement models and dispatcher support, then add extension methods over `IAgentWebSocketClient` for typed control messages that use the existing immediate-send path. Expose new typed subscriptions and ordered `ForceEndTurn` through `IAgentProtocolClient` and `ClientFactory.CreateAgentProtocolClient()` without modifying the legacy interface or factory return type. Concrete-client convenience methods may forward to the extensions.
 
 ### Acceptance Criteria
 
@@ -92,6 +102,28 @@ Implement models and dispatcher support, then add extension methods over `IAgent
 - Recorded fixtures exercise every new inbound event, including a cancellation event containing multiple function IDs.
 - Dispatcher tests prove all known frames select their typed handler and unsupported frames continue to reach `UnhandledResponse`.
 - A cancellation test documents the required application behavior: never send a function response for a cancelled call ID.
+
+### Live Validation Note
+
+The Phase 2A live smoke validated connection, Flux-backed `ForceEndTurn`, `UpdateListen`, `UpdateSpeak`, `UpdatePrompt`, injected-agent audio, history, and latency reports. The live service accepted a valid `UpdateThink` message without an error but did not emit the documented `ThinkUpdated` acknowledgement. Keep the typed `ThinkUpdated` model and dispatcher support covered by contract fixtures; treat the missing live acknowledgement as a service behavior gap rather than changing the client contract.
+
+## Phase 2B: Voice Agent Catalog and Custom Think Frames
+
+### Goal
+
+Complete the Agent scope intentionally excluded from Phase 2A without expanding legacy interfaces.
+
+### Work
+
+1. Add a narrow Agent settings client for `GET /v1/agent/settings/think/models` with a dedicated factory method.
+2. Add typed request and response models for `__customToThinkProvider` and `__customFromThinkProvider` only after reconfirming their current AsyncAPI contract and live behavior.
+3. Add a runnable example or focused live smoke for the catalog and custom Think-provider frames that uses a disposable configuration.
+
+### Acceptance Criteria
+
+- The catalog client has route, authentication, and response-deserialization tests.
+- Custom Think frames have exact wire tests and continue to fall back to `UnhandledResponse` when no typed subscriber is registered.
+- Live validation is opt-in and reports unsupported service behavior without weakening the typed contract.
 
 ## Phase 3: Management Reporting and Billing
 
@@ -178,8 +210,8 @@ Run a live test only for endpoints where a deterministic unit test cannot prove 
 
 | Release | Scope |
 | --- | --- |
-| Next 7.x minor release (`feat:`) | Phase 0 route and request-shape corrections with no public type changes, plus Phase 1 Flux STT options. |
-| Next 7.x feature release | Phase 2 Voice Agent extension methods and models, plus Phase 3 reporting through a new narrow client and factory. |
+| Current PR stack | Merge Phase 0 (#445), then Phase 1 (#446), then Phase 2A (#447). |
+| Next 7.x feature slice | Phase 2B Agent catalog and custom Think-provider frames, then Phase 3 reporting through a new narrow client and factory. |
 | Follow-up releases | Phase 4 additive model completion and Phase 5 resiliency/escape-hatch work. |
 | Future major, only if explicitly approved | Any public-interface expansion or callback/numeric-option type correction deferred by this roadmap. |
 
