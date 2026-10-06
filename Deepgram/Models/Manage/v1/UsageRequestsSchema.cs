@@ -42,6 +42,26 @@ public class UsageRequestsSchema
 	[JsonPropertyName("status")]
     public string? Status { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("accessor")]
+    public string? Accessor { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("request_id")]
+    public string? RequestId { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("deployment")]
+    public string? Deployment { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("endpoint")]
+    public string? Endpoint { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("method")]
+    public string? Method { get; set; }
+
     /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>

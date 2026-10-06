@@ -62,6 +62,8 @@ Task<BalancesResponse> GetBalances(string projectId, ...)
 Task<BalanceResponse> GetBalance(string projectId, string balanceId, ...)
 ```
 
+For new usage, billing, and purchase reporting, use `ClientFactory.CreateManagementReportingClient()` instead. It exposes current `GetUsageBreakdown`, `GetBillingBreakdown`, `GetBillingFields`, and `GetPurchases` methods without changing the legacy `IManageClient` interface.
+
 ## Common schema parameters
 
 | Schema | Key fields | Notes |
@@ -89,4 +91,4 @@ var key = await client.CreateKey(
     });
 ```
 
-Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).
+Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [ManagementReportingClient](/docs/api-reference/management-reporting-client), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).

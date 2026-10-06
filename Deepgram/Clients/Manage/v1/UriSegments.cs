@@ -10,7 +10,11 @@ public static class UriSegments
     //across SDK And Test Projects Simpler and Easier to change
     public const string PROJECTS = "projects";
     public const string BALANCES = "balances";
+    public const string BILLING = "billing";
     public const string USAGE = "usage";
+    public const string BREAKDOWN = "breakdown";
+    public const string FIELDS = "fields";
+    public const string PURCHASES = "purchases";
     public const string MEMBERS = "members";
     public const string KEYS = "keys";
     public const string INVITES = "invites";

@@ -3,7 +3,7 @@ title: "Client Factory and Options"
 description: "How the SDK resolves credentials, chooses client versions, and configures REST or WebSocket behavior."
 ---
 
-`ClientFactory` is the main entry point for application code. It hides the versioned namespaces under `Deepgram.Clients.*` and returns interfaces such as `IListenRESTClient`, `IFluxWebSocketClient`, `IFluxSpeakRESTClient`, `IFluxSpeakWebSocketClient`, `IAgentCatalogClient`, `IAgentManageClient`, and `IAgentWebSocketClient`. The companion option types, `DeepgramHttpClientOptions` and `DeepgramWsClientOptions`, control authentication, base addresses, global headers, global addons, keepalive, and autoflush behavior.
+`ClientFactory` is the main entry point for application code. It hides the versioned namespaces under `Deepgram.Clients.*` and returns interfaces such as `IListenRESTClient`, `IFluxWebSocketClient`, `IFluxSpeakRESTClient`, `IFluxSpeakWebSocketClient`, `IManagementReportingClient`, `IAgentCatalogClient`, `IAgentManageClient`, and `IAgentWebSocketClient`. The companion option types, `DeepgramHttpClientOptions` and `DeepgramWsClientOptions`, control authentication, base addresses, global headers, global addons, keepalive, and autoflush behavior.
 
 The implementation lives in `Deepgram/ClientFactory.cs`, `Deepgram/Models/Authenticate/v1/DeepgramHttpClientOptions.cs`, and `Deepgram/Models/Authenticate/v1/DeepgramWsClientOptions.cs`.
 
