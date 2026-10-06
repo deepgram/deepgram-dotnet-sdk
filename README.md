@@ -223,15 +223,9 @@ Console.WriteLine($"Request ID: {response.RequestId}");
 ### Callback method compatibility
 
 `PreRecordedSchema.CallbackMethod` is a legacy Boolean property. To request a callback with HTTP
-`PUT`, leave that property unset and pass the documented method through `addons` instead:
-
-```csharp
-var response = await deepgramClient.TranscribeUrlCallBack(
-    new UrlSource("https://static.deepgram.com/examples/Bueller-Life-moves-pretty-fast.wav"),
-    "https://your-callback-url.com/webhook",
-    new PreRecordedSchema { Model = "nova-3" },
-    addons: new Dictionary<string, string> { ["callback_method"] = "PUT" });
-```
+`PUT` is not supported by the current service when sent as an add-on query parameter. Leave it
+unset to use the server's default callback behavior. The SDK does not expose a supported way to
+select a callback method in 7.x.
 
 ## Streaming Audio
 

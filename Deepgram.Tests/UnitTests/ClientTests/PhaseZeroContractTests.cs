@@ -135,16 +135,14 @@ public class PhaseZeroContractTests
         document.RootElement.GetProperty("comment").GetString().Should().Be("staging cluster");
     }
 
-    [TestCase("POST")]
-    [TestCase("PUT")]
-    public void PreRecorded_CallbackMethod_Addon_Should_Preserve_Http_Method(string callbackMethod)
+    [Test]
+    public void PreRecorded_CallbackMethod_Should_Be_Omitted_When_Unset()
     {
         var schema = new PreRecordedSchema { CallBack = "https://example.test/callback" };
 
-        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", schema,
-            new Dictionary<string, string> { ["callback_method"] = callbackMethod })).Query);
+        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", schema)).Query);
 
-        query["callback_method"].Should().Be(callbackMethod);
+        query["callback_method"].Should().BeNull();
     }
 
     [Test]

@@ -26,18 +26,18 @@ Expose corrected API contracts without changing existing public behavior before 
 
 1. Add a narrow self-hosted distribution-credentials client targeting `/v1/projects/{project_id}/self-hosted/distribution/credentials`.
 2. Give the new client typed query options for `scopes` and `provider`, and retain only `comment` in the JSON body.
-3. Document the pre-recorded `callback_method` Boolean limitation and prove the existing `addons` workaround can send `POST` or `PUT`.
+3. Document the pre-recorded `callback_method` Boolean limitation and the current server behavior: leave it unset to use the server default because the service rejects an explicit method parameter.
 4. Add a current contract test for Aura REST numeric query parameters (`sample_rate` and `bit_rate`) and document the current string serialization without changing public property types.
 5. Validate the current self-hosted route against the hosted service before release. Keep the existing `SelfHostedClient` unchanged; it remains the legacy compatibility surface.
 
 ### Compatibility Decision
 
-Do not change `PreRecordedSchema.CallbackMethod` from `bool?` in this roadmap. A new correctly typed property would map to the same wire name and needs custom serialization; changing the existing property would be source-breaking. Document the limitation and use the existing `addons` escape hatch for callers that need `callback_method=PUT`. Revisit a first-class callback-method redesign only in a separately approved major-version plan.
+Do not change `PreRecordedSchema.CallbackMethod` from `bool?` in this roadmap. A new correctly typed property would map to the same wire name and needs custom serialization; changing the existing property would be source-breaking. The live service currently rejects explicit `callback_method` query values, so this SDK must document the server-default behavior rather than offer an add-on workaround. Revisit the API-contract divergence and a first-class callback-method redesign only in a separately approved major-version plan.
 
 ### Acceptance Criteria
 
 - A request construction test asserts the new self-hosted client's route and the exact split between query string and JSON body.
-- A callback workaround test proves that `addons` sends both `POST` and `PUT` exactly as the API expects.
+- A callback test verifies the legacy property is omitted when unset, preserving the server-default behavior.
 - Existing self-hosted, listen REST, and full-solution tests pass.
 - No existing public interface, method signature, property name, property type, or wire behavior changes.
 
