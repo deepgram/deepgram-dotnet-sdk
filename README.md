@@ -685,7 +685,7 @@ await agentClient.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema
 ### Available Think models
 
 Read the current Voice Agent Think-model catalog before configuring a session. The catalog is
-read-only and does not require a project ID.
+read-only, public, and does not require a project ID or credentials.
 
 ```csharp
 using Deepgram.Models.Agent.v1.REST;

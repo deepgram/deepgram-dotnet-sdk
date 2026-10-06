@@ -185,6 +185,44 @@ public class AgentMessageDispatchCoverageTests
         act.Should().NotThrow();
     }
 
+    [TestCase("{\"result\":\"continue\"}", JsonValueKind.Object)]
+    [TestCase("[\"next\",2]", JsonValueKind.Array)]
+    [TestCase("\"plain text\"", JsonValueKind.String)]
+    [TestCase("42", JsonValueKind.Number)]
+    [TestCase("true", JsonValueKind.True)]
+    [TestCase("null", JsonValueKind.Null)]
+    public async Task ProcessTextMessage_Should_Dispatch_CustomThinkProvider_Any_Json_Content(string content, JsonValueKind kind)
+    {
+        var client = NewClient();
+        CustomFromThinkProviderResponse? customFromThinkProvider = null;
+        await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
+
+        FeedTextMessage(client, $$"""{"type":"__customFromThinkProvider","content":{{content}}}""");
+
+        using var expected = JsonDocument.Parse(content);
+        customFromThinkProvider.Should().NotBeNull();
+        customFromThinkProvider!.Content.ValueKind.Should().Be(kind);
+        JsonSerializer.Serialize(customFromThinkProvider.Content).Should().Be(JsonSerializer.Serialize(expected.RootElement));
+    }
+
+    [Test]
+    public async Task ProcessTextMessage_With_Missing_CustomThinkProvider_Content_Should_Remain_Unhandled()
+    {
+        var client = NewClient();
+        CustomFromThinkProviderResponse? customFromThinkProvider = null;
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, response) => unhandled = response));
+
+        FeedTextMessage(client, """{"type":"__customFromThinkProvider"}""");
+
+        using (new AssertionScope())
+        {
+            customFromThinkProvider.Should().BeNull();
+            unhandled!.Raw.Should().Contain("__customFromThinkProvider");
+        }
+    }
+
     [Test]
     public void ProcessBinaryMessage_Without_An_Audio_Subscriber_Should_Not_Throw()
     {

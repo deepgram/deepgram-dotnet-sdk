@@ -30,6 +30,28 @@ public class AgentCatalogClientTests
     }
 
     [Test]
+    [NonParallelizable]
+    public void CreateAgentCatalogClient_Should_Allow_A_Public_Catalog_Request_Without_Credentials()
+    {
+        var previousApiKey = Environment.GetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_API_KEY);
+        var previousAccessToken = Environment.GetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_ACCESS_TOKEN);
+        Environment.SetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_API_KEY, null);
+        Environment.SetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_ACCESS_TOKEN, null);
+
+        try
+        {
+            Action create = () => ClientFactory.CreateAgentCatalogClient();
+
+            create.Should().NotThrow();
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_API_KEY, previousApiKey);
+            Environment.SetEnvironmentVariable(Deepgram.Constants.Defaults.DEEPGRAM_ACCESS_TOKEN, previousAccessToken);
+        }
+    }
+
+    [Test]
     public async Task GetThinkModels_Should_Call_GetAsync_Returning_Catalog_Response()
     {
         var options = new DeepgramHttpClientOptions(ApiKey) { OnPrem = true };

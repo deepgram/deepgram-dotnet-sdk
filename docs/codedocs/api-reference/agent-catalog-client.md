@@ -28,6 +28,6 @@ foreach (var model in catalog.Models ?? new List<AgentThinkModel>())
 }
 ```
 
-The request is read-only and does not need a project ID. Configure an API key through the client constructor or `DEEPGRAM_API_KEY`.
+The request is read-only and does not need a project ID or credentials. When an API key or access token is available, the client sends it using the standard SDK precedence; otherwise, it requests the public catalog anonymously.
 
 Related pages: [AgentWebSocketClient](/docs/api-reference/agent-websocket-client), [AgentManageClient](/docs/api-reference/agent-manage-client), and [Library and ClientFactory](/docs/api-reference/library-and-client-factory).
