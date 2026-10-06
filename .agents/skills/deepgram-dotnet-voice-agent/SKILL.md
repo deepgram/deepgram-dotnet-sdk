@@ -133,8 +133,8 @@ Send helpers:
 
 1. **Use the actual event/model names in this repo.** `SettingsSchema`, `ConversationTextResponse`, etc. — not the Python names.
 2. **`Provider` is dynamic.** Extra provider-specific properties are stored through `JsonExtensionData`; set them carefully.
-3. **Function call support is partial.** `FunctionCallRequestResponse` is marked `TODO: this needs to be defined`, so inspect raw payload behavior before relying on typed fields.
-4. **There is no convenience `SendFunctionCallResponse(...)` helper on the public interface.** If you need it, send serialized `FunctionCallResponseSchema` manually via the generic send path.
+3. **Function calls are typed.** `FunctionCallRequestResponse.Functions` carries typed calls. For each client-side call, send an ID-matched `AgentFunctionCallResponseSchema`; never respond after receiving `FunctionCallCancelled` for that ID.
+4. **Use `SendFunctionCallResponse(...)` for current function results.** Build an `AgentFunctionCallResponseSchema` with `id`, `name`, and `content`; do not use the legacy `FunctionCallResponseSchema` wire shape for new code.
 5. **Audio formats must match.** The examples align both input and output around `linear16` / `24000`.
 6. **`Deepgram.Microphone` depends on PortAudio.** Local microphone examples need the helper project/package and a working PortAudio environment.
 

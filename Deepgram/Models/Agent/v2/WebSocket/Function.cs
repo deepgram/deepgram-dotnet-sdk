@@ -18,6 +18,14 @@ public record Function
     [JsonPropertyName("parameters")]
     public Dictionary<string, object>? Parameters { get; set; }
 
+    /// <summary>
+    /// Prevents speculative dispatch until the user turn is confirmed. Use this for actions that
+    /// cannot be safely undone.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("defer_until_eot")]
+    public bool? DeferUntilEot { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]
     public FunctionEndpoint? Endpoint { get; set; }

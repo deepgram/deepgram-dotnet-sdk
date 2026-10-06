@@ -109,14 +109,14 @@ await client.Subscribe(new EventHandler<FunctionCallRequestResponse>(async (_, e
             continue;
         }
 
-        var result = new FunctionCallResponseSchema
+        var result = new AgentFunctionCallResponseSchema
         {
-            FunctionCallId = call.Id,
-            Output = JsonSerializer.Serialize(new { status = "open", priority = "high" })
+            Id = call.Id,
+            Name = call.Name,
+            Content = JsonSerializer.Serialize(new { status = "open", priority = "high" })
         };
 
-        var payload = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result));
-        await client.SendMessageImmediately(payload);
+        await client.SendFunctionCallResponse(result);
     }
 }));
 

@@ -15,9 +15,9 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 /// <summary>
 /// Regression tests for #395: the Agent client parsed the message "type" with Enum.Parse, which
-/// threw ArgumentException for any message type unknown to this SDK version (e.g. the server's
-/// "History" and "Warning" messages). The client must instead route unknown types to the Unhandled
-/// event without throwing, keeping it forward-compatible with new server message types.
+/// threw ArgumentException for any message type unknown to this SDK version. The client must route
+/// unknown types to the Unhandled event without throwing, keeping it forward-compatible with new
+/// server message types.
 /// </summary>
 public class AgentUnknownMessageTests
 {
@@ -39,8 +39,8 @@ public class AgentUnknownMessageTests
         client.ProcessTextMessage(result, ms);
     }
 
-    [TestCase("Warning")]
-    [TestCase("History")]
+    [TestCase("FutureWarning")]
+    [TestCase("SomeFutureEvent")]
     public async Task ProcessTextMessage_With_Unknown_Type_Should_Not_Throw_And_Surface_As_Unhandled(string unknownType)
     {
         var client = new Client(_apiKey, _options);
@@ -78,6 +78,42 @@ public class AgentUnknownMessageTests
             Action act = () => FeedTextMessage(client, json);
             act.Should().NotThrow();
             welcome.Should().NotBeNull("a known type must still be routed to its typed event after the TryParse change");
+        }
+    }
+
+    [TestCase("Warning")]
+    [TestCase("History")]
+    public async Task ProcessTextMessage_With_New_Known_Type_Without_Protocol_Subscriber_Should_Remain_Unhandled(string type)
+    {
+        var client = new Client(_apiKey, _options);
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, e) => unhandled = e));
+
+        FeedTextMessage(client, $"{{\"type\":\"{type}\"}}");
+
+        using (new AssertionScope())
+        {
+            unhandled.Should().NotBeNull();
+            unhandled!.Type.Should().Be(WebSocketType.Unhandled);
+            unhandled.Raw.Should().Contain(type);
+        }
+    }
+
+    [TestCase("{}")]
+    [TestCase("{\"type\":5}")]
+    public async Task ProcessTextMessage_With_Missing_Or_NonString_Type_Should_Remain_Unhandled(string json)
+    {
+        var client = new Client(_apiKey, _options);
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, e) => unhandled = e));
+
+        FeedTextMessage(client, json);
+
+        using (new AssertionScope())
+        {
+            unhandled.Should().NotBeNull();
+            unhandled!.Type.Should().Be(WebSocketType.Unhandled);
+            unhandled.Raw.Should().Be(json);
         }
     }
 }

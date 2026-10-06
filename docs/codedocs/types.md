@@ -276,10 +276,14 @@ public class SettingsSchema
     public bool? Experimental { get; set; }
     public List<string>? Tags { get; set; }
     public bool? MipOptOut { get; set; } = false;
+    public AgentFlags? Flags { get; set; }
     public Audio Audio { get; set; } = new Audio();
     public Agent Agent { get; set; } = new Agent();
 }
 ```
+
+`AgentFlags` currently exposes nullable `History`, which enables or disables History event
+reporting for the session.
 
 `Deepgram.Models.Agent.v2.WebSocket.InjectUserMessageSchema`
 
@@ -291,15 +295,19 @@ public class InjectUserMessageSchema
 }
 ```
 
-`Deepgram.Models.Agent.v2.WebSocket.FunctionCallResponseSchema`
+`Deepgram.Models.Agent.v2.WebSocket.AgentFunctionCallResponseSchema`
 
 ```csharp
-public class FunctionCallResponseSchema
+public class AgentFunctionCallResponseSchema
 {
     public string? Type { get; } = AgentClientTypes.FunctionCallResponse;
-    public string? FunctionCallId { get; set; }
-    public string? Output { get; set; }
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public string? Content { get; set; }
 }
 ```
+
+`FunctionCallResponseSchema` remains the legacy payload shape. Use
+`AgentFunctionCallResponseSchema` with `SendFunctionCallResponse` for the current protocol.
 
 These agent models are notable because they mix strongly typed structure with dynamic provider payloads. `Provider` in `Deepgram/Models/Agent/v2/WebSocket/Provider.cs` stores extra JSON properties through `JsonExtensionData`, which lets the SDK support provider-specific fields without a separate class for every vendor.

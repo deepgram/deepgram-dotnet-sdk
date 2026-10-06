@@ -34,6 +34,13 @@ public class SettingsSchema
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; } = false;
 
+    /// <summary>
+    /// Enables or disables optional Agent session reporting.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("flags")]
+    public AgentFlags? Flags { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("audio")]
     public Audio Audio { get; set; } = new Audio();
@@ -49,4 +56,17 @@ public class SettingsSchema
     {
         return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
+}
+
+/// <summary>
+/// Optional Agent session behavior flags.
+/// </summary>
+public class AgentFlags
+{
+    /// <summary>
+    /// Enables History event reporting. The server default is true.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("history")]
+    public bool? History { get; set; }
 }

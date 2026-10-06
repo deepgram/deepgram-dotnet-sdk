@@ -32,6 +32,7 @@ Primary signatures:
 public static class ClientFactory
 {
     public static IAgentWebSocketClient CreateAgentWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
+    public static IAgentProtocolClient CreateAgentProtocolClient(string apiKey = "", DeepgramWsClientOptions? options = null);
     public static IAgentManageClient CreateAgentManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IFluxWebSocketClient CreateFluxWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);

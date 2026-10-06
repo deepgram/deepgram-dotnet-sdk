@@ -27,6 +27,14 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a Voice Agent client with the current protocol event subscriptions.
+    /// </summary>
+    public static V2.IAgentProtocolClient CreateAgentProtocolClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new AgentWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
     /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
     /// their template variables
     /// </summary>

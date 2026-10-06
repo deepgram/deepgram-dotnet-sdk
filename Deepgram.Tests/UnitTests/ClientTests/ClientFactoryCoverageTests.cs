@@ -23,6 +23,7 @@ public class ClientFactoryCoverageTests
         using (new AssertionScope())
         {
             ClientFactory.CreateAgentWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentWebSocketClient>();
+            ClientFactory.CreateAgentProtocolClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentProtocolClient>();
             ClientFactory.CreateAgentManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentManageClient>();
             ClientFactory.CreateAnalyzeClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAnalyzeClient>();
             ClientFactory.CreateAuthClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAuthClient>();

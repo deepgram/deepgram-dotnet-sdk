@@ -628,6 +628,41 @@ var function = new Function
 };
 ```
 
+### Current session controls and function safety
+
+Use `CreateAgentProtocolClient()` when you need typed subscriptions for current Voice Agent
+protocol events. `FunctionCallCancelled` means the named client-side calls must not receive a
+response.
+
+```csharp
+var agentClient = ClientFactory.CreateAgentProtocolClient();
+
+await agentClient.Subscribe(new EventHandler<FunctionCallCancelledResponse>((_, e) =>
+{
+    foreach (var function in e.Functions ?? new List<CancelledFunctionCall>())
+    {
+        Console.WriteLine($"Cancelled: {function.Id} ({function.Name})");
+        // Do not send AgentFunctionCallResponseSchema for this ID.
+    }
+}));
+
+var chargeCard = new Function
+{
+    Name = "charge_card",
+    DeferUntilEot = true, // Wait for a confirmed user turn before an irreversible action.
+};
+settings.Agent.Think.Functions = new List<Function> { chargeCard };
+
+// Connect settings before sending any session control message.
+await agentClient.Connect(settings);
+
+await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
+{
+    Prompt = "Keep answers concise and confirm before charging a card.",
+});
+await agentClient.SendForceEndTurn(); // Requires a Flux listen provider and IAgentProtocolClient.
+```
+
 ### Reusable Agent Configurations
 
 Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of
