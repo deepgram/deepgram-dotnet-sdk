@@ -54,6 +54,34 @@ public class PhaseZeroContractTests
     }
 
     [Test]
+    public async Task CreateDistributionCredentials_Should_Use_An_Empty_Body_When_Omitted()
+    {
+        var uri = AbstractRestClient.GetUri(_options,
+            $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.DISTRIBUTION_CREDENTIALS}");
+        var expectedResponse = new AutoFaker<CredentialResponse>().Generate();
+        var client = Substitute.For<DistributionCredentialsClient>(_apiKey, _options, null);
+
+        client.When(x => x.PostAsync<DistributionCredentialsCreateSchema, DistributionCredentialsCreateOptions, CredentialResponse>(
+            Arg.Any<string>(), null, Arg.Any<DistributionCredentialsCreateSchema>())).DoNotCallBase();
+        client.PostAsync<DistributionCredentialsCreateSchema, DistributionCredentialsCreateOptions, CredentialResponse>(
+            uri, null, Arg.Any<DistributionCredentialsCreateSchema>()).Returns(expectedResponse);
+
+        var result = await client.CreateDistributionCredentials(_projectId);
+
+        await client.Received().PostAsync<DistributionCredentialsCreateSchema, DistributionCredentialsCreateOptions, CredentialResponse>(
+            uri, null, Arg.Is<DistributionCredentialsCreateSchema>(schema => schema.Comment == null));
+        result.Should().BeEquivalentTo(expectedResponse);
+    }
+
+    [Test]
+    public void DistributionCredentialsClient_Should_Suppress_Response_Body_Logging()
+    {
+        var client = new InspectableDistributionCredentialsClient(_apiKey, _options);
+
+        client.LogResponseBodiesForTest.Should().BeFalse();
+    }
+
+    [Test]
     public async Task ListDistributionCredentials_Should_Use_Current_Route()
     {
         var uri = AbstractRestClient.GetUri(_options,
@@ -154,5 +182,15 @@ public class PhaseZeroContractTests
 
         query["sample_rate"].Should().Be("24000");
         query["bit_rate"].Should().Be("48000");
+    }
+
+    private sealed class InspectableDistributionCredentialsClient : DistributionCredentialsClient
+    {
+        public InspectableDistributionCredentialsClient(string apiKey, DeepgramHttpClientOptions options)
+            : base(apiKey, options)
+        {
+        }
+
+        public bool LogResponseBodiesForTest => LogResponseBodies;
     }
 }
