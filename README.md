@@ -680,6 +680,8 @@ foreach (var model in catalog.Models ?? new List<AgentThinkModel>())
 }
 ```
 
+[See the runnable example](./examples/agent/rest/think_models/).
+
 ### Reusable Agent Configurations
 
 Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of
