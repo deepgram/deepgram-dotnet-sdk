@@ -53,6 +53,10 @@ public class ManagementReportingClientTests
             new UsageBreakdownSchema { Start = new DateTime(2026, 1, 1), Grouping = "models", Deployment = "hosted", Numerals = true });
         var billing = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/projects/project-id/billing/breakdown",
             new BillingBreakdownSchema { Grouping = new List<string> { "deployment", "tags" }, LineItem = "streaming::nova-3" });
+        var fields = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/projects/project-id/billing/fields",
+            new BillingFieldsSchema { Start = new DateTime(2026, 1, 1), End = new DateTime(2026, 1, 31) });
+        var purchases = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/projects/project-id/purchases",
+            new PurchasesSchema { Limit = 25 });
         var requests = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/projects/project-id/requests",
             new UsageRequestsSchema { Accessor = "accessor-id", RequestId = "request-id", Deployment = "hosted", Endpoint = "listen", Method = "sync" });
 
@@ -60,6 +64,8 @@ public class ManagementReportingClientTests
         {
             usage.Should().Contain("start=2026-01-01").And.Contain("grouping=models").And.Contain("deployment=hosted").And.Contain("numerals=true");
             billing.Should().Contain("grouping=deployment").And.Contain("grouping=tags").And.Contain("line_item=streaming%3a%3anova-3");
+            fields.Should().Contain("start=2026-01-01").And.Contain("end=2026-01-31");
+            purchases.Should().Contain("limit=25");
             requests.Should().Contain("accessor=accessor-id").And.Contain("request_id=request-id").And.Contain("deployment=hosted").And.Contain("endpoint=listen").And.Contain("method=sync");
         }
     }

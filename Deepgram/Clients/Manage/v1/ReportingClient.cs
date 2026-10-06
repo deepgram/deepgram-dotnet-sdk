@@ -15,6 +15,9 @@ namespace Deepgram.Clients.Manage.v1;
 public class ReportingClient(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
     : AbstractRestClient(apiKey, deepgramClientOptions, httpId), IManagementReportingClient
 {
+    // Usage, billing, and purchase responses can contain sensitive project data.
+    protected override bool LogResponseBodies => false;
+
     public async Task<UsageBreakdownResponse> GetUsageBreakdown(string projectId, UsageBreakdownSchema? schema = null,
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
