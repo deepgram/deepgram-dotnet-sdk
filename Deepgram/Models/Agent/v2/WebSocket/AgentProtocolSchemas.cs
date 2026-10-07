@@ -119,7 +119,7 @@ public class AgentFunctionCallResponseSchema
 }
 
 /// <summary>
-/// Ends the current user turn when the Agent uses a Flux listen provider.
+/// Ends the current user turn when the Agent uses a Flux STT listen provider.
 /// </summary>
 public class AgentForceEndTurnSchema
 {
