@@ -97,6 +97,7 @@ public class BillingBreakdownSchema
     [JsonIgnore] public List<string>? Grouping { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("grouping")]
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public string? GroupingParameter => Grouping is null ? null : JsonSerializer.Serialize(Grouping);
 }
 
