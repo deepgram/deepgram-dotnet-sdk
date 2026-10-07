@@ -16,7 +16,8 @@ public static class FluxSpeakTextControls
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(word);
         ArgumentException.ThrowIfNullOrWhiteSpace(ipa);
-        return $"\\{JsonSerializer.Serialize(new { word, pronounce = ipa })}";
+        var payload = JsonSerializer.Serialize(new { word, pronounce = ipa });
+        return $"\\{payload[..^1]}\\}}";
     }
 
     /// <summary>
@@ -24,11 +25,11 @@ public static class FluxSpeakTextControls
     /// </summary>
     public static string Pause(TimeSpan duration)
     {
-        if (duration <= TimeSpan.Zero || duration.TotalMilliseconds % 1 != 0)
+        if (duration < TimeSpan.FromMilliseconds(500) || duration > TimeSpan.FromMilliseconds(3000) || duration.TotalMilliseconds % 1 != 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(duration), "Pause duration must be a positive whole number of milliseconds.");
+            throw new ArgumentOutOfRangeException(nameof(duration), "Pause duration must be a whole number of milliseconds between 500 and 3000.");
         }
 
-        return $"\\{{pause:{duration.TotalMilliseconds:0}ms}}";
+        return $"\\{{pause:{duration.TotalMilliseconds:0}ms\\}}";
     }
 }

@@ -10,7 +10,8 @@ public class FluxSpeakTextControlsTests
     public void Pronunciation_Should_Escape_Json_Content()
     {
         var control = FluxSpeakTextControls.Pronunciation("C#", "siː ʃɑːrp");
-        using var document = JsonDocument.Parse(control[1..]);
+        control.Should().EndWith("\\}");
+        using var document = JsonDocument.Parse(control[1..^2] + "}");
 
         document.RootElement.GetProperty("word").GetString().Should().Be("C#");
         document.RootElement.GetProperty("pronounce").GetString().Should().Be("siː ʃɑːrp");
@@ -19,6 +20,6 @@ public class FluxSpeakTextControlsTests
     [Test]
     public void Pause_Should_Format_Rest_Marker()
     {
-        FluxSpeakTextControls.Pause(TimeSpan.FromMilliseconds(800)).Should().Be("\\{pause:800ms}");
+        FluxSpeakTextControls.Pause(TimeSpan.FromMilliseconds(500)).Should().Be("\\{pause:500ms\\}");
     }
 }
