@@ -26,6 +26,7 @@ public class ListenV1ConfigureLiveIntegrationTests
         try
         {
             await client.Connect(new LiveSchema { Model = "nova-3", InterimResults = true });
+            client.IsConnected().Should().BeTrue();
             client.SendConfigure(new ConfigureSchema { Keyterms = new List<string> { "Deepgram" } });
             await Task.Delay(TimeSpan.FromSeconds(1));
 

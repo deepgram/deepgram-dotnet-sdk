@@ -35,7 +35,7 @@ namespace SampleApp
             // Start the connection
             var liveSchema = new LiveSchema()
             {
-                Model = "nova-2",
+                Model = "nova-3",
                 Punctuate = true,
                 SmartFormat = true,
             };
