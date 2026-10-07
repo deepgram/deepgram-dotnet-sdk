@@ -6,13 +6,12 @@ namespace Deepgram.Models.Flux.Speak.WebSocket;
 
 /// <summary>
 /// Controls applied during a turn, nested inside <see cref="SpeechMetadataResponse"/> and
-/// <see cref="SpeechInterruptedMetadata"/>. Inline pronunciation and pause controls are a coming-soon
-/// fast-follow, so every count is currently 0.
+/// <see cref="SpeechInterruptedMetadata"/>.
 /// </summary>
 public record ControlsApplied
 {
     /// <summary>
-    /// Pronunciation overrides successfully applied. Currently always 0 (coming-soon fast-follow).
+    /// Pronunciation overrides successfully applied.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("pronunciations_applied")]
@@ -20,7 +19,6 @@ public record ControlsApplied
 
     /// <summary>
     /// Pronunciation entries that triggered a warning (invalid IPA, word too long).
-    /// Currently always 0 (coming-soon fast-follow).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("pronunciation_warnings")]
