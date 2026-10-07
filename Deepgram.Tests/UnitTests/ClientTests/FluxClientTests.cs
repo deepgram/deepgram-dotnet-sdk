@@ -120,12 +120,15 @@ public class FluxClientTests
         var schema = new FluxSchema
         {
             Model = "flux-general-en",
-            Redact = "aggressive_numbers",
+            Numerals = true,
+            Redact = "numbers",
         };
 
         var query = Client.BuildQueryString(schema);
 
-        query.Should().Contain("redact=aggressive_numbers");
+        query.Should().Be("model=flux-general-en&numerals=true&redact=numbers");
+        Client.BuildQueryString(new FluxSchema { Model = "flux-general-en", Redact = "aggressive_numbers" })
+            .Should().Be("model=flux-general-en&redact=aggressive_numbers");
     }
 
     [Test]
@@ -584,6 +587,27 @@ public class FluxClientTests
             configured.Numerals.Should().BeTrue();
             updated.Numerals.Should().BeFalse();
             updated.RequestId.Should().Be("req-1");
+        }
+    }
+
+    [Test]
+    public void ConfigureSuccessResponse_Should_Deserialize_Live_Server_Payload()
+    {
+        // Field set from a live /v2/listen ConfigureSuccess; request_id and thresholds are placeholders.
+        var json = """
+        {"type":"ConfigureSuccess","request_id":"7f3c2a9e-1b4d-4e8a-9c6f-2d5b8a1e0f34","thresholds":{"eot_threshold":0.7,"eot_timeout_ms":5000},"keyterms":[],"profanity_filter":false,"redact_usage":false,"numerals":true,"sequence_id":17}
+        """;
+
+        var response = JsonSerializer.Deserialize<ConfigureSuccessResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Type.Should().Be(FluxType.ConfigureSuccess);
+            response.SequenceId.Should().Be(17);
+            response.Keyterms.Should().BeEmpty();
+            response.Numerals.Should().BeTrue();
+            response.ProfanityFilter.Should().BeFalse();
+            response.RedactUsage.Should().BeFalse();
         }
     }
 
