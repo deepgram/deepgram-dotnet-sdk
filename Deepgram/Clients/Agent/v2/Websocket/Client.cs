@@ -1072,8 +1072,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_functionCallResponseReceived, functionCallResponse);
                     break;
                 case AgentType.CustomFromThinkProvider:
+                    if (_customFromThinkProviderReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var customFromThinkProviderResponse = data.Deserialize<CustomFromThinkProviderResponse>();
-                    if (_customFromThinkProviderReceived == null || customFromThinkProviderResponse == null ||
+                    if (customFromThinkProviderResponse == null ||
                         customFromThinkProviderResponse.Content.ValueKind == JsonValueKind.Undefined)
                     {
                         base.ProcessTextMessage(result, ms);
