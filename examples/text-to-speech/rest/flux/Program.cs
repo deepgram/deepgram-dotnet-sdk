@@ -28,20 +28,19 @@ namespace SampleApp
             // must be a flux-* voice. Speed (0.85-1.15 in 0.05 steps) and Expressivity (beta,
             // -2 to 2) are optional GA params, available on both transports.
             var mp3 = await speakClient.ToFile(
-                new TextSource("Your appointment is confirmed for 3pm tomorrow."),
+                new TextSource($"Take {FluxSpeakTextControls.Pronunciation("dupilumab", "duːˈpɪljuːmæb")} twice daily."),
                 "output.mp3",
                 new SpeakSchema()
                 {
                     Model = "flux-alexis-en",
                     Encoding = "mp3",
                     BitRate = 48000,
-                    Speed = 1.05,
                 });
             Console.WriteLine($"Wrote output.mp3 (request {mp3.RequestId}, {mp3.Characters} chars)");
 
             // Uncompressed linear16 WAV at 44100 Hz. sample_rate is an integer on the wire.
             var wav = await speakClient.ToFile(
-                new TextSource("Your appointment is confirmed for 3pm tomorrow."),
+                new TextSource($"Your appointment is confirmed.{FluxSpeakTextControls.Pause(TimeSpan.FromMilliseconds(500))}Tomorrow."),
                 "output.wav",
                 new SpeakSchema()
                 {

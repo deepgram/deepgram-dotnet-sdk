@@ -384,6 +384,8 @@ existing interface member was renamed, removed, or changed.
 
 Synthesize speech with [Deepgram Flux TTS](https://developers.deepgram.com/docs/flux-tts/overview), available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
 
+`FluxSpeakTextControls.Pronunciation(word, ipa)` formats Early Access IPA markers for Flux TTS REST or WebSocket text. `FluxSpeakTextControls.Pause(duration)` formats batch REST-only pauses from 500 to 3000 ms in 100 ms increments. Do not combine pronunciation with non-default speed or with a pause in the same request; Flux TTS rejects those combinations.
+
 Streaming sends five client messages — `Speak`, `Flush`, `Interrupt`, `Configure`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `SpeechInterrupted`, `Flushed`, `ConfigureSuccess`/`ConfigureFailure`, `SessionMetadata`, `Warning`, `Error`).
 
 ```csharp
