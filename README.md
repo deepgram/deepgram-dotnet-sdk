@@ -54,7 +54,7 @@ Power your apps with world-class speech and Language AI models.
     - [Get All Requests](#get-all-requests)
     - [Get Request](#get-request)
     - [Get Fields](#get-fields)
-    - [Summarize Usage](#summarize-usage)
+    - [Get Usage Breakdown](#get-usage-breakdown)
   - [Billing](#billing)
     - [Get All Balances](#get-all-balances)
     - [Get Balance](#get-balance)
@@ -1242,7 +1242,7 @@ var response = await reportingClient.GetUsageBreakdown(projectId, new UsageBreak
 Console.WriteLine($"Usage groups: {response.Results?.Count ?? 0}");
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/management-api/usage/get).
+[See our API reference for more info](https://developers.deepgram.com/reference/manage/usage/breakdown/get).
 
 [See the Example for more info](./examples/manage/usage/).
 

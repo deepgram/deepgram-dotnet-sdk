@@ -62,6 +62,13 @@ Task<BalancesResponse> GetBalances(string projectId, ...)
 Task<BalanceResponse> GetBalance(string projectId, string balanceId, ...)
 ```
 
+Current typed filters are available as extensions without changing `IManageClient`:
+
+```csharp
+Task<ProjectResponse> GetProject(string projectId, ProjectQuerySchema query, ...)
+Task<KeysResponse> GetKeys(string projectId, KeysQuerySchema query, ...)
+```
+
 For new usage, billing, and purchase reporting, use `ClientFactory.CreateManagementReportingClient()` instead. It exposes current `GetUsageBreakdown`, `GetBillingBreakdown`, `GetBillingFields`, and `GetPurchases` methods without changing the legacy `IManageClient` interface.
 
 ## Common schema parameters
@@ -72,6 +79,8 @@ For new usage, billing, and purchase reporting, use `ClientFactory.CreateManagem
 | `KeySchema` | `Comment`, `Scopes`, `Tags`, `ExpirationDate`, `TimeToLiveInSeconds` | `CreateKey` throws if both expiration fields are set. |
 | `ModelSchema` | query-style filter fields | Used when listing models. |
 | `UsageRequestsSchema` / `UsageSummarySchema` / `UsageFieldsSchema` | usage filters | Used for reporting endpoints. |
+| `ProjectQuerySchema` | `Limit`, `Page` | Optional pagination filters for a project lookup. |
+| `KeysQuerySchema` | `Status` | Filters project keys by `active` or `expired`. |
 
 ## Example
 
