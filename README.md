@@ -345,7 +345,7 @@ var fluxSchema = new FluxSchema()
     Encoding = "linear16",
     SampleRate = 16000,
     EotThreshold = 0.7,
-    Redact = "numbers", // Flux supports numbers or aggressive_numbers only
+    Redact = "numbers", // Flux STT supports numbers or aggressive_numbers only; each redacted number becomes *
 };
 await fluxClient.Connect(fluxSchema);
 

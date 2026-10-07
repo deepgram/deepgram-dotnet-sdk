@@ -82,7 +82,7 @@ namespace SampleApp
                     SampleRate = 16000,
                     EotThreshold = 0.7,
                     EagerEotThreshold = 0.5,
-                    // Flux supports only number redaction, not entity redaction.
+                    // Flux STT supports only number redaction, not entity redaction.
                     Redact = "numbers",
                 };
                 bool bConnected = await fluxClient.Connect(fluxSchema);
