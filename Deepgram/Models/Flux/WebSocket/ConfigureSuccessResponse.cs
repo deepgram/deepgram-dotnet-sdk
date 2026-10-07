@@ -72,7 +72,7 @@ public record ConfigureSuccessResponse
     public bool? ProfanityFilter { get; set; }
 
     /// <summary>
-    /// Whether keyterm and other parameter values are redacted from the session's usage records.
+    /// The <c>redact_usage</c> value the server reports for this session.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("redact_usage")]
