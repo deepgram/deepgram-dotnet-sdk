@@ -43,6 +43,14 @@ public class ConfigureSchema
     public List<string>? LanguageHints { get; set; }
 
     /// <summary>
+    /// Enables or disables numeral formatting for subsequent transcripts. Null keeps the current
+    /// setting.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("numerals")]
+    public bool? Numerals { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()

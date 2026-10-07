@@ -104,12 +104,31 @@ public class FluxClientTests
             Model = "flux-general-en",
             MipOptOut = true,
             ProfanityFilter = false,
+            Numerals = true,
         };
 
         var query = Client.BuildQueryString(schema);
 
         query.Should().Contain("mip_opt_out=true");
         query.Should().Contain("profanity_filter=false");
+        query.Should().Contain("numerals=true");
+    }
+
+    [Test]
+    public void BuildQueryString_Should_Serialize_Flux_Number_Redaction()
+    {
+        var schema = new FluxSchema
+        {
+            Model = "flux-general-en",
+            Numerals = true,
+            Redact = "numbers",
+        };
+
+        var query = Client.BuildQueryString(schema);
+
+        query.Should().Be("model=flux-general-en&numerals=true&redact=numbers");
+        Client.BuildQueryString(new FluxSchema { Model = "flux-general-en", Redact = "aggressive_numbers" })
+            .Should().Be("model=flux-general-en&redact=aggressive_numbers");
     }
 
     [Test]
@@ -245,6 +264,7 @@ public class FluxClientTests
             },
             Keyterms = new List<string> { "Deepgram" },
             LanguageHints = new List<string> { "en", "es" },
+            Numerals = true,
         };
 
         using var doc = JsonDocument.Parse(configure.ToString());
@@ -255,6 +275,7 @@ public class FluxClientTests
         doc.RootElement.GetProperty("thresholds").GetProperty("eot_timeout_ms").GetInt32().Should().Be(4000);
         doc.RootElement.GetProperty("keyterms")[0].GetString().Should().Be("Deepgram");
         doc.RootElement.GetProperty("language_hints")[1].GetString().Should().Be("es");
+        doc.RootElement.GetProperty("numerals").GetBoolean().Should().BeTrue();
     }
 
     [Test]
@@ -269,6 +290,7 @@ public class FluxClientTests
 
         doc.RootElement.TryGetProperty("keyterms", out _).Should().BeFalse();
         doc.RootElement.TryGetProperty("language_hints", out _).Should().BeFalse();
+        doc.RootElement.TryGetProperty("numerals", out _).Should().BeFalse();
         doc.RootElement.GetProperty("thresholds").TryGetProperty("eager_eot_threshold", out _).Should().BeFalse();
         doc.RootElement.GetProperty("thresholds").TryGetProperty("eot_timeout_ms", out _).Should().BeFalse();
     }
@@ -511,7 +533,8 @@ public class FluxClientTests
             "sequence_id": 3,
             "thresholds": { "eager_eot_threshold": 0.5, "eot_threshold": 0.7, "eot_timeout_ms": 5000 },
             "keyterms": ["alpha", "beta"],
-            "language_hints": ["en"]
+            "language_hints": ["en"],
+            "numerals": true
         }
         """;
 
@@ -525,6 +548,7 @@ public class FluxClientTests
             response.Thresholds.EotTimeoutMs.Should().Be(5000);
             response.Keyterms.Should().Equal("alpha", "beta");
             response.LanguageHints.Should().Equal("en");
+            response.Numerals.Should().BeTrue();
         }
     }
 
@@ -545,6 +569,46 @@ public class FluxClientTests
         var response = JsonSerializer.Deserialize<ConfigureSuccessResponse>(json);
 
         response!.Keyterms.Should().Equal("alpha");
+    }
+
+    [Test]
+    public void ConfigureSuccessResponse_Should_Copy_Numerals()
+    {
+        var configured = new ConfigureSuccessResponse
+        {
+            RequestId = "req-1",
+            Numerals = true,
+        };
+
+        var updated = configured with { Numerals = false };
+
+        using (new AssertionScope())
+        {
+            configured.Numerals.Should().BeTrue();
+            updated.Numerals.Should().BeFalse();
+            updated.RequestId.Should().Be("req-1");
+        }
+    }
+
+    [Test]
+    public void ConfigureSuccessResponse_Should_Deserialize_Live_Server_Payload()
+    {
+        // Field set from a live /v2/listen ConfigureSuccess; request_id and thresholds are placeholders.
+        var json = """
+        {"type":"ConfigureSuccess","request_id":"7f3c2a9e-1b4d-4e8a-9c6f-2d5b8a1e0f34","thresholds":{"eot_threshold":0.7,"eot_timeout_ms":5000},"keyterms":[],"profanity_filter":false,"redact_usage":false,"numerals":true,"sequence_id":17}
+        """;
+
+        var response = JsonSerializer.Deserialize<ConfigureSuccessResponse>(json);
+
+        using (new AssertionScope())
+        {
+            response!.Type.Should().Be(FluxType.ConfigureSuccess);
+            response.SequenceId.Should().Be(17);
+            response.Keyterms.Should().BeEmpty();
+            response.Numerals.Should().BeTrue();
+            response.ProfanityFilter.Should().BeFalse();
+            response.RedactUsage.Should().BeFalse();
+        }
     }
 
     [Test]
@@ -621,10 +685,11 @@ public class FluxClientTests
         await client.Subscribe(new EventHandler<ConfigureSuccessResponse>((sender, e) => received = e));
 
         client.ProcessTextMessage(_webSocketReceiveResult, ToStream(
-            """{ "type": "ConfigureSuccess", "request_id": "req-1", "sequence_id": 3, "thresholds": { "eot_threshold": 0.7 }, "keyterms": [] }"""));
+            """{ "type": "ConfigureSuccess", "request_id": "req-1", "sequence_id": 3, "thresholds": { "eot_threshold": 0.7 }, "keyterms": [], "numerals": false }"""));
 
         received.Should().NotBeNull();
         received!.Thresholds!.EotThreshold.Should().Be(0.7);
+        received.Numerals.Should().BeFalse();
     }
 
     [Test]
@@ -879,6 +944,7 @@ public class FluxClientTests
             SequenceId = 4,
             Thresholds = new ConfigureThresholds { EagerEotThreshold = 0.4, EotThreshold = 0.7, EotTimeoutMs = 5000 },
             Keyterms = new List<string> { "alpha" },
+            Numerals = true,
         };
         var schema = new FluxSchema { Model = "flux-general-en", Keyterm = new List<string> { "a" } };
 
@@ -891,6 +957,7 @@ public class FluxClientTests
             var successRoundTrip = JsonSerializer.Deserialize<ConfigureSuccessResponse>(success.ToString())!;
             successRoundTrip.Keyterms.Should().Equal("alpha");
             successRoundTrip.Thresholds!.EotTimeoutMs.Should().Be(5000);
+            successRoundTrip.Numerals.Should().BeTrue();
             JsonSerializer.Deserialize<FluxSchema>(schema.ToString())!.Model.Should().Be("flux-general-en");
             turnInfo.Words![0].ToString().Should().Contain("hello");
             success.Thresholds!.ToString().Should().Contain("eot_timeout_ms");

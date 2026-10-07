@@ -345,8 +345,12 @@ var fluxSchema = new FluxSchema()
     Encoding = "linear16",
     SampleRate = 16000,
     EotThreshold = 0.7,
+    Redact = "numbers", // Flux STT supports numbers or aggressive_numbers only; each redacted number becomes *
 };
 await fluxClient.Connect(fluxSchema);
+
+// Turn numeral formatting on or off for future transcripts without reconnecting.
+await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true });
 
 // Stream audio to Deepgram in ~80ms chunks (2560 bytes at 16kHz linear16)
 byte[] audioChunk = GetAudioChunk(); // Your audio source
