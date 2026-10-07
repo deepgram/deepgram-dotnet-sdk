@@ -23,6 +23,9 @@ namespace SampleApp
                 new SpeakSchema()
                 {
                     Model = "aura-2-thalia-en",
+                    Speed = 1.1,
+                    Tag = new List<string> { "hello-world" },
+                    MipOptOut = true,
                 });
 
             //Console.WriteLine(response);

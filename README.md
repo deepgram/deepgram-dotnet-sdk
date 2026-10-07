@@ -763,6 +763,7 @@ Current Aura REST options include `Speed`, repeated `Tag` values, and `MipOptOut
 ```csharp
 var options = new Deepgram.Models.Speak.v1.REST.SpeakSchema
 {
+    Model = "aura-2-thalia-en",
     Speed = 1.1,
     Tag = new List<string> { "release", "voice" },
     MipOptOut = true,
@@ -776,10 +777,7 @@ var speakClient = ClientFactory.CreateSpeakRESTClient();
 var response = await speakClient.ToFile(
     new TextSource("Hello world!"),
     "output.wav",
-    new SpeakSchema()
-    {
-        Model = "aura-2-thalia-en",
-    });
+    options);
 
 Console.WriteLine($"Audio saved to: output.wav");
 ```

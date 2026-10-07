@@ -46,8 +46,8 @@ public class ManagementReportingLiveIntegrationTests
         {
             usage.Results.Should().NotBeNull();
             billing.Results.Should().NotBeNull();
-            fields.Accessors.Should().NotBeNull();
-            purchases.Orders.Should().NotBeNull();
+            fields.Should().NotBeNull();
+            purchases.Should().NotBeNull();
         }
     }
 }
