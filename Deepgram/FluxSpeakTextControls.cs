@@ -2,6 +2,8 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Text.Encodings.Web;
+
 namespace Deepgram;
 
 /// <summary>
@@ -9,6 +11,12 @@ namespace Deepgram;
 /// </summary>
 public static class FluxSpeakTextControls
 {
+    // Keep IPA as raw UTF-8 (as in the Deepgram docs); quotes and backslashes are still escaped.
+    private static readonly JsonSerializerOptions MarkerJsonOptions = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
     /// <summary>
     /// Formats an IPA pronunciation marker for Flux TTS REST or WebSocket text.
     /// </summary>
@@ -16,7 +24,7 @@ public static class FluxSpeakTextControls
     {
         if (string.IsNullOrWhiteSpace(word)) throw new ArgumentException("Word is required.", nameof(word));
         if (string.IsNullOrWhiteSpace(ipa)) throw new ArgumentException("IPA is required.", nameof(ipa));
-        var payload = JsonSerializer.Serialize(new { word, pronounce = ipa });
+        var payload = JsonSerializer.Serialize(new { word, pronounce = ipa }, MarkerJsonOptions);
         return $"\\{payload.Substring(0, payload.Length - 1)}\\}}";
     }
 
