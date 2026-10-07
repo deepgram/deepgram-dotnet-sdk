@@ -14,10 +14,10 @@ public static class FluxSpeakTextControls
     /// </summary>
     public static string Pronunciation(string word, string ipa)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(word);
-        ArgumentException.ThrowIfNullOrWhiteSpace(ipa);
+        if (string.IsNullOrWhiteSpace(word)) throw new ArgumentException("Word is required.", nameof(word));
+        if (string.IsNullOrWhiteSpace(ipa)) throw new ArgumentException("IPA is required.", nameof(ipa));
         var payload = JsonSerializer.Serialize(new { word, pronounce = ipa });
-        return $"\\{payload[..^1]}\\}}";
+        return $"\\{payload.Substring(0, payload.Length - 1)}\\}}";
     }
 
     /// <summary>
@@ -25,9 +25,9 @@ public static class FluxSpeakTextControls
     /// </summary>
     public static string Pause(TimeSpan duration)
     {
-        if (duration < TimeSpan.FromMilliseconds(500) || duration > TimeSpan.FromMilliseconds(3000) || duration.TotalMilliseconds % 1 != 0)
+        if (duration < TimeSpan.FromMilliseconds(500) || duration > TimeSpan.FromMilliseconds(3000) || duration.TotalMilliseconds % 100 != 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(duration), "Pause duration must be a whole number of milliseconds between 500 and 3000.");
+            throw new ArgumentOutOfRangeException(nameof(duration), "Pause duration must be between 500 and 3000 milliseconds in 100 millisecond increments.");
         }
 
         return $"\\{{pause:{duration.TotalMilliseconds:0}ms\\}}";

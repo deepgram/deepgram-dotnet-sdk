@@ -22,4 +22,12 @@ public class FluxSpeakTextControlsTests
     {
         FluxSpeakTextControls.Pause(TimeSpan.FromMilliseconds(500)).Should().Be("\\{pause:500ms\\}");
     }
+
+    [TestCase(550)]
+    [TestCase(400)]
+    [TestCase(3100)]
+    public void Pause_With_Unsupported_Duration_Should_Throw(int milliseconds)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => FluxSpeakTextControls.Pause(TimeSpan.FromMilliseconds(milliseconds)));
+    }
 }

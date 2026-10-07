@@ -35,7 +35,6 @@ namespace SampleApp
                     Model = "flux-alexis-en",
                     Encoding = "mp3",
                     BitRate = 48000,
-                    Speed = 1.05,
                 });
             Console.WriteLine($"Wrote output.mp3 (request {mp3.RequestId}, {mp3.Characters} chars)");
 
