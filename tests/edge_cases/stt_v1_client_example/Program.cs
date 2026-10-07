@@ -40,6 +40,11 @@ namespace SampleApp
                 SmartFormat = true,
             };
             await liveClient.Connect(liveSchema);
+            liveClient.SendConfigure(new ConfigureSchema
+            {
+                Keyterms = new List<string> { "Deepgram" },
+                Features = new Dictionary<string, bool> { ["numerals"] = true },
+            });
 
             // get the webcast data... this is a blocking operation
             try
