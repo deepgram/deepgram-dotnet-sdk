@@ -49,6 +49,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     private event EventHandler<ThinkUpdatedResponse>? _thinkUpdatedReceived;
     private event EventHandler<FunctionCallCancelledResponse>? _functionCallCancelledReceived;
     private event EventHandler<FunctionCallResponse>? _functionCallResponseReceived;
+    private event EventHandler<CustomFromThinkProviderResponse>? _customFromThinkProviderReceived;
     private event EventHandler<LatencyReportResponse>? _latencyReportReceived;
     private event EventHandler<AgentWarningResponse>? _warningReceived;
     private event EventHandler<AgentHistoryResponse>? _historyReceived;
@@ -446,6 +447,20 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         return true;
     }
 
+    public async Task<bool> Subscribe(EventHandler<CustomFromThinkProviderResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _customFromThinkProviderReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
     public async Task<bool> Subscribe(EventHandler<LatencyReportResponse> eventHandler)
     {
         await _mutexSubscribe.WaitAsync();
@@ -770,10 +785,23 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             // messages like "History"/"Warning") are routed to the base handler and surfaced as
             // Unhandled instead of throwing an ArgumentException. See #395.
             if (!data.RootElement.TryGetProperty("type", out var typeElement) ||
-                typeElement.ValueKind != JsonValueKind.String ||
-                !Enum.TryParse<AgentType>(typeElement.GetString(), out var val))
+                typeElement.ValueKind != JsonValueKind.String)
             {
                 Log.Debug("ProcessTextMessage", "Message type is missing or unknown. Routing to base handler...");
+                base.ProcessTextMessage(result, ms);
+                Log.Verbose("AgentWSClient.ProcessTextMessage", "LEAVE");
+                return;
+            }
+
+            var type = typeElement.GetString();
+            AgentType val;
+            if (string.Equals(type, AgentClientTypes.CustomFromThinkProvider, StringComparison.Ordinal))
+            {
+                val = AgentType.CustomFromThinkProvider;
+            }
+            else if (!Enum.TryParse(type, out val))
+            {
+                Log.Debug("ProcessTextMessage", "Message type is unknown. Routing to base handler...");
                 base.ProcessTextMessage(result, ms);
                 Log.Verbose("AgentWSClient.ProcessTextMessage", "LEAVE");
                 return;
@@ -1042,6 +1070,21 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                         return;
                     }
                     InvokeParallel(_functionCallResponseReceived, functionCallResponse);
+                    break;
+                case AgentType.CustomFromThinkProvider:
+                    if (_customFromThinkProviderReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var customFromThinkProviderResponse = data.Deserialize<CustomFromThinkProviderResponse>();
+                    if (customFromThinkProviderResponse == null ||
+                        customFromThinkProviderResponse.Content.ValueKind == JsonValueKind.Undefined)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_customFromThinkProviderReceived, customFromThinkProviderResponse);
                     break;
                 case AgentType.LatencyReport:
                     if (_latencyReportReceived == null)

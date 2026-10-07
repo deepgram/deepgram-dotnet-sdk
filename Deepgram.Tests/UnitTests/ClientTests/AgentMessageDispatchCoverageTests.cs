@@ -51,6 +51,7 @@ public class AgentMessageDispatchCoverageTests
         ThinkUpdatedResponse? thinkUpdated = null;
         FunctionCallCancelledResponse? functionCallCancelled = null;
         FunctionCallResponse? functionCallResponse = null;
+        CustomFromThinkProviderResponse? customFromThinkProvider = null;
         LatencyReportResponse? latencyReport = null;
         AgentWarningResponse? warning = null;
         AgentHistoryResponse? history = null;
@@ -72,6 +73,7 @@ public class AgentMessageDispatchCoverageTests
         await client.Subscribe(new EventHandler<ThinkUpdatedResponse>((_, response) => thinkUpdated = response));
         await client.Subscribe(new EventHandler<FunctionCallCancelledResponse>((_, response) => functionCallCancelled = response));
         await client.Subscribe(new EventHandler<FunctionCallResponse>((_, response) => functionCallResponse = response));
+        await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
         await client.Subscribe(new EventHandler<LatencyReportResponse>((_, response) => latencyReport = response));
         await client.Subscribe(new EventHandler<AgentWarningResponse>((_, response) => warning = response));
         await client.Subscribe(new EventHandler<AgentHistoryResponse>((_, response) => history = response));
@@ -95,6 +97,7 @@ public class AgentMessageDispatchCoverageTests
                           """{"type":"ThinkUpdated"}""",
                           """{"type":"FunctionCallCancelled","functions":[{"id":"call-1","name":"charge_card"}]}""",
                           """{"type":"FunctionCallResponse","id":"call-2","name":"lookup","content":"{}"}""",
+                          """{"type":"__customFromThinkProvider","content":{"next":"continue","attempt":2}}""",
                           """{"type":"LatencyReport","stt_latency":"0.2","total_latency":"1.1"}""",
                           """{"type":"Warning","code":"FORCE_END_TURN_UNSUPPORTED","description":"requires Flux"}""",
                           """{"type":"History","role":"assistant","content":"Welcome back"}""",
@@ -129,6 +132,7 @@ public class AgentMessageDispatchCoverageTests
             functionCallCancelled.Functions![0].Id.Should().Be("call-1");
             functionCallResponse!.Id.Should().Be("call-2");
             functionCallResponse.Name.Should().Be("lookup");
+            customFromThinkProvider!.Content.GetProperty("next").GetString().Should().Be("continue");
             latencyReport!.SttLatency.Should().Be(0.2m);
             latencyReport.TotalLatency.Should().Be(1.1m);
             warning!.Code.Should().Be("FORCE_END_TURN_UNSUPPORTED");
@@ -186,6 +190,7 @@ public class AgentMessageDispatchCoverageTests
     [TestCase("ThinkUpdated")]
     [TestCase("FunctionCallCancelled")]
     [TestCase("FunctionCallResponse")]
+    [TestCase("__customFromThinkProvider")]
     [TestCase("LatencyReport")]
     [TestCase("Warning")]
     [TestCase("History")]
@@ -196,6 +201,44 @@ public class AgentMessageDispatchCoverageTests
         Action act = () => FeedTextMessageType(client, type);
 
         act.Should().NotThrow();
+    }
+
+    [TestCase("{\"result\":\"continue\"}", JsonValueKind.Object)]
+    [TestCase("[\"next\",2]", JsonValueKind.Array)]
+    [TestCase("\"plain text\"", JsonValueKind.String)]
+    [TestCase("42", JsonValueKind.Number)]
+    [TestCase("true", JsonValueKind.True)]
+    [TestCase("null", JsonValueKind.Null)]
+    public async Task ProcessTextMessage_Should_Dispatch_CustomThinkProvider_Any_Json_Content(string content, JsonValueKind kind)
+    {
+        var client = NewClient();
+        CustomFromThinkProviderResponse? customFromThinkProvider = null;
+        await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
+
+        FeedTextMessage(client, $$"""{"type":"__customFromThinkProvider","content":{{content}}}""");
+
+        using var expected = JsonDocument.Parse(content);
+        customFromThinkProvider.Should().NotBeNull();
+        customFromThinkProvider!.Content.ValueKind.Should().Be(kind);
+        JsonSerializer.Serialize(customFromThinkProvider.Content).Should().Be(JsonSerializer.Serialize(expected.RootElement));
+    }
+
+    [Test]
+    public async Task ProcessTextMessage_With_Missing_CustomThinkProvider_Content_Should_Remain_Unhandled()
+    {
+        var client = NewClient();
+        CustomFromThinkProviderResponse? customFromThinkProvider = null;
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, response) => unhandled = response));
+
+        FeedTextMessage(client, """{"type":"__customFromThinkProvider"}""");
+
+        using (new AssertionScope())
+        {
+            customFromThinkProvider.Should().BeNull();
+            unhandled!.Raw.Should().Contain("__customFromThinkProvider");
+        }
     }
 
     [Test]

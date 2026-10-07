@@ -663,6 +663,44 @@ await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 await agentClient.SendForceEndTurn(); // Requires a Flux STT listen provider and IAgentProtocolClient.
 ```
 
+### Custom Think providers
+
+Experimental custom Think provider messages require a `wss://` endpoint in
+`settings.Agent.Think.Endpoint.Url`. The SDK forwards `JsonElement` content unchanged, including
+objects, arrays, scalar values, and JSON `null`.
+
+```csharp
+await agentClient.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, e) =>
+{
+    Console.WriteLine(e.Content.GetRawText());
+}));
+
+using var document = JsonDocument.Parse("""{"action":"continue"}""");
+await agentClient.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema
+{
+    Content = document.RootElement.Clone(),
+});
+```
+
+### Available Think models
+
+Read the current Voice Agent Think-model catalog before configuring a session. The catalog is
+read-only, public, and does not require a project ID or credentials.
+
+```csharp
+using Deepgram.Models.Agent.v1.REST;
+
+var catalogClient = ClientFactory.CreateAgentCatalogClient();
+var catalog = await catalogClient.GetThinkModels();
+
+foreach (var model in catalog.Models ?? new List<AgentThinkModel>())
+{
+    Console.WriteLine($"{model.Provider}: {model.Id} ({model.Name})");
+}
+```
+
+[See the runnable example](./examples/agent/rest/think_models/).
+
 ### Reusable Agent Configurations
 
 Store the `agent` block of a Settings message with Deepgram and reference it by UUID instead of

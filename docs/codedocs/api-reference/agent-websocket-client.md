@@ -56,7 +56,7 @@ Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler)
 `ClientFactory.CreateAgentProtocolClient()` returns `IAgentProtocolClient`, which additionally
 provides typed subscriptions for `ListenUpdatedResponse`, `ThinkUpdatedResponse`,
 `FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`, and
-`AgentHistoryResponse`, and `FunctionCallResponse`.
+`AgentHistoryResponse`, `FunctionCallResponse`, and `CustomFromThinkProviderResponse`.
 
 ### Send and helper methods
 
@@ -75,7 +75,8 @@ bool IsConnected()
 
 The following extension methods work with both `IAgentWebSocketClient` and
 `IAgentProtocolClient`: `SendUpdateListen`, `SendUpdateThink`, `SendUpdateSpeak`,
-`SendUpdatePrompt`, `SendInjectAgentMessage`, and `SendFunctionCallResponse`.
+`SendUpdatePrompt`, `SendInjectAgentMessage`, `SendFunctionCallResponse`, and
+`SendCustomToThinkProvider`.
 `SendForceEndTurn` is available on `IAgentProtocolClient` and, as an extension method, on the
 `IAgentWebSocketClient` returned by `ClientFactory.CreateAgentWebSocketClient()`; either way the
 SDK flushes queued audio before sending the control frame. The extension throws
@@ -93,6 +94,7 @@ implement `IAgentProtocolClient`.
 | `InjectUserMessageSchema` | `Type`, `Content` | Text injection without microphone audio. |
 | `AgentFunctionCallResponseSchema` | `Id`, `Name`, `Content` | Current response message for function-calling flows. |
 | `AgentInjectAgentMessageSchema` | `Message`, `Behavior` | Current Agent speech injection message. |
+| `AgentCustomToThinkProviderSchema` | `Content` | Experimental arbitrary JSON forwarded to a custom Think provider. |
 | `Function` | `DeferUntilEot` | Prevents speculative dispatch of irreversible functions. |
 
 ## Example
@@ -111,6 +113,24 @@ settings.Agent.Speak.Provider.Model = "aura-2-thalia-en";
 await client.Connect(settings);
 await client.SendInjectUserMessage("What is still unresolved in our queue?");
 await client.SendUpdatePrompt(new AgentUpdatePromptSchema { Prompt = "Answer in one sentence." });
+```
+
+## Custom Think providers
+
+Experimental custom Think messages require `settings.Agent.Think.Endpoint.Url` to use `wss://`.
+Their content is represented as `JsonElement` and forwarded unchanged, including JSON `null`.
+
+```csharp
+await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) =>
+{
+    Console.WriteLine(response.Content.GetRawText());
+}));
+
+using var payload = JsonDocument.Parse("""{"action":"continue"}""");
+await client.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema
+{
+    Content = payload.RootElement.Clone(),
+});
 ```
 
 Related pages: [Agent Conversations](/docs/agent-conversations), [Guides: Build a Voice Agent](/docs/guides/build-a-voice-agent).
