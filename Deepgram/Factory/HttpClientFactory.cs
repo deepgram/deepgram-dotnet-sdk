@@ -98,6 +98,11 @@ internal class HttpClientFactory
             // Use API key authentication (fallback)
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
         }
+        else if (options is DeepgramHttpClientOptions { AllowAnonymous: true })
+        {
+            // Public endpoint: send the request without an Authorization header.
+            Log.Debug("SetAuthenticationHeader", "Public endpoint; no Authorization header sent.");
+        }
         else
         {
             // No authentication credentials available

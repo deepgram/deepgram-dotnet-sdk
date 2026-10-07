@@ -134,4 +134,24 @@ public class AgentUnknownMessageTests
             unhandled.Raw.Should().Be(json);
         }
     }
+
+    [Test]
+    public async Task ProcessTextMessage_With_Malformed_LatencyReport_Without_Protocol_Subscriber_Should_Remain_Unhandled()
+    {
+        var client = new Client(_apiKey, _options);
+        UnhandledResponse? unhandled = null;
+        await client.Subscribe(new EventHandler<UnhandledResponse>((_, e) => unhandled = e));
+
+        // A payload the typed model cannot deserialize must not be dropped when nobody subscribed to it.
+        var json = "{\"type\":\"LatencyReport\",\"total_latency\":\"n/a\"}";
+
+        using (new AssertionScope())
+        {
+            Action act = () => FeedTextMessage(client, json);
+            act.Should().NotThrow();
+            unhandled.Should().NotBeNull("a LatencyReport with no protocol subscriber must reach Unhandled even when it is malformed");
+            unhandled!.Type.Should().Be(WebSocketType.Unhandled);
+            unhandled.Raw.Should().Be(json);
+        }
+    }
 }
