@@ -6,6 +6,11 @@ namespace Deepgram.Models.Manage.v1;
 
 public record UsageRequest
 {
+    [JsonPropertyName("code")]
+    public double? Code { get; set; }
+
+    [JsonPropertyName("deployment")]
+    public string? Deployment { get; set; }
     /// <summary>
     /// Identifier of request.
     /// </summary>

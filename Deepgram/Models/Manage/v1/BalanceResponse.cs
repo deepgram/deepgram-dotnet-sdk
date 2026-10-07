@@ -6,6 +6,8 @@ namespace Deepgram.Models.Manage.v1;
 
 public record BalanceResponse
 {
+    [JsonPropertyName("purchase_order_id")]
+    public string? PurchaseOrderId { get; set; }
     /// <summary>
     /// Balance id
     /// </summary>

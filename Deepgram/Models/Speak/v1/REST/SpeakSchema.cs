@@ -6,6 +6,17 @@ namespace Deepgram.Models.Speak.v1.REST;
 
 public class SpeakSchema
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("speed")]
+    public double? Speed { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("tag")]
+    public List<string>? Tag { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; }
     /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">

@@ -758,6 +758,17 @@ await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 
 Convert text into speech using the REST API.
 
+Current Aura REST options include `Speed`, repeated `Tag` values, and `MipOptOut`:
+
+```csharp
+var options = new Deepgram.Models.Speak.v1.REST.SpeakSchema
+{
+    Speed = 1.1,
+    Tag = new List<string> { "release", "voice" },
+    MipOptOut = true,
+};
+```
+
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var speakClient = ClientFactory.CreateSpeakRESTClient();
