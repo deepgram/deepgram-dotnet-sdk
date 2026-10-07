@@ -24,6 +24,13 @@ public enum AgentType
     SettingsApplied,
     PromptUpdated,
     SpeakUpdated,
+    ListenUpdated,
+    ThinkUpdated,
+    FunctionCallCancelled,
+    FunctionCallResponse,
+    LatencyReport,
+    Warning,
+    History,
 }
 
 public static class AgentClientTypes
@@ -31,10 +38,13 @@ public static class AgentClientTypes
     // user message types
     public const string Settings = "Settings";
     public const string UpdatePrompt = "UpdatePrompt";
+    public const string UpdateListen = "UpdateListen";
+    public const string UpdateThink = "UpdateThink";
     public const string UpdateSpeak = "UpdateSpeak";
     public const string InjectAgentMessage = "InjectAgentMessage";
     public const string InjectUserMessage = "InjectUserMessage";
     public const string FunctionCallResponse = "FunctionCallResponse";
     public const string KeepAlive = "KeepAlive";
+    public const string ForceEndTurn = "ForceEndTurn";
     public const string Close = "Close";
 }

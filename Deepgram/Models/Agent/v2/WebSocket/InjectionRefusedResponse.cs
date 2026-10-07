@@ -14,6 +14,10 @@ public record InjectionRefusedResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public AgentType? Type { get; } = AgentType.InjectionRefused;
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+
     /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>

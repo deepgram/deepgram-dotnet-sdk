@@ -18,7 +18,7 @@ namespace Deepgram.Clients.Agent.v2.WebSocket;
 /// <summary>
 /// Implements version 2 of the Listen WebSocket Client.
 /// </summary>
-public class Client : AbstractWebSocketClient, IAgentWebSocketClient
+public class Client : AbstractWebSocketClient, IAgentProtocolClient
 {
     /// <param name="apiKey">Required DeepgramApiKey</param>
     /// <param name="deepgramClientOptions"><see cref="IDeepgramClientOptions"/> for HttpClient Configuration</param>
@@ -45,6 +45,13 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
     private event EventHandler<InjectionRefusedResponse>? _injectionRefusedReceived;
     private event EventHandler<PromptUpdatedResponse>? _promptUpdatedReceived;
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
+    private event EventHandler<ListenUpdatedResponse>? _listenUpdatedReceived;
+    private event EventHandler<ThinkUpdatedResponse>? _thinkUpdatedReceived;
+    private event EventHandler<FunctionCallCancelledResponse>? _functionCallCancelledReceived;
+    private event EventHandler<FunctionCallResponse>? _functionCallResponseReceived;
+    private event EventHandler<LatencyReportResponse>? _latencyReportReceived;
+    private event EventHandler<AgentWarningResponse>? _warningReceived;
+    private event EventHandler<AgentHistoryResponse>? _historyReceived;
     #endregion
 
     /// <summary>
@@ -383,6 +390,104 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         return true;
     }
 
+    public async Task<bool> Subscribe(EventHandler<ListenUpdatedResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _listenUpdatedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<ThinkUpdatedResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _thinkUpdatedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<FunctionCallCancelledResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _functionCallCancelledReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<FunctionCallResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _functionCallResponseReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<LatencyReportResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _latencyReportReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<AgentWarningResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _warningReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<AgentHistoryResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _historyReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
     /// <summary>
     /// Subscribe to an Close event from the Deepgram API
     /// </summary>
@@ -506,6 +611,16 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
         byte[] data = Encoding.UTF8.GetBytes(injectUserMessageSchema.ToString());
         await SendMessageImmediately(data);
+    }
+
+    /// <summary>
+    /// Flushes queued audio and then ends the current user turn. This control is supported when
+    /// the Agent session uses a Flux STT listen provider.
+    /// </summary>
+    public async Task SendForceEndTurn()
+    {
+        await Flush();
+        await SendMessageImmediately(Encoding.UTF8.GetBytes(new AgentForceEndTurnSchema().ToString()));
     }
     /// <summary>
     /// Sends a Close message to Deepgram
@@ -651,13 +766,14 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
         {
             Log.Verbose("ProcessTextMessage", $"raw response: {response}");
             var data = JsonDocument.Parse(response);
-            var typeString = data.RootElement.GetProperty("type").GetString();
             // Use TryParse so Agent message types unknown to this SDK version (e.g. new server
             // messages like "History"/"Warning") are routed to the base handler and surfaced as
             // Unhandled instead of throwing an ArgumentException. See #395.
-            if (!Enum.TryParse<AgentType>(typeString, out var val))
+            if (!data.RootElement.TryGetProperty("type", out var typeElement) ||
+                typeElement.ValueKind != JsonValueKind.String ||
+                !Enum.TryParse<AgentType>(typeElement.GetString(), out var val))
             {
-                Log.Debug("ProcessTextMessage", $"Unknown Agent message type '{typeString}'. Routing to base handler...");
+                Log.Debug("ProcessTextMessage", "Message type is missing or unknown. Routing to base handler...");
                 base.ProcessTextMessage(result, ms);
                 Log.Verbose("AgentWSClient.ProcessTextMessage", "LEAVE");
                 return;
@@ -870,6 +986,104 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
 
                     Log.Debug("ProcessTextMessage", $"Invoking SpeakUpdatedResponse. event: {speakUpdatedResponse}");
                     InvokeParallel(_speakUpdatedReceived, speakUpdatedResponse);
+                    break;
+                case AgentType.ListenUpdated:
+                    if (_listenUpdatedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var listenUpdatedResponse = data.Deserialize<ListenUpdatedResponse>();
+                    if (listenUpdatedResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_listenUpdatedReceived, listenUpdatedResponse);
+                    break;
+                case AgentType.ThinkUpdated:
+                    if (_thinkUpdatedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var thinkUpdatedResponse = data.Deserialize<ThinkUpdatedResponse>();
+                    if (thinkUpdatedResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_thinkUpdatedReceived, thinkUpdatedResponse);
+                    break;
+                case AgentType.FunctionCallCancelled:
+                    if (_functionCallCancelledReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var functionCallCancelledResponse = data.Deserialize<FunctionCallCancelledResponse>();
+                    if (functionCallCancelledResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_functionCallCancelledReceived, functionCallCancelledResponse);
+                    break;
+                case AgentType.FunctionCallResponse:
+                    if (_functionCallResponseReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var functionCallResponse = data.Deserialize<FunctionCallResponse>();
+                    if (functionCallResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_functionCallResponseReceived, functionCallResponse);
+                    break;
+                case AgentType.LatencyReport:
+                    if (_latencyReportReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var latencyReportResponse = data.Deserialize<LatencyReportResponse>();
+                    if (latencyReportResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_latencyReportReceived, latencyReportResponse);
+                    break;
+                case AgentType.Warning:
+                    if (_warningReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var warningResponse = data.Deserialize<AgentWarningResponse>();
+                    if (warningResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_warningReceived, warningResponse);
+                    break;
+                case AgentType.History:
+                    if (_historyReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var historyResponse = data.Deserialize<AgentHistoryResponse>();
+                    if (historyResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_historyReceived, historyResponse);
                     break;
                 default:
                     Log.Debug("ProcessTextMessage", "Calling base.ProcessTextMessage...");
