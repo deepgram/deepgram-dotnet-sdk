@@ -87,6 +87,12 @@ Operational notes:
 - `CreateDistributionCredentials` uses the same REST plumbing as the rest of the SDK, so you can still attach custom headers or addons for operational tracing.
 - `CreateSelfHostedClient()` remains available for applications using the legacy on-prem route and request shape.
 
-Use the distribution credentials client for new code. `OnPremClient` remains deprecated and frozen.
+Use the distribution credentials client for new code.
+
+## Legacy Client
+
+`SelfHostedClient` and `Clients.SelfHosted.v1.Client` are frozen legacy clients for the retired
+on-prem route. They remain available for source compatibility but are marked obsolete; do not add
+new functionality to either surface.
 
 Related pages: [ManageClient](/docs/api-reference/manage-client).

@@ -3,9 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.SelfHosted.v1;
-using AuraSpeakSchema = Deepgram.Models.Speak.v1.REST.SpeakSchema;
-using AuraTextSource = Deepgram.Models.Speak.v1.REST.TextSource;
-
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
 /// <summary>
@@ -15,31 +12,6 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 /// </summary>
 public class SelfHostedDistributionCredentialsLiveIntegrationTests
 {
-    [Test]
-    public async Task Live_AuraRest_Should_Accept_Numeric_String_Output_Options()
-    {
-        var apiKey = GetLiveApiKey();
-        var client = ClientFactory.CreateSpeakRESTClient(apiKey);
-
-        var mp3Response = await client.ToStream(new AuraTextSource("Phase zero bitrate validation."), new AuraSpeakSchema
-        {
-            Model = "aura-2-thalia-en",
-            Encoding = "mp3",
-            BitRate = "48000",
-        });
-        var linear16Response = await client.ToStream(new AuraTextSource("Phase zero sample rate validation."), new AuraSpeakSchema
-        {
-            Model = "aura-2-thalia-en",
-            Encoding = "linear16",
-            SampleRate = "24000",
-        });
-
-        mp3Response.Stream.Should().NotBeNull();
-        mp3Response.Stream!.Length.Should().BeGreaterThan(0);
-        linear16Response.Stream.Should().NotBeNull();
-        linear16Response.Stream!.Length.Should().BeGreaterThan(0);
-    }
-
     [Test]
     public async Task Live_SelfHostedDistributionCredentials_Should_List()
     {
@@ -104,11 +76,10 @@ public class SelfHostedDistributionCredentialsLiveIntegrationTests
     private static (string ApiKey, string ProjectId) GetLiveConfiguration()
     {
         var apiKey = GetLiveApiKey();
-        var projectId = Environment.GetEnvironmentVariable("DEEPGRAM_SELF_HOSTED_PROJECT_ID")
-            ?? Environment.GetEnvironmentVariable("DEEPGRAM_PROJECT_ID");
+        var projectId = Environment.GetEnvironmentVariable("DEEPGRAM_SELF_HOSTED_PROJECT_ID");
         if (string.IsNullOrWhiteSpace(projectId))
         {
-            Assert.Ignore("DEEPGRAM_SELF_HOSTED_PROJECT_ID or DEEPGRAM_PROJECT_ID is not set. Skipping live self-hosted credentials test.");
+            Assert.Ignore("DEEPGRAM_SELF_HOSTED_PROJECT_ID is not set. Skipping live self-hosted credentials test.");
         }
 
         return (apiKey!, projectId!);

@@ -5,6 +5,8 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Deepgram.Models.Speak.v2.WebSocket;
+using AuraSpeakSchema = Deepgram.Models.Speak.v1.REST.SpeakSchema;
+using AuraTextSource = Deepgram.Models.Speak.v1.REST.TextSource;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -20,6 +22,38 @@ public class SpeakLiveIntegrationTests
     {
         return GlobalTestEnvironment.DeepgramApiKeyAtStartup
             ?? Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY");
+    }
+
+    [Test]
+    public async Task Live_AuraRest_Should_Accept_Numeric_String_Output_Options()
+    {
+        var apiKey = ResolveApiKey();
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            Assert.Ignore("DEEPGRAM_API_KEY is not set. Skipping live Aura REST test.");
+        }
+
+        var client = ClientFactory.CreateSpeakRESTClient(apiKey!);
+        var mp3Response = await client.ToStream(new AuraTextSource("Bitrate validation."), new AuraSpeakSchema
+        {
+            Model = "aura-2-thalia-en",
+            Encoding = "mp3",
+            BitRate = "48000",
+        });
+        var linear16Response = await client.ToStream(new AuraTextSource("Sample-rate validation."), new AuraSpeakSchema
+        {
+            Model = "aura-2-thalia-en",
+            Encoding = "linear16",
+            SampleRate = "24000",
+        });
+
+        using (new AssertionScope())
+        {
+            mp3Response.Stream.Should().NotBeNull();
+            mp3Response.Stream!.Length.Should().BeGreaterThan(0);
+            linear16Response.Stream.Should().NotBeNull();
+            linear16Response.Stream!.Length.Should().BeGreaterThan(0);
+        }
     }
 
     [Test]

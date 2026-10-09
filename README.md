@@ -61,7 +61,7 @@ Power your apps with world-class speech and Language AI models.
   - [Models](#models)
     - [Get All Project Models](#get-all-project-models)
     - [Get Model](#get-model)
-   - [Self-Hosted Distribution Credentials](#self-hosted-distribution-credentials)
+  - [Self-Hosted Distribution Credentials](#self-hosted-distribution-credentials)
   - [Logging](#logging)
   - [Backwards Compatibility](#backwards-compatibility)
   - [Development and Contributing](#development-and-contributing)
@@ -222,10 +222,9 @@ Console.WriteLine($"Request ID: {response.RequestId}");
 
 ### Callback method compatibility
 
-`PreRecordedSchema.CallbackMethod` is a legacy Boolean property. To request a callback with HTTP
-`PUT` is not supported by the current service when sent as an add-on query parameter. Leave it
-unset to use the server's default callback behavior. The SDK does not expose a supported way to
-select a callback method in 7.x.
+`PreRecordedSchema.CallbackMethod` is a legacy Boolean property. The API currently rejects
+`callback_method=put`; leave `CallbackMethod` unset to use the default `POST` callback behavior.
+The SDK does not expose a supported way to select a callback method in 7.x.
 
 ## Streaming Audio
 

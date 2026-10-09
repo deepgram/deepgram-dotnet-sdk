@@ -12,7 +12,7 @@ using AuraSpeakSchema = Deepgram.Models.Speak.v1.REST.SpeakSchema;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
-public class PhaseZeroContractTests
+public class SelfHostedDistributionCredentialsClientTests
 {
     private DeepgramHttpClientOptions _options = null!;
     private string _apiKey = null!;
