@@ -56,7 +56,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var obj = new PreRecordedSchema() { Alternatives = 1 };
         var expected = $"alternatives={obj.Alternatives}";
 
@@ -127,7 +127,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var obj = new PreRecordedSchema() { Paragraphs = true };
         var expected = $"{nameof(obj.Paragraphs).ToLower()}=true";
         //Act
@@ -141,7 +141,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var options = new AutoFaker<KeySchema>().Generate();
         var time = DateTime.Now;
         options.ExpirationDate = time;
@@ -159,7 +159,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_Valid_String_When_CallBack_Set()
     {
-        // Input and Output 
+        // Input and Output
         var signedCallBackUrl = "As$Ssw.com";
         var expected = HttpUtility.UrlEncode(signedCallBackUrl);
 
