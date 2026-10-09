@@ -54,7 +54,7 @@ Power your apps with world-class speech and Language AI models.
     - [Get All Requests](#get-all-requests)
     - [Get Request](#get-request)
     - [Get Fields](#get-fields)
-    - [Summarize Usage](#summarize-usage)
+    - [Get Usage Breakdown](#get-usage-breakdown)
   - [Billing](#billing)
     - [Get All Balances](#get-all-balances)
     - [Get Balance](#get-balance)
@@ -1214,7 +1214,7 @@ used for requests in the specified project.
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var manageClient = ClientFactory.CreateManageClient();
 
-var response = await manageClient.GetUsageFields(projectId);
+var response = await manageClient.GetUsageFields(projectId, new UsageFieldsSchema());
 
 Console.WriteLine($"Fields: {response.Fields}");
 ```
@@ -1223,21 +1223,26 @@ Console.WriteLine($"Fields: {response.Fields}");
 
 [See the Example for more info](./examples/manage/usage/).
 
-### Summarize Usage
+### Get Usage Breakdown
 
-`Deprecated` Retrieves the usage for a specific project. Use Get Project Usage Breakdown
-for a more comprehensive usage summary.
+Retrieves current usage totals grouped by a reporting dimension. Prefer this endpoint for new
+reporting integrations; `GetUsageSummary` remains available on `ManageClient` for compatibility.
 
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var manageClient = ClientFactory.CreateManageClient();
+var reportingClient = ClientFactory.CreateManagementReportingClient();
 
-var response = await manageClient.GetUsageSummary(projectId);
+var response = await reportingClient.GetUsageBreakdown(projectId, new UsageBreakdownSchema
+{
+    Start = DateTime.UtcNow.Date.AddDays(-7),
+    End = DateTime.UtcNow.Date,
+    Grouping = "models",
+});
 
-Console.WriteLine($"Usage summary: {response.Usage}");
+Console.WriteLine($"Usage groups: {response.Results?.Count ?? 0}");
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/management-api/usage/get).
+[See our API reference for more info](https://developers.deepgram.com/reference/manage/usage/breakdown/get).
 
 [See the Example for more info](./examples/manage/usage/).
 
