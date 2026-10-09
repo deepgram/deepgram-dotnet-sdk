@@ -7,7 +7,9 @@ namespace Deepgram.Models.Listen.v2.WebSocket;
 /// <summary>
 /// Updates selected settings on an open <c>/v1/listen</c> stream. Keyterms require a Nova-3
 /// model and the global endpoint. A successful update does not receive an acknowledgement; the
-/// server sends an Error response when it rejects a Configure message.
+/// server sends an Error response when it rejects a Configure message. Keep keyterms under the
+/// 500-token limit: an over-limit update can stop transcription and close with <c>1011 (NET-0000)</c>
+/// without an Error response.
 /// </summary>
 public class ConfigureSchema
 {
@@ -16,6 +18,7 @@ public class ConfigureSchema
 
     /// <summary>
     /// Replaces the current keyterm list. An empty list clears keyterms; <c>null</c> leaves them unchanged.
+    /// Keep each update under the 500-token keyterm limit.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("keyterms")]

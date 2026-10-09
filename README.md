@@ -258,8 +258,10 @@ var liveSchema = new LiveSchema()
 await liveClient.Connect(liveSchema);
 
 // Reconfigure an open Nova-3 global stream without reconnecting. Keyterms replace the active
-// list; use an empty list to clear them. Success has no acknowledgement. A server rejection
-// arrives as an Error response with Code == "KeytermsNotSupported".
+// list; use an empty list to clear them. Keep every update below 500 keyterm tokens: an over-limit
+// update can stop transcription and close with 1011 (NET-0000) without an Error response. Success
+// has no acknowledgement. Other server rejections arrive as an Error response with
+// Code == "KeytermsNotSupported".
 await liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
 {
     if (e.Code == "KeytermsNotSupported")

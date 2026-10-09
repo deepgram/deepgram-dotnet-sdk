@@ -15,11 +15,14 @@ public static class ListenWebSocketClientExtensions
     /// Keyterms require a Nova-3 model and the global endpoint. A successful Configure message
     /// does not receive an acknowledgement; server rejections arrive as an Error response.
     /// </summary>
-    public static Task SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
+    public static async Task SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
     {
         if (client is null) throw new ArgumentNullException(nameof(client));
         if (configure is null) throw new ArgumentNullException(nameof(configure));
 
-        return client.SendMessageImmediately(Encoding.UTF8.GetBytes(configure.ToString()));
+        // Configure applies at an audio boundary. Drain preceding queued audio before sending its
+        // immediate control frame so sequential Send(...) then SendConfigure(...) calls preserve order.
+        await client.Flush();
+        await client.SendMessageImmediately(Encoding.UTF8.GetBytes(configure.ToString()));
     }
 }
