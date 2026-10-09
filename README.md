@@ -345,7 +345,7 @@ var fluxSchema = new FluxSchema()
     Encoding = "linear16",
     SampleRate = 16000,
     EotThreshold = 0.7,
-    Redact = "numbers", // Flux STT supports numbers or aggressive_numbers only; each redacted number becomes *
+    Redact = "numbers", // Flux supports numbers or aggressive_numbers only
 };
 await fluxClient.Connect(fluxSchema);
 
@@ -758,6 +758,21 @@ await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 
 Convert text into speech using the REST API.
 
+Current Aura REST options include `Speed`, repeated `Tag` values, and `MipOptOut`:
+
+```csharp
+var options = new Deepgram.Models.Speak.v1.REST.SpeakSchema
+{
+    Model = "aura-2-thalia-en",
+    Speed = 1.1,
+    Tag = new List<string> { "release", "voice" },
+    // Opts this request out of the Model Improvement Program; see
+    // https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program
+    // for pricing and data-retention effects.
+    // MipOptOut = true,
+};
+```
+
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var speakClient = ClientFactory.CreateSpeakRESTClient();
@@ -765,10 +780,7 @@ var speakClient = ClientFactory.CreateSpeakRESTClient();
 var response = await speakClient.ToFile(
     new TextSource("Hello world!"),
     "output.wav",
-    new SpeakSchema()
-    {
-        Model = "aura-2-thalia-en",
-    });
+    options);
 
 Console.WriteLine($"Audio saved to: output.wav");
 ```

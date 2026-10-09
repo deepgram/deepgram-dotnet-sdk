@@ -6,6 +6,8 @@ namespace Deepgram.Models.Manage.v1;
 
 public record ProjectResponse : Project
 {
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; }
     /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>

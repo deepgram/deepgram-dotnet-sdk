@@ -6,6 +6,9 @@ namespace Deepgram.Models.Analyze.v1;
 
 public class AnalyzeSchema
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("tag")]
+    public List<string>? Tag { get; set; }
     /// <summary>
     /// Callback URL to provide if you would like your submitted text to be processed.
     /// </summary>
@@ -91,4 +94,3 @@ public class AnalyzeSchema
         return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
 }
-

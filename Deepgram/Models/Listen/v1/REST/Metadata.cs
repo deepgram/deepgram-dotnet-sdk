@@ -6,6 +6,11 @@ namespace Deepgram.Models.Listen.v1.REST;
 
 public record Metadata
 {
+    [JsonPropertyName("diarize_info")]
+    public DiarizeInfo? DiarizeInfo { get; set; }
+
+    [JsonPropertyName("tags")]
+    public List<string>? Tags { get; set; }
     /// <summary>
     /// Number of channels detected in the submitted audio.
     /// </summary>
