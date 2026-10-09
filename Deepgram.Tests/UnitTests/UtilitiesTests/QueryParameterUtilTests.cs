@@ -234,7 +234,7 @@ public class QueryParameterUtilTests
     {
         // Input and Output
         var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["café"] };
-        var expected = "https://api.deepgram.com/?keyterm=caf%C3%A9";
+        var expected = "https://api.deepgram.com/?keyterm=café";
 
         //Act
         var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
@@ -248,7 +248,7 @@ public class QueryParameterUtilTests
     {
         // Input and Output
         var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["say \"hi\""] };
-        var expected = "https://api.deepgram.com/?keyterm=say+%22hi%22";
+        var expected = "https://api.deepgram.com/?keyterm=say+\"hi\"";
 
         //Act
         var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);

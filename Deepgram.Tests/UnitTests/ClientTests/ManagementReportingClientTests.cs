@@ -63,7 +63,7 @@ public class ManagementReportingClientTests
         using (new AssertionScope())
         {
             usage.Should().Contain("start=2026-01-01").And.Contain("grouping=models").And.Contain("deployment=hosted").And.Contain("numerals=true");
-            billing.Should().Contain("grouping=%5b%22deployment%22%2c%22tags%22%5d").And.Contain("line_item=streaming%3a%3anova-3");
+            billing.Should().Contain("grouping=deployment").And.Contain("grouping=tags").And.Contain("line_item=streaming%3a%3anova-3");
             fields.Should().Contain("start=2026-01-01").And.Contain("end=2026-01-31");
             purchases.Should().Contain("limit=25");
             requests.Should().Contain("accessor=accessor-id").And.Contain("request_id=request-id").And.Contain("deployment=hosted").And.Contain("endpoint=listen").And.Contain("method=sync");

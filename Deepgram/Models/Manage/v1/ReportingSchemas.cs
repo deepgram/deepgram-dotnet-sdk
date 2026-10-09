@@ -94,11 +94,9 @@ public class BillingBreakdownSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] [JsonPropertyName("tag")] public string? Tag { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] [JsonPropertyName("line_item")] public string? LineItem { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] [JsonPropertyName("deployment")] public string? Deployment { get; set; }
-    [JsonIgnore] public List<string>? Grouping { get; set; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("grouping")]
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public string? GroupingParameter => Grouping is null ? null : JsonSerializer.Serialize(Grouping);
+    public List<string>? Grouping { get; set; }
 }
 
 /// <summary>

@@ -27,8 +27,7 @@ internal static class QueryParameterUtil
         {
             var propertyInfoList = parameter.GetType()
                 .GetProperties()
-                .Where(v => v.GetValue(parameter) is not null &&
-                    v.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition != JsonIgnoreCondition.Always);
+                .Where(v => v.GetValue(parameter) is not null);
 
             queryString = UrlEncode(parameter, propertyInfoList, addons);
         } else
@@ -41,11 +40,7 @@ internal static class QueryParameterUtil
         var query = HttpUtility.ParseQueryString(queryString);
         uriBuilder.Query = query.ToString();
 
-        var uri = uriBuilder.Uri;
-        var escapedQuery = uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
-        return string.IsNullOrEmpty(escapedQuery)
-            ? uri.GetLeftPart(UriPartial.Path).TrimEnd('/')
-            : $"{uri.GetLeftPart(UriPartial.Path)}?{escapedQuery}";
+        return uriBuilder.Uri.ToString().TrimEnd('/');
     }
 
     /// <summary>
