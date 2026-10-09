@@ -214,4 +214,49 @@ public class QueryParameterUtilTests
         result.Should().NotContain("diarize_model");
     }
 
+    // FormatURL is shared by every REST client; these pin the exact escaped string it returns.
+    [Test]
+    public void FormatURL_Should_Escape_Callback_Url_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { CallBack = "https://x.com/a?b=c&d=e" };
+        var expected = "https://api.deepgram.com/?callback=https%3a%2f%2fx.com%2fa%3fb%3dc%26d%3de";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Percent_Encode_Unicode_Value_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["café"] };
+        var expected = "https://api.deepgram.com/?keyterm=café";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Percent_Encode_Double_Quote_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["say \"hi\""] };
+        var expected = "https://api.deepgram.com/?keyterm=say+\"hi\"";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Encode_Space_As_Plus_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["new york"] };
+        var expected = "https://api.deepgram.com/?keyterm=new+york";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
 }
