@@ -3,22 +3,22 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text;
-using Deepgram.Clients.Interfaces.v1;
-using Deepgram.Models.Listen.v1.WebSocket;
+using Deepgram.Clients.Interfaces.v2;
+using Deepgram.Models.Listen.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class ListenV1ConfigureTests
 {
     [Test]
-    public void SendConfigure_Should_Serialize_Nullable_Keyterms_And_Features()
+    public async Task SendConfigure_Should_Serialize_Nullable_Keyterms_And_Features()
     {
         var client = Substitute.For<IListenWebSocketClient>();
         byte[]? sent = null;
         client.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>()))
             .Do(call => sent = call.Arg<byte[]>());
 
-        client.SendConfigure(new ConfigureSchema
+        await client.SendConfigure(new ConfigureSchema
         {
             Keyterms = null,
             Features = new Dictionary<string, bool> { ["numerals"] = true },
@@ -28,6 +28,20 @@ public class ListenV1ConfigureTests
         json.RootElement.GetProperty("type").GetString().Should().Be("Configure");
         json.RootElement.TryGetProperty("keyterms", out _).Should().BeFalse();
         json.RootElement.GetProperty("features").GetProperty("numerals").GetBoolean().Should().BeTrue();
+    }
+
+    [Test]
+    public async Task SendConfigure_Should_Serialize_Empty_Keyterms()
+    {
+        var client = Substitute.For<IListenWebSocketClient>();
+        byte[]? sent = null;
+        client.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>()))
+            .Do(call => sent = call.Arg<byte[]>());
+
+        await client.SendConfigure(new ConfigureSchema { Keyterms = new List<string>() });
+
+        using var json = JsonDocument.Parse(Encoding.UTF8.GetString(sent!));
+        json.RootElement.GetProperty("keyterms").EnumerateArray().Should().BeEmpty();
     }
 
     [Test]

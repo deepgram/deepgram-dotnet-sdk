@@ -2,20 +2,28 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-namespace Deepgram.Models.Listen.v1.WebSocket;
+namespace Deepgram.Models.Listen.v2.WebSocket;
 
 /// <summary>
-/// Updates selected settings on an open Listen v1 stream.
+/// Updates selected settings on an open <c>/v1/listen</c> stream. Keyterms require a Nova-3
+/// model and the global endpoint. A successful update does not receive an acknowledgement; the
+/// server sends an Error response when it rejects a Configure message.
 /// </summary>
 public class ConfigureSchema
 {
     [JsonPropertyName("type")]
     public string Type { get; } = "Configure";
 
+    /// <summary>
+    /// Replaces the current keyterm list. An empty list clears keyterms; <c>null</c> leaves them unchanged.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("keyterms")]
     public List<string>? Keyterms { get; set; }
 
+    /// <summary>
+    /// Updates supported formatting features, such as <c>numerals</c>.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("features")]
     public Dictionary<string, bool>? Features { get; set; }

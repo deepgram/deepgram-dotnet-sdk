@@ -3,21 +3,23 @@
 // SPDX-License-Identifier: MIT
 
 using System.Text;
-using Deepgram.Clients.Interfaces.v1;
-using Deepgram.Models.Listen.v1.WebSocket;
+using Deepgram.Clients.Interfaces.v2;
+using Deepgram.Models.Listen.v2.WebSocket;
 
 namespace Deepgram;
 
 public static class ListenWebSocketClientExtensions
 {
     /// <summary>
-    /// Sends a Configure message without reconnecting the Listen v1 stream.
+    /// Sends a Configure message on an open <c>/v1/listen</c> stream without reconnecting.
+    /// Keyterms require a Nova-3 model and the global endpoint. A successful Configure message
+    /// does not receive an acknowledgement; server rejections arrive as an Error response.
     /// </summary>
-    public static void SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
+    public static Task SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
     {
         if (client is null) throw new ArgumentNullException(nameof(client));
         if (configure is null) throw new ArgumentNullException(nameof(configure));
 
-        client.SendMessageImmediately(Encoding.UTF8.GetBytes(configure.ToString()));
+        return client.SendMessageImmediately(Encoding.UTF8.GetBytes(configure.ToString()));
     }
 }

@@ -6,9 +6,6 @@ namespace Deepgram.Models.Listen.v1.WebSocket;
 
 public record ErrorResponse
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("code")]
-    public string? Code { get; set; }
     /// <summary>
     /// Error Description
     /// </summary>

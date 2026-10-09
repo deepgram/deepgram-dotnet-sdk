@@ -257,6 +257,22 @@ var liveSchema = new LiveSchema()
 };
 await liveClient.Connect(liveSchema);
 
+// Reconfigure an open Nova-3 global stream without reconnecting. Keyterms replace the active
+// list; use an empty list to clear them. Success has no acknowledgement. A server rejection
+// arrives as an Error response with Code == "KeytermsNotSupported".
+await liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
+{
+    if (e.Code == "KeytermsNotSupported")
+    {
+        Console.Error.WriteLine(e.Description);
+    }
+}));
+await liveClient.SendConfigure(new ConfigureSchema
+{
+    Keyterms = new List<string> { "Deepgram" },
+    Features = new Dictionary<string, bool> { ["numerals"] = true },
+});
+
 // Stream audio data to Deepgram
 byte[] audioData = GetAudioData(); // Your audio source
 liveClient.Send(audioData);
