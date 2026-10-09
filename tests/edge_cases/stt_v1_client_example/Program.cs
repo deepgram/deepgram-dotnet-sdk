@@ -2,8 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Listen.v1.WebSocket;
-using ListenV1 = Deepgram.Clients.Listen.v1.WebSocket;
+using Deepgram.Models.Listen.v2.WebSocket;
 
 namespace SampleApp
 {
@@ -15,15 +14,10 @@ namespace SampleApp
             Library.Initialize();
 
             // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
-            var liveClient = ClientFactory.CreateListenWebSocketClient(1) as ListenV1.Client;
-            if (liveClient == null)
-            {
-                Console.WriteLine("Failed to create ListenWebSocketClient");
-                return;
-            }
+            var liveClient = ClientFactory.CreateListenWebSocketClient();
 
             // Subscribe to the EventResponseReceived event
-            liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
+            await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
             {
                 if (e.Channel.Alternatives[0].Transcript == "")
                 {
@@ -35,11 +29,16 @@ namespace SampleApp
             // Start the connection
             var liveSchema = new LiveSchema()
             {
-                Model = "nova-2",
+                Model = "nova-3",
                 Punctuate = true,
                 SmartFormat = true,
             };
             await liveClient.Connect(liveSchema);
+            await liveClient.SendConfigure(new ConfigureSchema
+            {
+                Keyterms = new List<string> { "Deepgram" },
+                Features = new Dictionary<string, bool> { ["numerals"] = true },
+            });
 
             // get the webcast data... this is a blocking operation
             try

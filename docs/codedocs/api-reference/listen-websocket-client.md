@@ -3,7 +3,7 @@ title: "ListenWebSocketClient"
 description: "Live transcription connection lifecycle, event subscriptions, and audio send methods."
 ---
 
-Source files: `Deepgram/ListenWebSocketClient.cs`, `Deepgram/Clients/Interfaces/v2/IListenWebSocketClient.cs`, `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`.
+Source files: `Deepgram/ListenWebSocketClient.cs`, `Deepgram/ListenWebSocketClientExtensions.cs`, `Deepgram/Clients/Interfaces/v2/IListenWebSocketClient.cs`, `Deepgram/Clients/Listen/v2/WebSocket/Client.cs`.
 
 Import paths:
 
@@ -64,9 +64,30 @@ void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend)
 void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend)
 Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
 Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
+Task SendConfigure(ConfigureSchema configure)
 WebSocketState State()
 bool IsConnected()
 ```
+
+### Mid-stream Configure
+
+`SendConfigure` updates an open `/v1/listen` stream without reconnecting. It first calls `Flush()` so
+audio queued through `Send`, `SendBinary`, or `SendMessage` reaches the server before the Configure
+frame. Await it to establish an audio/configuration boundary.
+
+```csharp
+await client.SendConfigure(new ConfigureSchema
+{
+    Keyterms = new List<string> { "Deepgram" },
+    Features = new Dictionary<string, bool> { ["numerals"] = true },
+});
+```
+
+Keyterms require Nova-3 on the global endpoint. An empty `Keyterms` list clears the active list;
+`null` leaves it unchanged. A successful Configure has no acknowledgement. Ordinary server
+rejections arrive through `ErrorResponse`, such as `Code == "KeytermsNotSupported"`. Keep each
+keyterm update below 500 tokens: an over-limit update can stop transcription and close with
+`1011 (NET-0000)` without an Error response.
 
 ## Key `LiveSchema` fields
 

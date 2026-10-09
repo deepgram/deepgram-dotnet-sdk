@@ -157,6 +157,12 @@ client.Send(audioChunk);
 await client.SendMessageImmediately(controlBytes);
 ```
 
+`SendConfigure` is the exception for a mid-stream `/v1/listen` Configure control: it drains queued
+audio before writing Configure immediately, so `client.Send(audio); await client.SendConfigure(...)`
+keeps the audio before the new configuration. Keyterms require Nova-3 on the global endpoint. Use
+an empty list to clear keyterms and keep each update under 500 tokens; an over-limit update can
+close the stream with `1011 (NET-0000)` without sending an Error response.
+
 </Accordion>
 <Accordion title="Autoflush convenience vs explicit lifecycle control">
 `AutoFlushReplyDelta` is useful when your app behaves like push-to-talk and wants the SDK to nudge the stream toward a final result after inactivity. That convenience comes with less explicit control, because the timing is now partly driven by background logic rather than your own call to `SendFinalize()`. `SendFinalize()` first drains the SDK's queued audio and then sends the server `Finalize` control message; await a final `ResultResponse` before calling `Stop()` so the last transcript is not discarded. If your input timing is messy or user-driven, autoflush can remove a surprising amount of edge-case code from the app layer.
