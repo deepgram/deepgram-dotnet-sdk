@@ -7,6 +7,13 @@ namespace Deepgram.Models.Speak.v1.WebSocket;
 public class SpeakSchema
 {
     /// <summary>
+    /// Opts this request out of the Model Improvement Program.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; }
+
+    /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>

@@ -28,7 +28,6 @@ namespace PreRecorded
                 {
                     Model = "nova-3",
                     Keyterm = new List<string> { "Bueller" },
-                    MipOptOut = true,
                 },
                 null, // use the default timeout
                 customOptions);

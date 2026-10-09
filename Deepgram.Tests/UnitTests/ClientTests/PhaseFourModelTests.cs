@@ -8,6 +8,10 @@ using Deepgram.Models.Manage.v1;
 using Deepgram.Models.Speak.v1.REST;
 using Deepgram.Utilities;
 using ListenMetadata = Deepgram.Models.Listen.v1.REST.Metadata;
+using ListenV1LiveSchema = Deepgram.Models.Listen.v1.WebSocket.LiveSchema;
+using ListenV2LiveSchema = Deepgram.Models.Listen.v2.WebSocket.LiveSchema;
+using SpeakV1WebSocketSchema = Deepgram.Models.Speak.v1.WebSocket.SpeakSchema;
+using System.Globalization;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -16,20 +20,35 @@ public class PhaseFourModelTests
     [Test]
     public void Current_Request_Options_Should_Serialize_To_Their_Wire_Names()
     {
-        var speak = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakSchema
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
         {
-            Speed = 1.2,
-            Tag = new List<string> { "release", "phase-four" },
-            MipOptOut = true,
-        });
-        var listen = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new PreRecordedSchema { MipOptOut = true });
-        var analyze = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/read", new AnalyzeSchema { Tag = new List<string> { "release", "phase-four" } });
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            var speak = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakSchema
+            {
+                Speed = 1.2,
+                Tag = new List<string> { "release", "phase-four" },
+                MipOptOut = true,
+            });
+            var listen = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new PreRecordedSchema { MipOptOut = true });
+            var analyze = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/read", new AnalyzeSchema { Tag = new List<string> { "release", "phase-four" } });
+            var listenV1 = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new ListenV1LiveSchema { MipOptOut = true });
+            var listenV2 = QueryParameterUtil.FormatURL("https://api.deepgram.com/v2/listen", new ListenV2LiveSchema { MipOptOut = true });
+            var speakWebSocket = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakV1WebSocketSchema { MipOptOut = true });
 
-        using (new AssertionScope())
+            using (new AssertionScope())
+            {
+                speak.Should().Contain("speed=1.2").And.Contain("tag=release").And.Contain("tag=phase-four").And.Contain("mip_opt_out=true");
+                listen.Should().Contain("mip_opt_out=true");
+                analyze.Should().Contain("tag=release").And.Contain("tag=phase-four");
+                listenV1.Should().Contain("mip_opt_out=true");
+                listenV2.Should().Contain("mip_opt_out=true");
+                speakWebSocket.Should().Contain("mip_opt_out=true");
+            }
+        }
+        finally
         {
-            speak.Should().Contain("speed=1.2").And.Contain("tag=release").And.Contain("tag=phase-four").And.Contain("mip_opt_out=true");
-            listen.Should().Contain("mip_opt_out=true");
-            analyze.Should().Contain("tag=release").And.Contain("tag=phase-four");
+            CultureInfo.CurrentCulture = originalCulture;
         }
     }
 

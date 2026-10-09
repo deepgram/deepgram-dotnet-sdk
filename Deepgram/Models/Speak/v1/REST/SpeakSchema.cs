@@ -6,14 +6,23 @@ namespace Deepgram.Models.Speak.v1.REST;
 
 public class SpeakSchema
 {
+    /// <summary>
+    /// Controls the speech-rate multiplier for supported Aura models.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("speed")]
     public double? Speed { get; set; }
 
+    /// <summary>
+    /// Adds one or more labels to the synthesized request.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
 
+    /// <summary>
+    /// Opts this request out of the Model Improvement Program.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }

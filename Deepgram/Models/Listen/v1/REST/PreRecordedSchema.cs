@@ -6,6 +6,9 @@ namespace Deepgram.Models.Listen.v1.REST;
 
 public class PreRecordedSchema
 {
+    /// <summary>
+    /// Opts this request out of the Model Improvement Program.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }

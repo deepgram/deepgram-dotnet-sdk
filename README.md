@@ -766,7 +766,10 @@ var options = new Deepgram.Models.Speak.v1.REST.SpeakSchema
     Model = "aura-2-thalia-en",
     Speed = 1.1,
     Tag = new List<string> { "release", "voice" },
-    MipOptOut = true,
+    // Opts this request out of the Model Improvement Program; see
+    // https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program
+    // for pricing and data-retention effects.
+    // MipOptOut = true,
 };
 ```
 

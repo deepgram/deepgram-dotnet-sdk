@@ -6,6 +6,12 @@ namespace Deepgram.Models.Listen.v1.WebSocket;
 
 public class LiveSchema
 {
+    /// <summary>
+    /// Opts this request out of the Model Improvement Program.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; }
 
     /// <summary>
     /// Number of transcripts to return per request

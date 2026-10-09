@@ -47,10 +47,14 @@ Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegm
 | Flux TTS, batch | `POST /v2/speak` | `CreateFluxSpeakRESTClient` | `Clients/Flux/Speak/REST` | Shipped |
 | Flux TTS, streaming | `wss /v2/speak` | `CreateFluxSpeakWebSocketClient` | `Clients/Flux/Speak/WebSocket` | Shipped; `SendText`, `SendFlush`, `SendInterrupt`, `SendConfigure`, `Stop` |
 | Voice Agent | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentWebSocketClient` | `Clients/Agent/v2/Websocket` | Shipped |
+| Voice Agent protocol | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentProtocolClient` | `Clients/Agent/v2/Websocket` | Current typed controls and event subscriptions |
+| Voice Agent Think catalog | `/v1/agent/settings/think/models` | `CreateAgentCatalogClient` | `AgentCatalogClient` | Shipped |
 | Voice Agent management | `/v1/projects/{id}/agents`, `/agent-variables` | `CreateAgentManageClient` | `Clients/AgentManage/v1` | Shipped |
 | Text intelligence | `POST /v1/read` | `CreateAnalyzeClient` | `Clients/Analyze/v1` | Shipped |
 | Management API | `/v1/projects/...` | `CreateManageClient` | `Clients/Manage/v1` | Shipped |
+| Management reporting | `/v1/projects/{id}/usage/breakdown`, billing, purchases | `CreateManagementReportingClient` | `ManagementReportingClient` | Current reporting endpoints |
 | Self-hosted credentials | `/v1/projects/{id}/onprem/...` | `CreateSelfHostedClient` | `Clients/SelfHosted/v1` | Shipped |
+| Self-hosted distribution credentials | `/v1/projects/{id}/self-hosted/distribution/credentials` | `CreateSelfHostedDistributionCredentialsClient` | `DistributionCredentialsClient` | Current self-hosted credentials API |
 | Auth (grant token) | `POST /v1/auth/grant` | `CreateAuthClient` | `Clients/Auth/v1` | Shipped |
 
 `LiveClient`, `PreRecordedClient`, `SpeakClient`, and `OnPremClient` (and `Clients/Live`, `Clients/PreRecorded`, `Clients/OnPrem`) are deprecated and frozen. Point new code at `ListenWebSocketClient`, `ListenRESTClient`, `SpeakRESTClient`, and `SelfHostedClient`.

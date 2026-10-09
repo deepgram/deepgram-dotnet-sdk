@@ -37,7 +37,7 @@ public class ManagementReportingLiveIntegrationTests
         {
             Start = start,
             End = end,
-            Grouping = new List<string> { "deployment" },
+            Grouping = new List<string> { "deployment", "tags" },
         });
         var fields = await client.GetBillingFields(projectId, new BillingFieldsSchema { Start = start, End = end });
         var purchases = await client.GetPurchases(projectId, new PurchasesSchema { Limit = 1 });
@@ -46,8 +46,8 @@ public class ManagementReportingLiveIntegrationTests
         {
             usage.Results.Should().NotBeNull();
             billing.Results.Should().NotBeNull();
-            fields.Should().NotBeNull();
-            purchases.Should().NotBeNull();
+            fields.Accessors.Should().NotBeNull();
+            purchases.Orders.Should().NotBeNull();
         }
     }
 }
