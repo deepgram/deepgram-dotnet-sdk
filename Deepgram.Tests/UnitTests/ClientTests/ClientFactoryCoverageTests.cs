@@ -33,6 +33,8 @@ public class ClientFactoryCoverageTests
             ClientFactory.CreateListenRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IListenRESTClient>();
             ClientFactory.CreateManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManageClient>();
             ClientFactory.CreateSelfHostedClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISelfHostedClient>();
+            ClientFactory.CreateSelfHostedDistributionCredentialsClient(ApiKey, HttpOptions)
+                .Should().BeAssignableTo<V1.ISelfHostedDistributionCredentialsClient>();
             ClientFactory.CreateSpeakRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISpeakRESTClient>();
             ClientFactory.CreateSpeakWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.ISpeakWebSocketClient>();
         }

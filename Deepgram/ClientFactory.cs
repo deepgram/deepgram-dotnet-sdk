@@ -136,6 +136,15 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a client for the current self-hosted distribution credentials API.
+    /// </summary>
+    public static V1.ISelfHostedDistributionCredentialsClient CreateSelfHostedDistributionCredentialsClient(string apiKey = "",
+        DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new SelfHostedDistributionCredentialsClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new ListenRESTClient
     /// </summary>
     /// <param name="apiKey"></param>

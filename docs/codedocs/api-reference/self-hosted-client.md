@@ -1,9 +1,9 @@
 ---
-title: "SelfHostedClient"
-description: "Manage self-hosted credentials attached to Deepgram projects."
+title: "Self-Hosted Distribution Credentials"
+description: "Manage current self-hosted distribution credentials attached to Deepgram projects."
 ---
 
-Source files: `Deepgram/SelfHostedClient.cs`, `Deepgram/Clients/Interfaces/v1/ISelfHostedClient.cs`, `Deepgram/Clients/SelfHosted/v1/Client.cs`.
+Source files: `Deepgram/SelfHostedDistributionCredentialsClient.cs`, `Deepgram/Clients/Interfaces/v1/ISelfHostedDistributionCredentialsClient.cs`, `Deepgram/Clients/SelfHosted/v1/DistributionCredentialsClient.cs`.
 
 Import paths:
 
@@ -13,72 +13,86 @@ Import paths:
 Constructor:
 
 ```csharp
-public SelfHostedClient(
+public SelfHostedDistributionCredentialsClient(
     string apiKey = "",
     DeepgramHttpClientOptions? deepgramClientOptions = null,
     string? httpId = null)
 ```
 
-## Public methods
+## Current Client
 
 ```csharp
-Task<CredentialsResponse> ListCredentials(
+var client = ClientFactory.CreateSelfHostedDistributionCredentialsClient();
+```
+
+```csharp
+Task<CredentialsResponse> ListDistributionCredentials(
     string projectId,
     CancellationTokenSource? cancellationToken = default,
     Dictionary<string, string>? addons = null,
     Dictionary<string, string>? headers = null)
 
-Task<CredentialResponse> GetCredentials(
+Task<CredentialResponse> GetDistributionCredentials(
     string projectId,
-    string credentialsId,
+    string distributionCredentialsId,
     CancellationTokenSource? cancellationToken = default,
     Dictionary<string, string>? addons = null,
     Dictionary<string, string>? headers = null)
 
-Task<MessageResponse> DeleteCredentials(
+Task<CredentialResponse> CreateDistributionCredentials(
     string projectId,
-    string credentialsId,
+    DistributionCredentialsCreateSchema? credentialsSchema = null,
+    DistributionCredentialsCreateOptions? options = null,
     CancellationTokenSource? cancellationToken = default,
     Dictionary<string, string>? addons = null,
     Dictionary<string, string>? headers = null)
 
-Task<CredentialResponse> CreateCredentials(
+Task<CredentialResponse> DeleteDistributionCredentials(
     string projectId,
-    CredentialsSchema credentialsSchema,
+    string distributionCredentialsId,
     CancellationTokenSource? cancellationToken = default,
     Dictionary<string, string>? addons = null,
     Dictionary<string, string>? headers = null)
 ```
 
-## Credentials schema
+## Request Types
 
 | Property | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `Comment` | `string?` | `null` | Human-readable description. |
-| `Scopes` | `List<string>?` | `null` | Credential scopes. |
-| `Provider` | `string?` | `null` | Backing provider label. |
+| `DistributionCredentialsCreateSchema.Comment` | `string?` | `null` | Human-readable description in the JSON body. |
+| `DistributionCredentialsCreateOptions.Scopes` | `List<string>?` | `null` | Credential scopes, repeated in the query string. |
+| `DistributionCredentialsCreateOptions.Provider` | `string?` | `null` | Distribution provider in the query string; the hosted API supports `quay`. |
 
 ## Example
 
 ```csharp
-var client = ClientFactory.CreateSelfHostedClient();
+var client = ClientFactory.CreateSelfHostedDistributionCredentialsClient();
 
-var credential = await client.CreateCredentials(
+var credential = await client.CreateDistributionCredentials(
     projectId: "project_id",
-    credentialsSchema: new CredentialsSchema
+    credentialsSchema: new DistributionCredentialsCreateSchema
     {
         Comment = "Credential for staging cluster",
-        Provider = "aws",
-        Scopes = new List<string> { "read", "write" }
+    },
+    options: new DistributionCredentialsCreateOptions
+    {
+        Provider = "quay",
+        Scopes = new List<string> { "self-hosted:product:api" }
     });
 ```
 
 Operational notes:
 
-- `ListCredentials` is the entry point you usually call first because the delete and get operations both depend on a `credentialsId`.
-- `CreateCredentials` uses the same REST plumbing as the rest of the SDK, so you can still attach custom headers or addons for operational tracing.
-- The public wrapper `OnPremClient` is deprecated in favor of `SelfHostedClient`, and the source code marks that older wrapper as frozen.
+- `ListDistributionCredentials` is the entry point you usually call first because the delete and get operations both depend on a distribution credentials ID.
+- `CreateDistributionCredentials` uses the same REST plumbing as the rest of the SDK, so you can still attach custom headers or addons for operational tracing.
+- `CreateSelfHostedClient()` remains available for applications using the legacy on-prem route and request shape.
 
-If you are migrating from older code that referenced `OnPremClient`, this page's method set is the one to standardize on going forward.
+Use the distribution credentials client for new code.
+
+## Legacy Client
+
+`SelfHostedClient` and `Clients.SelfHosted.v1.Client` are frozen legacy clients for the retired
+on-prem route. They remain available for source compatibility but are marked obsolete; do not add
+new functionality to either surface.
 
 Related pages: [ManageClient](/docs/api-reference/manage-client).

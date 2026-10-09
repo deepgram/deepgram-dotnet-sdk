@@ -8,8 +8,9 @@ using Deepgram.Models.Authenticate.v1;
 namespace Deepgram;
 
 /// <summary>
-/// Implements the latest supported version of the SelfHosted Client.
+/// Implements the frozen legacy on-prem SelfHosted Client.
 /// </summary>
+[Obsolete("Use SelfHostedDistributionCredentialsClient instead.")]
 public class SelfHostedClient : Client
 {
     public SelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,

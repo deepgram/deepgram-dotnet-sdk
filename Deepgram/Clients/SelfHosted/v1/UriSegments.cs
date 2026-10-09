@@ -10,4 +10,5 @@ public static class UriSegments
     //across SDK And Test Projects Simpler and Easier to change
     public const string PROJECTS = "projects";
     public const string SELF_HOSTED = "onprem/distribution/credentials";
+    public const string DISTRIBUTION_CREDENTIALS = "self-hosted/distribution/credentials";
 }

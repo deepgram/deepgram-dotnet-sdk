@@ -61,11 +61,7 @@ Power your apps with world-class speech and Language AI models.
   - [Models](#models)
     - [Get All Project Models](#get-all-project-models)
     - [Get Model](#get-model)
-  - [On-Prem APIs](#on-prem-apis)
-    - [List On-Prem credentials](#list-on-prem-credentials)
-    - [Get On-Prem credentials](#get-on-prem-credentials)
-    - [Create On-Prem credentials](#create-on-prem-credentials)
-    - [Delete On-Prem credentials](#delete-on-prem-credentials)
+  - [Self-Hosted Distribution Credentials](#self-hosted-distribution-credentials)
   - [Logging](#logging)
   - [Backwards Compatibility](#backwards-compatibility)
   - [Development and Contributing](#development-and-contributing)
@@ -223,6 +219,12 @@ Console.WriteLine($"Request ID: {response.RequestId}");
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text-api/listen).
+
+### Callback method compatibility
+
+`PreRecordedSchema.CallbackMethod` is a legacy Boolean property. The API currently rejects
+`callback_method=put`; leave `CallbackMethod` unset to use the default `POST` callback behavior.
+The SDK does not expose a supported way to select a callback method in 7.x.
 
 ## Streaming Audio
 
@@ -695,6 +697,9 @@ var response = await speakClient.ToFile(
 
 Console.WriteLine($"Audio saved to: output.wav");
 ```
+
+Aura REST `SampleRate` and `BitRate` continue to accept numeric strings in the 7.x schema, for
+example `SampleRate = "24000"` and `BitRate = "48000"`.
 
 [See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech-api/speak).
 
@@ -1236,72 +1241,44 @@ Console.WriteLine($"Model: {response.Model}");
 
 [See the Example for more info](./examples/manage/models/).
 
-## On-Prem APIs
+## Self-Hosted Distribution Credentials
 
-### List On-Prem credentials
-
-Lists sets of distribution credentials for the specified project.
-
-```csharp
-// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var selfHostedClient = ClientFactory.CreateSelfHostedClient();
-
-var response = await selfHostedClient.ListSelfhostedCredentials(projectId);
-
-Console.WriteLine($"Credentials: {response.Credentials}");
-```
-
-[See our API reference for more info](https://developers.deepgram.com/reference/self-hosted-api/list-credentials).
-
-### Get On-Prem credentials
-
-Returns a set of distribution credentials for the specified project.
+Use `CreateSelfHostedDistributionCredentialsClient()` for the current
+`/v1/projects/{project_id}/self-hosted/distribution/credentials` API. The request body contains
+only the optional comment; provider and scopes are query options.
 
 ```csharp
-// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var selfHostedClient = ClientFactory.CreateSelfHostedClient();
+using Deepgram.Models.SelfHosted.v1;
 
-var response = await selfHostedClient.GetSelfhostedCredentials(projectId, distributionCredentialsId);
+// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key.
+var selfHostedClient = ClientFactory.CreateSelfHostedDistributionCredentialsClient();
 
-Console.WriteLine($"Credentials: {response.Credentials}");
+var credential = await selfHostedClient.CreateDistributionCredentials(
+    projectId,
+    new DistributionCredentialsCreateSchema
+    {
+        Comment = "Credential for the staging cluster",
+    },
+    new DistributionCredentialsCreateOptions
+    {
+        Provider = "quay",
+        Scopes = new List<string>
+        {
+            "self-hosted:product:api",
+            "self-hosted:product:engine",
+        },
+    });
+
+Console.WriteLine($"Created credentials: {credential.DistributionCredentials?.DistributionCredentialsId}");
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/self-hosted-api/get-credentials).
+The client also provides `ListDistributionCredentials`, `GetDistributionCredentials`, and
+`DeleteDistributionCredentials`.
 
-### Create On-Prem credentials
+`CreateSelfHostedClient()` remains available for existing applications that use the legacy
+on-prem route and request shape; use the current distribution-credentials client for new code.
 
-Creates a set of distribution credentials for the specified project.
-
-```csharp
-// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var selfHostedClient = ClientFactory.CreateSelfHostedClient();
-
-var createOptions = new SelfhostedCredentialsSchema()
-{
-    Comment = "My on-prem credentials",
-};
-
-var response = await selfHostedClient.CreateSelfhostedCredentials(projectId, createOptions);
-
-Console.WriteLine($"Created credentials: {response.CredentialsID}");
-```
-
-[See our API reference for more info](https://developers.deepgram.com/reference/self-hosted-api/create-credentials).
-
-### Delete On-Prem credentials
-
-Deletes a set of distribution credentials for the specified project.
-
-```csharp
-// Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var selfHostedClient = ClientFactory.CreateSelfHostedClient();
-
-var response = await selfHostedClient.DeleteSelfhostedCredentials(projectId, distributionCredentialId);
-
-Console.WriteLine($"Delete result: {response.Message}");
-```
-
-[See our API reference for more info](https://developers.deepgram.com/reference/self-hosted-api/delete-credentials).
+[See our API reference for more info](https://developers.deepgram.com/reference/self-hosted/distribution-credentials/list).
 
 ## Logging
 
