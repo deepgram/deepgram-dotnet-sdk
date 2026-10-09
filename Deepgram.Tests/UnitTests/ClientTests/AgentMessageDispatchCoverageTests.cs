@@ -141,6 +141,24 @@ public class AgentMessageDispatchCoverageTests
         }
     }
 
+    [TestCase("""{"type":"AgentStartedSpeaking","total_latency":1.2,"tts_latency":0.4,"ttt_latency":0.8}""")]
+    [TestCase("""{"type":"AgentStartedSpeaking","total_latency":"1.2","tts_latency":"0.4","ttt_latency":"0.8"}""")]
+    public async Task ProcessTextMessage_Should_Read_AgentStartedSpeaking_Latencies_As_Numbers_Or_Strings(string json)
+    {
+        var client = NewClient();
+        AgentStartedSpeakingResponse? startedSpeaking = null;
+        await client.Subscribe(new EventHandler<AgentStartedSpeakingResponse>((_, response) => startedSpeaking = response));
+
+        FeedTextMessage(client, json);
+
+        using (new AssertionScope())
+        {
+            startedSpeaking!.TotalLatency.Should().Be(1.2m);
+            startedSpeaking.TtsLatency.Should().Be(0.4m);
+            startedSpeaking.TttLatency.Should().Be(0.8m);
+        }
+    }
+
     [Test]
     public async Task ProcessBinaryMessage_Should_Dispatch_Agent_Audio()
     {

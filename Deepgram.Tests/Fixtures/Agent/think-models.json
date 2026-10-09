@@ -1,0 +1,24 @@
+{
+  "models": [
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o mini",
+      "provider": "open_ai"
+    },
+    {
+      "id": "claude-sonnet-4-5",
+      "name": "Claude Sonnet 4.5",
+      "provider": "anthropic"
+    },
+    {
+      "id": "gemini-2.5-flash",
+      "name": "Gemini 2.5 Flash",
+      "provider": "google"
+    },
+    {
+      "id": "openai/gpt-oss-20b",
+      "name": "GPT OSS 20B",
+      "provider": "groq"
+    }
+  ]
+}

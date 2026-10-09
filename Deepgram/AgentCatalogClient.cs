@@ -27,8 +27,7 @@ public class AgentCatalogClient : Clients.Agent.v1.REST.Client
             return options;
         }
 
-        // The Think-model catalog is public. OnPrem suppresses the shared options constructor's
-        // credential requirement; it does not alter the agent.deepgram.com request route.
-        return new DeepgramHttpClientOptions(onPrem: true);
+        // The Think-model catalog is public, so a client without credentials sends no Authorization header.
+        return new DeepgramHttpClientOptions(allowAnonymous: true);
     }
 }

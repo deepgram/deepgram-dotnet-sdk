@@ -660,7 +660,7 @@ await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 {
     Prompt = "Keep answers concise and confirm before charging a card.",
 });
-await agentClient.SendForceEndTurn(); // Requires a Flux listen provider and IAgentProtocolClient.
+await agentClient.SendForceEndTurn(); // Requires a Flux STT listen provider and IAgentProtocolClient.
 ```
 
 ### Custom Think providers
