@@ -142,7 +142,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Error("Connect", "Failed to connect to Deepgram API");
                 Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-                CloseConnectionScope();
+                ResetFailedConnection();
                 return false;
             }
 
@@ -172,7 +172,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            ResetFailedConnection();
             return false;
         }
         catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true })
@@ -181,10 +181,11 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            var httpStatusCode = DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket);
+            ResetFailedConnection();
             throw new DeepgramWebSocketException(
                 "Failed to connect to Deepgram API",
-                DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket),
+                httpStatusCode,
                 ex);
         }
         catch (Exception ex)
@@ -193,13 +194,26 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            ResetFailedConnection();
             throw;
         }
 
         void StartSenderBackgroundThread() => Task.Run(() => ProcessSendQueue());
 
         void StartReceiverBackgroundThread() => Task.Run(() => ProcessReceiveQueue());
+    }
+
+    /// <summary>
+    /// Returns the client to its pre-connect state after a failed <see cref="Connect"/>, so the
+    /// caller can retry. Without this, the half-initialized socket stays assigned and the next
+    /// Connect() call returns true without opening a connection.
+    /// </summary>
+    private void ResetFailedConnection()
+    {
+        DisposeCancellationTokenSource();
+        var socket = Interlocked.Exchange(ref _clientWebSocket, null);
+        socket?.Dispose();
+        CloseConnectionScope();
     }
 
     /// <summary>
