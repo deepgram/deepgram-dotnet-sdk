@@ -210,10 +210,10 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     private void ResetFailedConnection()
     {
+        CloseConnectionScope();
         DisposeCancellationTokenSource();
         var socket = Interlocked.Exchange(ref _clientWebSocket, null);
         socket?.Dispose();
-        CloseConnectionScope();
     }
 
     /// <summary>
