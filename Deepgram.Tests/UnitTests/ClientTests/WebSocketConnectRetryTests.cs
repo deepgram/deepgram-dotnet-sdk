@@ -19,8 +19,18 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 /// </summary>
 public class WebSocketConnectRetryTests
 {
-    // Nothing listens on this address, so ConnectAsync fails with "connection refused".
-    private const string RefusedEndpoint = "ws://127.0.0.1:1";
+    /// <summary>
+    /// Returns a loopback endpoint with nothing listening on it, so ConnectAsync fails with
+    /// "connection refused". The port comes from the OS and is released before it is used.
+    /// </summary>
+    private static string GetRefusedEndpoint()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return $"ws://127.0.0.1:{port}";
+    }
 
     private sealed class TestWebSocketClient : AbstractWebSocketClient
     {
@@ -34,12 +44,15 @@ public class WebSocketConnectRetryTests
     [Test]
     public async Task AbstractClient_Connect_After_A_Refused_Connect_Should_Fail_Again()
     {
+        var refusedEndpoint = GetRefusedEndpoint();
         using var client = new TestWebSocketClient(new Faker().Random.Guid().ToString());
 
-        Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(RefusedEndpoint));
+        Func<Task<bool>> connect = async () => await client.Connect(refusedEndpoint);
+
+        await connect.Should().ThrowAsync<WebSocketException>();
         client.State().Should().Be(WebSocketState.None, "a failed connect must not keep the dead socket");
 
-        Func<Task<bool>> retry = async () => await client.Connect(RefusedEndpoint);
+        Func<Task<bool>> retry = async () => await client.Connect(refusedEndpoint);
 
         await retry.Should().ThrowAsync<WebSocketException>(
             "a retry must attempt a new connection instead of reporting the failed one as connected");
@@ -73,11 +86,13 @@ public class WebSocketConnectRetryTests
     public async Task ListenClient_Connect_After_A_Refused_Connect_Should_Not_Report_Success()
     {
         var apiKey = new Faker().Random.Guid().ToString();
-        var options = new DeepgramWsClientOptions(apiKey, RefusedEndpoint, keepAlive: false, onPrem: true);
+        var options = new DeepgramWsClientOptions(apiKey, GetRefusedEndpoint(), keepAlive: false, onPrem: true);
         using var client = new ListenV2.Client(apiKey, options);
         var schema = new LiveSchema { Model = "nova-3" };
 
-        Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(schema));
+        Func<Task<bool>> connect = async () => await client.Connect(schema);
+
+        await connect.Should().ThrowAsync<WebSocketException>();
 
         Func<Task<bool>> retry = async () => await client.Connect(schema);
 
