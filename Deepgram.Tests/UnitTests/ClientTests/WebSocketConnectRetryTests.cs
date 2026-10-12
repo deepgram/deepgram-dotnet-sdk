@@ -145,8 +145,8 @@ public class WebSocketConnectRetryTests
                         "Connection: Upgrade\r\n" +
                         $"Sec-WebSocket-Accept: {accept}\r\n\r\n";
                     var responseBytes = Encoding.ASCII.GetBytes(response);
-                    await stream.WriteAsync(responseBytes, 0, responseBytes.Length, _cts.Token);
                     Interlocked.Increment(ref _acceptedConnections);
+                    await stream.WriteAsync(responseBytes, 0, responseBytes.Length, _cts.Token);
                 }
             }
             catch
