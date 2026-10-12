@@ -100,9 +100,28 @@ public class ManagementReportingClientTests
         {
             usage!.Results![0].AgentHours.Should().Be(0.5d);
             usage.Results[0].Grouping!.Models.Should().Contain("nova-3").And.Contain((string?)null);
-            billing!.Results![0].Grouping!.LineItem.Should().Be("streaming::nova-3");
+            billing!.Results![0].Dollars.Should().Be(0.25m);
+            billing.Results[0].Grouping!.LineItem.Should().Be("streaming::nova-3");
             fields!.LineItems!["streaming::nova-3"].Should().Be("Streaming STT");
-            purchases!.Orders![0].Expiration.Should().Be(new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc));
+            purchases!.Orders![0].Amount.Should().Be(150m);
+            purchases.Orders[0].Expiration.Should().Be(new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc));
+        }
+    }
+
+    [Test]
+    public void ReportingResponses_Should_Deserialize_Money_As_Exact_Decimals()
+    {
+        var billing = JsonSerializer.Deserialize<BillingBreakdownResponse>("""{"results":[{"dollars":12.30}]}""");
+        var purchases = JsonSerializer.Deserialize<PurchasesResponse>("""{"orders":[{"amount":0.1},{"amount":0.1},{"amount":0.1}]}""");
+
+        var orders = purchases!.Orders!;
+        var total = orders.Sum(order => order.Amount!.Value);
+
+        using (new AssertionScope())
+        {
+            billing!.Results![0].Dollars.Should().Be(12.3m);
+            orders[0].Amount.Should().Be(0.1m);
+            total.Should().Be(0.3m);
         }
     }
 }
