@@ -214,7 +214,7 @@ public class QueryParameterUtilTests
         result.Should().NotContain("diarize_model");
     }
 
-    // FormatURL is shared by every REST client; these pin the exact escaped string it returns.
+    // FormatURL is shared by every REST client; these pin the exact string it returns.
     [Test]
     public void FormatURL_Should_Escape_Callback_Url_Exactly()
     {
@@ -230,7 +230,7 @@ public class QueryParameterUtilTests
     }
 
     [Test]
-    public void FormatURL_Should_Percent_Encode_Unicode_Value_Exactly()
+    public void FormatURL_Should_Leave_Unicode_Value_Unescaped_Exactly()
     {
         // Input and Output
         var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["café"] };
@@ -244,7 +244,7 @@ public class QueryParameterUtilTests
     }
 
     [Test]
-    public void FormatURL_Should_Percent_Encode_Double_Quote_Exactly()
+    public void FormatURL_Should_Leave_Double_Quote_Unescaped_Exactly()
     {
         // Input and Output
         var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["say \"hi\""] };
