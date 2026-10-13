@@ -10,6 +10,7 @@ using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.WebSocket;
 using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
 using Microsoft.Extensions.Logging;
+using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
 using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Common = Deepgram.Models.Common.v2.WebSocket;
@@ -91,6 +92,70 @@ public class WebSocketLifecycleTests
                 FirstSendCloseReturned.TrySetResult(true);
                 await ReleaseFirstSendClose.Task;
             }
+        }
+    }
+
+    private static bool IsSettingsMessage(ArraySegment<byte> data, WebSocketMessageType messageType) =>
+        messageType == WebSocketMessageType.Text
+        && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("\"Settings\"");
+
+    /// <summary>
+    /// A Voice Agent client whose first Settings message, sent by Connect(), fails to send.
+    /// </summary>
+    private sealed class FailingSettingsAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        private int _failuresLeft = 1;
+
+        public FailingSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _failuresLeft, 0) == 1)
+            {
+                throw new WebSocketException("Simulated Settings send failure");
+            }
+            return base.SendOnConnection(owned, data, messageType, token);
+        }
+    }
+
+    /// <summary>
+    /// A Voice Agent client that holds its Settings message until the connection's Close event has
+    /// fired, so Settings is sent only after the server's close has been processed.
+    /// </summary>
+    private sealed class SettingsAfterCloseAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        public SettingsAfterCloseAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public TaskCompletionSource<bool> Closed { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType))
+            {
+                await Closed.Task.WaitAsync(GateTimeout);
+            }
+            await base.SendOnConnection(owned, data, messageType, token);
+        }
+    }
+
+    /// <summary>
+    /// A Voice Agent client whose connection drops while Connect() sends the Settings message: the
+    /// send aborts the socket and returns without sending.
+    /// </summary>
+    private sealed class DroppedDuringSettingsAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        private int _drops = 1;
+
+        public DroppedDuringSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _drops, 0) == 1)
+            {
+                owned.Socket.Abort();
+                return Task.CompletedTask;
+            }
+            return base.SendOnConnection(owned, data, messageType, token);
         }
     }
 
@@ -905,5 +970,302 @@ public class WebSocketLifecycleTests
         }
 
         await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Connect_After_A_Failed_Settings_Send_Should_Open_A_New_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new FailingSettingsAgentClient(apiKey, options);
+        var settings = new AgentModels.SettingsSchema();
+        var openEvents = 0;
+        var closeEvents = 0;
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            closed.TrySetResult(true);
+        }));
+
+        Func<Task<bool>> connect = async () => await client.Connect(settings);
+
+        await connect.Should().ThrowAsync<WebSocketException>();
+        await closed.Task.WaitAsync(GateTimeout);
+        using (new AssertionScope())
+        {
+            client.IsConnected().Should().BeFalse("a connection whose Settings message failed must be released");
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1, "the connection raised Open, so it raises Close once");
+        }
+
+        var connected = await client.Connect(settings);
+        var secondConnection = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var settingsFrame = await secondConnection.ReadFrameAsync().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeTrue();
+            client.IsConnected().Should().BeTrue("the retry must open a new connection");
+            server.AcceptedConnections.Should().Be(2);
+            settingsFrame.Text.Should().Contain("\"Settings\"", "the retry must send the Settings message on the new connection");
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Connect_Should_Fail_When_The_Server_Closes_Before_Settings()
+    {
+        // The server closes every connection right after the upgrade.
+        using var server = new LoopbackWebSocketServer(connection => connection.SendCloseAsync());
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new SettingsAfterCloseAgentClient(apiKey, options);
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            client.Closed.TrySetResult(true);
+        }));
+
+        var connected = await client.Connect(new AgentModels.SettingsSchema());
+        await client.Closed.Task.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeFalse("an agent connection that never received its Settings message has not connected");
+            client.IsConnected().Should().BeFalse();
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1);
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Connect_Should_Fail_When_The_Connection_Drops_During_Settings()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new DroppedDuringSettingsAgentClient(apiKey, options);
+        var openEvents = 0;
+        var closeEvents = 0;
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            closed.TrySetResult(true);
+        }));
+
+        var connected = await client.Connect(new AgentModels.SettingsSchema());
+        await closed.Task.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1, "the connection raised Open, so it raises Close once");
+            connected.Should().BeFalse("the Settings message never reached the agent");
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "the dropped connection must be released so a retry can connect");
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Concurrent_Connect_Should_Not_Release_The_First_Connection()
+    {
+        // Hold the first connection inside its handshake until the test lets it finish.
+        var upgradeRequested = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completeUpgrade = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(beforeUpgrade: async () =>
+        {
+            upgradeRequested.TrySetResult(true);
+            await completeUpgrade.Task;
+        });
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Agent.v2.WebSocket.Client(apiKey, options);
+        var settings = new AgentModels.SettingsSchema();
+
+        var firstConnect = client.Connect(settings);
+        await upgradeRequested.Task.WaitAsync(GateTimeout);
+
+        // A second Connect() while the first is still in its handshake.
+        var secondConnected = await client.Connect(settings).WaitAsync(GateTimeout);
+
+        completeUpgrade.TrySetResult(true);
+        var firstConnected = await firstConnect.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            secondConnected.Should().BeTrue("the second Connect() keeps the \"already initialized\" result");
+            firstConnected.Should().BeTrue("the second Connect() must not release the first connection");
+            client.IsConnected().Should().BeTrue();
+            server.AcceptedConnections.Should().Be(1);
+        }
+
+        // The Settings messages must all be on the wire before this KeepAlive.
+        await client.SendKeepAlive();
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var settingsMessages = 0;
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.Text.Contains("\"KeepAlive\""))
+            {
+                break;
+            }
+            if (frame.Text.Contains("\"Settings\""))
+            {
+                settingsMessages++;
+            }
+        }
+
+        settingsMessages.Should().Be(1, "only the Connect() that opened the connection sends Settings");
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Dropped_Connection_Should_Raise_Close_And_Allow_A_New_Connect()
+    {
+        // The server drops the first connection's TCP connection without a close frame.
+        using var server = new LoopbackWebSocketServer(connection =>
+        {
+            if (connection.Number == 1)
+            {
+                connection.Abort();
+            }
+            return Task.CompletedTask;
+        });
+        using var client = new ExposedClient(NewApiKey());
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            closed.TrySetResult(true);
+        }));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+        await closed.Task.WaitAsync(GateTimeout);
+
+        var reconnected = await client.Connect(server.Endpoint);
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1, "a dropped connection is torn down once");
+            reconnected.Should().BeTrue();
+            client.IsConnected().Should().BeTrue("Connect() after a dropped connection must open a new one");
+            server.AcceptedConnections.Should().Be(2);
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_With_A_Cancelled_Token_Should_Release_And_Raise_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.WebSocket.Client(apiKey, options);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        Func<Task<bool>> stop = () => client.Stop(cancelled, nullByte: true);
+
+        (await stop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1);
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the connection");
+        }
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Stop_With_A_Cancelled_Token_Should_Release_And_Raise_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.Speak.WebSocket.Client(apiKey, options);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<FluxSpeak.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+        (await client.Connect(new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        Func<Task<bool>> stop = () => client.Stop(cancelled, nullByte: true);
+
+        (await stop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1);
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the connection");
+        }
+    }
+
+    /// <summary>
+    /// A Flux STT client that exposes its send mutex and signals once its CloseStream send is
+    /// waiting for that mutex.
+    /// </summary>
+    private sealed class MutexGatedFluxClient : Deepgram.Clients.Flux.WebSocket.Client
+    {
+        public MutexGatedFluxClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public SemaphoreSlim SendMutex => _mutexSend;
+
+        public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            // The base send runs synchronously up to its wait for the held mutex, so once it has
+            // returned its task, it is waiting there.
+            var send = base.SendOnConnection(owned, data, messageType, token);
+            if (messageType == WebSocketMessageType.Text
+                && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
+            {
+                CloseStreamWaitingForMutex.TrySetResult(true);
+            }
+            await send;
+        }
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_Should_Not_Throw_When_The_Connection_Is_Released_During_Its_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new MutexGatedFluxClient(apiKey, options);
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+
+        // Hold the send mutex so Stop()'s CloseStream send waits for it.
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            var stop = client.Stop();
+            await client.CloseStreamWaitingForMutex.Task.WaitAsync(GateTimeout);
+
+            // Release the connection while the close is in flight; this cancels its token.
+            client.Dispose();
+
+            Func<Task<bool>> awaitStop = () => stop.WaitAsync(GateTimeout);
+            (await awaitStop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        }
+        finally
+        {
+            client.SendMutex.Release();
+        }
     }
 }

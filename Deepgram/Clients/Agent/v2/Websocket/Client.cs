@@ -74,6 +74,27 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
                 return false;
             }
 
+            if (owned == null)
+            {
+                // "Already initialized": the Connect() that opened the current connection sends
+                // its Settings message, so this call sends nothing and keeps the existing result.
+                Log.Debug("Connect", "Client has already been initialized. Not sending Settings.");
+                Log.Verbose("AgentWSClient.Connect", "LEAVE");
+                return true;
+            }
+
+            // The Settings message and the checks below belong to the connection this call opened.
+            // If it is already gone (the server closed it while the Open handlers ran), the agent
+            // cannot be configured, so the connect has failed (#455).
+            if (!owned.IsOpen)
+            {
+                Log.Warning("Connect", "The connection closed before the Settings message was sent");
+                Log.Verbose("AgentWSClient.Connect", "LEAVE");
+
+                await ReleaseAndRaiseClose(owned);
+                return false;
+            }
+
             var json = options.ToString(); // Assuming options is a serializable object
             var root = JsonNode.Parse(json)!.AsObject();
 
@@ -110,10 +131,38 @@ public class Client : AbstractWebSocketClient, IAgentWebSocketClient
             var cleanedJson = root.ToJsonString();
             Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
             var bytes = Encoding.UTF8.GetBytes(cleanedJson);
-            await SendMessageImmediately(bytes);
+            try
+            {
+                // Send on the connection this call opened, never on a newer one.
+                await SendOnConnection(owned, new ArraySegment<byte>(bytes), WebSocketMessageType.Text, owned.Token);
+            }
+            catch (OperationCanceledException) when (owned.IsReleased)
+            {
+                // The connection was torn down while the Settings message was being sent; the
+                // check below fails the connect.
+            }
+            catch
+            {
+                // Without its Settings message the agent connection is unusable. Release it so a
+                // retry opens a new connection instead of reporting this one as connected (#455).
+                // Open has fired for it, so Close does too.
+                await ReleaseAndRaiseClose(owned);
+                throw;
+            }
+
+            // The send does nothing once the connection is released, and the connection can drop
+            // during the send. Either way the agent was never configured: fail the connect (#455).
+            if (!owned.IsOpen)
+            {
+                Log.Warning("Connect", "The connection closed while the Settings message was being sent");
+                Log.Verbose("AgentWSClient.Connect", "LEAVE");
+
+                await ReleaseAndRaiseClose(owned);
+                return false;
+            }
 
             // keepalive thread, handed the connection it belongs to (#455)
-            if (_deepgramClientOptions.KeepAlive && owned != null)
+            if (_deepgramClientOptions.KeepAlive)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
                 StartKeepAliveBackgroundThread(owned);

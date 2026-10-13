@@ -496,10 +496,12 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             Log.Verbose("FluxWSClient.Stop", "LEAVE");
             return result;
         }
-        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException)
+        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException
+            || ex is OperationCanceledException)
         {
             // The receive loop tore the connection down while we were stopping - the shutdown
-            // already happened, just not by us. Finish any remaining cleanup and report success.
+            // already happened, just not by us - or the caller's token cancelled the close
+            // handshake. Finish the teardown and report success, as the base Stop() does.
             Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
             // Release only this connection: cancel before dispose, and leave any newer
             // connection's fields alone. Raise Close if this call did the release (#455).
