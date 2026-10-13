@@ -9,6 +9,7 @@ public record BalanceResponse
     /// <summary>
     /// Description or reference of the purchase associated with the balance.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("purchase_order_id")]
     public string? PurchaseOrderId { get; set; }
 

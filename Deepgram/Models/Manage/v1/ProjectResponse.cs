@@ -9,6 +9,7 @@ public record ProjectResponse : Project
     /// <summary>
     /// Whether the project is opted out of the Model Improvement Program.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }
 

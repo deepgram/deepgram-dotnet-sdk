@@ -9,12 +9,14 @@ public record UsageRequest
     /// <summary>
     /// Response code of the request.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("code")]
     public double? Code { get; set; }
 
     /// <summary>
     /// Deployment type of the request.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("deployment")]
     public string? Deployment { get; set; }
 

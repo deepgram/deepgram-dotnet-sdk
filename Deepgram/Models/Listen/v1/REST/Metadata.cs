@@ -9,12 +9,14 @@ public record Metadata
     /// <summary>
     /// The diarizer that produced the speaker labels. Present only when diarization ran.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("diarize_info")]
     public DiarizeInfo? DiarizeInfo { get; set; }
 
     /// <summary>
     /// Tags set on the request with the <c>tag</c> query parameter.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }
 
