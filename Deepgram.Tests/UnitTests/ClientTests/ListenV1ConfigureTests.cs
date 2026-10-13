@@ -58,6 +58,20 @@ public class ListenV1ConfigureTests
     }
 
     [Test]
+    public async Task SendConfigure_Should_Flush_Before_Sending_Configure()
+    {
+        var client = Substitute.For<IListenWebSocketClient>();
+
+        await client.SendConfigure(new ConfigureSchema { Keyterms = new List<string> { "Deepgram" } });
+
+        Received.InOrder(() =>
+        {
+            client.Flush();
+            client.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>());
+        });
+    }
+
+    [Test]
     public async Task SendConfigure_Should_Drain_Queued_Audio_Before_Configure()
     {
         using var portProbe = new TcpListener(IPAddress.Loopback, 0);
