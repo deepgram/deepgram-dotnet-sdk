@@ -18,7 +18,7 @@ using System.Globalization;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
-public class PhaseFourModelTests
+public class RequestResponseFieldTests
 {
     [Test]
     public void Current_Request_Options_Should_Serialize_To_Their_Wire_Names()
@@ -30,20 +30,20 @@ public class PhaseFourModelTests
             var speak = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakSchema
             {
                 Speed = 1.2,
-                Tag = new List<string> { "release", "phase-four" },
+                Tag = new List<string> { "release", "dotnet-sdk" },
                 MipOptOut = true,
             });
             var listen = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new PreRecordedSchema { MipOptOut = true });
-            var analyze = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/read", new AnalyzeSchema { Tag = new List<string> { "release", "phase-four" } });
-            var listenV2 = QueryParameterUtil.FormatURL("https://api.deepgram.com/v2/listen", new ListenV2LiveSchema { MipOptOut = true });
+            var analyze = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/read", new AnalyzeSchema { Tag = new List<string> { "release", "dotnet-sdk" } });
+            var listenWebSocket = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new ListenV2LiveSchema { MipOptOut = true });
             var speakWebSocket = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakV2WebSocketSchema { MipOptOut = true });
 
             using (new AssertionScope())
             {
-                speak.Should().Contain("speed=1.2").And.Contain("tag=release").And.Contain("tag=phase-four").And.Contain("mip_opt_out=true");
+                speak.Should().Contain("speed=1.2").And.Contain("tag=release").And.Contain("tag=dotnet-sdk").And.Contain("mip_opt_out=true");
                 listen.Should().Contain("mip_opt_out=true");
-                analyze.Should().Contain("tag=release").And.Contain("tag=phase-four");
-                listenV2.Should().Contain("mip_opt_out=true");
+                analyze.Should().Contain("tag=release").And.Contain("tag=dotnet-sdk");
+                listenWebSocket.Should().Contain("mip_opt_out=true");
                 speakWebSocket.Should().Contain("mip_opt_out=true");
             }
         }
@@ -56,7 +56,7 @@ public class PhaseFourModelTests
     [Test]
     public void Current_Response_Fields_Should_Deserialize()
     {
-        var metadata = JsonSerializer.Deserialize<ListenMetadata>("""{"diarize_info":{"model_uuid":"model-uuid","arch":"nova"},"tags":["release","phase-four"]}""");
+        var metadata = JsonSerializer.Deserialize<ListenMetadata>("""{"diarize_info":{"model_uuid":"model-uuid","arch":"v2"},"tags":["release","dotnet-sdk"]}""");
         var project = JsonSerializer.Deserialize<ProjectResponse>("""{"mip_opt_out":true}""");
         var request = JsonSerializer.Deserialize<UsageRequest>("""{"code":429,"deployment":"self-hosted"}""");
         var balance = JsonSerializer.Deserialize<BalanceResponse>("""{"purchase_order_id":"po-123","purchase":"legacy"}""");
@@ -64,8 +64,8 @@ public class PhaseFourModelTests
         using (new AssertionScope())
         {
             metadata!.DiarizeInfo!.ModelUuid.Should().Be("model-uuid");
-            metadata.DiarizeInfo.Arch.Should().Be("nova");
-            metadata.Tags.Should().Equal("release", "phase-four");
+            metadata.DiarizeInfo.Arch.Should().Be("v2");
+            metadata.Tags.Should().Equal("release", "dotnet-sdk");
             project!.MipOptOut.Should().BeTrue();
             request!.Code.Should().Be(429d);
             request.Deployment.Should().Be("self-hosted");
