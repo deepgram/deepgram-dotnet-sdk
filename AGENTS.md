@@ -48,7 +48,7 @@ Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegm
 | Flux TTS, streaming | `wss /v2/speak` | `CreateFluxSpeakWebSocketClient` | `Clients/Flux/Speak/WebSocket` | Shipped; `SendText`, `SendFlush`, `SendInterrupt`, `SendConfigure`, `Stop` |
 | Voice Agent | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentWebSocketClient` | `Clients/Agent/v2/Websocket` | Shipped |
 | Voice Agent protocol | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentProtocolClient` | `Clients/Agent/v2/Websocket` | Shipped; typed controls and event subscriptions |
-| Voice Agent Think catalog | `/v1/agent/settings/think/models` | `CreateAgentCatalogClient` | `Clients/Agent/v1/REST` | Shipped |
+| Voice Agent Think catalog | `GET agent.deepgram.com/v1/agent/settings/think/models` | `CreateAgentCatalogClient` | `Clients/Agent/v1/REST` | Shipped |
 | Voice Agent management | `/v1/projects/{id}/agents`, `/agent-variables` | `CreateAgentManageClient` | `Clients/AgentManage/v1` | Shipped |
 | Text intelligence | `POST /v1/read` | `CreateAnalyzeClient` | `Clients/Analyze/v1` | Shipped |
 | Management API | `/v1/projects/...` | `CreateManageClient` | `Clients/Manage/v1` | Shipped |

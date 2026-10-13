@@ -765,7 +765,7 @@ Aura REST requests also accept `Speed`, one or more `Tag` values, and `MipOptOut
 var speakClient = ClientFactory.CreateSpeakRESTClient();
 
 var response = await speakClient.ToFile(
-    new TextSource("Hello world!"),
+    new Deepgram.Models.Speak.v1.REST.TextSource("Hello world!"),
     "output.wav",
     new SpeakSchema()
     {
