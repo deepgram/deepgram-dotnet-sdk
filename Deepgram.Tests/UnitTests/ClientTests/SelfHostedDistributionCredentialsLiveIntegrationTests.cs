@@ -27,7 +27,7 @@ public class SelfHostedDistributionCredentialsLiveIntegrationTests
     {
         var (apiKey, projectId) = GetLiveConfiguration();
         var client = ClientFactory.CreateSelfHostedDistributionCredentialsClient(apiKey);
-        var comment = $"dotnet-sdk-phase-zero-{Guid.NewGuid():N}";
+        var comment = $"dotnet-sdk-live-test-{Guid.NewGuid():N}";
         string? distributionCredentialsId = null;
 
         try

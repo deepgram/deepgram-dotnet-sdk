@@ -5,10 +5,8 @@
 using Deepgram.Abstractions.v1;
 using Deepgram.Clients.SelfHosted.v1;
 using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Models.SelfHosted.v1;
 using Deepgram.Utilities;
-using AuraSpeakSchema = Deepgram.Models.Speak.v1.REST.SpeakSchema;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -164,24 +162,23 @@ public class SelfHostedDistributionCredentialsClientTests
     }
 
     [Test]
-    public void PreRecorded_CallbackMethod_Should_Be_Omitted_When_Unset()
+    public async Task ListAndGetDistributionCredentials_Should_Call_The_Literal_SelfHosted_Url()
     {
-        var schema = new PreRecordedSchema { CallBack = "https://example.test/callback" };
+        var distributionCredentialsId = new Faker().Random.Guid().ToString();
+        var listUrl = $"https://api.deepgram.com/v1/projects/{_projectId}/self-hosted/distribution/credentials";
+        var getUrl = $"{listUrl}/{distributionCredentialsId}";
+        var client = Substitute.For<DistributionCredentialsClient>(_apiKey, _options, null);
 
-        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", schema)).Query);
+        client.When(x => x.GetAsync<CredentialsResponse>(Arg.Any<string>())).DoNotCallBase();
+        client.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
+        client.GetAsync<CredentialsResponse>(Arg.Any<string>()).Returns(new AutoFaker<CredentialsResponse>().Generate());
+        client.GetAsync<CredentialResponse>(Arg.Any<string>()).Returns(new AutoFaker<CredentialResponse>().Generate());
 
-        query["callback_method"].Should().BeNull();
-    }
+        await client.ListDistributionCredentials(_projectId);
+        await client.GetDistributionCredentials(_projectId, distributionCredentialsId);
 
-    [Test]
-    public void AuraRest_Numeric_Options_Should_Use_Current_String_Query_Serialization()
-    {
-        var schema = new AuraSpeakSchema { SampleRate = "24000", BitRate = "48000" };
-
-        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", schema)).Query);
-
-        query["sample_rate"].Should().Be("24000");
-        query["bit_rate"].Should().Be("48000");
+        await client.Received(1).GetAsync<CredentialsResponse>(listUrl);
+        await client.Received(1).GetAsync<CredentialResponse>(getUrl);
     }
 
     private sealed class InspectableDistributionCredentialsClient : DistributionCredentialsClient

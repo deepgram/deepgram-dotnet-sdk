@@ -169,4 +169,15 @@ public class SpeakClientTests
 
         await speakClient.DidNotReceive().PostAsync<Stream, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<Stream>());
     }
+
+    [Test]
+    public void AuraRest_Numeric_Options_Should_Use_Current_String_Query_Serialization()
+    {
+        var schema = new SpeakSchema { SampleRate = "24000", BitRate = "48000" };
+
+        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", schema)).Query);
+
+        query["sample_rate"].Should().Be("24000");
+        query["bit_rate"].Should().Be("48000");
+    }
 }
