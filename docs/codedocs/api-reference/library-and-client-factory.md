@@ -48,7 +48,7 @@ public static class ClientFactory
 }
 ```
 
-Version-specific overloads also exist and return `object` for migration scenarios. Those overloads are useful when you need older WebSocket client versions, but new code should use the latest overloads above.
+Version-specific overloads also exist and return `object` for migration scenarios. Those overloads are useful when you need older WebSocket client versions, but new code should use the latest overloads above. `CreateSelfHostedClient` is obsolete; use `CreateSelfHostedDistributionCredentialsClient` for new code.
 
 ## Constructor and option parameters
 

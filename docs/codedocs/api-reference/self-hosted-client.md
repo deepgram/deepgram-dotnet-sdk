@@ -85,14 +85,13 @@ Operational notes:
 
 - `ListDistributionCredentials` is the entry point you usually call first because the delete and get operations both depend on a distribution credentials ID.
 - `CreateDistributionCredentials` uses the same REST plumbing as the rest of the SDK, so you can still attach custom headers or addons for operational tracing.
-- `CreateSelfHostedClient()` remains available for applications using the legacy on-prem route and request shape.
-
-Use the distribution credentials client for new code.
 
 ## Legacy Client
 
-`SelfHostedClient` and `Clients.SelfHosted.v1.Client` are frozen legacy clients for the retired
-on-prem route. They remain available for source compatibility but are marked obsolete; do not add
-new functionality to either surface.
+`CreateSelfHostedClient()` and the `SelfHostedClient` it returns are obsolete. `SelfHostedClient`
+calls the older `onprem/distribution/credentials` route, which still responds but no longer appears
+in the API reference. Use `CreateSelfHostedDistributionCredentialsClient()` for new code.
+
+`SelfHostedClient` and `Clients.SelfHosted.v1.Client` are frozen; do not add functionality to either.
 
 Related pages: [ManageClient](/docs/api-reference/manage-client).

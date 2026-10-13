@@ -222,9 +222,9 @@ Console.WriteLine($"Request ID: {response.RequestId}");
 
 ### Callback method compatibility
 
-`PreRecordedSchema.CallbackMethod` is a legacy Boolean property. The API currently rejects
-`callback_method=put`; leave `CallbackMethod` unset to use the default `POST` callback behavior.
-The SDK does not expose a supported way to select a callback method in 7.x.
+`PreRecordedSchema.CallbackMethod` is a legacy Boolean property, so it cannot name an HTTP
+method: setting it sends `callback_method=true` or `callback_method=false`. Leave it unset to
+get the default `POST` callback.
 
 ## Streaming Audio
 
@@ -697,9 +697,6 @@ var response = await speakClient.ToFile(
 
 Console.WriteLine($"Audio saved to: output.wav");
 ```
-
-Aura REST `SampleRate` and `BitRate` continue to accept numeric strings in the 7.x schema, for
-example `SampleRate = "24000"` and `BitRate = "48000"`.
 
 [See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech-api/speak).
 
@@ -1275,8 +1272,9 @@ Console.WriteLine($"Created credentials: {credential.DistributionCredentials?.Di
 The client also provides `ListDistributionCredentials`, `GetDistributionCredentials`, and
 `DeleteDistributionCredentials`.
 
-`CreateSelfHostedClient()` remains available for existing applications that use the legacy
-on-prem route and request shape; use the current distribution-credentials client for new code.
+`CreateSelfHostedClient()` and the `SelfHostedClient` it returns are obsolete. `SelfHostedClient`
+calls the older `onprem/distribution/credentials` route, which still responds but no longer appears
+in the API reference. Use `CreateSelfHostedDistributionCredentialsClient()` for new code.
 
 [See our API reference for more info](https://developers.deepgram.com/reference/self-hosted/distribution-credentials/list).
 
