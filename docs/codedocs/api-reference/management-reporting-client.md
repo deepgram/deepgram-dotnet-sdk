@@ -22,6 +22,8 @@ var billing = await reporting.GetBillingBreakdown(projectId, new BillingBreakdow
 });
 ```
 
+`UsageBreakdownSchema.Grouping` takes one dimension (`accessor`, `endpoint`, `feature_set`, `models`, `method`, `tags`, or `deployment`). `BillingBreakdownSchema.Grouping` takes a list of one or more dimensions (`accessor`, `deployment`, `line_item`, `tags`), which the SDK sends as repeated `grouping=` query parameters.
+
 ## Public Methods
 
 ```csharp
