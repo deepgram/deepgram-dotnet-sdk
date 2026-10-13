@@ -1260,6 +1260,13 @@ Console.WriteLine($"Usage groups: {response.Results?.Count ?? 0}");
 
 ## Billing
 
+Balances are read through `ManageClient`. For billing reports, use the reporting client from
+`ClientFactory.CreateManagementReportingClient()`: `GetBillingBreakdown` returns dollar totals that you
+can group by accessor, deployment, line item, or tag, `GetBillingFields` lists the accessors,
+deployments, tags, and line items you can filter that breakdown by, and `GetPurchases` lists the
+project's purchase orders. See the
+[ManagementReportingClient reference](./docs/codedocs/api-reference/management-reporting-client.md).
+
 ### Get All Balances
 
 Retrieves the list of balance info for the specified project.
