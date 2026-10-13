@@ -250,6 +250,13 @@ await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
     }
 }));
 
+// Print every server Error, including rejected Configure updates.
+await liveClient.Subscribe(
+    new EventHandler<Deepgram.Models.Listen.v2.WebSocket.ErrorResponse>((sender, e) =>
+    {
+        Console.Error.WriteLine($"{e.Variant} {e.Code}: {e.Description}");
+    }));
+
 // Connect to Deepgram
 var liveSchema = new LiveSchema()
 {
@@ -257,18 +264,12 @@ var liveSchema = new LiveSchema()
 };
 await liveClient.Connect(liveSchema);
 
-// Reconfigure an open Nova-3 global stream without reconnecting. Keyterms replace the active
-// list; use an empty list to clear them. Keep every update below 500 keyterm tokens: an over-limit
-// update can stop transcription and close with 1011 (NET-0000) without an Error response. Success
-// has no acknowledgement. Other server rejections arrive as an Error response with
-// Code == "KeytermsNotSupported".
-await liveClient.Subscribe(new EventHandler<ErrorResponse>((sender, e) =>
-{
-    if (e.Code == "KeytermsNotSupported")
-    {
-        Console.Error.WriteLine(e.Description);
-    }
-}));
+// Update keyterms or features on an open stream without reconnecting. Keyterm updates work on
+// Nova-3 on api.deepgram.com, not yet on the EU, Australia, or India hosts. Keyterms replace the
+// active list; an empty list clears it. Keep each update under 500 tokens: an over-limit update
+// returns no Error, transcription stops, and the stream closes with 1011 (NET-0000).
+// Success has no acknowledgement; most rejections arrive as an Error. Details:
+// https://developers.deepgram.com/docs/configure
 await liveClient.SendConfigure(new ConfigureSchema
 {
     Keyterms = new List<string> { "Deepgram" },
