@@ -28,6 +28,10 @@ public interface IListenWebSocketClient
     /// <summary>
     /// Subscribe to an Open event from the Deepgram API
     /// </summary>
+    /// <remarks>
+    /// The handler runs before Connect() returns. If it throws, the exception is logged at Error
+    /// level and the connection stays open; Connect() still returns true.
+    /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<OpenResponse> eventHandler);

@@ -8,9 +8,11 @@ using Deepgram.Abstractions.v2;
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.WebSocket;
+using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
 using Microsoft.Extensions.Logging;
 using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
+using Common = Deepgram.Models.Common.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -25,6 +27,20 @@ public class WebSocketLifecycleTests
     private static readonly TimeSpan GateTimeout = TimeSpan.FromSeconds(10);
 
     private static string NewApiKey() => new Faker().Random.Guid().ToString();
+
+    /// <summary>
+    /// A client whose SendClose() sends nothing and which exposes the socket it currently holds.
+    /// </summary>
+    private sealed class ExposedClient : AbstractWebSocketClient
+    {
+        public ExposedClient(string apiKey)
+            : base(apiKey, new DeepgramWsClientOptions(apiKey) { KeepAlive = false }) { }
+
+        public ClientWebSocket? CurrentSocket => _clientWebSocket;
+
+        public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null) =>
+            Task.CompletedTask;
+    }
 
     /// <summary>
     /// Holds the first SendClose() call until the test opens <see cref="ReleaseFirstSendClose"/>.
@@ -369,5 +385,525 @@ public class WebSocketLifecycleTests
         {
             client.SendMutex.Release();
         }
+    }
+
+    [Test]
+    public async Task Stop_Should_Dispose_The_Socket()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+        var socket = client.CurrentSocket;
+        socket.Should().NotBeNull();
+
+        (await client.Stop()).Should().BeTrue();
+
+        Func<Task> send = () => socket!.SendAsync(new ArraySegment<byte>(new byte[] { 1 }), WebSocketMessageType.Binary, true, CancellationToken.None);
+        await send.Should().ThrowAsync<ObjectDisposedException>("Stop() must dispose the socket it releases");
+    }
+
+    [Test]
+    public async Task Connect_From_A_Close_Handler_Should_Open_A_New_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var reconnect = new TaskCompletionSource<Task<bool>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+        {
+            if (Interlocked.Increment(ref closeEvents) == 1)
+            {
+                // Reconnect from inside the handler, as an app that reconnects on close would.
+                reconnect.TrySetResult(client.Connect(server.Endpoint));
+            }
+        }));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+        (await client.Stop()).Should().BeTrue();
+
+        var reconnectTask = await reconnect.Task.WaitAsync(GateTimeout);
+        var reconnected = await reconnectTask.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            reconnected.Should().BeTrue();
+            client.IsConnected().Should().BeTrue("a Connect() from a Close handler must open a real connection");
+            server.AcceptedConnections.Should().Be(2);
+        }
+
+        await client.Stop();
+    }
+
+    /// <summary>A client whose SendClose() runs the test's script.</summary>
+    private sealed class ScriptedCloseClient : AbstractWebSocketClient
+    {
+        private readonly Func<Task> _sendClose;
+
+        public ScriptedCloseClient(string apiKey, Func<Task> sendClose)
+            : base(apiKey, new DeepgramWsClientOptions(apiKey) { KeepAlive = false })
+        {
+            _sendClose = sendClose;
+        }
+
+        public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null) => _sendClose();
+    }
+
+    [Test]
+    public async Task Concurrent_Stops_Should_Raise_Close_Once()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var entered = 0;
+        var bothEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseSendClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var client = new ScriptedCloseClient(NewApiKey(), async () =>
+        {
+            if (Interlocked.Increment(ref entered) == 2)
+            {
+                bothEntered.TrySetResult(true);
+            }
+            await releaseSendClose.Task;
+        });
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+
+        // Both Stop() calls get past every "already released" check before either one goes on.
+        var firstStop = client.Stop();
+        var secondStop = client.Stop();
+        await bothEntered.Task.WaitAsync(GateTimeout);
+        releaseSendClose.TrySetResult(true);
+        var results = await Task.WhenAll(firstStop, secondStop).WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            results.Should().AllBeEquivalentTo(true);
+            Volatile.Read(ref closeEvents).Should().Be(1, "one connection was stopped, so Close fires once");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task Stop_Should_Raise_Close_When_The_Close_Handshake_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ScriptedCloseClient(NewApiKey(),
+            () => throw new WebSocketException("Simulated close handshake failure"));
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+        var stopped = await client.Stop().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            stopped.Should().BeTrue();
+            Volatile.Read(ref closeEvents).Should().Be(1, "a Stop() whose close handshake fails still ends the connection");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task Stop_Should_Raise_Close_When_The_Close_Handshake_Times_Out()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ScriptedCloseClient(NewApiKey(), () => Task.CompletedTask);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+
+        // A disconnect timeout that has already expired.
+        using var expired = new CancellationTokenSource();
+        expired.Cancel();
+        var stopped = await client.Stop(expired).WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            stopped.Should().BeTrue();
+            Volatile.Read(ref closeEvents).Should().Be(1, "a Stop() that times out still ends the connection");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    /// <summary>A loopback server that closes a connection once it receives the given text message.</summary>
+    private static LoopbackWebSocketServer ServerClosingOn(string messageType) => new(async connection =>
+    {
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync();
+            if (frame.IsText && frame.Text.Contains($"\"{messageType}\""))
+            {
+                await connection.SendCloseAsync();
+                return;
+            }
+        }
+    });
+
+    [Test]
+    public async Task FluxClient_Stop_Should_Deliver_Close_To_Every_Subscriber_Once()
+    {
+        using var server = ServerClosingOn("CloseStream");
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.WebSocket.Client(apiKey, options);
+        var first = 0;
+        var second = 0;
+        await client.Subscribe(new EventHandler<CloseResponse>((_, _) => Interlocked.Increment(ref first)));
+        await client.Subscribe(new EventHandler<CloseResponse>((_, _) => Interlocked.Increment(ref second)));
+
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref first).Should().Be(1);
+            Volatile.Read(ref second).Should().Be(1, "every Close subscriber receives the event");
+        }
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Stop_Should_Deliver_Close_To_Every_Subscriber_Once()
+    {
+        using var server = ServerClosingOn("Close");
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.Speak.WebSocket.Client(apiKey, options);
+        var first = 0;
+        var second = 0;
+        await client.Subscribe(new EventHandler<FluxSpeak.CloseResponse>((_, _) => Interlocked.Increment(ref first)));
+        await client.Subscribe(new EventHandler<FluxSpeak.CloseResponse>((_, _) => Interlocked.Increment(ref second)));
+
+        (await client.Connect(new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" })).Should().BeTrue();
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref first).Should().Be(1);
+            Volatile.Read(ref second).Should().Be(1, "every Close subscriber receives the event");
+        }
+    }
+
+    [Test]
+    public async Task Stop_During_The_Handshake_Should_Not_Raise_Close()
+    {
+        // Hold the connection inside its handshake: Open never fires for it.
+        var upgradeRequested = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completeUpgrade = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(beforeUpgrade: async () =>
+        {
+            upgradeRequested.TrySetResult(true);
+            await completeUpgrade.Task;
+        });
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var connect = client.Connect(server.Endpoint);
+        await upgradeRequested.Task.WaitAsync(GateTimeout);
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+        completeUpgrade.TrySetResult(true);
+        var connected = await connect.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeFalse("Stop() ended the connection during its handshake");
+            Volatile.Read(ref openEvents).Should().Be(0);
+            Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open, and Open never fired");
+        }
+    }
+
+    [Test]
+    public async Task Connect_Stopped_Before_Open_Should_Not_Raise_Open_Or_Report_Success()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var logs = new SignalingLoggerProvider();
+        var releaseConnect = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.Reset();
+        Log.Configure(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            // Hold Connect() after it has checked for a release and started its sender, just
+            // before it marks the connection opened.
+            const string senderStarting = "Sender Thread started";
+            var held = logs.WhenLogged(senderStarting);
+            logs.HoldWhenLogged(senderStarting, releaseConnect.Task);
+
+            var connect = client.Connect(server.Endpoint);
+            await held.WaitAsync(GateTimeout);
+
+            // A Stop() whose close handshake has already timed out releases the connection now.
+            using var expired = new CancellationTokenSource();
+            expired.Cancel();
+            (await client.Stop(expired).WaitAsync(GateTimeout)).Should().BeTrue();
+
+            releaseConnect.TrySetResult(true);
+            var connected = await connect.WaitAsync(GateTimeout);
+
+            using (new AssertionScope())
+            {
+                connected.Should().BeFalse("the connection was released before Open");
+                client.IsConnected().Should().BeFalse();
+                Volatile.Read(ref openEvents).Should().Be(0, "Open must not fire for a released connection");
+                Volatile.Read(ref closeEvents).Should().Be(0);
+            }
+        }
+        finally
+        {
+            releaseConnect.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    /// <summary>
+    /// Holds the first SendClose() call until the test completes <see cref="Release"/>. The gate
+    /// runs its continuation inline, so the rest of that Stop() runs inside Release.TrySetResult().
+    /// </summary>
+    private sealed class InlineGatedCloseClient : AbstractWebSocketClient
+    {
+        private int _calls;
+
+        public InlineGatedCloseClient(string apiKey)
+            : base(apiKey, new DeepgramWsClientOptions(apiKey) { KeepAlive = false }) { }
+
+        public TaskCompletionSource<bool> Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource<bool> Release { get; } = new();
+
+        public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+        {
+            if (Interlocked.Increment(ref _calls) == 1)
+            {
+                Entered.TrySetResult(true);
+                await Release.Task;
+            }
+        }
+    }
+
+    [Test]
+    public async Task Stop_Should_Return_After_Close_Raised_By_Another_Teardown()
+    {
+        // The server closes the connection when the test says so.
+        var serverClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(async connection =>
+        {
+            await serverClose.Task;
+            await connection.SendCloseAsync();
+        });
+        using var client = new InlineGatedCloseClient(NewApiKey());
+        var closeEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var finishClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+        {
+            closeEntered.TrySetResult(true);
+            finishClose.Task.Wait(GateTimeout);
+        }));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+
+        // The user Stop() runs off the test's context and is held inside SendClose().
+        var userStop = Task.Run(() => client.Stop());
+        await client.Entered.Task.WaitAsync(GateTimeout);
+
+        // The server closes; the receive loop wins the release and is now delivering Close.
+        serverClose.TrySetResult(true);
+        await closeEntered.Task.WaitAsync(GateTimeout);
+
+        try
+        {
+            // Let the user Stop() go. It runs inline here, finds the connection released by the
+            // receive loop, and must keep waiting while Close is still being delivered.
+            client.Release.TrySetResult(true);
+            userStop.IsCompleted.Should().BeFalse("Stop() returns only after Close has been delivered");
+        }
+        finally
+        {
+            finishClose.TrySetResult(true);
+        }
+
+        (await userStop.WaitAsync(GateTimeout)).Should().BeTrue();
+    }
+
+    [Test]
+    public async Task Server_Close_At_Once_Should_Raise_Open_Then_Close()
+    {
+        // The server closes every connection right after the upgrade. The receive loop starts
+        // only after the Open handlers return, so Close must follow a completed Open.
+        using var server = new LoopbackWebSocketServer(connection => connection.SendCloseAsync());
+        using var client = new ExposedClient(NewApiKey());
+        var closeRaised = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var openEvents = 0;
+        var closeEvents = 0;
+        var openEventsSeenByClose = -1;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+        {
+            Interlocked.CompareExchange(ref openEventsSeenByClose, Volatile.Read(ref openEvents), -1);
+            Interlocked.Increment(ref closeEvents);
+            closeRaised.TrySetResult(true);
+        }));
+
+        await client.Connect(server.Endpoint);
+        await closeRaised.Task.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref openEventsSeenByClose).Should().Be(1, "Open is delivered before Close");
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1);
+        }
+    }
+
+    [Test]
+    public async Task Connect_Should_Return_False_When_An_Open_Handler_Releases_The_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => client.Dispose()));
+
+        var connected = await client.Connect(server.Endpoint);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeFalse("the connection was released before Connect() returned");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task Stop_During_Open_Handlers_Should_Raise_Close_After_Open()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var events = new ConcurrentQueue<string>();
+        var openEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseOpen = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) =>
+        {
+            events.Enqueue("open-start");
+            openEntered.TrySetResult(true);
+            releaseOpen.Task.Wait(GateTimeout);
+            events.Enqueue("open-end");
+        }));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => events.Enqueue("close")));
+
+        var connect = Task.Run(() => client.Connect(server.Endpoint));
+        await openEntered.Task.WaitAsync(GateTimeout);
+
+        try
+        {
+            // Stop() ends the connection while its Open handler is still running. It does not
+            // wait for the Open handler, and Close is not raised yet.
+            (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+            events.Should().NotContain("close", "Close must not fire while Open is still being delivered");
+        }
+        finally
+        {
+            releaseOpen.TrySetResult(true);
+        }
+
+        var connected = await connect.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeFalse("the connection was stopped before Connect() returned");
+            events.Should().Equal(new[] { "open-start", "open-end", "close" }, "Close follows Open, once");
+        }
+    }
+
+    [Test]
+    public async Task Close_Should_Wait_For_Every_Open_Handler_When_Stop_Races_Them()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var events = new ConcurrentQueue<string>();
+        var firstEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseFirst = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) =>
+        {
+            firstEntered.TrySetResult(true);
+            releaseFirst.Task.Wait(GateTimeout);
+            events.Enqueue("open-1");
+        }));
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => events.Enqueue("open-2")));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => events.Enqueue("close")));
+
+        var connect = Task.Run(() => client.Connect(server.Endpoint));
+        await firstEntered.Task.WaitAsync(GateTimeout);
+
+        try
+        {
+            // A concurrent Stop() while the slow first Open handler runs.
+            (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+        }
+        finally
+        {
+            releaseFirst.TrySetResult(true);
+        }
+
+        await connect.WaitAsync(GateTimeout);
+
+        events.Should().Equal(new[] { "open-1", "open-2", "close" }, "Close starts only after every Open handler has returned");
+    }
+
+    [Test]
+    public async Task Stop_From_An_Open_Handler_Should_Complete_And_Raise_Close_After_Open()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var events = new ConcurrentQueue<string>();
+        var stopCompletedInHandler = false;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) =>
+        {
+            // A blocking Stop() from inside the Open handler must not deadlock.
+            var stop = client.Stop();
+            stopCompletedInHandler = stop.Wait(GateTimeout) && stop.Result;
+            events.Enqueue("open-end");
+        }));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => events.Enqueue("close")));
+
+        var connected = await client.Connect(server.Endpoint).WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            stopCompletedInHandler.Should().BeTrue("Stop() from an Open handler completes without waiting for Open delivery");
+            connected.Should().BeFalse();
+            events.Should().Equal(new[] { "open-end", "close" }, "Close follows Open, once");
+        }
+    }
+
+    [Test]
+    public async Task Connect_Should_Succeed_When_An_Open_Handler_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var laterHandlerRan = false;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => throw new InvalidOperationException("Open handler failure")));
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => laterHandlerRan = true));
+
+        var connected = await client.Connect(server.Endpoint);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeTrue("an Open handler exception is logged, not thrown from Connect()");
+            client.IsConnected().Should().BeTrue();
+            server.AcceptedConnections.Should().Be(1);
+            laterHandlerRan.Should().BeTrue("the next Open handler still runs");
+        }
+
+        await client.Stop();
     }
 }
