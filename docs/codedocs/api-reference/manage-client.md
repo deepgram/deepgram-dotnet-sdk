@@ -100,4 +100,4 @@ var key = await client.CreateKey(
     });
 ```
 
-Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [ManagementReportingClient](/docs/api-reference/management-reporting-client), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).
+Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [ManagementReportingClient](/docs/api-reference/management-reporting-client), [AgentManageClient](/docs/api-reference/agent-manage-client), [Self-Hosted Distribution Credentials](/docs/api-reference/self-hosted-client).

@@ -240,7 +240,26 @@ public class KeySchema
 }
 ```
 
-`Deepgram.Models.SelfHosted.v1.CredentialsSchema`
+`Deepgram.Models.SelfHosted.v1.DistributionCredentialsCreateSchema` is the JSON body for `CreateDistributionCredentials`.
+
+```csharp
+public class DistributionCredentialsCreateSchema
+{
+    public string? Comment { get; set; }
+}
+```
+
+`Deepgram.Models.SelfHosted.v1.DistributionCredentialsCreateOptions` holds the query options for `CreateDistributionCredentials`. Each entry in `Scopes` is sent as its own `scopes` query parameter.
+
+```csharp
+public class DistributionCredentialsCreateOptions
+{
+    public List<string>? Scopes { get; set; }
+    public string? Provider { get; set; }
+}
+```
+
+`Deepgram.Models.SelfHosted.v1.CredentialsSchema` is the request body for the obsolete `SelfHostedClient.CreateCredentials`.
 
 ```csharp
 public class CredentialsSchema

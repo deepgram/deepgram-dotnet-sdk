@@ -53,10 +53,11 @@ Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegm
 | Text intelligence | `POST /v1/read` | `CreateAnalyzeClient` | `Clients/Analyze/v1` | Shipped |
 | Management API | `/v1/projects/...` | `CreateManageClient` | `Clients/Manage/v1` | Shipped |
 | Management reporting | `/v1/projects/{id}/usage/breakdown`, billing, purchases | `CreateManagementReportingClient` | `Clients/Manage/v1` (`ReportingClient`) | Shipped |
-| Self-hosted credentials | `/v1/projects/{id}/onprem/...` | `CreateSelfHostedClient` | `Clients/SelfHosted/v1` | Shipped |
+| Self-hosted distribution credentials | `/v1/projects/{id}/self-hosted/distribution/credentials` | `CreateSelfHostedDistributionCredentialsClient` | `Clients/SelfHosted/v1/DistributionCredentialsClient.cs` | Shipped |
+| Self-hosted credentials, legacy | `/v1/projects/{id}/onprem/...` | `CreateSelfHostedClient` | `Clients/SelfHosted/v1/Client.cs` | Obsolete and frozen |
 | Auth (grant token) | `POST /v1/auth/grant` | `CreateAuthClient` | `Clients/Auth/v1` | Shipped |
 
-`LiveClient`, `PreRecordedClient`, `SpeakClient`, and `OnPremClient` (and `Clients/Live`, `Clients/PreRecorded`, `Clients/OnPrem`) are deprecated and frozen. Point new code at `ListenWebSocketClient`, `ListenRESTClient`, `SpeakRESTClient`, and `SelfHostedClient`.
+`LiveClient`, `PreRecordedClient`, `SpeakClient`, and `OnPremClient` (and `Clients/Live`, `Clients/PreRecorded`, `Clients/OnPrem`) are deprecated and frozen, as are `SelfHostedClient` and `Clients/SelfHosted/v1/Client.cs`. Point new code at `ListenWebSocketClient`, `ListenRESTClient`, `SpeakRESTClient`, and `SelfHostedDistributionCredentialsClient`.
 
 ## Prerequisites
 
@@ -159,6 +160,6 @@ Release Please manages stable releases from `main`; the full process is in `.git
 
 - Do not commit keys, `.env` files, `bin/`, or `obj/` (`clean-up.sh` removes build output).
 - Do not run `extras/live-smoke` or the `examples/agent/manage` programs against a production project.
-- Do not add new code to the deprecated `Live`, `PreRecorded`, `Speak` (v1 wrapper), or `OnPrem` clients.
+- Do not add new code to the deprecated `Live`, `PreRecorded`, `Speak` (v1 wrapper), or `OnPrem` clients, or to the legacy `SelfHostedClient` (`Clients/SelfHosted/v1/Client.cs`).
 - Do not reformat files you are not otherwise changing, and do not suppress analyzer warnings to silence the build.
 - Do not add a `<Version>` to a `.csproj`; the tag is the version.
