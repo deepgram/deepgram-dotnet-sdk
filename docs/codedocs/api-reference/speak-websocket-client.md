@@ -69,6 +69,7 @@ bool IsConnected()
 | `BitRate` | `int?` | `null` | Audio bitrate. |
 | `Encoding` | `string?` | `null` | Output encoding. |
 | `SampleRate` | `int?` | `null` | Output sample rate. |
+| `MipOptOut` | `bool?` | `null` | Sends `mip_opt_out` on the connection URL to opt this session out of the [Model Improvement Program](https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program). Review its pricing and data-retention effects before setting it to `true`. |
 
 Behavior notes from `Deepgram/Clients/Speak/v2/WebSocket/Client.cs`:
 

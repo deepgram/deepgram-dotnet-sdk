@@ -48,7 +48,7 @@ public record SpeechMetadataResponse
     public int? BillableCharacterCount { get; set; }
 
     /// <summary>
-    /// Controls applied during the turn. Currently always reports 0 (coming-soon fast-follow).
+    /// Controls applied during the turn.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("controls_applied")]

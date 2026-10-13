@@ -22,6 +22,14 @@ public record ConversationTextResponse
     [JsonPropertyName("content")]
     public string? Content { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages_hinted")]
+    public List<string>? LanguagesHinted { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages")]
+    public List<string>? Languages { get; set; }
+
     /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>

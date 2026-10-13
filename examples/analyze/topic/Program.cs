@@ -34,6 +34,7 @@ namespace PreRecorded
                 {
                     Language = "en",
                     Topics = true,
+                    Tag = new List<string> { "topic-example" },
                 });
 
             Console.WriteLine(response);

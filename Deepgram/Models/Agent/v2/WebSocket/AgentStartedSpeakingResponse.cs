@@ -19,14 +19,17 @@ public record AgentStartedSpeakingResponse
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("total_latency")]
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
     public decimal? TotalLatency { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("tts_latency")]
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
     public decimal? TtsLatency { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("ttt_latency")]
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
     public decimal? TttLatency { get; set; }
 
     /// <summary>

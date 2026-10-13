@@ -23,6 +23,8 @@ public class ClientFactoryCoverageTests
         using (new AssertionScope())
         {
             ClientFactory.CreateAgentWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentWebSocketClient>();
+            ClientFactory.CreateAgentProtocolClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentProtocolClient>();
+            ClientFactory.CreateAgentCatalogClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentCatalogClient>();
             ClientFactory.CreateAgentManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentManageClient>();
             ClientFactory.CreateAnalyzeClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAnalyzeClient>();
             ClientFactory.CreateAuthClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAuthClient>();
@@ -32,6 +34,8 @@ public class ClientFactoryCoverageTests
             ClientFactory.CreateListenWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IListenWebSocketClient>();
             ClientFactory.CreateListenRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IListenRESTClient>();
             ClientFactory.CreateManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManageClient>();
+            ClientFactory.CreateManagementReportingClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManagementReportingClient>();
+            ClientFactory.CreateSelfHostedClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISelfHostedClient>();
             ClientFactory.CreateSelfHostedDistributionCredentialsClient(ApiKey, HttpOptions)
                 .Should().BeAssignableTo<V1.ISelfHostedDistributionCredentialsClient>();
             ClientFactory.CreateSpeakRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISpeakRESTClient>();

@@ -7,8 +7,8 @@ namespace Deepgram.Models.Common.v2.WebSocket;
 public record ErrorResponse
 {
     /// <summary>
-    /// Machine-readable error code, e.g. CLIENT_MESSAGE_TIMEOUT. Sent by the Voice Agent API;
-    /// may be absent on other endpoints.
+    /// Machine-readable error code, such as CLIENT_MESSAGE_TIMEOUT (Voice Agent) or
+    /// KeytermsNotSupported (Listen Configure). May be absent.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("code")]
