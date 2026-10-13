@@ -34,6 +34,7 @@ public class ClientFactoryCoverageTests
             ClientFactory.CreateListenWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IListenWebSocketClient>();
             ClientFactory.CreateListenRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IListenRESTClient>();
             ClientFactory.CreateManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManageClient>();
+            ClientFactory.CreateManagementReportingClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManagementReportingClient>();
             ClientFactory.CreateSelfHostedClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISelfHostedClient>();
             ClientFactory.CreateSpeakRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISpeakRESTClient>();
             ClientFactory.CreateSpeakWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.ISpeakWebSocketClient>();

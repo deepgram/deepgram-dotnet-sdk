@@ -140,6 +140,14 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a client for current management reporting endpoints.
+    /// </summary>
+    public static V1.IManagementReportingClient CreateManagementReportingClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new ManagementReportingClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new SelfHostedClient
     /// </summary>
     /// <param name="apiKey"></param>

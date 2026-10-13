@@ -7,6 +7,13 @@ namespace Deepgram.Models.Manage.v1;
 public record BalanceResponse
 {
     /// <summary>
+    /// Description or reference of the purchase associated with the balance.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("purchase_order_id")]
+    public string? PurchaseOrderId { get; set; }
+
+    /// <summary>
     /// Balance id
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

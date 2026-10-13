@@ -54,7 +54,7 @@ Power your apps with world-class speech and Language AI models.
     - [Get All Requests](#get-all-requests)
     - [Get Request](#get-request)
     - [Get Fields](#get-fields)
-    - [Summarize Usage](#summarize-usage)
+    - [Get Usage Breakdown](#get-usage-breakdown)
   - [Billing](#billing)
     - [Get All Balances](#get-all-balances)
     - [Get Balance](#get-balance)
@@ -250,12 +250,31 @@ await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
     }
 }));
 
+// Print every server Error, including rejected Configure updates.
+await liveClient.Subscribe(
+    new EventHandler<Deepgram.Models.Listen.v2.WebSocket.ErrorResponse>((sender, e) =>
+    {
+        Console.Error.WriteLine($"{e.Variant} {e.Code}: {e.Description}");
+    }));
+
 // Connect to Deepgram
 var liveSchema = new LiveSchema()
 {
     Model = "nova-3",
 };
 await liveClient.Connect(liveSchema);
+
+// Update keyterms or features on an open stream without reconnecting. Keyterm updates work on
+// Nova-3 on api.deepgram.com, not yet on the EU, Australia, or India hosts. Keyterms replace the
+// active list; an empty list clears it. Keep each update under 500 tokens: an over-limit update
+// returns no Error, transcription stops, and the stream closes with 1011 (NET-0000).
+// Success has no acknowledgement; most rejections arrive as an Error. Details:
+// https://developers.deepgram.com/docs/configure
+await liveClient.SendConfigure(new ConfigureSchema
+{
+    Keyterms = new List<string> { "Deepgram" },
+    Features = new Dictionary<string, bool> { ["numerals"] = true },
+});
 
 // Stream audio data to Deepgram
 byte[] audioData = GetAudioData(); // Your audio source
@@ -383,6 +402,8 @@ existing interface member was renamed, removed, or changed.
 ## Flux Text to Speech
 
 Synthesize speech with [Deepgram Flux TTS](https://developers.deepgram.com/docs/flux-tts/overview), available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
+
+`FluxSpeakTextControls.Pronunciation(word, ipa)` formats Early Access IPA markers for Flux TTS REST or WebSocket text. `FluxSpeakTextControls.Pause(duration)` formats batch REST-only pauses from 500 to 3000 ms in 100 ms increments. Do not combine pronunciation with non-default speed or with a pause in the same request; Flux TTS rejects those combinations.
 
 Streaming sends five client messages — `Speak`, `Flush`, `Interrupt`, `Configure`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `SpeechInterrupted`, `Flushed`, `ConfigureSuccess`/`ConfigureFailure`, `SessionMetadata`, `Warning`, `Error`).
 
@@ -758,16 +779,24 @@ await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 
 Convert text into speech using the REST API.
 
+Aura REST requests also accept `Speed`, one or more `Tag` values, and `MipOptOut`:
+
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var speakClient = ClientFactory.CreateSpeakRESTClient();
 
 var response = await speakClient.ToFile(
-    new TextSource("Hello world!"),
+    new Deepgram.Models.Speak.v1.REST.TextSource("Hello world!"),
     "output.wav",
     new SpeakSchema()
     {
         Model = "aura-2-thalia-en",
+        Speed = 1.1,
+        Tag = new List<string> { "release", "voice" },
+        // Opts this request out of the Model Improvement Program; see
+        // https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program
+        // for pricing and data-retention effects.
+        // MipOptOut = true,
     });
 
 Console.WriteLine($"Audio saved to: output.wav");
@@ -1214,7 +1243,7 @@ used for requests in the specified project.
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var manageClient = ClientFactory.CreateManageClient();
 
-var response = await manageClient.GetUsageFields(projectId);
+var response = await manageClient.GetUsageFields(projectId, new UsageFieldsSchema());
 
 Console.WriteLine($"Fields: {response.Fields}");
 ```
@@ -1223,25 +1252,37 @@ Console.WriteLine($"Fields: {response.Fields}");
 
 [See the Example for more info](./examples/manage/usage/).
 
-### Summarize Usage
+### Get Usage Breakdown
 
-`Deprecated` Retrieves the usage for a specific project. Use Get Project Usage Breakdown
-for a more comprehensive usage summary.
+Retrieves current usage totals grouped by a reporting dimension. Prefer this endpoint for new
+reporting integrations; `GetUsageSummary` remains available on `ManageClient` for compatibility.
 
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
-var manageClient = ClientFactory.CreateManageClient();
+var reportingClient = ClientFactory.CreateManagementReportingClient();
 
-var response = await manageClient.GetUsageSummary(projectId);
+var response = await reportingClient.GetUsageBreakdown(projectId, new UsageBreakdownSchema
+{
+    Start = DateTime.UtcNow.Date.AddDays(-7),
+    End = DateTime.UtcNow.Date,
+    Grouping = "models",
+});
 
-Console.WriteLine($"Usage summary: {response.Usage}");
+Console.WriteLine($"Usage groups: {response.Results?.Count ?? 0}");
 ```
 
-[See our API reference for more info](https://developers.deepgram.com/reference/management-api/usage/get).
+[See our API reference for more info](https://developers.deepgram.com/reference/manage/usage/breakdown/get).
 
 [See the Example for more info](./examples/manage/usage/).
 
 ## Billing
+
+Balances are read through `ManageClient`. For billing reports, use the reporting client from
+`ClientFactory.CreateManagementReportingClient()`: `GetBillingBreakdown` returns dollar totals that you
+can group by one or more of `accessor`, `deployment`, `line_item`, or `tags`, `GetBillingFields` lists the accessors,
+deployments, tags, and line items you can filter that breakdown by, and `GetPurchases` lists the
+project's purchase orders. See the
+[ManagementReportingClient reference](./docs/codedocs/api-reference/management-reporting-client.md).
 
 ### Get All Balances
 

@@ -92,6 +92,17 @@ namespace SampleApp
                 Console.WriteLine($"\n\n{summaryResp}\n\n");
             }
 
+            // Current reporting uses a dedicated client so its response models can evolve without
+            // changing the legacy management interface.
+            var reportingClient = ClientFactory.CreateManagementReportingClient();
+            var breakdown = await reportingClient.GetUsageBreakdown(myId, new UsageBreakdownSchema
+            {
+                Start = DateTime.UtcNow.Date.AddDays(-7),
+                End = DateTime.UtcNow.Date,
+                Grouping = "models",
+            });
+            Console.WriteLine($"\n\nUsage breakdown groups: {breakdown.Results?.Count ?? 0}\n\n");
+
 
             Console.WriteLine("\n\nPress any key to exit.");
             Console.ReadKey();

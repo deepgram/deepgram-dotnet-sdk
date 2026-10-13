@@ -73,6 +73,7 @@ public class PreRecordedSchema
     public List<string>? Keywords { get; set; }
     public List<string>? Keyterm { get; set; }
     public string? Language { get; set; }
+    public bool? MipOptOut { get; set; }
     public string? Model { get; set; }
     public bool? MultiChannel { get; set; }
     public bool? Numerals { get; set; }
@@ -105,6 +106,7 @@ public class LiveSchema
     public List<string>? Keywords { get; set; }
     public List<string>? Keyterm { get; set; }
     public string? Language { get; set; }
+    public bool? MipOptOut { get; set; }
     public string? Model { get; set; }
     public bool? NoDelay { get; set; }
     public bool? Punctuate { get; set; }
@@ -154,6 +156,9 @@ public class SpeakSchema
     public string? Container { get; set; }
     public string? Encoding { get; set; }
     public string? SampleRate { get; set; }
+    public double? Speed { get; set; }
+    public List<string>? Tag { get; set; }
+    public bool? MipOptOut { get; set; }
 }
 ```
 
@@ -166,6 +171,7 @@ public class SpeakSchema
     public int? BitRate { get; set; }
     public string? Encoding { get; set; }
     public int? SampleRate { get; set; }
+    public bool? MipOptOut { get; set; }
 }
 ```
 
@@ -197,6 +203,7 @@ public class AnalyzeSchema
     public string? Language { get; set; }
     public bool? Sentiment { get; set; }
     public bool? Summarize { get; set; }
+    public List<string>? Tag { get; set; }
     public bool? Topics { get; set; }
 }
 ```

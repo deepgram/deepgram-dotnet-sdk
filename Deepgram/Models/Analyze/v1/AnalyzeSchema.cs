@@ -7,6 +7,13 @@ namespace Deepgram.Models.Analyze.v1;
 public class AnalyzeSchema
 {
     /// <summary>
+    /// Labels this request for identification in usage reporting.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("tag")]
+    public List<string>? Tag { get; set; }
+
+    /// <summary>
     /// Callback URL to provide if you would like your submitted text to be processed.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -91,4 +98,3 @@ public class AnalyzeSchema
         return JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
     }
 }
-
