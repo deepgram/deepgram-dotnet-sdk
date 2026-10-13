@@ -11,7 +11,7 @@ using SpeakTextSource = Deepgram.Models.Speak.v1.REST.TextSource;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
-public class PhaseFourLiveIntegrationTests
+public class RequestOptionsLiveIntegrationTests
 {
     [Test]
     public async Task Live_Current_Request_Options_Should_Be_Accepted()
@@ -20,15 +20,15 @@ public class PhaseFourLiveIntegrationTests
             ?? Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            Assert.Ignore("DEEPGRAM_API_KEY is not set. Skipping Phase 4 live integration test.");
+            Assert.Ignore("DEEPGRAM_API_KEY is not set. Skipping live request options test.");
         }
 
         var speak = ClientFactory.CreateSpeakRESTClient(apiKey!);
-        var audio = await speak.ToStream(new SpeakTextSource("Phase four integration check."), new SpeakSchema
+        var audio = await speak.ToStream(new SpeakTextSource("Request options integration check."), new SpeakSchema
         {
             Model = "aura-2-thalia-en",
             Speed = 1.1,
-            Tag = new List<string> { "phase-four" },
+            Tag = new List<string> { "dotnet-sdk-live-test" },
             MipOptOut = true,
         });
 
@@ -40,11 +40,11 @@ public class PhaseFourLiveIntegrationTests
         });
 
         var analyze = ClientFactory.CreateAnalyzeClient(apiKey);
-        var analysis = await analyze.AnalyzeText(new AnalyzeTextSource("Phase four integration check."), new AnalyzeSchema
+        var analysis = await analyze.AnalyzeText(new AnalyzeTextSource("Request options integration check."), new AnalyzeSchema
         {
             Language = "en",
             Topics = true,
-            Tag = new List<string> { "phase-four" },
+            Tag = new List<string> { "dotnet-sdk-live-test" },
         });
 
         using (new AssertionScope())

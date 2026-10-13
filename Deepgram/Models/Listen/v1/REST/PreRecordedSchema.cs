@@ -6,9 +6,14 @@ namespace Deepgram.Models.Listen.v1.REST;
 
 public class PreRecordedSchema
 {
+    /// <summary>
+    /// Opts this request out of the Model Improvement Program. Review the Model Improvement Program
+    /// documentation for pricing and data-retention effects before setting this to <c>true</c>.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }
+
     /// <summary>
     /// Number of transcripts to return per request
     /// <see href="https://developers.deepgram.com/reference/pre-recorded"/>

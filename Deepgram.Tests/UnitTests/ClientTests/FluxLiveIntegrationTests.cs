@@ -65,13 +65,13 @@ public class FluxLiveIntegrationTests
             Model = "flux-general-en",
             Encoding = "linear16",
             SampleRate = 16000,
-            Numerals = true,
+            Numerals = false,
             Redact = "numbers",
         });
         connected.Should().BeTrue("the client must connect to the live Flux endpoint");
 
         // Confirm mid-session numeral formatting is accepted and echoed by the server.
-        await client.SendConfigure(new ConfigureSchema { Numerals = false });
+        await client.SendConfigure(new ConfigureSchema { Numerals = true });
         (await Task.WhenAny(configureSuccessReceived.Task, Task.Delay(5000))).Should().Be(configureSuccessReceived.Task,
             "the server must acknowledge a numerals Configure message");
 
@@ -113,8 +113,8 @@ public class FluxLiveIntegrationTests
             connectedMsg.SequenceId.Should().Be(0);
 
             var configureSuccess = await configureSuccessReceived.Task;
-            (configureSuccess.Numerals is null or false).Should().BeTrue(
-                "the server may omit the optional numerals echo, but must not report it as enabled after disabling it");
+            configureSuccess.Numerals.Should().BeTrue(
+                "the server echoes the active numerals value after enabling it mid-session");
 
             var endOfTurn = await endOfTurnReceived.Task;
             endOfTurn.Transcript.Should().NotBeNullOrEmpty();

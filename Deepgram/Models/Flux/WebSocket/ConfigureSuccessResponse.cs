@@ -65,6 +65,20 @@ public record ConfigureSuccessResponse
     public bool? Numerals { get; set; }
 
     /// <summary>
+    /// Whether the profanity filter is active for the session.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("profanity_filter")]
+    public bool? ProfanityFilter { get; set; }
+
+    /// <summary>
+    /// The <c>redact_usage</c> value the server reports for this session.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("redact_usage")]
+    public bool? RedactUsage { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()

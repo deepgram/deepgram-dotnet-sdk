@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Collections;
+using System.Globalization;
 using Deepgram.Models.PreRecorded.v1;
 using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Speak.v1;
@@ -16,7 +17,7 @@ internal static class QueryParameterUtil
     /// </summary>
     public static string FormatURL<S>(string uriSegment, S? parameter, Dictionary<string, string>? addons = null)
     {
-        //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted 
+        //checks for http:// https:// http https - https:// is include to ensure it is all stripped out and correctly formatted
         Regex regex = new Regex(@"\b(http:\/\/|https:\/\/|http|https)\b", RegexOptions.IgnoreCase);
         if (!regex.IsMatch(uriSegment))
             uriSegment = $"https://{uriSegment}";
@@ -27,8 +28,7 @@ internal static class QueryParameterUtil
         {
             var propertyInfoList = parameter.GetType()
                 .GetProperties()
-                .Where(v => v.GetValue(parameter) is not null &&
-                    v.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition != JsonIgnoreCondition.Always);
+                .Where(v => v.GetValue(parameter) is not null);
 
             queryString = UrlEncode(parameter, propertyInfoList, addons);
         } else
@@ -41,11 +41,7 @@ internal static class QueryParameterUtil
         var query = HttpUtility.ParseQueryString(queryString);
         uriBuilder.Query = query.ToString();
 
-        var uri = uriBuilder.Uri;
-        var escapedQuery = uri.GetComponents(UriComponents.Query, UriFormat.UriEscaped);
-        return string.IsNullOrEmpty(escapedQuery)
-            ? uri.GetLeftPart(UriPartial.Path).TrimEnd('/')
-            : $"{uri.GetLeftPart(UriPartial.Path)}?{escapedQuery}";
+        return uriBuilder.Uri.ToString().TrimEnd('/');
     }
 
     /// <summary>
@@ -90,8 +86,17 @@ internal static class QueryParameterUtil
                     case DateTime time:
                         sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
                         break;
+                    case double number:
+                        sb.Append($"{name}={HttpUtility.UrlEncode(number.ToString(CultureInfo.InvariantCulture))}&");
+                        break;
+                    case float number:
+                        sb.Append($"{name}={HttpUtility.UrlEncode(number.ToString(CultureInfo.InvariantCulture))}&");
+                        break;
+                    case decimal number:
+                        sb.Append($"{name}={HttpUtility.UrlEncode(number.ToString(CultureInfo.InvariantCulture))}&");
+                        break;
                     //specific case for the Extra Parameter dictionary to format the querystring correctly
-                    //no case changing of the key or values as theses are unknowns and the casing may have 
+                    //no case changing of the key or values as theses are unknowns and the casing may have
                     //significance to the user
                     case Dictionary<string, string> dict:
                         if (name == "extra")

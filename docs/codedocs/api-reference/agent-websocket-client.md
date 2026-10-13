@@ -77,8 +77,11 @@ The following extension methods work with both `IAgentWebSocketClient` and
 `IAgentProtocolClient`: `SendUpdateListen`, `SendUpdateThink`, `SendUpdateSpeak`,
 `SendUpdatePrompt`, `SendInjectAgentMessage`, `SendFunctionCallResponse`, and
 `SendCustomToThinkProvider`.
-`SendForceEndTurn` requires `IAgentProtocolClient` so the SDK can flush queued audio before
-sending the control frame.
+`SendForceEndTurn` is available on `IAgentProtocolClient` and, as an extension method, on the
+`IAgentWebSocketClient` returned by `ClientFactory.CreateAgentWebSocketClient()`; either way the
+SDK flushes queued audio before sending the control frame. The extension throws
+`NotSupportedException` for an `IAgentWebSocketClient` implementation that does not also
+implement `IAgentProtocolClient`.
 
 ## Main schema types
 

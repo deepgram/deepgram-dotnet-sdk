@@ -50,14 +50,26 @@ public class UsageRequestsSchema
     [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
+    /// <summary>
+    /// Deployment type of the requests to return.
+    /// </summary>
+    /// <remarks>Possible Values: null, hosted, beta OR self-hosted</remarks>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("deployment")]
     public string? Deployment { get; set; }
 
+    /// <summary>
+    /// Endpoint of the requests to return.
+    /// </summary>
+    /// <remarks>Possible Values: null, listen, read, speak OR agent</remarks>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]
     public string? Endpoint { get; set; }
 
+    /// <summary>
+    /// Method of the requests to return.
+    /// </summary>
+    /// <remarks>Possible Values: null, sync, async OR streaming</remarks>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("method")]
     public string? Method { get; set; }

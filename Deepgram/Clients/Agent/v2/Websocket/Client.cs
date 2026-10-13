@@ -630,7 +630,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
 
     /// <summary>
     /// Flushes queued audio and then ends the current user turn. This control is supported when
-    /// the Agent session uses a Flux listen provider.
+    /// the Agent session uses a Flux STT listen provider.
     /// </summary>
     public async Task SendForceEndTurn()
     {
@@ -1016,8 +1016,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_speakUpdatedReceived, speakUpdatedResponse);
                     break;
                 case AgentType.ListenUpdated:
+                    if (_listenUpdatedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var listenUpdatedResponse = data.Deserialize<ListenUpdatedResponse>();
-                    if (_listenUpdatedReceived == null || listenUpdatedResponse == null)
+                    if (listenUpdatedResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1025,8 +1030,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_listenUpdatedReceived, listenUpdatedResponse);
                     break;
                 case AgentType.ThinkUpdated:
+                    if (_thinkUpdatedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var thinkUpdatedResponse = data.Deserialize<ThinkUpdatedResponse>();
-                    if (_thinkUpdatedReceived == null || thinkUpdatedResponse == null)
+                    if (thinkUpdatedResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1034,8 +1044,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_thinkUpdatedReceived, thinkUpdatedResponse);
                     break;
                 case AgentType.FunctionCallCancelled:
+                    if (_functionCallCancelledReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var functionCallCancelledResponse = data.Deserialize<FunctionCallCancelledResponse>();
-                    if (_functionCallCancelledReceived == null || functionCallCancelledResponse == null)
+                    if (functionCallCancelledResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1043,8 +1058,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_functionCallCancelledReceived, functionCallCancelledResponse);
                     break;
                 case AgentType.FunctionCallResponse:
+                    if (_functionCallResponseReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var functionCallResponse = data.Deserialize<FunctionCallResponse>();
-                    if (_functionCallResponseReceived == null || functionCallResponse == null)
+                    if (functionCallResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1052,8 +1072,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_functionCallResponseReceived, functionCallResponse);
                     break;
                 case AgentType.CustomFromThinkProvider:
+                    if (_customFromThinkProviderReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var customFromThinkProviderResponse = data.Deserialize<CustomFromThinkProviderResponse>();
-                    if (_customFromThinkProviderReceived == null || customFromThinkProviderResponse == null ||
+                    if (customFromThinkProviderResponse == null ||
                         customFromThinkProviderResponse.Content.ValueKind == JsonValueKind.Undefined)
                     {
                         base.ProcessTextMessage(result, ms);
@@ -1062,8 +1087,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_customFromThinkProviderReceived, customFromThinkProviderResponse);
                     break;
                 case AgentType.LatencyReport:
+                    if (_latencyReportReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var latencyReportResponse = data.Deserialize<LatencyReportResponse>();
-                    if (_latencyReportReceived == null || latencyReportResponse == null)
+                    if (latencyReportResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1071,8 +1101,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_latencyReportReceived, latencyReportResponse);
                     break;
                 case AgentType.Warning:
+                    if (_warningReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var warningResponse = data.Deserialize<AgentWarningResponse>();
-                    if (_warningReceived == null || warningResponse == null)
+                    if (warningResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;
@@ -1080,8 +1115,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     InvokeParallel(_warningReceived, warningResponse);
                     break;
                 case AgentType.History:
+                    if (_historyReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
                     var historyResponse = data.Deserialize<AgentHistoryResponse>();
-                    if (_historyReceived == null || historyResponse == null)
+                    if (historyResponse == null)
                     {
                         base.ProcessTextMessage(result, ms);
                         return;

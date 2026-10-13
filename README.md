@@ -364,7 +364,7 @@ var fluxSchema = new FluxSchema()
     Encoding = "linear16",
     SampleRate = 16000,
     EotThreshold = 0.7,
-    Redact = "numbers", // Flux supports numbers or aggressive_numbers only
+    Redact = "numbers", // Flux STT supports numbers or aggressive_numbers only; each redacted number becomes *
 };
 await fluxClient.Connect(fluxSchema);
 
@@ -681,7 +681,7 @@ await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 {
     Prompt = "Keep answers concise and confirm before charging a card.",
 });
-await agentClient.SendForceEndTurn(); // Requires a Flux listen provider and IAgentProtocolClient.
+await agentClient.SendForceEndTurn(); // Requires a Flux STT listen provider and IAgentProtocolClient.
 ```
 
 ### Custom Think providers
@@ -779,26 +779,25 @@ await agentManageClient.DeleteAgentVariable(projectId, variable.VariableId!);
 
 Convert text into speech using the REST API.
 
-Current Aura REST options include `Speed`, repeated `Tag` values, and `MipOptOut`:
-
-```csharp
-var options = new Deepgram.Models.Speak.v1.REST.SpeakSchema
-{
-    Model = "aura-2-thalia-en",
-    Speed = 1.1,
-    Tag = new List<string> { "release", "voice" },
-    MipOptOut = true,
-};
-```
+Aura REST requests also accept `Speed`, one or more `Tag` values, and `MipOptOut`:
 
 ```csharp
 // Set "DEEPGRAM_API_KEY" environment variable to your Deepgram API Key
 var speakClient = ClientFactory.CreateSpeakRESTClient();
 
 var response = await speakClient.ToFile(
-    new TextSource("Hello world!"),
+    new Deepgram.Models.Speak.v1.REST.TextSource("Hello world!"),
     "output.wav",
-    options);
+    new SpeakSchema()
+    {
+        Model = "aura-2-thalia-en",
+        Speed = 1.1,
+        Tag = new List<string> { "release", "voice" },
+        // Opts this request out of the Model Improvement Program; see
+        // https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program
+        // for pricing and data-retention effects.
+        // MipOptOut = true,
+    });
 
 Console.WriteLine($"Audio saved to: output.wav");
 ```
@@ -1277,6 +1276,13 @@ Console.WriteLine($"Usage groups: {response.Results?.Count ?? 0}");
 [See the Example for more info](./examples/manage/usage/).
 
 ## Billing
+
+Balances are read through `ManageClient`. For billing reports, use the reporting client from
+`ClientFactory.CreateManagementReportingClient()`: `GetBillingBreakdown` returns dollar totals that you
+can group by accessor, deployment, line item, or tag, `GetBillingFields` lists the accessors,
+deployments, tags, and line items you can filter that breakdown by, and `GetPurchases` lists the
+project's purchase orders. See the
+[ManagementReportingClient reference](./docs/codedocs/api-reference/management-reporting-client.md).
 
 ### Get All Balances
 

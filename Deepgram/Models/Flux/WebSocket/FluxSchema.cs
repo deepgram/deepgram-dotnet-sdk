@@ -89,8 +89,8 @@ public class FluxSchema
     public bool? Numerals { get; set; }
 
     /// <summary>
-    /// Redacts recognized numbers from the transcript. Flux supports only <c>numbers</c> and
-    /// <c>aggressive_numbers</c>.
+    /// Redacts recognized numbers from the transcript, replacing each one with <c>*</c>.
+    /// Flux STT supports only <c>numbers</c> and <c>aggressive_numbers</c>.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("redact")]

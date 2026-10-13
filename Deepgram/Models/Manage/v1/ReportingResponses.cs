@@ -47,7 +47,7 @@ public class BillingBreakdownResponse
 
 public class BillingBreakdownResult
 {
-    [JsonPropertyName("dollars")] public double? Dollars { get; set; }
+    [JsonPropertyName("dollars")] public decimal? Dollars { get; set; }
     [JsonPropertyName("grouping")] public BillingBreakdownGrouping? Grouping { get; set; }
 }
 
@@ -85,7 +85,7 @@ public class PurchaseOrder
     [JsonPropertyName("order_id")] public string? OrderId { get; set; }
     [JsonPropertyName("expiration")] public DateTime? Expiration { get; set; }
     [JsonPropertyName("created")] public DateTime? Created { get; set; }
-    [JsonPropertyName("amount")] public double? Amount { get; set; }
+    [JsonPropertyName("amount")] public decimal? Amount { get; set; }
     [JsonPropertyName("units")] public string? Units { get; set; }
     [JsonPropertyName("order_type")] public string? OrderType { get; set; }
 }

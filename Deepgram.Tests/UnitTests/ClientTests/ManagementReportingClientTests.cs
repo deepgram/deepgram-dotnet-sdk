@@ -63,7 +63,7 @@ public class ManagementReportingClientTests
         using (new AssertionScope())
         {
             usage.Should().Contain("start=2026-01-01").And.Contain("grouping=models").And.Contain("deployment=hosted").And.Contain("numerals=true");
-            billing.Should().Contain("grouping=%5b%22deployment%22%2c%22tags%22%5d").And.Contain("line_item=streaming%3a%3anova-3");
+            billing.Should().Contain("grouping=deployment").And.Contain("grouping=tags").And.Contain("line_item=streaming%3a%3anova-3");
             fields.Should().Contain("start=2026-01-01").And.Contain("end=2026-01-31");
             purchases.Should().Contain("limit=25");
             requests.Should().Contain("accessor=accessor-id").And.Contain("request_id=request-id").And.Contain("deployment=hosted").And.Contain("endpoint=listen").And.Contain("method=sync");
@@ -100,9 +100,28 @@ public class ManagementReportingClientTests
         {
             usage!.Results![0].AgentHours.Should().Be(0.5d);
             usage.Results[0].Grouping!.Models.Should().Contain("nova-3").And.Contain((string?)null);
-            billing!.Results![0].Grouping!.LineItem.Should().Be("streaming::nova-3");
+            billing!.Results![0].Dollars.Should().Be(0.25m);
+            billing.Results[0].Grouping!.LineItem.Should().Be("streaming::nova-3");
             fields!.LineItems!["streaming::nova-3"].Should().Be("Streaming STT");
-            purchases!.Orders![0].Expiration.Should().Be(new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc));
+            purchases!.Orders![0].Amount.Should().Be(150m);
+            purchases.Orders[0].Expiration.Should().Be(new DateTime(2026, 12, 31, 0, 0, 0, DateTimeKind.Utc));
+        }
+    }
+
+    [Test]
+    public void ReportingResponses_Should_Deserialize_Money_As_Exact_Decimals()
+    {
+        var billing = JsonSerializer.Deserialize<BillingBreakdownResponse>("""{"results":[{"dollars":12.30}]}""");
+        var purchases = JsonSerializer.Deserialize<PurchasesResponse>("""{"orders":[{"amount":0.1},{"amount":0.1},{"amount":0.1}]}""");
+
+        var orders = purchases!.Orders!;
+        var total = orders.Sum(order => order.Amount!.Value);
+
+        using (new AssertionScope())
+        {
+            billing!.Results![0].Dollars.Should().Be(12.3m);
+            orders[0].Amount.Should().Be(0.1m);
+            total.Should().Be(0.3m);
         }
     }
 }
