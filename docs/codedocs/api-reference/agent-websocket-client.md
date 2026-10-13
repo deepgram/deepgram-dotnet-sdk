@@ -55,7 +55,7 @@ Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler)
 
 `ClientFactory.CreateAgentProtocolClient()` returns `IAgentProtocolClient`, which additionally
 provides typed subscriptions for `ListenUpdatedResponse`, `ThinkUpdatedResponse`,
-`FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`, and
+`FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`,
 `AgentHistoryResponse`, `FunctionCallResponse`, and `CustomFromThinkProviderResponse`.
 
 ### Send and helper methods
