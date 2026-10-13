@@ -4,7 +4,6 @@
 
 using System.Net.Sockets;
 using System.Net.WebSockets;
-using System.Security.Cryptography;
 using Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
@@ -61,7 +60,7 @@ public class WebSocketConnectRetryTests
     [Test]
     public async Task AbstractClient_Connect_After_A_Cancelled_Connect_Should_Open_A_New_Connection()
     {
-        using var server = new HandshakeServer();
+        using var server = new LoopbackWebSocketServer();
         using var client = new TestWebSocketClient(new Faker().Random.Guid().ToString());
 
         using (var cancelled = new CancellationTokenSource())
@@ -99,99 +98,5 @@ public class WebSocketConnectRetryTests
         await retry.Should().ThrowAsync<WebSocketException>(
             "a retry must attempt a new connection instead of reporting the failed one as connected");
         client.IsConnected().Should().BeFalse();
-    }
-
-    /// <summary>
-    /// Accepts WebSocket upgrades on a loopback port and holds each connection open until disposed.
-    /// </summary>
-    private sealed class HandshakeServer : IDisposable
-    {
-        private readonly TcpListener _listener = new(IPAddress.Loopback, 0);
-        private readonly CancellationTokenSource _cts = new();
-        private readonly System.Collections.Concurrent.ConcurrentBag<TcpClient> _clients = new();
-        private int _acceptedConnections;
-
-        public string Endpoint { get; }
-
-        public int AcceptedConnections => Volatile.Read(ref _acceptedConnections);
-
-        public HandshakeServer()
-        {
-            _listener.Start();
-            Endpoint = $"ws://127.0.0.1:{((IPEndPoint)_listener.LocalEndpoint).Port}";
-            _ = Task.Run(RunAsync);
-        }
-
-        public void Dispose()
-        {
-            _cts.Cancel();
-            _listener.Stop();
-            foreach (var client in _clients)
-            {
-                client.Dispose();
-            }
-            _cts.Dispose();
-        }
-
-        private async Task RunAsync()
-        {
-            try
-            {
-                while (!_cts.IsCancellationRequested)
-                {
-                    var client = await _listener.AcceptTcpClientAsync(_cts.Token);
-                    _clients.Add(client);
-                    var stream = client.GetStream();
-
-                    var request = await ReadHeadersAsync(stream, _cts.Token);
-                    var keyLine = request.Split(new[] { "\r\n" }, StringSplitOptions.None)
-                        .First(l => l.StartsWith("Sec-WebSocket-Key:", StringComparison.OrdinalIgnoreCase));
-                    var key = keyLine.Substring(keyLine.IndexOf(':') + 1).Trim();
-                    string accept;
-                    using (var sha1 = SHA1.Create())
-                    {
-                        accept = Convert.ToBase64String(
-                            sha1.ComputeHash(Encoding.ASCII.GetBytes(key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")));
-                    }
-
-                    var response =
-                        "HTTP/1.1 101 Switching Protocols\r\n" +
-                        "Upgrade: websocket\r\n" +
-                        "Connection: Upgrade\r\n" +
-                        $"Sec-WebSocket-Accept: {accept}\r\n\r\n";
-                    var responseBytes = Encoding.ASCII.GetBytes(response);
-                    Interlocked.Increment(ref _acceptedConnections);
-                    await stream.WriteAsync(responseBytes, 0, responseBytes.Length, _cts.Token);
-                }
-            }
-            catch
-            {
-                // Server torn down by the test.
-            }
-        }
-
-        private static async Task<string> ReadHeadersAsync(NetworkStream stream, CancellationToken cancellationToken)
-        {
-            var bytes = new List<byte>();
-            var buffer = new byte[1];
-            while (true)
-            {
-                var read = await stream.ReadAsync(buffer, 0, 1, cancellationToken);
-                if (read == 0)
-                {
-                    break;
-                }
-
-                bytes.Add(buffer[0]);
-                var count = bytes.Count;
-                if (count >= 4 && bytes[count - 4] == '\r' && bytes[count - 3] == '\n' &&
-                    bytes[count - 2] == '\r' && bytes[count - 1] == '\n')
-                {
-                    break;
-                }
-            }
-
-            return Encoding.ASCII.GetString(bytes.ToArray());
-        }
     }
 }
