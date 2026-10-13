@@ -57,6 +57,9 @@ Task<AsyncResponse> StreamCallBack(
 | `SampleRate` | `string?` | `null` | Audio sample rate. |
 | `CallBack` | `string?` | `null` | Callback URL for asynchronous generation. |
 | `CallBackMethod` | `string?` | `null` | Callback method metadata. |
+| `Speed` | `double?` | `null` | Speaking-rate multiplier. |
+| `Tag` | `List<string>?` | `null` | Labels for usage reporting; each value is sent as its own `tag` query parameter. |
+| `MipOptOut` | `bool?` | `null` | Sends `mip_opt_out` to opt this request out of the [Model Improvement Program](https://developers.deepgram.com/docs/the-deepgram-model-improvement-partnership-program). Review its pricing and data-retention effects before setting it to `true`. |
 
 ## Return shape
 
