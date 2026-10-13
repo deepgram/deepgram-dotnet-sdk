@@ -7,6 +7,13 @@ namespace Deepgram.Models.Manage.v1;
 public record ProjectResponse : Project
 {
     /// <summary>
+    /// Whether the project is opted out of the Model Improvement Program.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("mip_opt_out")]
+    public bool? MipOptOut { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()
