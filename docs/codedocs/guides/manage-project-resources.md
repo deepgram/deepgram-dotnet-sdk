@@ -45,12 +45,11 @@ Console.WriteLine(key);
 ### Inspect self-hosted credentials for the same project
 
 ```csharp
-using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.SelfHosted.v1;
 
-var selfHosted = ClientFactory.CreateSelfHostedClient(
-    options: new DeepgramHttpClientOptions(onPrem: false));
+var selfHosted = ClientFactory.CreateSelfHostedDistributionCredentialsClient();
 
-var credentials = await selfHosted.ListCredentials(project.ProjectId);
+var credentials = await selfHosted.ListDistributionCredentials(project.ProjectId);
 Console.WriteLine(credentials);
 
 Library.Terminate();
@@ -62,7 +61,7 @@ Library.Terminate();
 Important details from the SDK:
 
 - `ManageClient.CreateKey` throws if you set both `ExpirationDate` and `TimeToLiveInSeconds`.
-- Management APIs and self-hosted credential APIs use different clients, but they share the same REST abstraction and auth model.
+- Management APIs and current self-hosted distribution credential APIs use different clients, but they share the same REST abstraction and auth model.
 - Per-request `headers` and `addons` are available on every method if your admin workflow needs custom metadata.
 
 This workflow is intentionally split across two clients because the repository separates general project administration from self-hosted credential operations. That separation is useful in larger codebases: you can keep management-only permissions in one service while placing self-hosted credential operations behind a smaller operational boundary.

@@ -5,7 +5,9 @@ name: Daily Tests
 # Mirrors the tests-daily workflow in the Python and Java SDKs.
 #
 # Requires the repository secret DEEPGRAM_API_KEY. Currently a maintainer's key scoped to a test
-# project; an org-owned key is the intended long-term owner. Rotating the key turns this run red.
+# project; an org-owned key is the intended long-term owner. The destructive self-hosted credentials
+# live test is intentionally opt-in: it needs a disposable, self-hosted-enabled project and skips
+# unless DEEPGRAM_SELF_HOSTED_PROJECT_ID is supplied by the environment.
 # The destructive agent CRUD smokes under extras/live-smoke are intentionally NOT run here;
 # they need a disposable project and leave permanent state behind.
 

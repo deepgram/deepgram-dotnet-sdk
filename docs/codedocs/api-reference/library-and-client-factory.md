@@ -41,13 +41,14 @@ public static class ClientFactory
     public static IAuthClient CreateAuthClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
+    public static ISelfHostedDistributionCredentialsClient CreateSelfHostedDistributionCredentialsClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static ISpeakRESTClient CreateSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null);
     public static ISpeakWebSocketClient CreateSpeakWebSocketClient(string apiKey = "", DeepgramWsClientOptions? options = null);
 }
 ```
 
-Version-specific overloads also exist and return `object` for migration scenarios. Those overloads are useful when you need older WebSocket client versions, but new code should use the latest overloads above.
+Version-specific overloads also exist and return `object` for migration scenarios. Those overloads are useful when you need older WebSocket client versions, but new code should use the latest overloads above. `CreateSelfHostedClient` is obsolete; use `CreateSelfHostedDistributionCredentialsClient` for new code.
 
 ## Constructor and option parameters
 
