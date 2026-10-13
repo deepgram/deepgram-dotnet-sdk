@@ -4,6 +4,8 @@
 
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
@@ -56,7 +58,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Int_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var obj = new PreRecordedSchema() { Alternatives = 1 };
         var expected = $"alternatives={obj.Alternatives}";
 
@@ -127,7 +129,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_Boolean_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var obj = new PreRecordedSchema() { Paragraphs = true };
         var expected = $"{nameof(obj.Paragraphs).ToLower()}=true";
         //Act
@@ -141,7 +143,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_String_When_Passing_DateTime_Parameter()
     {
-        // Input and Output 
+        // Input and Output
         var options = new AutoFaker<KeySchema>().Generate();
         var time = DateTime.Now;
         options.ExpirationDate = time;
@@ -159,7 +161,7 @@ public class QueryParameterUtilTests
     [Test]
     public void GetParameters_Should_Return_Valid_String_When_CallBack_Set()
     {
-        // Input and Output 
+        // Input and Output
         var signedCallBackUrl = "As$Ssw.com";
         var expected = HttpUtility.UrlEncode(signedCallBackUrl);
 
@@ -214,4 +216,77 @@ public class QueryParameterUtilTests
         result.Should().NotContain("diarize_model");
     }
 
+    // FormatURL is shared by every REST client; these pin the exact string it returns.
+    [Test]
+    public void FormatURL_Should_Escape_Callback_Url_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { CallBack = "https://x.com/a?b=c&d=e" };
+        var expected = "https://api.deepgram.com/?callback=https%3a%2f%2fx.com%2fa%3fb%3dc%26d%3de";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Leave_Unicode_Value_Unescaped_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["café"] };
+        var expected = "https://api.deepgram.com/?keyterm=café";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Leave_Double_Quote_Unescaped_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["say \"hi\""] };
+        var expected = "https://api.deepgram.com/?keyterm=say+\"hi\"";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Encode_Space_As_Plus_Exactly()
+    {
+        var obj = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema { Keyterm = ["new york"] };
+        var expected = "https://api.deepgram.com/?keyterm=new+york";
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    public void FormatURL_Should_Format_Float_And_Decimal_With_Invariant_Culture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            var obj = new FloatDecimalSchema { F = 1.5f, M = 0.25m };
+            var expected = "https://api.deepgram.com/?f=1.5&m=0.25";
+
+            var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+            result.Should().Be(expected);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    private sealed class FloatDecimalSchema
+    {
+        [JsonPropertyName("f")]
+        public float? F { get; set; }
+
+        [JsonPropertyName("m")]
+        public decimal? M { get; set; }
+    }
 }

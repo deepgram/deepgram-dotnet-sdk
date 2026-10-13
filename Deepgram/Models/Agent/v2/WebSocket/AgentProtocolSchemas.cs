@@ -119,6 +119,20 @@ public class AgentFunctionCallResponseSchema
 }
 
 /// <summary>
+/// Sends an arbitrary JSON value to a custom Think provider.
+/// </summary>
+public class AgentCustomToThinkProviderSchema
+{
+    [JsonPropertyName("type")]
+    public string Type { get; } = AgentClientTypes.CustomToThinkProvider;
+
+    [JsonPropertyName("content")]
+    public JsonElement Content { get; set; }
+
+    public override string ToString() => JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+}
+
+/// <summary>
 /// Ends the current user turn when the Agent uses a Flux STT listen provider.
 /// </summary>
 public class AgentForceEndTurnSchema

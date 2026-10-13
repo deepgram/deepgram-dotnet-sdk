@@ -20,6 +20,7 @@ public interface IAgentProtocolClient : IAgentWebSocketClient
     Task<bool> Subscribe(EventHandler<ThinkUpdatedResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<FunctionCallCancelledResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<FunctionCallResponse> eventHandler);
+    Task<bool> Subscribe(EventHandler<CustomFromThinkProviderResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<LatencyReportResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<AgentWarningResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<AgentHistoryResponse> eventHandler);

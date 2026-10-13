@@ -12,6 +12,12 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class AgentProtocolControlTests
 {
+    private static JsonElement JsonValue(string value)
+    {
+        using var document = JsonDocument.Parse(value);
+        return document.RootElement.Clone();
+    }
+
     [Test]
     public async Task AgentProtocolExtensions_Should_Serialize_Current_Control_Messages()
     {
@@ -44,6 +50,7 @@ public class AgentProtocolControlTests
         await client.SendUpdatePrompt(new AgentUpdatePromptSchema { Prompt = "Use short answers" });
         await client.SendInjectAgentMessage(new AgentInjectAgentMessageSchema { Message = "One moment", Behavior = "queue" });
         await client.SendFunctionCallResponse(new AgentFunctionCallResponseSchema { Id = "call-1", Name = "get_weather", Content = "{}" });
+        await client.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema { Content = JsonValue("{\"action\":\"continue\"}") });
 
         var protocolClient = Substitute.For<IAgentProtocolClient>();
         protocolClient.SendForceEndTurn().Returns(Task.CompletedTask);
@@ -52,7 +59,7 @@ public class AgentProtocolControlTests
         using (new AssertionScope())
         {
             payloads.Select(document => document.RootElement.GetProperty("type").GetString()).Should().Equal(
-                "UpdateListen", "UpdateThink", "UpdateSpeak", "UpdatePrompt", "InjectAgentMessage", "FunctionCallResponse");
+                "UpdateListen", "UpdateThink", "UpdateSpeak", "UpdatePrompt", "InjectAgentMessage", "FunctionCallResponse", "__customToThinkProvider");
             payloads[4].RootElement.GetProperty("message").GetString().Should().Be("One moment");
             payloads[4].RootElement.GetProperty("behavior").GetString().Should().Be("queue");
             payloads[2].RootElement.GetProperty("speak").ValueKind.Should().Be(JsonValueKind.Array);
@@ -61,6 +68,7 @@ public class AgentProtocolControlTests
             payloads[2].RootElement.GetProperty("speak")[2].GetProperty("provider").GetProperty("model_id").GetString().Should().Be("sonic-english");
             payloads[5].RootElement.GetProperty("id").GetString().Should().Be("call-1");
             payloads[5].RootElement.GetProperty("content").GetString().Should().Be("{}");
+            payloads[6].RootElement.GetProperty("content").GetProperty("action").GetString().Should().Be("continue");
             await protocolClient.Received(1).SendForceEndTurn();
         }
 
@@ -88,6 +96,8 @@ public class AgentProtocolControlTests
         await client.Invoking(c => c.SendFunctionCallResponse(new AgentFunctionCallResponseSchema { Name = "fn" }))
             .Should().ThrowAsync<ArgumentException>();
         await client.Invoking(c => c.SendFunctionCallResponse(new AgentFunctionCallResponseSchema { Name = "fn", Content = "{}" }))
+            .Should().ThrowAsync<ArgumentException>();
+        await client.Invoking(c => c.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema()))
             .Should().ThrowAsync<ArgumentException>();
         await client.Invoking(c => c.SendUpdateThink(new AgentUpdateThinkSchema { Think = new Think { Prompt = "missing provider" } }))
             .Should().ThrowAsync<ArgumentException>();
@@ -119,6 +129,26 @@ public class AgentProtocolControlTests
         await client.Received(1).SendMessageImmediately(
             Arg.Is<byte[]>(payload => JsonDocument.Parse(Encoding.UTF8.GetString(payload), default).RootElement.GetProperty("content").GetString() == ""),
             AgentConstants.UseArrayLengthForSend, null);
+    }
+
+    [TestCase("{\"request\":\"continue\"}")]
+    [TestCase("[\"next\",2]")]
+    [TestCase("\"plain text\"")]
+    [TestCase("null")]
+    public async Task CustomToThinkProvider_Should_Serialize_Any_Json_Value(string content)
+    {
+        var client = Substitute.For<IAgentWebSocketClient>();
+        var payloads = new List<JsonDocument>();
+        client.SendMessageImmediately(Arg.Do<byte[]>(data => payloads.Add(JsonDocument.Parse(Encoding.UTF8.GetString(data)))),
+            Arg.Any<int>(), Arg.Any<CancellationTokenSource>()).Returns(Task.CompletedTask);
+
+        await client.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema { Content = JsonValue(content) });
+
+        payloads.Should().ContainSingle();
+        payloads[0].RootElement.GetProperty("type").GetString().Should().Be("__customToThinkProvider");
+        JsonSerializer.Serialize(payloads[0].RootElement.GetProperty("content"))
+            .Should().Be(JsonSerializer.Serialize(JsonValue(content)));
+        payloads[0].Dispose();
     }
 
     [Test]

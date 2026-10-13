@@ -62,6 +62,15 @@ Task<BalancesResponse> GetBalances(string projectId, ...)
 Task<BalanceResponse> GetBalance(string projectId, string balanceId, ...)
 ```
 
+Current typed filters are available as extensions without changing `IManageClient`:
+
+```csharp
+Task<ProjectResponse> GetProject(string projectId, ProjectQuerySchema query, ...)
+Task<KeysResponse> GetKeys(string projectId, KeysQuerySchema query, ...)
+```
+
+For new usage, billing, and purchase reporting, use `ClientFactory.CreateManagementReportingClient()` instead. It exposes current `GetUsageBreakdown`, `GetBillingBreakdown`, `GetBillingFields`, and `GetPurchases` methods without changing the legacy `IManageClient` interface.
+
 ## Common schema parameters
 
 | Schema | Key fields | Notes |
@@ -70,6 +79,8 @@ Task<BalanceResponse> GetBalance(string projectId, string balanceId, ...)
 | `KeySchema` | `Comment`, `Scopes`, `Tags`, `ExpirationDate`, `TimeToLiveInSeconds` | `CreateKey` throws if both expiration fields are set. |
 | `ModelSchema` | query-style filter fields | Used when listing models. |
 | `UsageRequestsSchema` / `UsageSummarySchema` / `UsageFieldsSchema` | usage filters | Used for reporting endpoints. |
+| `ProjectQuerySchema` | `Limit`, `Page` | Optional pagination filters for a project lookup. |
+| `KeysQuerySchema` | `Status` | Filters project keys by `active` or `expired`. |
 
 ## Example
 
@@ -89,4 +100,4 @@ var key = await client.CreateKey(
     });
 ```
 
-Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).
+Related pages: [Guides: Manage Project Resources](/docs/guides/manage-project-resources), [ManagementReportingClient](/docs/api-reference/management-reporting-client), [AgentManageClient](/docs/api-reference/agent-manage-client), [SelfHostedClient](/docs/api-reference/self-hosted-client).

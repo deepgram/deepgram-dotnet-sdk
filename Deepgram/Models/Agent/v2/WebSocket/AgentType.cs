@@ -28,6 +28,7 @@ public enum AgentType
     ThinkUpdated,
     FunctionCallCancelled,
     FunctionCallResponse,
+    CustomFromThinkProvider,
     LatencyReport,
     Warning,
     History,
@@ -44,6 +45,8 @@ public static class AgentClientTypes
     public const string InjectAgentMessage = "InjectAgentMessage";
     public const string InjectUserMessage = "InjectUserMessage";
     public const string FunctionCallResponse = "FunctionCallResponse";
+    public const string CustomToThinkProvider = "__customToThinkProvider";
+    public const string CustomFromThinkProvider = "__customFromThinkProvider";
     public const string KeepAlive = "KeepAlive";
     public const string ForceEndTurn = "ForceEndTurn";
     public const string Close = "Close";

@@ -35,6 +35,14 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a Voice Agent settings catalog client.
+    /// </summary>
+    public static V1.IAgentCatalogClient CreateAgentCatalogClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AgentCatalogClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
     /// their template variables
     /// </summary>
@@ -129,6 +137,14 @@ public static class ClientFactory
     public static V1.IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new ManageClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Creates a client for current management reporting endpoints.
+    /// </summary>
+    public static V1.IManagementReportingClient CreateManagementReportingClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new ManagementReportingClient(apiKey, options, httpId);
     }
 
     /// <summary>
