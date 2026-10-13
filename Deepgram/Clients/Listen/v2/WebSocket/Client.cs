@@ -45,6 +45,14 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. For the Flux STT and Flux TTS clients, a blocking Stop().Wait() inside an Open handler
+    /// waits out the close grace period. An exception thrown by an Open handler is logged at Error
+    /// level and Connect() still returns true. Messages still queued from earlier sends are sent as
+    /// soon as the new connection opens; the send methods' remarks say which ones are kept.
+    /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,

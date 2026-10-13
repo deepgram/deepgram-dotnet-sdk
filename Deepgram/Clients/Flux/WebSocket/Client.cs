@@ -65,6 +65,14 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// <summary>
     /// Connect to the Deepgram Flux API WebSocket to begin transcribing audio
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. For the Flux STT and Flux TTS clients, a blocking Stop().Wait() inside an Open handler
+    /// waits out the close grace period. An exception thrown by an Open handler is logged at Error
+    /// level and Connect() still returns true. Messages still queued from earlier sends are sent as
+    /// soon as the new connection opens; the send methods' remarks say which ones are kept.
+    /// </remarks>
     /// <param name="options">Options to use when transcribing audio, <see cref="FluxSchema.Model"/> is required</param>
     /// <param name="cancelToken">Provide a cancel token to be used for the connect or use the internal one</param>
     /// <param name="addons">Additional query parameters to pass to the API</param>
@@ -429,6 +437,12 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// teardown concurrently; this method coordinates with it instead of faulting on the
     /// already-disposed socket.
     /// </summary>
+    /// <remarks>
+    /// Stop() returns after the Close event has been delivered, except when it ends a connection
+    /// whose Open handlers are still running: then it returns without waiting for them, and Close
+    /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
+    /// the new connection's Open. Dispose() raises no Close.
+    /// </remarks>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public new async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
     {
