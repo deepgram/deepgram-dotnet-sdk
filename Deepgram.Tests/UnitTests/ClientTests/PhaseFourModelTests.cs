@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Models.Analyze.v1;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.Speak.v1.REST;
@@ -11,6 +12,8 @@ using ListenMetadata = Deepgram.Models.Listen.v1.REST.Metadata;
 using ListenV1LiveSchema = Deepgram.Models.Listen.v1.WebSocket.LiveSchema;
 using ListenV2LiveSchema = Deepgram.Models.Listen.v2.WebSocket.LiveSchema;
 using SpeakV1WebSocketSchema = Deepgram.Models.Speak.v1.WebSocket.SpeakSchema;
+using SpeakV2WebSocketClient = Deepgram.Clients.Speak.v2.WebSocket.Client;
+using SpeakV2WebSocketSchema = Deepgram.Models.Speak.v2.WebSocket.SpeakSchema;
 using System.Globalization;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
@@ -32,16 +35,14 @@ public class PhaseFourModelTests
             });
             var listen = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new PreRecordedSchema { MipOptOut = true });
             var analyze = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/read", new AnalyzeSchema { Tag = new List<string> { "release", "phase-four" } });
-            var listenV1 = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", new ListenV1LiveSchema { MipOptOut = true });
             var listenV2 = QueryParameterUtil.FormatURL("https://api.deepgram.com/v2/listen", new ListenV2LiveSchema { MipOptOut = true });
-            var speakWebSocket = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakV1WebSocketSchema { MipOptOut = true });
+            var speakWebSocket = QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/speak", new SpeakV2WebSocketSchema { MipOptOut = true });
 
             using (new AssertionScope())
             {
                 speak.Should().Contain("speed=1.2").And.Contain("tag=release").And.Contain("tag=phase-four").And.Contain("mip_opt_out=true");
                 listen.Should().Contain("mip_opt_out=true");
                 analyze.Should().Contain("tag=release").And.Contain("tag=phase-four");
-                listenV1.Should().Contain("mip_opt_out=true");
                 listenV2.Should().Contain("mip_opt_out=true");
                 speakWebSocket.Should().Contain("mip_opt_out=true");
             }
@@ -70,6 +71,28 @@ public class PhaseFourModelTests
             request.Deployment.Should().Be("self-hosted");
             balance!.PurchaseOrderId.Should().Be("po-123");
             balance.Purchase.Should().Be("legacy");
+        }
+    }
+
+    [Test]
+    public void Speak_WebSocket_Uri_Should_Include_MipOptOut()
+    {
+        var uri = SpeakV2WebSocketClient.GetUri(new DeepgramWsClientOptions("test-api-key"), new SpeakV2WebSocketSchema { MipOptOut = true });
+
+        using (new AssertionScope())
+        {
+            uri.AbsoluteUri.Should().StartWith("wss://api.deepgram.com/v1/speak?");
+            uri.Query.Should().Contain("mip_opt_out=true");
+        }
+    }
+
+    [Test]
+    public void Deprecated_WebSocket_Schemas_Should_Not_Expose_MipOptOut()
+    {
+        using (new AssertionScope())
+        {
+            typeof(SpeakV1WebSocketSchema).GetProperty("MipOptOut").Should().BeNull();
+            typeof(ListenV1LiveSchema).GetProperty("MipOptOut").Should().BeNull();
         }
     }
 }
