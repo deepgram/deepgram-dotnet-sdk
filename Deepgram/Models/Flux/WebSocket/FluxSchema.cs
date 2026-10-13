@@ -82,6 +82,21 @@ public class FluxSchema
     public List<string>? LanguageHint { get; set; }
 
     /// <summary>
+    /// Converts recognized numbers from written words to digits. Default false.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("numerals")]
+    public bool? Numerals { get; set; }
+
+    /// <summary>
+    /// Redacts recognized numbers from the transcript, replacing each one with <c>*</c>.
+    /// Flux STT supports only <c>numbers</c> and <c>aggressive_numbers</c>.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("redact")]
+    public string? Redact { get; set; }
+
+    /// <summary>
     /// Removes profanity from the transcript. Default false.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
