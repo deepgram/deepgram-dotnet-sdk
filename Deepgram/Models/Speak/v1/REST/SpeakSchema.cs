@@ -14,7 +14,7 @@ public class SpeakSchema
     public double? Speed { get; set; }
 
     /// <summary>
-    /// Adds one or more labels to the synthesized request.
+    /// Labels this request for identification in usage reporting.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("tag")]
@@ -27,6 +27,7 @@ public class SpeakSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }
+
     /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">

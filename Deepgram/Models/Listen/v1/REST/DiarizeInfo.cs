@@ -4,11 +4,20 @@
 
 namespace Deepgram.Models.Listen.v1.REST;
 
+/// <summary>
+/// The diarizer that produced the speaker labels.
+/// </summary>
 public class DiarizeInfo
 {
+    /// <summary>
+    /// UUID of the diarizer model.
+    /// </summary>
     [JsonPropertyName("model_uuid")]
     public string? ModelUuid { get; set; }
 
+    /// <summary>
+    /// Architecture of the diarizer, such as <c>v1</c> or <c>v2</c>.
+    /// </summary>
     [JsonPropertyName("arch")]
     public string? Arch { get; set; }
 }

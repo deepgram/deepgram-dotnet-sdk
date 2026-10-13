@@ -6,11 +6,18 @@ namespace Deepgram.Models.Listen.v1.REST;
 
 public record Metadata
 {
+    /// <summary>
+    /// The diarizer that produced the speaker labels. Present only when diarization ran.
+    /// </summary>
     [JsonPropertyName("diarize_info")]
     public DiarizeInfo? DiarizeInfo { get; set; }
 
+    /// <summary>
+    /// Tags set on the request with the <c>tag</c> query parameter.
+    /// </summary>
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }
+
     /// <summary>
     /// Number of channels detected in the submitted audio.
     /// </summary>

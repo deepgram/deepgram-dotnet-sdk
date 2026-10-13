@@ -13,6 +13,7 @@ public class PreRecordedSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mip_opt_out")]
     public bool? MipOptOut { get; set; }
+
     /// <summary>
     /// Number of transcripts to return per request
     /// <see href="https://developers.deepgram.com/reference/pre-recorded"/>
