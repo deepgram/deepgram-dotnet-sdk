@@ -12,8 +12,11 @@ public static class ListenWebSocketClientExtensions
 {
     /// <summary>
     /// Sends a Configure message on an open <c>/v1/listen</c> stream without reconnecting.
-    /// Keyterms require a Nova-3 model and the global endpoint. A successful Configure message
-    /// does not receive an acknowledgement; server rejections arrive as an Error response.
+    /// Keyterm updates require a Nova-3 model on <c>api.deepgram.com</c>; see
+    /// <see cref="ConfigureSchema"/> for the keyterm limit and regional hosts. Most rejections
+    /// arrive as an Error response. <c>SendConfigure</c> sends nothing while the client is not
+    /// connected. Each new connection starts from its <see cref="LiveSchema"/> settings, so send
+    /// the update again after every <c>Connect()</c>.
     /// </summary>
     public static async Task SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
     {

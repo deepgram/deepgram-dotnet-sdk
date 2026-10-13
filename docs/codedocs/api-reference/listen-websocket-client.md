@@ -64,7 +64,7 @@ void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend)
 void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend)
 Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
 Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
-Task SendConfigure(ConfigureSchema configure)
+Task SendConfigure(ConfigureSchema configure) // extension method in Deepgram.ListenWebSocketClientExtensions
 WebSocketState State()
 bool IsConnected()
 ```
@@ -73,7 +73,9 @@ bool IsConnected()
 
 `SendConfigure` updates an open `/v1/listen` stream without reconnecting. It first calls `Flush()` so
 audio queued through `Send`, `SendBinary`, or `SendMessage` reaches the server before the Configure
-frame. Await it to establish an audio/configuration boundary.
+frame. Await it to establish an audio/configuration boundary. `SendConfigure` sends nothing while
+the client is not connected. Each new connection starts from its `LiveSchema` settings, so send the
+update again after every `Connect()`.
 
 ```csharp
 await client.SendConfigure(new ConfigureSchema
@@ -83,11 +85,16 @@ await client.SendConfigure(new ConfigureSchema
 });
 ```
 
-Keyterms require Nova-3 on the global endpoint. An empty `Keyterms` list clears the active list;
-`null` leaves it unchanged. A successful Configure has no acknowledgement. Ordinary server
-rejections arrive through `ErrorResponse`, such as `Code == "KeytermsNotSupported"`. Keep each
-keyterm update below 500 tokens: an over-limit update can stop transcription and close with
-`1011 (NET-0000)` without an Error response.
+An empty `Keyterms` list clears the active list; `null` leaves it unchanged. Keyterm updates work
+on Nova-3 streams on `api.deepgram.com`. They are not yet available on the EU, Australia, or India
+regional hosts, and as of October 2026 the EU host accepts a keyterm update without an Error, so do
+not rely on an Error to detect an unsupported host. A successful update has no acknowledgement.
+Most rejections arrive as an Error response with a `Variant` and, when one applies, a `Code`, for
+example `InvalidConfigureMessage` / `KeytermsNotSupported` (keyterms on a model other than
+Nova-3); the stream keeps its previous settings. Keep each keyterm update under the 500-token limit
+and check the list size before sending; the SDK does not check it. As of October 2026, an
+over-limit update does not return an Error: transcription stops, and the server closes the stream
+with `1011 (NET-0000)` after about 30 seconds.
 
 ## Key `LiveSchema` fields
 

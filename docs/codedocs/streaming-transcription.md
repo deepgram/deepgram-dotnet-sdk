@@ -159,9 +159,13 @@ await client.SendMessageImmediately(controlBytes);
 
 `SendConfigure` is the exception for a mid-stream `/v1/listen` Configure control: it drains queued
 audio before writing Configure immediately, so `client.Send(audio); await client.SendConfigure(...)`
-keeps the audio before the new configuration. Keyterms require Nova-3 on the global endpoint. Use
-an empty list to clear keyterms and keep each update under 500 tokens; an over-limit update can
-close the stream with `1011 (NET-0000)` without sending an Error response.
+keeps the audio before the new configuration. Keyterm updates work on Nova-3 streams on
+`api.deepgram.com`. They are not yet available on the EU, Australia, or India regional hosts, and
+as of October 2026 the EU host accepts a keyterm update without an Error, so do not rely on an
+Error to detect an unsupported host. Keep each keyterm update under the 500-token limit and check
+the list size before sending; the SDK does not check it. As of October 2026, an over-limit update
+does not return an Error: transcription stops, and the server closes the stream with
+`1011 (NET-0000)` after about 30 seconds.
 
 </Accordion>
 <Accordion title="Autoflush convenience vs explicit lifecycle control">

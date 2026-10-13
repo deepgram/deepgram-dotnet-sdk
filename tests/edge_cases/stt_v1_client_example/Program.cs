@@ -13,6 +13,7 @@ namespace SampleApp
             // Initialize Library with default logging
             Library.Initialize();
 
+            // Despite the folder name, this harness runs the current ListenWebSocketClient.
             // use the client factory with a API Key set with the "DEEPGRAM_API_KEY" environment variable
             var liveClient = ClientFactory.CreateListenWebSocketClient();
 
