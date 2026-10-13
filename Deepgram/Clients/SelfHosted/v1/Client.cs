@@ -14,7 +14,7 @@ namespace Deepgram.Clients.SelfHosted.v1;
 /// </summary>
 /// <param name="apiKey">Required DeepgramApiKey</param>
 /// <param name="deepgramClientOptions"><see cref="DeepgramHttpClientOptions"/> for HttpClient Configuration</param>
-[Obsolete("Use SelfHostedDistributionCredentialsClient instead.")]
+[Obsolete("Please use Deepgram.Clients.SelfHosted.v1.DistributionCredentialsClient instead", false)]
 public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClientOptions = null, string? httpId = null)
     : AbstractRestClient(apiKey, deepgramClientOptions, httpId), ISelfHostedClient
 {

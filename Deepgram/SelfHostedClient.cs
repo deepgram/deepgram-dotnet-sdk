@@ -10,7 +10,7 @@ namespace Deepgram;
 /// <summary>
 /// Implements the frozen legacy on-prem SelfHosted Client.
 /// </summary>
-[Obsolete("Use SelfHostedDistributionCredentialsClient instead.")]
+[Obsolete("Please use SelfHostedDistributionCredentialsClient instead", false)]
 public class SelfHostedClient : Client
 {
     public SelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? deepgramClientOptions = null,
