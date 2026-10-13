@@ -4,6 +4,8 @@
 
 using Deepgram.Models.Manage.v1;
 using Deepgram.Models.PreRecorded.v1;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace Deepgram.Tests.UnitTests.UtilitiesTests;
 
@@ -259,4 +261,32 @@ public class QueryParameterUtilTests
         result.Should().Be(expected);
     }
 
+    [Test]
+    public void FormatURL_Should_Format_Float_And_Decimal_With_Invariant_Culture()
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("de-DE");
+            var obj = new FloatDecimalSchema { F = 1.5f, M = 0.25m };
+            var expected = "https://api.deepgram.com/?f=1.5&m=0.25";
+
+            var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+            result.Should().Be(expected);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
+    private sealed class FloatDecimalSchema
+    {
+        [JsonPropertyName("f")]
+        public float? F { get; set; }
+
+        [JsonPropertyName("m")]
+        public decimal? M { get; set; }
+    }
 }
