@@ -250,12 +250,31 @@ await liveClient.Subscribe(new EventHandler<ResultResponse>((sender, e) =>
     }
 }));
 
+// Print every server Error, including rejected Configure updates.
+await liveClient.Subscribe(
+    new EventHandler<Deepgram.Models.Listen.v2.WebSocket.ErrorResponse>((sender, e) =>
+    {
+        Console.Error.WriteLine($"{e.Variant} {e.Code}: {e.Description}");
+    }));
+
 // Connect to Deepgram
 var liveSchema = new LiveSchema()
 {
     Model = "nova-3",
 };
 await liveClient.Connect(liveSchema);
+
+// Update keyterms or features on an open stream without reconnecting. Keyterm updates work on
+// Nova-3 on api.deepgram.com, not yet on the EU, Australia, or India hosts. Keyterms replace the
+// active list; an empty list clears it. Keep each update under 500 tokens: an over-limit update
+// returns no Error, transcription stops, and the stream closes with 1011 (NET-0000).
+// Success has no acknowledgement; most rejections arrive as an Error. Details:
+// https://developers.deepgram.com/docs/configure
+await liveClient.SendConfigure(new ConfigureSchema
+{
+    Keyterms = new List<string> { "Deepgram" },
+    Features = new Dictionary<string, bool> { ["numerals"] = true },
+});
 
 // Stream audio data to Deepgram
 byte[] audioData = GetAudioData(); // Your audio source
@@ -383,6 +402,8 @@ existing interface member was renamed, removed, or changed.
 ## Flux Text to Speech
 
 Synthesize speech with [Deepgram Flux TTS](https://developers.deepgram.com/docs/flux-tts/overview), available on two transports. Stream text in and receive synthesized audio out turn by turn over a WebSocket (built for voice agents), or generate a complete block of audio in a single batch (REST) request. Models are `flux-{voice}-{language}` (e.g. `flux-alexis-en`); an Aura model on this endpoint is rejected — use the classic Speak client for Aura voices.
+
+`FluxSpeakTextControls.Pronunciation(word, ipa)` formats Early Access IPA markers for Flux TTS REST or WebSocket text. `FluxSpeakTextControls.Pause(duration)` formats batch REST-only pauses from 500 to 3000 ms in 100 ms increments. Do not combine pronunciation with non-default speed or with a pause in the same request; Flux TTS rejects those combinations.
 
 Streaming sends five client messages — `Speak`, `Flush`, `Interrupt`, `Configure`, and `Close` (note: `Close`, not the listen client's `CloseStream`). Audio arrives as interleaved binary chunks alongside JSON control messages (`Connected`, `SpeechStarted`, `SpeechMetadata`, `SpeechInterrupted`, `Flushed`, `ConfigureSuccess`/`ConfigureFailure`, `SessionMetadata`, `Warning`, `Error`).
 
