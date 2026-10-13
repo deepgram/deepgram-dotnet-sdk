@@ -18,7 +18,7 @@ public record ControlsApplied
     public int? PronunciationsApplied { get; set; }
 
     /// <summary>
-    /// Pronunciation entries that triggered a warning (invalid IPA, word too long).
+    /// Pronunciation overrides that triggered an IPA warning (a PRON-* code, such as an invalid IPA character).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("pronunciation_warnings")]

@@ -28,7 +28,7 @@ namespace SampleApp
             // must be a flux-* voice. Speed (0.85-1.15 in 0.05 steps) and Expressivity (beta,
             // -2 to 2) are optional GA params, available on both transports.
             var mp3 = await speakClient.ToFile(
-                new TextSource($"Your appointment is confirmed for {FluxSpeakTextControls.Pronunciation("3pm", "θriː piː ɛm")}. Tomorrow."),
+                new TextSource($"Take {FluxSpeakTextControls.Pronunciation("dupilumab", "duːˈpɪljuːmæb")} twice daily."),
                 "output.mp3",
                 new SpeakSchema()
                 {
