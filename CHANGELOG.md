@@ -1,5 +1,26 @@
 # Changelog
 
+## [7.2.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.3...7.2.0) (2026-10-13)
+
+
+### Features
+
+* add current self-hosted credentials client ([24adb8e](https://github.com/deepgram/deepgram-dotnet-sdk/commit/24adb8e8402b4d8cb975de777a4d2420370e5f9f))
+* **agent:** add current protocol controls ([80b4e6f](https://github.com/deepgram/deepgram-dotnet-sdk/commit/80b4e6f92dba8f7f5d1d70aa2761c1971b1f9b77))
+* **agent:** add Think model catalog client ([2eac499](https://github.com/deepgram/deepgram-dotnet-sdk/commit/2eac4999c228d2427e5d4168ec2efc7b59a08885))
+* complete current API models ([971f8c9](https://github.com/deepgram/deepgram-dotnet-sdk/commit/971f8c99a48eb9af57c3ada7df9104fce87b7207))
+* **flux:** add numerals and redaction options ([1cb7168](https://github.com/deepgram/deepgram-dotnet-sdk/commit/1cb7168e4351a53f64585934a4a74e3c44fb385b))
+* **flux:** add text control helpers ([70db782](https://github.com/deepgram/deepgram-dotnet-sdk/commit/70db7821dc73edeaadc144f5efb91151181c31f6))
+* **listen:** add Configure for Nova-3 streaming ([95bd033](https://github.com/deepgram/deepgram-dotnet-sdk/commit/95bd033acfcd0136c476000d6d0794e44ee5ebf4))
+* **manage:** add reporting client ([d2faa81](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d2faa81092f9e778009e02a14a959e09d2ea4171))
+* **speak:** add MipOptOut to the Speak WebSocket client options ([99a3a5d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/99a3a5d14dd27cd6313205cc41c423e045c8827b))
+
+
+### Bug Fixes
+
+* **manage:** use decimal for billing and purchase amounts ([730100a](https://github.com/deepgram/deepgram-dotnet-sdk/commit/730100a7eccfacf5ca663c9adb2f5c209cb54263))
+* warn when callers use ClientFactory.CreateSelfHostedClient ([db2bf04](https://github.com/deepgram/deepgram-dotnet-sdk/commit/db2bf04517444d5734c76866f2439fef31621b0c))
+
 ## [7.1.3](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.2...7.1.3) (2026-10-05)
 
 
