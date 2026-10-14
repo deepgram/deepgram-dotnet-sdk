@@ -19,7 +19,7 @@
 ### Bug Fixes
 
 * **manage:** Use `decimal` rather than `double` for billing and purchase amounts to preserve exact currency values in sums and comparisons. ([730100a](https://github.com/deepgram/deepgram-dotnet-sdk/commit/730100a7eccfacf5ca663c9adb2f5c209cb54263))
-* Mark `ClientFactory.CreateSelfHostedClient()` obsolete and direct callers to `CreateSelfHostedDistributionCredentialsClient()` for the current self-hosted distribution credentials routes. ([db2bf04](https://github.com/deepgram/deepgram-dotnet-sdk/commit/db2bf04517444d5734c76866f2439fef31621b0c))
+* Mark the legacy self-hosted client factory and concrete client types obsolete, and direct callers to `SelfHostedDistributionCredentialsClient` for the current self-hosted distribution credentials routes. ([db2bf04](https://github.com/deepgram/deepgram-dotnet-sdk/commit/db2bf04517444d5734c76866f2439fef31621b0c))
 
 ## [7.1.3](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.2...7.1.3) (2026-10-05)
 
