@@ -340,8 +340,7 @@ client is not connected does not throw, and the message is not always dropped:
   notices the end, may be dropped.
 - Messages queued while no sender is running (after it has stopped, or around a failed
   `Connect()`) stay queued. The next successful `Connect()` sends them to the server all at once.
-- For the Voice Agent, that backlog can be written before the Settings message, which the agent
-  expects first, so do not queue audio while the agent client is disconnected.
+- For the Voice Agent, queued audio is sent after the Settings message.
 - After `Dispose()`, sends are dropped.
 
 For live audio, such as a microphone, that burst of stale audio is rarely what you want. Stop
@@ -647,7 +646,7 @@ For a complete implementation, you would need to:
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
 
-Do not queue audio while the agent client is disconnected: on the next `Connect()`, queued audio can be written before the Settings message. See [Audio sent while disconnected](#audio-sent-while-disconnected).
+Queued audio is sent after the Settings message. See [Audio sent while disconnected](#audio-sent-while-disconnected).
 
 ### Defining function-call parameters
 

@@ -20,7 +20,11 @@ public interface IAgentWebSocketClient
     /// return, so an Open handler that waits for a message from the server blocks until its own
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
-    /// opens; the send methods' remarks say which ones are kept.
+    /// opens; the send methods' remarks say which ones are kept. Connect() sends the Settings
+    /// message before raising Open and before any queued message; if Settings cannot be sent,
+    /// Connect() fails and raises neither Open nor Close. When Connect() returns true for a
+    /// connection that another Connect() opened, that connection keeps the Settings it was opened
+    /// with: this call's options are not sent.
     /// </remarks>
     public Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
@@ -158,17 +162,29 @@ public interface IAgentWebSocketClient
     /// <summary>
     /// Sends a KeepAlive message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendKeepAlive();
 
     /// <summary>
     /// Sends an InjectUserMessage to the agent
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="content">The specific phrase or statement the agent should respond to</param>
     public Task SendInjectUserMessage(string content);
 
     /// <summary>
     /// Sends an InjectUserMessage to the agent using a schema object
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="injectUserMessageSchema">The InjectUserMessage schema containing the message details</param>
     public Task SendInjectUserMessage(InjectUserMessageSchema injectUserMessageSchema);
 
@@ -186,8 +202,7 @@ public interface IAgentWebSocketClient
     /// while no sender is running (after it has stopped, or around a failed Connect()) stays
     /// queued and is sent all at once on the next successful Connect(). Stop sending while
     /// disconnected, or use a new client, to keep stale audio from the server.
-    /// For the Voice Agent, that backlog can be written before the Settings message, which the agent
-    /// expects first: do not queue audio while the client is disconnected.
+    /// Queued audio is sent after the Settings message.
     /// </remarks>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
@@ -203,6 +218,10 @@ public interface IAgentWebSocketClient
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
     /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
     /// /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>
@@ -211,6 +230,10 @@ public interface IAgentWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
     /// /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>

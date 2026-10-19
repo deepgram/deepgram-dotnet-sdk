@@ -63,7 +63,11 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// return, so an Open handler that waits for a message from the server blocks until its own
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
-    /// opens; the send methods' remarks say which ones are kept.
+    /// opens; the send methods' remarks say which ones are kept. Connect() sends the Settings
+    /// message before raising Open and before any queued message; if Settings cannot be sent,
+    /// Connect() fails and raises neither Open nor Close. When Connect() returns true for a
+    /// connection that another Connect() opened, that connection keeps the Settings it was opened
+    /// with: this call's options are not sent.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
@@ -78,10 +82,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         {
             var myURI = GetUri(_deepgramClientOptions);
             Log.Debug("Connect", $"uri: {myURI}");
+            var settings = BuildSettingsPayload(options);
             // owned is the connection this call opened. It is null when another connection was
-            // already published ("already initialized"): that connection's own Connect() runs
-            // its post-connect work, so this call does none (#455).
-            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers);
+            // already published ("already initialized"): that connection's own Connect() sent its
+            // Settings message, so this call does no post-connect work (#455). The Settings message
+            // is sent by the pre-open step, before Open and before anything queued (#455).
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers,
+                (connection, connectToken) => SendSettings(connection, settings, connectToken)).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -89,46 +96,15 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                 return false;
             }
 
-            var json = options.ToString(); // Assuming options is a serializable object
-            var root = JsonNode.Parse(json)!.AsObject();
-
-            // Check agent exists
-            if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
+            if (owned == null)
             {
-                void DeleteProviderIfEmpty(JsonObject parent)
-                {
-                    if (parent.TryGetPropertyValue("provider", out var providerNode))
-                    {
-                        if (providerNode is JsonObject providerObj && providerObj.Count == 0)
-                        {
-                            parent.Remove("provider");
-                        }
-                    }
-                }
-
-                string[] sections = { "think", "speak", "listen" };
-
-                foreach (var section in sections)
-                {
-                    if (agent.TryGetPropertyValue(section, out var sectionNode) && sectionNode is JsonObject sectionObj)
-                    {
-                        DeleteProviderIfEmpty(sectionObj);
-                        if (sectionObj.Count == 0)
-                        {
-                            agent.Remove(section);
-                        }
-                    }
-                }
+                Log.Debug("Connect", "Client has already been initialized. Not sending Settings.");
+                Log.Verbose("AgentWSClient.Connect", "LEAVE");
+                return true;
             }
 
-            // Re-serialize the cleaned object
-            var cleanedJson = root.ToJsonString();
-            Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
-            var bytes = Encoding.UTF8.GetBytes(cleanedJson);
-            await SendMessageImmediately(bytes);
-
             // keepalive thread, handed the connection it belongs to (#455)
-            if (_deepgramClientOptions.KeepAlive && owned != null)
+            if (_deepgramClientOptions.KeepAlive)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
                 StartKeepAliveBackgroundThread(owned);
@@ -156,6 +132,93 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         }
 
         void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned));
+    }
+
+    /// <summary>
+    /// Serializes the Settings message, dropping empty provider objects and agent sections.
+    /// </summary>
+    private static byte[] BuildSettingsPayload(SettingsSchema options)
+    {
+        var json = options.ToString(); // Assuming options is a serializable object
+        var root = JsonNode.Parse(json)!.AsObject();
+
+        // Check agent exists
+        if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
+        {
+            void DeleteProviderIfEmpty(JsonObject parent)
+            {
+                if (parent.TryGetPropertyValue("provider", out var providerNode))
+                {
+                    if (providerNode is JsonObject providerObj && providerObj.Count == 0)
+                    {
+                        parent.Remove("provider");
+                    }
+                }
+            }
+
+            string[] sections = { "think", "speak", "listen" };
+
+            foreach (var section in sections)
+            {
+                if (agent.TryGetPropertyValue(section, out var sectionNode) && sectionNode is JsonObject sectionObj)
+                {
+                    DeleteProviderIfEmpty(sectionObj);
+                    if (sectionObj.Count == 0)
+                    {
+                        agent.Remove(section);
+                    }
+                }
+            }
+        }
+
+        // Re-serialize the cleaned object
+        var cleanedJson = root.ToJsonString();
+        Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
+        return Encoding.UTF8.GetBytes(cleanedJson);
+    }
+
+    /// <summary>
+    /// The pre-open step of <see cref="Connect"/>: sends the Settings message on the connection
+    /// being opened, before its sender starts and before Open. True when the connection is still
+    /// open afterwards. Without its Settings message the agent connection is unusable, so false
+    /// fails the connect (#455).
+    /// </summary>
+    private async Task<bool> SendSettings(ConnectionState owned, byte[] settings, CancellationToken connectToken)
+    {
+        if (!owned.IsOpen)
+        {
+            Log.Warning("Connect", "The connection closed before the Settings message was sent");
+            return false;
+        }
+
+        try
+        {
+            // Bounded by the connect token, and by the connection's own token so a release ends
+            // the send at once.
+            using var sendToken = CancellationTokenSource.CreateLinkedTokenSource(owned.Token, connectToken);
+            await SendOnConnection(owned, new ArraySegment<byte>(settings), WebSocketMessageType.Text, sendToken.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (connectToken.IsCancellationRequested)
+        {
+            Log.Warning("Connect", "The connect token was cancelled while the Settings message was being sent");
+            return false;
+        }
+        catch (ObjectDisposedException) when (owned.IsReleased)
+        {
+            // The connection was released (its token source disposed) before the send started.
+            return false;
+        }
+
+        // The send does nothing once the connection is released, and the connection can drop
+        // during the send. Either way the agent was never configured.
+        if (!owned.IsOpen)
+        {
+            Log.Warning("Connect", "The connection closed while the Settings message was being sent");
+            return false;
+        }
+
+        return true;
     }
 
     #region Subscribe Event
@@ -597,6 +660,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends a KeepAlive message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendKeepAlive()
     {
         ControlMessage message = new ControlMessage(AgentClientTypes.KeepAlive);
@@ -607,6 +674,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends an InjectUserMessage to the agent
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="content">The specific phrase or statement the agent should respond to</param>
     public async Task SendInjectUserMessage(string content)
     {
@@ -627,6 +698,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends an InjectUserMessage to the agent using a schema object
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="injectUserMessageSchema">The InjectUserMessage schema containing the message details</param>
     public async Task SendInjectUserMessage(InjectUserMessageSchema injectUserMessageSchema)
     {
@@ -652,6 +727,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// Flushes queued audio and then ends the current user turn. This control is supported when
     /// the Agent session uses a Flux STT listen provider.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendForceEndTurn()
     {
         await Flush();

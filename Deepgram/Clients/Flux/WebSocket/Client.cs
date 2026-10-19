@@ -313,6 +313,10 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// language hints mid-stream. Parameters left null keep their current values. The API
     /// responds with a ConfigureSuccess or ConfigureFailure message.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="configure">The configuration update to send</param>
     public async Task SendConfigure(ConfigureSchema configure)
     {
@@ -340,6 +344,10 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// the turn always ends on the audio you actually sent.
     /// <see href="https://developers.deepgram.com/docs/flux/force-end-turn"/>
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendForceEndTurn()
     {
         // Flush any buffered audio first so ForceEndTurn can't overtake audio still in the send

@@ -74,8 +74,8 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// timeout. A blocking Stop().Wait() inside an Open handler waits out this client's close grace
     /// period (<c>DefaultCloseGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
     /// logged at Error level and Connect() still returns true. SendText(), SendFlush(),
-    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected they
-    /// are dropped.
+    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected,
+    /// including while Connect() is still in progress, they are dropped.
     /// </remarks>
     /// <param name="options">Options to use when synthesizing, <see cref="SpeakSchema.Model"/> is required</param>
     /// <param name="cancelToken">Provide a cancel token to be used for the connect or use the internal one</param>
@@ -409,6 +409,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// <summary>
     /// Sends a Speak message ({"type":"Speak","text":...}) to synthesize text into the active turn.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="text">The text to synthesize</param>
     public async Task SendText(string text)
     {
@@ -427,6 +431,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// Sends a Flush message ({"type":"Flush"}) to end the active turn and generate the remaining
     /// audio. The server replies with Flushed, then SpeechMetadata once the turn's audio is sent.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendFlush()
     {
         var message = new ControlMessage(Constants.Flush);
@@ -442,6 +450,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// SpeechInterrupted, or a Warning if it cannot act on the interrupt (no audio generated yet,
     /// an earlier interrupt still in flight, a non-advancing offset, or no active turn).
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="interrupt">
     /// The interrupt to send. Include <see cref="InterruptSchema.PlaybackOffset"/> so the server
     /// can compute the text_spoken/text_remaining split; omit it (or pass null for a bare
@@ -461,6 +473,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// Sends an Interrupt message carrying a playback offset. Convenience overload of
     /// <see cref="SendInterrupt(InterruptSchema?)"/> for the common case.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="playbackOffsetMs">
     /// Milliseconds of audio played, cumulative from the start of the session (not the current
     /// turn). Each interrupt's offset must advance past the position established by the previous
@@ -475,6 +491,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// The server responds with ConfigureSuccess (echoing what it applied) or ConfigureFailure
     /// (e.g. code SPEED_OUT_OF_RANGE) - speed is not range-checked client-side.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="configure">The configuration update to send</param>
     public async Task SendConfigure(ConfigureSchema configure)
     {

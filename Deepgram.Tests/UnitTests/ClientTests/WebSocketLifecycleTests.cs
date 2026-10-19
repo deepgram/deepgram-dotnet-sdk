@@ -10,6 +10,7 @@ using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.WebSocket;
 using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
 using Microsoft.Extensions.Logging;
+using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
 using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Common = Deepgram.Models.Common.v2.WebSocket;
@@ -91,6 +92,86 @@ public class WebSocketLifecycleTests
                 FirstSendCloseReturned.TrySetResult(true);
                 await ReleaseFirstSendClose.Task;
             }
+        }
+    }
+
+    private static bool IsSettingsMessage(ArraySegment<byte> data, WebSocketMessageType messageType) =>
+        messageType == WebSocketMessageType.Text
+        && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("\"Settings\"");
+
+    /// <summary>
+    /// A Voice Agent client whose first Settings message, sent by Connect(), fails to send.
+    /// </summary>
+    private sealed class FailingSettingsAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        private int _failuresLeft = 1;
+
+        public FailingSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _failuresLeft, 0) == 1)
+            {
+                throw new WebSocketException("Simulated Settings send failure");
+            }
+            return base.SendOnConnection(owned, data, messageType, token);
+        }
+    }
+
+    /// <summary>
+    /// A Voice Agent client that records the order of its Settings and binary sends, and lets a
+    /// test hold the Settings message and see when a binary send starts.
+    /// </summary>
+    private sealed class OrderingAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        public OrderingAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public ConcurrentQueue<string> Events { get; } = new();
+
+        public TaskCompletionSource<bool> SettingsEntered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        /// <summary>Completed by default; a test replaces it to hold the Settings message.</summary>
+        public Task ReleaseSettings { get; set; } = Task.CompletedTask;
+
+        public TaskCompletionSource<bool> BinarySendStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType))
+            {
+                SettingsEntered.TrySetResult(true);
+                await ReleaseSettings.WaitAsync(GateTimeout);
+                await base.SendOnConnection(owned, data, messageType, token);
+                Events.Enqueue("settings");
+                return;
+            }
+            if (messageType == WebSocketMessageType.Binary)
+            {
+                Events.Enqueue("binary");
+                BinarySendStarted.TrySetResult(true);
+            }
+            await base.SendOnConnection(owned, data, messageType, token);
+        }
+    }
+
+    /// <summary>
+    /// A Voice Agent client whose connection drops while Connect() sends the Settings message: the
+    /// send aborts the socket and returns without sending.
+    /// </summary>
+    private sealed class DroppedDuringSettingsAgentClient : Deepgram.Clients.Agent.v2.WebSocket.Client
+    {
+        private int _drops = 1;
+
+        public DroppedDuringSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _drops, 0) == 1)
+            {
+                owned.Socket.Abort();
+                return Task.CompletedTask;
+            }
+            return base.SendOnConnection(owned, data, messageType, token);
         }
     }
 
@@ -900,6 +981,284 @@ public class WebSocketLifecycleTests
             server.AcceptedConnections.Should().Be(1);
             laterHandlerRan.Should().BeTrue("the next Open handler still runs");
         }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Connect_After_A_Failed_Settings_Send_Should_Open_A_New_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new FailingSettingsAgentClient(apiKey, options);
+        var settings = new AgentModels.SettingsSchema();
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        Func<Task<bool>> connect = async () => await client.Connect(settings);
+
+        await connect.Should().ThrowAsync<WebSocketException>();
+        using (new AssertionScope())
+        {
+            client.IsConnected().Should().BeFalse("a connection whose Settings message failed must be released");
+            Volatile.Read(ref openEvents).Should().Be(0, "Settings is sent before Open, so a failed Settings raises no Open");
+            Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open");
+        }
+
+        var connected = await client.Connect(settings);
+        var secondConnection = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var settingsFrame = await secondConnection.ReadFrameAsync().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeTrue();
+            client.IsConnected().Should().BeTrue("the retry must open a new connection");
+            server.AcceptedConnections.Should().Be(2);
+            settingsFrame.Text.Should().Contain("\"Settings\"", "the retry must send the Settings message on the new connection");
+        }
+
+        // Positive control: the retried connection raised Open, so its Stop() raises Close once.
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1);
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Server_Close_Right_After_The_Upgrade_Should_Raise_Open_Then_Close()
+    {
+        // The server closes every connection right after the upgrade. Settings goes out before the
+        // receive loop starts, and a socket reports the server's close only once it reads it, so
+        // the Settings send succeeds: Connect() returns true, Open is raised, and the receive loop
+        // then raises Close.
+        using var server = new LoopbackWebSocketServer(connection => connection.SendCloseAsync());
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Agent.v2.WebSocket.Client(apiKey, options);
+        var openEvents = 0;
+        var closeEvents = 0;
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            closed.TrySetResult(true);
+        }));
+
+        var connected = await client.Connect(new AgentModels.SettingsSchema()).WaitAsync(GateTimeout);
+        await closed.Task.WaitAsync(GateTimeout);
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var firstFrame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeTrue("the Settings message was sent before the server's close was read");
+            firstFrame.Text.Should().Contain("\"Settings\"");
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1, "the receive loop reads the server's close after Open");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Connect_Should_Fail_When_The_Connection_Drops_During_Settings()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new DroppedDuringSettingsAgentClient(apiKey, options);
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var connected = await client.Connect(new AgentModels.SettingsSchema()).WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref openEvents).Should().Be(0, "Settings is sent before Open, so a connection that drops during it raises no Open");
+            Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open");
+            connected.Should().BeFalse("the Settings message never reached the agent");
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "the dropped connection must be released so a retry can connect");
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Should_Send_Settings_Before_Raising_Open()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => client.Events.Enqueue("open")));
+
+        (await client.Connect(new AgentModels.SettingsSchema()).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        client.Events.Should().Equal(new[] { "settings", "open" }, "the agent is configured before Open is raised");
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Should_Send_Settings_Before_Queued_Audio()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+
+        // The Open handler waits until the queued audio is being sent, so the order on the wire is
+        // decided before Connect() returns.
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) =>
+            client.BinarySendStarted.Task.Wait(GateTimeout)));
+
+        // Audio queued before Connect().
+        client.SendBinary(new byte[] { 1, 2, 3 });
+
+        (await client.Connect(new AgentModels.SettingsSchema()).WaitAsync(GateTimeout)).Should().BeTrue();
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var first = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+        var second = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            first.Text.Should().Contain("\"Settings\"", "Settings is the first frame on the wire");
+            second.IsText.Should().BeFalse("the queued audio follows Settings");
+            client.Events.Should().Equal(new[] { "settings", "binary" });
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Immediate_Send_Before_Open_Should_Not_Precede_Settings()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        var releaseSettings = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.ReleaseSettings = releaseSettings.Task;
+
+        var connect = client.Connect(new AgentModels.SettingsSchema());
+        await client.SettingsEntered.Task.WaitAsync(GateTimeout);
+
+        // An immediate send while the Settings message is held: the connection is not open yet.
+        await client.SendMessageImmediately(Encoding.UTF8.GetBytes("{\"type\":\"InjectUserMessage\",\"content\":\"early\"}"))
+            .WaitAsync(GateTimeout);
+
+        releaseSettings.TrySetResult(true);
+        (await connect.WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // A sentinel: everything sent before it is on the wire by the time it arrives.
+        await client.SendKeepAlive().WaitAsync(GateTimeout);
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var before = new List<string>();
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.Text.Contains("\"KeepAlive\""))
+            {
+                break;
+            }
+            before.Add(frame.Text);
+        }
+
+        using (new AssertionScope())
+        {
+            before.Should().HaveCount(1, "the immediate send before Open is dropped");
+            before[0].Should().Contain("\"Settings\"");
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Audio_Sent_From_An_Open_Handler_Should_Follow_Settings()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) =>
+        {
+            // Start streaming as soon as the connection opens, and wait until that audio is being sent.
+            client.SendBinary(new byte[] { 4, 5, 6 });
+            client.BinarySendStarted.Task.Wait(GateTimeout);
+        }));
+
+        (await client.Connect(new AgentModels.SettingsSchema()).WaitAsync(GateTimeout)).Should().BeTrue();
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var first = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+        var second = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            first.Text.Should().Contain("\"Settings\"");
+            second.IsText.Should().BeFalse();
+            client.Events.Should().Equal(new[] { "settings", "binary" });
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task AgentClient_Concurrent_Connect_Should_Not_Release_The_First_Connection()
+    {
+        // Hold the first connection inside its handshake until the test lets it finish.
+        var upgradeRequested = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completeUpgrade = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(beforeUpgrade: async () =>
+        {
+            upgradeRequested.TrySetResult(true);
+            await completeUpgrade.Task;
+        });
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Agent.v2.WebSocket.Client(apiKey, options);
+        var settings = new AgentModels.SettingsSchema();
+
+        var firstConnect = client.Connect(settings);
+        await upgradeRequested.Task.WaitAsync(GateTimeout);
+
+        // A second Connect() while the first is still in its handshake.
+        var secondConnected = await client.Connect(settings).WaitAsync(GateTimeout);
+
+        completeUpgrade.TrySetResult(true);
+        var firstConnected = await firstConnect.WaitAsync(GateTimeout);
+
+        using (new AssertionScope())
+        {
+            secondConnected.Should().BeTrue("the second Connect() keeps the \"already initialized\" result");
+            firstConnected.Should().BeTrue("the second Connect() must not release the first connection");
+            client.IsConnected().Should().BeTrue();
+            server.AcceptedConnections.Should().Be(1);
+        }
+
+        // The Settings messages must all be on the wire before this KeepAlive.
+        await client.SendKeepAlive();
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var settingsMessages = 0;
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.Text.Contains("\"KeepAlive\""))
+            {
+                break;
+            }
+            if (frame.Text.Contains("\"Settings\""))
+            {
+                settingsMessages++;
+            }
+        }
+
+        settingsMessages.Should().Be(1, "only the Connect() that opened the connection sends Settings");
 
         await client.Stop();
     }

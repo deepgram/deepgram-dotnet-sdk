@@ -15,8 +15,8 @@ public static class ListenWebSocketClientExtensions
     /// Keyterm updates require a Nova-3 model on <c>api.deepgram.com</c>; see
     /// <see cref="ConfigureSchema"/> for the keyterm limit and regional hosts. Most rejections
     /// arrive as an Error response. <c>SendConfigure</c> sends nothing while the client is not
-    /// connected. Each new connection starts from its <see cref="LiveSchema"/> settings, so send
-    /// the update again after every <c>Connect()</c>.
+    /// connected, including while Connect() is still in progress. Each new connection starts from
+    /// its <see cref="LiveSchema"/> settings, so send the update again after every <c>Connect()</c>.
     /// </summary>
     public static async Task SendConfigure(this IListenWebSocketClient client, ConfigureSchema configure)
     {

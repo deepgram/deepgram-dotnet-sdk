@@ -25,8 +25,8 @@ public interface IFluxSpeakWebSocketClient
     /// timeout. A blocking Stop().Wait() inside an Open handler waits out this client's close grace
     /// period (<c>DefaultCloseGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
     /// logged at Error level and Connect() still returns true. SendText(), SendFlush(),
-    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected they
-    /// are dropped.
+    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected,
+    /// including while Connect() is still in progress, they are dropped.
     /// </remarks>
     public Task<bool> Connect(SpeakSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
@@ -152,30 +152,50 @@ public interface IFluxSpeakWebSocketClient
     /// <summary>
     /// Sends text to be synthesized into the active turn ({"type":"Speak","text":...}).
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendText(string text);
 
     /// <summary>
     /// Ends the active turn and generates the remaining audio ({"type":"Flush"}). The server
     /// replies with Flushed, then SpeechMetadata once the turn's audio has been sent.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendFlush();
 
     /// <summary>
     /// Cancels the currently active turn (barge-in). The server replies with SpeechInterrupted,
     /// or a Warning if it cannot act on the interrupt.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendInterrupt(InterruptSchema? interrupt = null);
 
     /// <summary>
     /// Cancels the currently active turn (barge-in), reporting the given playback offset.
     /// Convenience overload of <see cref="SendInterrupt(InterruptSchema?)"/>.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendInterrupt(long playbackOffsetMs);
 
     /// <summary>
     /// Changes the speaking rate mid-session, without reconnecting. The server responds with
     /// ConfigureSuccess or ConfigureFailure.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendConfigure(ConfigureSchema configure);
 
     /// <summary>

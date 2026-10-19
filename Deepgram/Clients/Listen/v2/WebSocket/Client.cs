@@ -300,6 +300,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a KeepAlive message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendKeepAlive()
     {
         Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
@@ -311,6 +315,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a Finalize message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendFinalize()
     {
         // Flush any buffered audio first so Finalize can't overtake audio still in the send

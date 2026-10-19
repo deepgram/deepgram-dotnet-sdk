@@ -120,6 +120,10 @@ public interface IFluxWebSocketClient
     /// Sends a Configure message to Deepgram to update end-of-turn thresholds, keyterms, or
     /// language hints mid-stream
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public Task SendConfigure(ConfigureSchema configure);
 
     // NOTE: SendForceEndTurn intentionally lives on the concrete
@@ -162,6 +166,10 @@ public interface IFluxWebSocketClient
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
     /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
     /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>
@@ -170,6 +178,10 @@ public interface IFluxWebSocketClient
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     /// <param name="data"></param>
     /// <param name="length">The number of bytes from the data to send. Use `Constants.UseArrayLengthForSend` to send the entire array.</param>
     /// <param name="_cancellationToken">Provide a cancel token to be used for the send function or use the internal one</param>

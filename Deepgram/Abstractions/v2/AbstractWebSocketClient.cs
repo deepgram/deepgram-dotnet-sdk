@@ -98,8 +98,17 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// initialized" result). Subclasses use <c>Owned</c> for their post-connect work, never
     /// <see cref="CurrentConnection"/>, so a concurrent Connect() cannot act on, or release,
     /// a connection it did not open.
+    /// <para>
+    /// <paramref name="beforeOpen"/>, when given, runs on the new connection after the handshake,
+    /// before its sender starts and before Open is raised, so the frames it sends are the first on
+    /// the wire (the Voice Agent sends its Settings message here). It receives the connect token.
+    /// If it returns false, the connection is released and Connect() returns false without raising
+    /// Open or Close; if it throws, the exception propagates as the raw exception. It is a per-call
+    /// delegate, not a virtual, because concurrent Connect() calls can carry different settings.
+    /// </para>
     /// </summary>
-    private protected async Task<(bool Connected, ConnectionState? Owned)> ConnectCore(string uri, CancellationTokenSource? cancelToken, Dictionary<string, string>? headers)
+    private protected async Task<(bool Connected, ConnectionState? Owned)> ConnectCore(string uri, CancellationTokenSource? cancelToken, Dictionary<string, string>? headers,
+        Func<ConnectionState, CancellationToken, Task<bool>>? beforeOpen = null)
     {
         Log.Verbose("AbstractWebSocketClient.Connect", "ENTER");
         if (Log.IsEnabled(LogLevel.Debug))
@@ -219,6 +228,9 @@ public abstract class AbstractWebSocketClient : IDisposable
         using var connectionScope = Log.BeginScope("AbstractWebSocketClient",
             new Dictionary<string, object> { ["dg.connection_id"] = owned.ConnectionId });
 
+        // True while the pre-open step runs: its failures surface as the raw exception, as the
+        // Voice Agent's Settings failures always have, not as a handshake failure.
+        var inPreOpenHook = false;
         try
         {
             var myUri = new Uri(uri);
@@ -278,6 +290,24 @@ public abstract class AbstractWebSocketClient : IDisposable
                 finally
                 {
                     delayCts.Cancel();
+                }
+            }
+
+            // The pre-open step runs before the sender starts and before Open, so what it sends
+            // comes first on the wire: nothing queued can overtake it, and immediate sends are
+            // refused until the connection is marked opened.
+            if (beforeOpen != null)
+            {
+                inPreOpenHook = true;
+                var prepared = await beforeOpen(owned, cancelToken!.Token).ConfigureAwait(false);
+                inPreOpenHook = false;
+                if (!prepared)
+                {
+                    Log.Warning("Connect", "The connection could not be prepared before Open. Not connecting.");
+                    Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+
+                    ResetFailedConnection(owned);
+                    return (false, null);
                 }
             }
 
@@ -395,7 +425,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             ResetFailedConnection(owned);
             return (false, null);
         }
-        catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true })
+        catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true } && !inPreOpenHook)
         {
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
@@ -865,14 +895,20 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     /// <summary>
     /// This method sends a binary message over the WebSocket connection immediately without queueing.
-    /// </summary>, 
+    /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     public virtual async Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
         // Read the current connection once and use its socket and token together, so a concurrent
         // Stop()/Dispose() or reconnect can't pair one connection's socket with another's token.
         // See #390 and #455.
+        // A connection that has not been marked opened is still connecting; an immediate send then
+        // could precede the pre-open step's frames (the Voice Agent's Settings message).
         var owned = CurrentConnection;
-        if (owned == null || !owned.IsOpen)
+        if (owned == null || !owned.IsOpened || !owned.IsOpen)
         {
             Log.Debug("SendBinaryImmediately", "WebSocket is not connected. Exiting...");
             return;
@@ -912,13 +948,19 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// This method sends a text message over the WebSocket connection immediately without queueing.
     /// </summary>
+    /// <remarks>
+    /// The message is sent only on a connection that has finished opening (its Open event has been
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// </remarks>
     public virtual async Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
         // Read the current connection once and use its socket and token together, so a concurrent
         // Stop()/Dispose() or reconnect can't pair one connection's socket with another's token.
         // See #390 and #455.
+        // A connection that has not been marked opened is still connecting; an immediate send then
+        // could precede the pre-open step's frames (the Voice Agent's Settings message).
         var owned = CurrentConnection;
-        if (owned == null || !owned.IsOpen)
+        if (owned == null || !owned.IsOpened || !owned.IsOpen)
         {
             Log.Debug("SendMessageImmediately", "WebSocket is not connected. Exiting...");
             return;
