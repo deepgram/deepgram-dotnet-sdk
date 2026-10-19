@@ -12,6 +12,7 @@ using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
 using Microsoft.Extensions.Logging;
 using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
 using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
+using SpeakModels = Deepgram.Models.Speak.v2.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 
@@ -1950,6 +1951,130 @@ public class WebSocketLifecycleTests
             server.DataFrames.Count(f => f.IsText && f.Text.Contains("\"Close\"")).Should().Be(1,
                 "Close is sent at most once per connection");
         }
+    }
+
+    /// <summary>
+    /// A Listen client that exposes its current connection and holds its sender inside the send of
+    /// a marker message until the test opens <see cref="ReleaseSender"/>.
+    /// </summary>
+    private sealed class FinalizeListenClient : Deepgram.Clients.Listen.v2.WebSocket.Client
+    {
+        public static readonly byte[] Marker = { 0xC2, 0xC2 };
+
+        public FinalizeListenClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal ConnectionState? Current => CurrentConnection;
+
+        public TaskCompletionSource<bool> SenderBlocked { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource<bool> ReleaseSender { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            if (data.Count == Marker.Length && data.SequenceEqual(Marker))
+            {
+                SenderBlocked.TrySetResult(true);
+                await ReleaseSender.Task;
+            }
+            await base.SendOnConnection(owned, data, messageType, token);
+        }
+    }
+
+    [Test]
+    public async Task ListenClient_Finalize_For_A_Stopped_Connection_Should_Not_Wait_On_A_Newer_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new FinalizeListenClient(apiKey, options);
+        var schema = new ListenModels.LiveSchema { Model = "nova-3" };
+
+        // Connection A, as an autoflush loop holds it.
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        var connectionA = client.Current!;
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // Connection B, whose sender is busy with queued audio.
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        client.SendBinary(FinalizeListenClient.Marker);
+        await client.SenderBlocked.Task.WaitAsync(GateTimeout);
+
+        try
+        {
+            // A's autoflush Finalize must not wait for B's queue.
+            Func<Task> finalize = () => client.SendFinalize(connectionA).WaitAsync(GateTimeout);
+            await finalize.Should().NotThrowAsync("a Finalize for a stopped connection must not wait on a newer connection's sender");
+        }
+        finally
+        {
+            client.ReleaseSender.TrySetResult(true);
+        }
+
+        // A sentinel queued on B: everything sent on B before it is on the wire when it arrives.
+        client.SendMessage(Encoding.UTF8.GetBytes("{\"type\":\"Sentinel\"}"));
+        var connectionB = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var before = new List<string>();
+        while (true)
+        {
+            var frame = await connectionB.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.IsText && frame.Text.Contains("\"Sentinel\""))
+            {
+                break;
+            }
+            if (frame.IsText)
+            {
+                before.Add(frame.Text);
+            }
+        }
+
+        before.Should().NotContain(f => f.Contains("\"Finalize\""), "connection A's Finalize must not reach connection B");
+
+        await client.Stop();
+    }
+
+    /// <summary>A Speak client that exposes its current connection.</summary>
+    private sealed class ExposedSpeakClient : Deepgram.Clients.Speak.v2.WebSocket.Client
+    {
+        public ExposedSpeakClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        internal ConnectionState? Current => CurrentConnection;
+    }
+
+    [Test]
+    public async Task SpeakClient_AutoFlush_For_A_Stopped_Connection_Should_Not_Reach_A_Newer_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new ExposedSpeakClient(apiKey, options);
+        var schema = new SpeakModels.SpeakSchema();
+
+        // Connection A, as an autoflush loop holds it.
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        var connectionA = client.Current!;
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // A's autoflush fires after A has ended, then the app speaks on connection B.
+        client.SendAutoFlush(connectionA);
+        client.SpeakWithText("sentinel");
+
+        var connectionB = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var before = new List<string>();
+        while (true)
+        {
+            var frame = await connectionB.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.Text.Contains("sentinel"))
+            {
+                break;
+            }
+            before.Add(frame.Text);
+        }
+
+        before.Should().NotContain(f => f.Contains("\"Flush\""), "a Flush from connection A's autoflush must not reach connection B");
+
+        await client.Stop();
     }
 
     /// <summary>

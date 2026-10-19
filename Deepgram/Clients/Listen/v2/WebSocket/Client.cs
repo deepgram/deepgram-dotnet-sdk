@@ -394,13 +394,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token);
     }
 
-    /// <summary>SendFinalize() for one connection: the autoflush loop sends on its own connection only (#455).</summary>
-    private async Task SendFinalize(ConnectionState owned)
+    /// <summary>
+    /// SendFinalize() for one connection: the autoflush loop flushes and sends on its own connection
+    /// only, so it never waits on, or sends to, a newer connection (#455).
+    /// </summary>
+    internal async Task SendFinalize(ConnectionState owned)
     {
         // Flush any buffered audio first so Finalize can't overtake audio still in the send
         // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
         Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
-        await Flush();
+        await FlushConnection(owned).ConfigureAwait(false);
 
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.Finalize);

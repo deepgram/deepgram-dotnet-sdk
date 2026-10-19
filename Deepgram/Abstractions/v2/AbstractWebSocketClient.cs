@@ -1042,22 +1042,38 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     public async Task Flush()
     {
-        var cts = _cancellationTokenSource;
-        if (!IsConnected() || cts == null)
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            Log.Debug("Flush", "WebSocket is not connected. Nothing to flush.");
+            return;
+        }
+
+        await FlushConnection(owned).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// <see cref="Flush"/> for one connection: waits until every message queued before the call has
+    /// been written by that connection's sender, or that connection has ended. The marker belongs to
+    /// the connection, so a newer connection's sender never reports it as reached (#455).
+    /// </summary>
+    private protected async Task FlushConnection(ConnectionState owned)
+    {
+        if (!owned.IsOpen)
         {
             Log.Debug("Flush", "WebSocket is not connected. Nothing to flush.");
             return;
         }
 
         var flushSignal = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        EnqueueSendMessage(WebSocketMessage.CreateFlushMarker(flushSignal));
+        EnqueueSendMessage(WebSocketMessage.CreateFlushMarker(flushSignal, owned));
 
         // Unblock if the connection is torn down before the marker is reached. Registering on an
-        // already-cancelled token runs the callback immediately; if the token was disposed by a
-        // concurrent teardown between the guard above and here, treat it as "connection gone".
+        // already-cancelled token runs the callback immediately; if the token's source was disposed
+        // by a concurrent teardown between the guard above and here, treat it as "connection gone".
         try
         {
-            using (cts.Token.Register(static state => ((TaskCompletionSource<bool>)state!).TrySetResult(false), flushSignal))
+            using (owned.Token.Register(static state => ((TaskCompletionSource<bool>)state!).TrySetResult(false), flushSignal))
             {
                 await flushSignal.Task.ConfigureAwait(false);
             }
@@ -1284,6 +1300,16 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Verbose("ProcessSendQueue", "Reading message off queue...");
                 while (_sendChannel.Reader.TryRead(out var message))
                 {
+                    // An SDK-internal message that belongs to another connection (an autoflush Flush
+                    // or Finalize marker from a connection that has ended) is dropped, never sent on
+                    // or reported as reached by this one (#455). Checked before the marker branch.
+                    if (message.Owner is { } messageOwner && !ReferenceEquals(messageOwner, owned))
+                    {
+                        Log.Debug("ProcessSendQueue", "Dropping a message that belongs to another connection.");
+                        message.FlushSignal?.TrySetResult(false);
+                        continue;
+                    }
+
                     // A flush marker carries no payload; reaching it in queue order means every
                     // message enqueued before it has been sent, so just signal and move on.
                     if (message.FlushSignal is not null)

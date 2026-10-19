@@ -398,7 +398,14 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     /// <summary>
     /// The SendMessage function needs to be overridden to handle the auto flush feature.
     /// </summary>
-    public override void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend)
+    public override void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend) =>
+        SendMessage(data, length, null);
+
+    /// <summary>
+    /// <see cref="SendMessage(byte[], int)"/> with the connection an SDK-internal message belongs
+    /// to; null for user messages.
+    /// </summary>
+    private void SendMessage(byte[] data, int length, ConnectionState? owner)
     {
         // auto flush
         if (_deepgramClientOptions.InspectSpeakMessage())
@@ -417,7 +424,18 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         }
 
         // send message
-        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length));
+        EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length, owner));
+    }
+
+    /// <summary>
+    /// The autoflush loop's Flush(): the same message, tagged with the loop's connection, so a
+    /// Flush still queued when that connection ends is dropped instead of reaching a newer one (#455).
+    /// </summary>
+    internal void SendAutoFlush(ConnectionState owned)
+    {
+        ControlMessage controlMessage = new ControlMessage(Constants.Flush);
+        byte[] byteArray = Encoding.UTF8.GetBytes(controlMessage.ToString());
+        SendMessage(byteArray, Constants.UseArrayLengthForSend, owned);
     }
 
     /// <summary>
@@ -471,10 +489,9 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     }
 
                     // Flush goes through the send queue on purpose, so it stays behind the queued
-                    // text. Enqueue it only while this loop's connection is still open (#455).
-                    // The check and the enqueue are not atomic: if the connection ends in
-                    // between, the Flush stays queued like any other message and goes to the next
-                    // connection, where a Flush with no text queued ahead of it is harmless.
+                    // text. Enqueue it only while this loop's connection is still open; it is
+                    // tagged with that connection, so if the connection ends before it is sent, a
+                    // newer connection's sender drops it (#455).
                     if (!owned.IsOpen)
                     {
                         Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
@@ -482,7 +499,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     }
 
                     Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Skipping...");
-                    Flush();
+                    SendAutoFlush(owned);
                     _lastReceived = null;
                 }
                 finally
