@@ -626,6 +626,62 @@ For a complete implementation, you would need to:
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
 
+### Typed providers
+
+`Listen.Provider`, `Think.Provider` and `Speak.Provider` are declared `dynamic`, so they accept any
+object. Prefer a typed provider: you get compile-time field names, the correct `type` discriminator
+by default, and the right snake_case JSON without hand-building it.
+
+```csharp
+using Deepgram.Models.Agent.v2.WebSocket;
+
+var settings = new SettingsSchema();
+
+// Flux STT inside the agent, with its turn-taking controls
+settings.Agent.Listen = new Listen
+{
+    Provider = new DeepgramListenProviderV2
+    {
+        Model = "flux-general-en",
+        EotThreshold = 0.7,
+        EotTimeoutMs = 5000,
+    },
+};
+
+settings.Agent.Think = new Think
+{
+    Provider = new OpenAiThinkProvider { Model = "gpt-4o-mini", Temperature = 0.7 },
+};
+
+// Version "v2" selects Flux TTS; "v1" selects Aura
+settings.Agent.Speak = new Speak
+{
+    Provider = new DeepgramSpeakProvider { Version = "v2", Model = "flux-kit-en" },
+};
+```
+
+Available providers:
+
+| Section | Types |
+| --- | --- |
+| `Listen` | `DeepgramListenProviderV1` (Nova), `DeepgramListenProviderV2` (Flux STT) |
+| `Think` | `AnthropicThinkProvider`, `AwsBedrockThinkProvider`, `GoogleThinkProvider`, `GroqThinkProvider`, `OpenAiThinkProvider` |
+| `Speak` | `DeepgramSpeakProvider`, `AwsPollySpeakProvider`, `CartesiaSpeakProvider`, `ElevenLabsSpeakProvider`, `OpenAiSpeakProvider` |
+
+`AwsBedrockThinkProvider` and `AwsPollySpeakProvider` take an `AwsCredentials` block; set
+`SessionToken` only for `"sts"`.
+
+The untyped route still works unchanged, so existing code needs no edits:
+
+```csharp
+dynamic provider = new Provider();
+provider.Type = "deepgram";
+provider.Model = "nova-3";
+settings.Agent.Listen.Provider = provider;
+```
+
+See `examples/agent/websocket/typed_providers`.
+
 ### Defining function-call parameters
 
 `Function.Parameters` is a JSON Schema expressed as a `Dictionary<string, object>`, so a function
