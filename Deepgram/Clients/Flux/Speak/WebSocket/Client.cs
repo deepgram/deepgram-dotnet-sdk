@@ -28,12 +28,6 @@ namespace Deepgram.Clients.Flux.Speak.WebSocket;
 /// </summary>
 public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 {
-    #region Fields
-    // Guards against the Close message being sent twice for one connection (a user-initiated
-    // Stop() calls SendClose, and the base Stop() would otherwise call it again).
-    private int _closeSent = 0;
-    #endregion
-
     /// <param name="apiKey">Required DeepgramApiKey</param>
     /// <param name="options"><see cref="IDeepgramClientOptions"/> for WebSocket Configuration</param>
     public Client(string? apiKey = null, IDeepgramClientOptions? options = null) : base(apiKey, options)
@@ -103,8 +97,6 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 
         try
         {
-            Interlocked.Exchange(ref _closeSent, 0);
-
             var myURI = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {myURI}");
             bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
@@ -557,7 +549,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             return;
         }
 
-        if (Interlocked.Exchange(ref _closeSent, 1) == 1)
+        // At most once per connection: a user Stop() calls SendClose, and its fallback to the base
+        // teardown would otherwise send it again. The mark lives on the connection, so a Connect()
+        // that returns the current connection cannot reset it (#455).
+        if (!owned.TryMarkCloseMessageSent())
         {
             Log.Debug("SendClose", "Close already sent for this connection. Skipping...");
             return;
@@ -690,7 +685,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             }
 
             // Server did not close (or teardown stalled): fall back to the base teardown.
-            // SendClose will not re-send Close (guarded by _closeSent).
+            // SendClose will not re-send Close (sent at most once per connection).
             Log.Debug("Stop", "Falling back to base Stop...");
             // Stop this connection only; base.Stop() would act on whatever is current by now.
             var result = await StopConnection(owned, cancelToken, nullByte);

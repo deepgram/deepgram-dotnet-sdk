@@ -1871,6 +1871,88 @@ public class WebSocketLifecycleTests
     }
 
     /// <summary>
+    /// A loopback server for the close-message tests: it signals <paramref name="firstReceived"/>
+    /// when the first message of the given type arrives, and closes the connection on a second one.
+    /// </summary>
+    private static LoopbackWebSocketServer ServerClosingOnSecond(string messageType, TaskCompletionSource<bool> firstReceived) => new(async connection =>
+    {
+        var seen = 0;
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync();
+            if (frame.IsText && frame.Text.Contains($"\"{messageType}\"") && ++seen == 1)
+            {
+                firstReceived.TrySetResult(true);
+            }
+            else if (frame.IsText && frame.Text.Contains($"\"{messageType}\""))
+            {
+                await connection.SendCloseAsync();
+                return;
+            }
+        }
+    });
+
+    [Test]
+    public async Task FluxClient_Connect_While_Connected_Should_Not_Let_Stop_Resend_CloseStream()
+    {
+        var firstCloseStream = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = ServerClosingOnSecond("CloseStream", firstCloseStream);
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.WebSocket.Client(apiKey, options);
+        var schema = new FluxSchema { Model = "flux-general-en" };
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // CloseStream goes out; the caller gives up on the grace period once the server has it.
+        using var closeToken = new CancellationTokenSource();
+        var sendClose = client.SendClose(false, closeToken);
+        await firstCloseStream.Task.WaitAsync(GateTimeout);
+        closeToken.Cancel();
+        await sendClose.WaitAsync(GateTimeout);
+
+        // A Connect() that returns the current connection must not re-arm CloseStream for it.
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        using (new AssertionScope())
+        {
+            server.AcceptedConnections.Should().Be(1);
+            server.DataFrames.Count(f => f.IsText && f.Text.Contains("\"CloseStream\"")).Should().Be(1,
+                "CloseStream is sent at most once per connection");
+        }
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Connect_While_Connected_Should_Not_Let_Stop_Resend_Close()
+    {
+        var firstClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = ServerClosingOnSecond("Close", firstClose);
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.Speak.WebSocket.Client(apiKey, options);
+        var schema = new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" };
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // Close goes out; the caller gives up on the grace period once the server has it.
+        using var closeToken = new CancellationTokenSource();
+        var sendClose = client.SendClose(false, closeToken);
+        await firstClose.Task.WaitAsync(GateTimeout);
+        closeToken.Cancel();
+        await sendClose.WaitAsync(GateTimeout);
+
+        // A Connect() that returns the current connection must not re-arm Close for it.
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+        using (new AssertionScope())
+        {
+            server.AcceptedConnections.Should().Be(1);
+            server.DataFrames.Count(f => f.IsText && f.Text.Contains("\"Close\"")).Should().Be(1,
+                "Close is sent at most once per connection");
+        }
+    }
+
+    /// <summary>
     /// Installs a log provider that throws on the given texts, runs <paramref name="act"/> (which
     /// must throw), runs <paramref name="afterAct"/>, resets the log, then checks that the client
     /// can connect again within the gate timeout.

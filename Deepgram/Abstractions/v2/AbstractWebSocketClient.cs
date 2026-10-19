@@ -741,6 +741,8 @@ public abstract class AbstractWebSocketClient : IDisposable
         // is then no longer usable, a Connect() still opening it fails, and it is always released.
         private const int StoppingFlag = 16;
         private int _flags;
+        // Set once the Flux STT CloseStream / Flux TTS Close message has been sent on this connection.
+        private int _closeMessageSent;
         private readonly TaskCompletionSource<bool> _released = new(TaskCreationOptions.RunContinuationsAsynchronously);
         // Completed when the connection is marked opened. Continuations run asynchronously, so a
         // waiting Connect() never runs inline on the opening thread before Open is delivered.
@@ -824,6 +826,12 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         /// <summary>Completes when the connection is marked opened.</summary>
         internal Task Ready => _ready.Task;
+
+        /// <summary>
+        /// True for the one caller that may send this connection's close message (the Flux STT
+        /// CloseStream or the Flux TTS Close), false once it has been claimed.
+        /// </summary>
+        internal bool TryMarkCloseMessageSent() => Interlocked.Exchange(ref _closeMessageSent, 1) == 0;
 
         /// <summary>Marks the connection opened; fails once a release or a Stop() has begun.</summary>
         internal bool TryMarkOpened()
