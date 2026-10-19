@@ -436,29 +436,40 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     return;
                 }
 
+                // Decide under the lock, then flush after releasing it. Flush() goes through
+                // SendMessage -> IncrementCounter, which takes _mutexLastDatagram, so calling it
+                // while holding the lock deadlocks this thread and every later SendMessage caller.
+                var shouldFlush = false;
                 await _mutexLastDatagram.WaitAsync();
                 try
                 {
                     if (_lastReceived == null)
                     {
                         Log.Debug("ProcessAutoFlush", "No datagram received. Skipping...");
-                        continue;
                     }
-
-                    var deltaTicks = DateTime.Now - _lastReceived;
-                    if (deltaTicks < diffTicks)
+                    else
                     {
-                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
-                        continue;
+                        var deltaTicks = DateTime.Now - _lastReceived;
+                        if (deltaTicks < diffTicks)
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
+                        }
+                        else
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Flushing...");
+                            _lastReceived = null;
+                            shouldFlush = true;
+                        }
                     }
-
-                    Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Skipping...");
-                    Flush();
-                    _lastReceived = null;
                 }
                 finally
                 {
                     _mutexLastDatagram.Release();
+                }
+
+                if (shouldFlush)
+                {
+                    Flush();
                 }
             }
 
