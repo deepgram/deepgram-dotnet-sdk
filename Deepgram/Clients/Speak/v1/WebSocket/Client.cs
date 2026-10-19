@@ -123,6 +123,13 @@ public class Client : IDisposable, ISpeakWebSocketClient
             }
         }
 
+        // caller-supplied socket settings, applied last so they can override the SDK's own
+        if (_deepgramClientOptions is DeepgramWsClientOptions { ConfigureClientWebSocket: { } configureClientWebSocket })
+        {
+            Log.Debug("Connect", "Applying ConfigureClientWebSocket");
+            configureClientWebSocket(_clientWebSocket.Options);
+        }
+
         // internal cancelation token for internal threads
         _cancellationTokenSource = new CancellationTokenSource();
 
