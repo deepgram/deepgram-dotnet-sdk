@@ -77,7 +77,9 @@ public class Client : IDisposable, ISpeakWebSocketClient
         Dictionary<string, string>? headers = null)
     {
         Log.Verbose("SpeakWSClient.Connect", "ENTER");
-        Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
+        // Connect payloads are redacted before logging so a credential-bearing field
+        // can never reach log.txt. See LogRedactionUtil.
+        Log.Information("Connect", $"options:\n{LogRedactionUtil.SerializeRedacted(options)}");
         Log.Debug("Connect", $"addons: {addons}");
 
         // check if the client is disposed
@@ -129,7 +131,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
         try
         {
             var _uri = GetUri(_deepgramClientOptions, options, addons);
-            Log.Debug("Connect", $"uri: {_uri}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(_uri)}");
 
             Log.Debug("Connect", "Connecting to Deepgram API...");
             await _clientWebSocket.ConnectAsync(_uri, cancelToken.Token).ConfigureAwait(false);

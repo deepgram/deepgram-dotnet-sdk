@@ -88,7 +88,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         try
         {
             var myURI = GetUri(_deepgramClientOptions);
-            Log.Debug("Connect", $"uri: {myURI}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(myURI)}");
             var settings = BuildSettingsPayload(options);
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() sent its

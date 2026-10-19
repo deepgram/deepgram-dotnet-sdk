@@ -92,13 +92,15 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             throw new DeepgramException("Flux TTS requires a model to be specified (e.g. \"flux-alexis-en\").");
         }
 
-        Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
+        // Connect payloads are redacted before logging so a credential-bearing field
+        // can never reach log.txt. See LogRedactionUtil.
+        Log.Information("Connect", $"options:\n{LogRedactionUtil.SerializeRedacted(options)}");
         Log.Debug("Connect", $"addons: {addons}");
 
         try
         {
             var myURI = GetUri(_deepgramClientOptions, options, addons);
-            Log.Debug("Connect", $"uri: {myURI}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(myURI)}");
             bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
