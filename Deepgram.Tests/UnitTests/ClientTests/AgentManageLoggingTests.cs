@@ -56,9 +56,8 @@ public class AgentManageLoggingTests
     [SetUp]
     public void SetUp()
     {
-        Log.Reset();
         _provider = new RecordingLoggerProvider();
-        Log.Configure(LoggerFactory.Create(builder =>
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(MelLogLevel.Trace);
             builder.AddProvider(_provider);

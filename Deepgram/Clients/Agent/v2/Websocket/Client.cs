@@ -58,6 +58,22 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
+    /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
+    /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
+    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping. Connect() sends the Settings message before raising Open and
+    /// before any queued message; if Settings cannot be sent, Connect() fails and raises neither Open
+    /// nor Close. When Connect() returns true for a connection that another Connect() opened, that
+    /// connection keeps the Settings it was opened with: this call's options are not sent.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
+    /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
@@ -71,7 +87,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         {
             var myURI = GetUri(_deepgramClientOptions);
             Log.Debug("Connect", $"uri: {myURI}");
-            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
+            var settings = BuildSettingsPayload(options);
+            // owned is the connection this call opened. It is null when another connection was
+            // already published ("already initialized"): that connection's own Connect() sent its
+            // Settings message, so this call does no post-connect work (#455). The Settings message
+            // is sent by the pre-open step, before Open and before anything queued (#455).
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers,
+                (connection, connectToken) => SendSettings(connection, settings, connectToken)).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -79,49 +101,18 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                 return false;
             }
 
-            var json = options.ToString(); // Assuming options is a serializable object
-            var root = JsonNode.Parse(json)!.AsObject();
-
-            // Check agent exists
-            if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
+            if (owned == null)
             {
-                void DeleteProviderIfEmpty(JsonObject parent)
-                {
-                    if (parent.TryGetPropertyValue("provider", out var providerNode))
-                    {
-                        if (providerNode is JsonObject providerObj && providerObj.Count == 0)
-                        {
-                            parent.Remove("provider");
-                        }
-                    }
-                }
-
-                string[] sections = { "think", "speak", "listen" };
-
-                foreach (var section in sections)
-                {
-                    if (agent.TryGetPropertyValue(section, out var sectionNode) && sectionNode is JsonObject sectionObj)
-                    {
-                        DeleteProviderIfEmpty(sectionObj);
-                        if (sectionObj.Count == 0)
-                        {
-                            agent.Remove(section);
-                        }
-                    }
-                }
+                Log.Debug("Connect", "Client has already been initialized. Not sending Settings.");
+                Log.Verbose("AgentWSClient.Connect", "LEAVE");
+                return true;
             }
 
-            // Re-serialize the cleaned object
-            var cleanedJson = root.ToJsonString();
-            Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
-            var bytes = Encoding.UTF8.GetBytes(cleanedJson);
-            await SendMessageImmediately(bytes);
-
-            // keepalive thread
+            // keepalive thread, handed the connection it belongs to (#455)
             if (_deepgramClientOptions.KeepAlive)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
-                StartKeepAliveBackgroundThread();
+                StartKeepAliveBackgroundThread(owned);
             }
 
             Log.Debug("Connect", "Connect Succeeded");
@@ -145,7 +136,101 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             throw;
         }
 
-        void StartKeepAliveBackgroundThread() => Task.Run(async () => await ProcessKeepAlive());
+        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned).ConfigureAwait(false));
+    }
+
+    /// <summary>
+    /// Serializes the Settings message, dropping empty provider objects and agent sections.
+    /// </summary>
+    private static byte[] BuildSettingsPayload(SettingsSchema options)
+    {
+        var json = options.ToString(); // Assuming options is a serializable object
+        var root = JsonNode.Parse(json)!.AsObject();
+
+        // Check agent exists
+        if (root.TryGetPropertyValue("agent", out var agentNode) && agentNode is JsonObject agent)
+        {
+            void DeleteProviderIfEmpty(JsonObject parent)
+            {
+                if (parent.TryGetPropertyValue("provider", out var providerNode))
+                {
+                    if (providerNode is JsonObject providerObj && providerObj.Count == 0)
+                    {
+                        parent.Remove("provider");
+                    }
+                }
+            }
+
+            string[] sections = { "think", "speak", "listen" };
+
+            foreach (var section in sections)
+            {
+                if (agent.TryGetPropertyValue(section, out var sectionNode) && sectionNode is JsonObject sectionObj)
+                {
+                    DeleteProviderIfEmpty(sectionObj);
+                    if (sectionObj.Count == 0)
+                    {
+                        agent.Remove(section);
+                    }
+                }
+            }
+        }
+
+        // Re-serialize the cleaned object
+        var cleanedJson = root.ToJsonString();
+        Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
+        return Encoding.UTF8.GetBytes(cleanedJson);
+    }
+
+    /// <summary>
+    /// The pre-open step of <see cref="Connect"/>: sends the Settings message on the connection
+    /// being opened, before its sender starts and before Open. True when the connection is still
+    /// open afterwards. Without its Settings message the agent connection is unusable, so false
+    /// fails the connect (#455).
+    /// </summary>
+    private async Task<bool> SendSettings(ConnectionState owned, byte[] settings, CancellationToken connectToken)
+    {
+        if (!owned.IsOpen)
+        {
+            Log.Warning("Connect", "The connection closed before the Settings message was sent");
+            return false;
+        }
+        if (owned.IsStopping)
+        {
+            // A Stop() has begun: the connect fails, and the Settings message is not sent.
+            Log.Warning("Connect", "The connection was stopped before the Settings message was sent");
+            return false;
+        }
+
+        try
+        {
+            // Bounded by the connect token, and by the connection's own token so a release ends
+            // the send at once.
+            using var sendToken = CancellationTokenSource.CreateLinkedTokenSource(owned.Token, connectToken);
+            await SendOnConnection(owned, new ArraySegment<byte>(settings), WebSocketMessageType.Text, sendToken.Token)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (connectToken.IsCancellationRequested)
+        {
+            Log.Warning("Connect", "The connect token was cancelled while the Settings message was being sent");
+            return false;
+        }
+        catch (ObjectDisposedException) when (owned.IsReleased)
+        {
+            // The connection was released (its token source disposed) before the send started.
+            return false;
+        }
+
+        // The send does nothing once the connection is released, and the connection can drop
+        // during the send. Either way the agent was never configured. A Stop() that began during
+        // the send fails the connect too.
+        if (!owned.IsOpen || owned.IsStopping)
+        {
+            Log.Warning("Connect", "The connection closed or was stopped while the Settings message was being sent");
+            return false;
+        }
+
+        return true;
     }
 
     #region Subscribe Event
@@ -506,6 +591,16 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Subscribe to an Close event from the Deepgram API
     /// </summary>
+    /// <remarks>
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
+    /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
@@ -577,6 +672,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends a KeepAlive message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendKeepAlive()
     {
         ControlMessage message = new ControlMessage(AgentClientTypes.KeepAlive);
@@ -587,6 +686,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends an InjectUserMessage to the agent
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="content">The specific phrase or statement the agent should respond to</param>
     public async Task SendInjectUserMessage(string content)
     {
@@ -607,6 +710,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends an InjectUserMessage to the agent using a schema object
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="injectUserMessageSchema">The InjectUserMessage schema containing the message details</param>
     public async Task SendInjectUserMessage(InjectUserMessageSchema injectUserMessageSchema)
     {
@@ -632,6 +739,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// Flushes queued audio and then ends the current user turn. This control is supported when
     /// the Agent session uses a Flux STT listen provider.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendForceEndTurn()
     {
         await Flush();
@@ -640,9 +751,23 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+    public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
-        if (_clientWebSocket == null || !IsConnected())
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
+            return Task.CompletedTask;
+        }
+        return SendClose(owned, nullByte, _cancellationToken);
+    }
+
+    /// <summary>
+    /// Sends the close message on one connection's socket only, never on a newer connection (#455).
+    /// </summary>
+    private protected override async Task SendClose(ConnectionState owned, bool nullByte, CancellationTokenSource? _cancellationToken)
+    {
+        if (!owned.IsOpen)
         {
             Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
             return;
@@ -651,49 +776,38 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
-            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
-            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
-            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
-            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
-            var socket = _clientWebSocket;
-            if (socket == null || !IsConnected())
-            {
-                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
-                return;
-            }
-            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
-
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(token);
-            try
-            {
-                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
+            var token = _cancellationToken?.Token ?? owned.Token;
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(AgentClientTypes.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        // The caller's token bounds the send, so Stop(token) keeps its timeout.
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
     }
     #endregion
 
-    internal async Task ProcessKeepAlive()
+    /// <summary>SendKeepAlive() for one connection: the keepalive loop sends on its own connection only (#455).</summary>
+    private async Task SendKeepAlive(ConnectionState owned)
+    {
+        ControlMessage message = new ControlMessage(AgentClientTypes.KeepAlive);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
+    }
+
+    internal async Task ProcessKeepAlive(ConnectionState owned)
     {
         Log.Verbose("AgentWSClient.ProcessKeepAlive", "ENTER");
 
         try
         {
+            // Use the connection this loop was started for, never the fields, so it stops with that
+            // connection and never acts on a newer one (#390, #455).
+            var _cancelToken = owned.Token;
             while (true)
             {
-                // snapshot the token each iteration to avoid a teardown race (#390)
-                var _cancelToken = GetInternalCancellationToken();
-
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
                 await Task.Delay(5000, _cancelToken);
 
@@ -702,13 +816,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
                 }
-                if (!IsConnected())
+                if (!owned.IsOpen)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;
                 }
 
-                await SendKeepAlive();
+                await SendKeepAlive(owned).ConfigureAwait(false);
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
