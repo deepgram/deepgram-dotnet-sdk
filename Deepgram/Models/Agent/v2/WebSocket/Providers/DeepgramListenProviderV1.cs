@@ -7,6 +7,9 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 /// <summary>
 /// Deepgram speech-to-text provider using the V1 API (Nova models).
 /// Assign to Listen.Provider.
+///
+/// Required by the API: <c>Type</c> (defaulted). Unset properties are omitted from the payload, so
+/// a missing required field is rejected by the server rather than caught locally.
 /// </summary>
 public record DeepgramListenProviderV1
 {

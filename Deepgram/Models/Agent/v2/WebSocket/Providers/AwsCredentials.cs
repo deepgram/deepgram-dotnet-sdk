@@ -7,6 +7,10 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 /// <summary>
 /// AWS credentials for the AWS Bedrock think provider and the AWS Polly speak provider.
 /// Use "sts" for short-lived credentials and "iam" for long-lived ones.
+///
+/// Required by the API when supplied: <c>Type</c>, <c>Region</c>, <c>AccessKeyId</c> and
+/// <c>SecretAccessKey</c>. <c>SessionToken</c> is for "sts" only. Unset properties are omitted from
+/// the payload, so a missing required field is rejected by the server rather than caught locally.
 /// </summary>
 public record AwsCredentials
 {

@@ -6,6 +6,10 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 
 /// <summary>
 /// Cartesia text-to-speech provider. Assign to Speak.Provider.
+///
+/// Required by the API: <c>Type</c> (defaulted), <c>ModelId</c> and <c>Voice</c>. Unset properties
+/// are omitted from the payload, so a missing required field is rejected by the server rather than
+/// caught locally.
 /// </summary>
 public record CartesiaSpeakProvider
 {

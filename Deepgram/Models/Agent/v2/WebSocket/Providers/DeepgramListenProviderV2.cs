@@ -7,6 +7,9 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 /// <summary>
 /// Deepgram speech-to-text provider using the V2 API (Flux STT).
 /// Assign to Listen.Provider.
+///
+/// Required by the API: <c>Type</c> (defaulted) and <c>Model</c>. Unset properties are omitted from
+/// the payload, so a missing required field is rejected by the server rather than caught locally.
 /// </summary>
 public record DeepgramListenProviderV2
 {

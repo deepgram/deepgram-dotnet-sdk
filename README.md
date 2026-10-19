@@ -671,6 +671,11 @@ Available providers:
 `AwsBedrockThinkProvider` and `AwsPollySpeakProvider` take an `AwsCredentials` block; set
 `SessionToken` only for `"sts"`.
 
+Settings is logged on connect, and `Library.Initialize()` writes `log.txt` by default. Credential
+values — `AccessKeyId`, `SecretAccessKey`, `SessionToken` and every `Endpoint.Headers` value — are
+redacted from that log; provider types, models, regions and header *names* are kept so a
+misconfigured provider is still debuggable.
+
 The untyped route still works unchanged, so existing code needs no edits:
 
 ```csharp
