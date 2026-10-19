@@ -19,6 +19,15 @@ public interface IFluxSpeakWebSocketClient
     /// <summary>
     /// Connects to the Deepgram Flux (v2 speak) WebSocket API.
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. A blocking Stop().Wait() inside an Open handler waits out this client's close grace
+    /// period (<c>DefaultCloseGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
+    /// logged at Error level and Connect() still returns true. SendText(), SendFlush(),
+    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected they
+    /// are dropped.
+    /// </remarks>
     public Task<bool> Connect(SpeakSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
 
@@ -26,6 +35,12 @@ public interface IFluxSpeakWebSocketClient
     /// Gracefully closes the connection: sends a Close message and waits briefly for the server to
     /// drain remaining audio, emit a final SessionMetadata, and close the socket.
     /// </summary>
+    /// <remarks>
+    /// Stop() returns after the Close event has been delivered, except when it ends a connection
+    /// whose Open handlers are still running: then it returns without waiting for them, and Close
+    /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
+    /// the new connection's Open. Dispose() raises no Close.
+    /// </remarks>
     public Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false);
     #endregion
 
@@ -35,7 +50,10 @@ public interface IFluxSpeakWebSocketClient
     /// </summary>
     /// <remarks>
     /// The handler runs before Connect() returns. If it throws, the exception is logged at Error
-    /// level and the connection stays open; Connect() still returns true.
+    /// level and the connection stays open; Connect() still returns true. The receive loop starts
+    /// only after the Open handlers return, so a handler that waits for a message from the server
+    /// blocks until its own timeout. A blocking Stop().Wait() inside an Open handler waits out this
+    /// client's close grace period (<c>DefaultCloseGracePeriodMs</c>, 3 s).
     /// </remarks>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<OpenResponse> eventHandler);
@@ -110,6 +128,16 @@ public interface IFluxSpeakWebSocketClient
     /// <summary>
     /// Subscribe to a Close event (raised locally when the connection closes).
     /// </summary>
+    /// <remarks>
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
+    /// </remarks>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler);
 

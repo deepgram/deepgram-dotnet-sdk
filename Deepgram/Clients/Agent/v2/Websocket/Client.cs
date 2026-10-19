@@ -58,6 +58,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
+    /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
+    /// opens; the send methods' remarks say which ones are kept.
+    /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
@@ -509,6 +516,16 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Subscribe to an Close event from the Deepgram API
     /// </summary>
+    /// <remarks>
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
+    /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)

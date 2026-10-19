@@ -329,6 +329,25 @@ catch (DeepgramWebSocketException exception)
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
 
+### Audio sent while disconnected
+
+`Send`, `SendBinary`, `SendMessage`, and the Aura TTS `SpeakWithText` queue each message for a
+background sender, which writes it to the socket while the client is connected. Sending while the
+client is not connected does not throw, and the message is not always dropped:
+
+- When a connection ends (`Stop()`, a server close, a dropped connection, or a send error), its
+  sender stops. Messages queued around that moment, including any queued before the sender
+  notices the end, may be dropped.
+- Messages queued while no sender is running (after it has stopped, or around a failed
+  `Connect()`) stay queued. The next successful `Connect()` sends them to the server all at once.
+- For the Voice Agent, that backlog can be written before the Settings message, which the agent
+  expects first, so do not queue audio while the agent client is disconnected.
+- After `Dispose()`, sends are dropped.
+
+For live audio, such as a microphone, that burst of stale audio is rarely what you want. Stop
+sending while the client is disconnected and resume once `Connect()` returns `true`, or create a
+new client for the new connection.
+
 ## Flux - Conversational Speech Recognition (Preview)
 
 > Flux support is currently in preview. The API surface may change in a future release.
@@ -388,6 +407,8 @@ await fluxClient.Stop();
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text/listen-flux).
+
+Audio sent while the client is disconnected can stay queued and be sent on the next `Connect()`; see [Audio sent while disconnected](#audio-sent-while-disconnected).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [bring-your-own-turn-detection version](./examples/speech-to-text/websocket/flux-force-end-turn/) and a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
@@ -625,6 +646,8 @@ For a complete implementation, you would need to:
 2. Implement audio playback for the agent's responses
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
+
+Do not queue audio while the agent client is disconnected: on the next `Connect()`, queued audio can be written before the Settings message. See [Audio sent while disconnected](#audio-sent-while-disconnected).
 
 ### Defining function-call parameters
 

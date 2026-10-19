@@ -28,10 +28,11 @@ public abstract class AbstractWebSocketClient : IDisposable
     // Locking model (#455). _lifecycleLock guards every change to which connection the client
     // owns: _connection, the three fields above, _senderTask and _disposed are only written
     // while holding it, except by the legacy DisposeCancellationTokenSource(), which nothing in
-    // the SDK calls and which is kept for derived classes. It is a plain lock, held for a few field reads and writes only: never
-    // across an await, and never while user code (event handlers, cancellation callbacks) runs.
-    // Hot paths (sends, IsConnected(), State()) read the fields without it; each reads a field
-    // once and then works on that value or on the connection's own ConnectionState.
+    // the SDK calls and which is kept for derived classes. It is a plain lock, held for a few
+    // field reads and writes only: never across an await, and never while user code (event
+    // handlers, cancellation callbacks) runs. Hot paths (sends, IsConnected(), State()) read
+    // the fields without it; each reads a field once and then works on that value or on the
+    // connection's own ConnectionState.
     private readonly object _lifecycleLock = new object();
 
     // The connection the fields above belong to (null when none is published), the most recent
@@ -76,12 +77,11 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
     /// </summary>
     /// <remarks>
-    /// Open event handlers run before this method returns. An exception thrown by an Open handler
-    /// is logged at Error level and does not fail the connection: Connect() still returns true.
-    /// The receive loop starts only after the Open handlers return, so an Open handler that waits
-    /// synchronously for a message from the server blocks until its own timeout. For the Flux STT
-    /// client, a blocking Stop().Wait() inside an Open handler waits out the CloseStream grace
-    /// period, because no receive loop is running yet to see the server close.
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
+    /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
+    /// opens; the send methods' remarks say which ones are kept.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
@@ -693,12 +693,10 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// Subscribe to an Open event from the Deepgram API
     /// </summary>
     /// <remarks>
-    /// The handler runs inside <see cref="Connect"/>. If it throws, the exception is logged at
-    /// Error level and the connection stays open; it does not reach the caller of Connect().
-    /// The receive loop starts only after the Open handlers return, so an Open handler that waits
-    /// synchronously for a message from the server blocks until its own timeout. For the Flux STT
-    /// client, a blocking Stop().Wait() inside an Open handler waits out the CloseStream grace
-    /// period, because no receive loop is running yet to see the server close.
+    /// The handler runs before Connect() returns. If it throws, the exception is logged at Error
+    /// level and the connection stays open; Connect() still returns true. The receive loop starts
+    /// only after the Open handlers return, so a handler that waits for a message from the server
+    /// blocks until its own timeout.
     /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
@@ -721,10 +719,14 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// Subscribe to a Close event from the Deepgram API
     /// </summary>
     /// <remarks>
-    /// Close fires once for each connection that raised Open, when Stop(), a server close or a
-    /// dropped connection ends it, and always after Open. If a Stop() ends the connection while
-    /// Open handlers are still running, Close fires as soon as they return. Dispose() raises no
-    /// Close.
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
     /// </remarks>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
@@ -833,6 +835,15 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// This method sends a binary message over the WebSocket connection.
     /// </summary>
+    /// <remarks>
+    /// The message is queued and written by a background sender while the client is connected.
+    /// When a connection ends, its sender stops: messages queued around that moment, including
+    /// any queued before the sender notices the end, may be dropped. Messages queued while no
+    /// sender is running (after it has stopped, or around a failed Connect()) stay queued and are
+    /// sent all at once on the next successful Connect(). To keep that backlog from reaching the
+    /// server, stop sending while disconnected or use a new client. After Dispose(), messages are
+    /// dropped.
+    /// </remarks>
     /// <param name="data"></param>
     public virtual void SendBinary(byte[] data, int length = Constants.UseArrayLengthForSend) =>
         EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Binary, length));
@@ -840,6 +851,15 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <summary>
     /// This method sends a text message over the WebSocket connection.
     /// </summary>
+    /// <remarks>
+    /// The message is queued and written by a background sender while the client is connected.
+    /// When a connection ends, its sender stops: messages queued around that moment, including
+    /// any queued before the sender notices the end, may be dropped. Messages queued while no
+    /// sender is running (after it has stopped, or around a failed Connect()) stay queued and are
+    /// sent all at once on the next successful Connect(). To keep that backlog from reaching the
+    /// server, stop sending while disconnected or use a new client. After Dispose(), messages are
+    /// dropped.
+    /// </remarks>
     public virtual void SendMessage(byte[] data, int length = Constants.UseArrayLengthForSend) =>
         EnqueueSendMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length));
 
@@ -1285,8 +1305,9 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     /// <remarks>
     /// Stop() returns after the Close event has been delivered, except when it ends a connection
-    /// whose Open handlers are still running: then it returns without waiting for them, and
-    /// Close fires as soon as they return. Dispose() raises no Close.
+    /// whose Open handlers are still running: then it returns without waiting for them, and Close
+    /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
+    /// the new connection's Open. Dispose() raises no Close.
     /// </remarks>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
