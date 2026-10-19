@@ -263,6 +263,12 @@ await liveClient.Subscribe(
 var liveSchema = new LiveSchema()
 {
     Model = "nova-3",
+    // Entity Detection extracts names, phone numbers, organizations and more. Entities arrive on
+    // final results only, in ResultResponse.Entities; enabling it also turns Punctuation on.
+    DetectEntities = true,
+    // DiarizeModel selects the diarization model and enables diarization on its own, so there is
+    // no need to also set Diarize. Streaming accepts "v1" and "latest"; "v2" is batch only.
+    DiarizeModel = "latest",
 };
 await liveClient.Connect(liveSchema);
 
