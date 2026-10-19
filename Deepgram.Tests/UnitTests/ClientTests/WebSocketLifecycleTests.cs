@@ -903,4 +903,143 @@ public class WebSocketLifecycleTests
 
         await client.Stop();
     }
+
+    [Test]
+    public async Task Dropped_Connection_Should_Raise_Close_And_Allow_A_New_Connect()
+    {
+        // The server drops the first connection's TCP connection without a close frame.
+        using var server = new LoopbackWebSocketServer(connection =>
+        {
+            if (connection.Number == 1)
+            {
+                connection.Abort();
+            }
+            return Task.CompletedTask;
+        });
+        using var client = new ExposedClient(NewApiKey());
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+        {
+            Interlocked.Increment(ref closeEvents);
+            closed.TrySetResult(true);
+        }));
+
+        (await client.Connect(server.Endpoint)).Should().BeTrue();
+        await closed.Task.WaitAsync(GateTimeout);
+
+        var reconnected = await client.Connect(server.Endpoint);
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1, "a dropped connection is torn down once");
+            reconnected.Should().BeTrue();
+            client.IsConnected().Should().BeTrue("Connect() after a dropped connection must open a new one");
+            server.AcceptedConnections.Should().Be(2);
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_With_A_Cancelled_Token_Should_Release_And_Raise_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.WebSocket.Client(apiKey, options);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        Func<Task<bool>> stop = () => client.Stop(cancelled, nullByte: true);
+
+        (await stop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1);
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the connection");
+        }
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Stop_With_A_Cancelled_Token_Should_Release_And_Raise_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.Speak.WebSocket.Client(apiKey, options);
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<FluxSpeak.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+        (await client.Connect(new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        Func<Task<bool>> stop = () => client.Stop(cancelled, nullByte: true);
+
+        (await stop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref closeEvents).Should().Be(1);
+            client.IsConnected().Should().BeFalse();
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the connection");
+        }
+    }
+
+    /// <summary>
+    /// A Flux STT client that exposes its send mutex and signals once its CloseStream send is
+    /// waiting for that mutex.
+    /// </summary>
+    private sealed class MutexGatedFluxClient : Deepgram.Clients.Flux.WebSocket.Client
+    {
+        public MutexGatedFluxClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public SemaphoreSlim SendMutex => _mutexSend;
+
+        public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            // The base send runs synchronously up to its wait for the held mutex, so once it has
+            // returned its task, it is waiting there.
+            var send = base.SendOnConnection(owned, data, messageType, token);
+            if (messageType == WebSocketMessageType.Text
+                && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
+            {
+                CloseStreamWaitingForMutex.TrySetResult(true);
+            }
+            await send;
+        }
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_Should_Not_Throw_When_The_Connection_Is_Released_During_Its_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new MutexGatedFluxClient(apiKey, options);
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+
+        // Hold the send mutex so Stop()'s CloseStream send waits for it.
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            var stop = client.Stop();
+            await client.CloseStreamWaitingForMutex.Task.WaitAsync(GateTimeout);
+
+            // Release the connection while the close is in flight; this cancels its token.
+            client.Dispose();
+
+            Func<Task<bool>> awaitStop = () => stop.WaitAsync(GateTimeout);
+            (await awaitStop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        }
+        finally
+        {
+            client.SendMutex.Release();
+        }
+    }
 }

@@ -968,6 +968,13 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Debug("SendOnConnection", "WebSocket was disposed while sending. Exiting...");
             Log.Verbose("SendOnConnection", $"ObjectDisposedException: {ex}");
         }
+        catch (OperationCanceledException ex) when (owned.IsReleased)
+        {
+            // A concurrent release cancelled the connection's token while this send waited or
+            // ran. The connection is gone; nothing to send.
+            Log.Debug("SendOnConnection", "The connection was released while sending. Exiting...");
+            Log.Verbose("SendOnConnection", $"OperationCanceledException: {ex}");
+        }
     }
 
     internal void EnqueueSendMessage(WebSocketMessage message)
@@ -1117,6 +1124,16 @@ public abstract class AbstractWebSocketClient : IDisposable
                 Log.Verbose("ProcessReceiveQueue", $"Exception: {ex}");
                 Log.Verbose("AbstractWebSocketClient.ProcessReceiveQueue", "LEAVE");
             }
+        }
+
+        // The socket stopped being open without a close frame (for example, the TCP connection
+        // dropped and the socket aborted). Tear the connection down like a server close, so
+        // Close fires and the next Connect() opens a new connection instead of hitting the
+        // "already initialized" guard. A no-op when a teardown already released it.
+        if (!owned.IsReleased)
+        {
+            Log.Information("ProcessReceiveQueue", "WebSocket is no longer open. Tearing down the connection...");
+            await StopConnection(owned);
         }
     }
 
@@ -1324,7 +1341,8 @@ public abstract class AbstractWebSocketClient : IDisposable
         try
         {
             // if websocket is open, send a close message on this connection
-            if (owned.IsOpen)
+            var wasOpen = owned.IsOpen;
+            if (wasOpen)
             {
                 Log.Debug("Stop", "Sending Close message...");
                 await SendClose(owned, nullByte, cancelToken);
@@ -1339,8 +1357,13 @@ public abstract class AbstractWebSocketClient : IDisposable
                 return true;
             }
 
-            // small delay to wait for any final transcription
-            await Task.Delay(100, cancelToken.Token).ConfigureAwait(false);
+            // Small delay to wait for any final transcription. A socket that was not open on entry
+            // (server close, dropped connection, still handshaking) has nothing more to deliver,
+            // so release it at once rather than keep a dead socket published.
+            if (wasOpen)
+            {
+                await Task.Delay(100, cancelToken.Token).ConfigureAwait(false);
+            }
 
             if (owned.IsReleased)
             {
