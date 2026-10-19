@@ -136,7 +136,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             throw;
         }
 
-        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned));
+        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -778,14 +778,14 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(AgentClientTypes.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
     }
     #endregion
 
@@ -794,7 +794,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     {
         ControlMessage message = new ControlMessage(AgentClientTypes.KeepAlive);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
     }
 
     internal async Task ProcessKeepAlive(ConnectionState owned)
@@ -822,7 +822,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     break;
                 }
 
-                await SendKeepAlive(owned);
+                await SendKeepAlive(owned).ConfigureAwait(false);
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");

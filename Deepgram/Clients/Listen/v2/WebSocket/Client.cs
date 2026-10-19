@@ -78,7 +78,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() runs
             // its post-connect work, so this call does none (#455).
-            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers);
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -119,9 +119,9 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             throw;
         }
 
-        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned));
+        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned).ConfigureAwait(false));
 
-        void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned));
+        void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned).ConfigureAwait(false));
     }
 
     #region Subscribe Event
@@ -374,14 +374,14 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(Constants.CloseStream);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
     }
     #endregion
 
@@ -391,7 +391,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.KeepAlive);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -408,7 +408,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.Finalize);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
     }
 
     internal async Task ProcessKeepAlive(ConnectionState owned)
@@ -436,7 +436,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     break;
                 }
 
-                await SendKeepAlive(owned);
+                await SendKeepAlive(owned).ConfigureAwait(false);
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
@@ -499,7 +499,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         continue;
                     }
 
-                    await SendFinalize(owned);
+                    await SendFinalize(owned).ConfigureAwait(false);
                     _lastReceived = null;
                 }
                 finally

@@ -99,7 +99,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         {
             var myURI = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {myURI}");
-            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
+            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -545,7 +545,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         if (nullByte)
         {
             // send a close to Deepgram, on this connection's socket only
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
             return;
         }
 
@@ -561,7 +561,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         ControlMessage message = new ControlMessage(Constants.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token).ConfigureAwait(false);
 
         // Flux drains remaining and queued audio and emits SessionMetadata AFTER Close, then
         // closes the connection from its side. Give it a grace period instead of tearing the
@@ -646,7 +646,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             if (owned.IsOpened && owned.IsOpen)
             {
                 // Sends {"type":"Close"} and waits (up to the grace period) for the server-side close.
-                await SendClose(owned, nullByte, cancelToken);
+                await SendClose(owned, nullByte, cancelToken).ConfigureAwait(false);
             }
 
             // If the server closed during the grace period, the receive loop is performing the
@@ -688,7 +688,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             // SendClose will not re-send Close (sent at most once per connection).
             Log.Debug("Stop", "Falling back to base Stop...");
             // Stop this connection only; base.Stop() would act on whatever is current by now.
-            var result = await StopConnection(owned, cancelToken, nullByte);
+            var result = await StopConnection(owned, cancelToken, nullByte).ConfigureAwait(false);
             Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
             return result;
         }
@@ -701,7 +701,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
             // Release only this connection: cancel before dispose, and leave any newer
             // connection's fields alone. Raise Close if this call did the release (#455).
-            await ReleaseAndRaiseClose(owned);
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
             Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
             return true;
         }

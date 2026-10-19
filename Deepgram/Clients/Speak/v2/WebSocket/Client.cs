@@ -74,7 +74,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() runs
             // its post-connect work, so this call does none (#455).
-            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers);
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -109,7 +109,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             throw;
         }
 
-        void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned));
+        void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned).ConfigureAwait(false));
     }
 
     #region Subscribe Event
@@ -386,13 +386,13 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(Constants.Close);
         byte[] data = Encoding.UTF8.GetBytes(message.ToString());
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
     }
 
     /// <summary>

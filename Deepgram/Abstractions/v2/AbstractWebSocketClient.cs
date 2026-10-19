@@ -1284,7 +1284,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // pick up a newer connection's socket or token. Release cancels the token before it
             // clears anything, so a released connection is always observed as cancelled here.
             var token = owned.Token;
-            while (await _sendChannel.Reader.WaitToReadAsync(token))
+            while (await _sendChannel.Reader.WaitToReadAsync(token).ConfigureAwait(false))
             {
                 if (token.IsCancellationRequested)
                 {
@@ -1321,7 +1321,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
                     // TODO: Add logging for message capturing for possible playback
                     Log.Verbose("ProcessSendQueue", "Sending message...");
-                    await SendOnConnection(owned, message.Message, message.MessageType, token);
+                    await SendOnConnection(owned, message.Message, message.MessageType, token).ConfigureAwait(false);
                 }
             }
 
@@ -1366,7 +1366,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 if (token.IsCancellationRequested)
                 {
                     Log.Information("ProcessReceiveQueue", "ReceiveThread cancelled");
-                    await StopConnection(owned);
+                    await StopConnection(owned).ConfigureAwait(false);
                     Log.Verbose("ProcessReceiveQueue", "LEAVE");
                     return;
                 }
@@ -1401,7 +1401,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     Log.Information("ProcessReceiveQueue", "Received WebSocket Close. Trigger cancel...");
-                    await StopConnection(owned);
+                    await StopConnection(owned).ConfigureAwait(false);
                     Log.Verbose("ProcessReceiveQueue", "LEAVE");
                     return;
                 }
@@ -1427,7 +1427,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         if (!owned.IsReleased)
         {
             Log.Information("ProcessReceiveQueue", "WebSocket is no longer open. Tearing down the connection...");
-            await StopConnection(owned);
+            await StopConnection(owned).ConfigureAwait(false);
         }
     }
 
@@ -1598,7 +1598,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             return true;
         }
 
-        var result = await StopConnection(owned, cancelToken, nullByte);
+        var result = await StopConnection(owned, cancelToken, nullByte).ConfigureAwait(false);
         Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
         return result;
     }
@@ -1668,7 +1668,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             if (wasOpen)
             {
                 Log.Debug("Stop", "Sending Close message...");
-                await SendClose(owned, nullByte, cancelToken);
+                await SendClose(owned, nullByte, cancelToken).ConfigureAwait(false);
             }
 
             // Another teardown may have released this connection while SendClose ran.
@@ -1722,7 +1722,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // observe cancellation and exit cleanly, compare-before-clear so a newer connection's
             // fields are left alone, and dispose the socket. Then raise Close, once. See #390, #455.
             Log.Debug("Stop", "Releasing the connection...");
-            await ReleaseAndRaiseClose(owned);
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
@@ -1737,7 +1737,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned);
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
             return true;
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException)
@@ -1750,7 +1750,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned);
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
             return true;
         }
         catch (Exception ex)
@@ -1759,7 +1759,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned);
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
             throw;
         }
     }
