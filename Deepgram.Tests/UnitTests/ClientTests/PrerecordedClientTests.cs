@@ -438,6 +438,16 @@ public class ListenRESTClientTests
         await prerecordedClient.DidNotReceive().PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>());
     }
 
+    [Test]
+    public void PreRecorded_CallbackMethod_Should_Be_Omitted_When_Unset()
+    {
+        var schema = new PreRecordedSchema { CallBack = "https://example.test/callback" };
+
+        var query = HttpUtility.ParseQueryString(new Uri(QueryParameterUtil.FormatURL("https://api.deepgram.com/v1/listen", schema)).Query);
+
+        query["callback_method"].Should().BeNull();
+    }
+
     private static Stream GetFakeStream(byte[] source)
     {
         var stream = new MemoryStream();

@@ -35,7 +35,7 @@ Three solution files exist. `Deepgram.sln` holds only `Deepgram`, `Deepgram.Test
 
 ## Client surfaces
 
-Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegments.cs` files on 2026-09-13.
+Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegments.cs` files on 2026-10-13.
 
 | Product | Endpoint | Factory method | Implementation | Status |
 | --- | --- | --- | --- | --- |
@@ -47,13 +47,17 @@ Every row below was checked against `Deepgram/ClientFactory.cs` and the `UriSegm
 | Flux TTS, batch | `POST /v2/speak` | `CreateFluxSpeakRESTClient` | `Clients/Flux/Speak/REST` | Shipped |
 | Flux TTS, streaming | `wss /v2/speak` | `CreateFluxSpeakWebSocketClient` | `Clients/Flux/Speak/WebSocket` | Shipped; `SendText`, `SendFlush`, `SendInterrupt`, `SendConfigure`, `Stop` |
 | Voice Agent | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentWebSocketClient` | `Clients/Agent/v2/Websocket` | Shipped |
+| Voice Agent protocol | `wss agent.deepgram.com/v1/agent/converse` | `CreateAgentProtocolClient` | `Clients/Agent/v2/Websocket` | Shipped; typed controls and event subscriptions |
+| Voice Agent Think catalog | `GET agent.deepgram.com/v1/agent/settings/think/models` | `CreateAgentCatalogClient` | `Clients/Agent/v1/REST` | Shipped |
 | Voice Agent management | `/v1/projects/{id}/agents`, `/agent-variables` | `CreateAgentManageClient` | `Clients/AgentManage/v1` | Shipped |
 | Text intelligence | `POST /v1/read` | `CreateAnalyzeClient` | `Clients/Analyze/v1` | Shipped |
 | Management API | `/v1/projects/...` | `CreateManageClient` | `Clients/Manage/v1` | Shipped |
-| Self-hosted credentials | `/v1/projects/{id}/onprem/...` | `CreateSelfHostedClient` | `Clients/SelfHosted/v1` | Shipped |
+| Management reporting | `/v1/projects/{id}/usage/breakdown`, billing, purchases | `CreateManagementReportingClient` | `Clients/Manage/v1` (`ReportingClient`) | Shipped |
+| Self-hosted distribution credentials | `/v1/projects/{id}/self-hosted/distribution/credentials` | `CreateSelfHostedDistributionCredentialsClient` | `Clients/SelfHosted/v1/DistributionCredentialsClient.cs` | Shipped |
+| Self-hosted credentials, legacy | `/v1/projects/{id}/onprem/...` | `CreateSelfHostedClient` | `Clients/SelfHosted/v1/Client.cs` | Obsolete and frozen |
 | Auth (grant token) | `POST /v1/auth/grant` | `CreateAuthClient` | `Clients/Auth/v1` | Shipped |
 
-`LiveClient`, `PreRecordedClient`, `SpeakClient`, and `OnPremClient` (and `Clients/Live`, `Clients/PreRecorded`, `Clients/OnPrem`) are deprecated and frozen. Point new code at `ListenWebSocketClient`, `ListenRESTClient`, `SpeakRESTClient`, and `SelfHostedClient`.
+`LiveClient`, `PreRecordedClient`, `SpeakClient`, and `OnPremClient` (and `Clients/Live`, `Clients/PreRecorded`, `Clients/OnPrem`) are deprecated and frozen, as are `SelfHostedClient` and `Clients/SelfHosted/v1/Client.cs`. Point new code at `ListenWebSocketClient`, `ListenRESTClient`, `SpeakRESTClient`, and `SelfHostedDistributionCredentialsClient`.
 
 ## Prerequisites
 
@@ -156,6 +160,6 @@ Release Please manages stable releases from `main`; the full process is in `.git
 
 - Do not commit keys, `.env` files, `bin/`, or `obj/` (`clean-up.sh` removes build output).
 - Do not run `extras/live-smoke` or the `examples/agent/manage` programs against a production project.
-- Do not add new code to the deprecated `Live`, `PreRecorded`, `Speak` (v1 wrapper), or `OnPrem` clients.
+- Do not add new code to the deprecated `Live`, `PreRecorded`, `Speak` (v1 wrapper), or `OnPrem` clients, or to the legacy `SelfHostedClient` (`Clients/SelfHosted/v1/Client.cs`).
 - Do not reformat files you are not otherwise changing, and do not suppress analyzer warnings to silence the build.
 - Do not add a `<Version>` to a `.csproj`; the tag is the version.

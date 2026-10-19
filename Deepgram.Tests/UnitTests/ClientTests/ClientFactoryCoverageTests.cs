@@ -23,6 +23,8 @@ public class ClientFactoryCoverageTests
         using (new AssertionScope())
         {
             ClientFactory.CreateAgentWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentWebSocketClient>();
+            ClientFactory.CreateAgentProtocolClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentProtocolClient>();
+            ClientFactory.CreateAgentCatalogClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentCatalogClient>();
             ClientFactory.CreateAgentManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentManageClient>();
             ClientFactory.CreateAnalyzeClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAnalyzeClient>();
             ClientFactory.CreateAuthClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAuthClient>();
@@ -32,9 +34,42 @@ public class ClientFactoryCoverageTests
             ClientFactory.CreateListenWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IListenWebSocketClient>();
             ClientFactory.CreateListenRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IListenRESTClient>();
             ClientFactory.CreateManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManageClient>();
+            ClientFactory.CreateManagementReportingClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IManagementReportingClient>();
             ClientFactory.CreateSelfHostedClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISelfHostedClient>();
+            ClientFactory.CreateSelfHostedDistributionCredentialsClient(ApiKey, HttpOptions)
+                .Should().BeAssignableTo<V1.ISelfHostedDistributionCredentialsClient>();
             ClientFactory.CreateSpeakRESTClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.ISpeakRESTClient>();
             ClientFactory.CreateSpeakWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.ISpeakWebSocketClient>();
+        }
+    }
+
+    [Test]
+    public void CreateSelfHostedClient_Overloads_Should_Be_Obsolete_And_Still_Return_The_Legacy_Client()
+    {
+        var overloads = typeof(ClientFactory).GetMethods()
+            .Where(method => method.Name == "CreateSelfHostedClient")
+            .ToList();
+
+        overloads.Should().HaveCount(2);
+
+        using (new AssertionScope())
+        {
+            foreach (var overload in overloads)
+            {
+                var obsolete = overload.GetCustomAttributes(typeof(ObsoleteAttribute), false)
+                    .Cast<ObsoleteAttribute>()
+                    .SingleOrDefault();
+
+                obsolete.Should().NotBeNull($"{overload} should be marked obsolete");
+                obsolete?.IsError.Should().BeFalse();
+                obsolete?.Message.Should().Contain("CreateSelfHostedDistributionCredentialsClient");
+
+                var arguments = overload.GetParameters()[0].ParameterType == typeof(int)
+                    ? new object?[] { 1, ApiKey, HttpOptions, null }
+                    : new object?[] { ApiKey, HttpOptions, null };
+
+                overload.Invoke(null, arguments).Should().BeAssignableTo<V1.ISelfHostedClient>();
+            }
         }
     }
 

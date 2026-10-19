@@ -73,6 +73,7 @@ public class PreRecordedSchema
     public List<string>? Keywords { get; set; }
     public List<string>? Keyterm { get; set; }
     public string? Language { get; set; }
+    public bool? MipOptOut { get; set; }
     public string? Model { get; set; }
     public bool? MultiChannel { get; set; }
     public bool? Numerals { get; set; }
@@ -105,6 +106,7 @@ public class LiveSchema
     public List<string>? Keywords { get; set; }
     public List<string>? Keyterm { get; set; }
     public string? Language { get; set; }
+    public bool? MipOptOut { get; set; }
     public string? Model { get; set; }
     public bool? NoDelay { get; set; }
     public bool? Punctuate { get; set; }
@@ -154,6 +156,9 @@ public class SpeakSchema
     public string? Container { get; set; }
     public string? Encoding { get; set; }
     public string? SampleRate { get; set; }
+    public double? Speed { get; set; }
+    public List<string>? Tag { get; set; }
+    public bool? MipOptOut { get; set; }
 }
 ```
 
@@ -166,6 +171,7 @@ public class SpeakSchema
     public int? BitRate { get; set; }
     public string? Encoding { get; set; }
     public int? SampleRate { get; set; }
+    public bool? MipOptOut { get; set; }
 }
 ```
 
@@ -197,6 +203,7 @@ public class AnalyzeSchema
     public string? Language { get; set; }
     public bool? Sentiment { get; set; }
     public bool? Summarize { get; set; }
+    public List<string>? Tag { get; set; }
     public bool? Topics { get; set; }
 }
 ```
@@ -233,7 +240,26 @@ public class KeySchema
 }
 ```
 
-`Deepgram.Models.SelfHosted.v1.CredentialsSchema`
+`Deepgram.Models.SelfHosted.v1.DistributionCredentialsCreateSchema` is the JSON body for `CreateDistributionCredentials`.
+
+```csharp
+public class DistributionCredentialsCreateSchema
+{
+    public string? Comment { get; set; }
+}
+```
+
+`Deepgram.Models.SelfHosted.v1.DistributionCredentialsCreateOptions` holds the query options for `CreateDistributionCredentials`. Each entry in `Scopes` is sent as its own `scopes` query parameter.
+
+```csharp
+public class DistributionCredentialsCreateOptions
+{
+    public List<string>? Scopes { get; set; }
+    public string? Provider { get; set; }
+}
+```
+
+`Deepgram.Models.SelfHosted.v1.CredentialsSchema` is the request body for the obsolete `SelfHostedClient.CreateCredentials`.
 
 ```csharp
 public class CredentialsSchema
@@ -276,10 +302,14 @@ public class SettingsSchema
     public bool? Experimental { get; set; }
     public List<string>? Tags { get; set; }
     public bool? MipOptOut { get; set; } = false;
+    public AgentFlags? Flags { get; set; }
     public Audio Audio { get; set; } = new Audio();
     public Agent Agent { get; set; } = new Agent();
 }
 ```
+
+`AgentFlags` currently exposes nullable `History`, which enables or disables History event
+reporting for the session.
 
 `Deepgram.Models.Agent.v2.WebSocket.InjectUserMessageSchema`
 
@@ -291,15 +321,19 @@ public class InjectUserMessageSchema
 }
 ```
 
-`Deepgram.Models.Agent.v2.WebSocket.FunctionCallResponseSchema`
+`Deepgram.Models.Agent.v2.WebSocket.AgentFunctionCallResponseSchema`
 
 ```csharp
-public class FunctionCallResponseSchema
+public class AgentFunctionCallResponseSchema
 {
     public string? Type { get; } = AgentClientTypes.FunctionCallResponse;
-    public string? FunctionCallId { get; set; }
-    public string? Output { get; set; }
+    public string? Id { get; set; }
+    public string? Name { get; set; }
+    public string? Content { get; set; }
 }
 ```
+
+`FunctionCallResponseSchema` remains the legacy payload shape. Use
+`AgentFunctionCallResponseSchema` with `SendFunctionCallResponse` for the current protocol.
 
 These agent models are notable because they mix strongly typed structure with dynamic provider payloads. `Provider` in `Deepgram/Models/Agent/v2/WebSocket/Provider.cs` stores extra JSON properties through `JsonExtensionData`, which lets the SDK support provider-specific fields without a separate class for every vendor.

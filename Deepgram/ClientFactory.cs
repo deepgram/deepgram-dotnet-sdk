@@ -27,6 +27,22 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a Voice Agent client with the current protocol event subscriptions.
+    /// </summary>
+    public static V2.IAgentProtocolClient CreateAgentProtocolClient(string apiKey = "", DeepgramWsClientOptions? options = null)
+    {
+        return new AgentWebSocketClient(apiKey, options);
+    }
+
+    /// <summary>
+    /// Creates a Voice Agent settings catalog client.
+    /// </summary>
+    public static V1.IAgentCatalogClient CreateAgentCatalogClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new AgentCatalogClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new AgentManageClient for managing reusable Voice Agent configurations and
     /// their template variables
     /// </summary>
@@ -124,15 +140,37 @@ public static class ClientFactory
     }
 
     /// <summary>
+    /// Creates a client for current management reporting endpoints.
+    /// </summary>
+    public static V1.IManagementReportingClient CreateManagementReportingClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new ManagementReportingClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
     /// Create a new SelfHostedClient
     /// </summary>
+    /// <remarks>
+    /// Frozen legacy client for the older onprem/distribution/credentials route. Use
+    /// CreateSelfHostedDistributionCredentialsClient for new code.
+    /// </remarks>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
     /// <param name="httpId"></param>
     /// <returns></returns>
+    [Obsolete("Please use CreateSelfHostedDistributionCredentialsClient instead", false)]
     public static V1.ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         return new SelfHostedClient(apiKey, options, httpId);
+    }
+
+    /// <summary>
+    /// Creates a client for the current self-hosted distribution credentials API.
+    /// </summary>
+    public static V1.ISelfHostedDistributionCredentialsClient CreateSelfHostedDistributionCredentialsClient(string apiKey = "",
+        DeepgramHttpClientOptions? options = null, string? httpId = null)
+    {
+        return new SelfHostedDistributionCredentialsClient(apiKey, options, httpId);
     }
 
     /// <summary>
@@ -244,6 +282,11 @@ public static class ClientFactory
     /// This method allows you to create an SelfHostedClient with a specific version of the client.
     /// TODO: this should be revisited at a later time. Opportunity to use reflection to get the type of the client
     /// </summary>
+    /// <remarks>
+    /// Frozen legacy client for the older onprem/distribution/credentials route. Use
+    /// CreateSelfHostedDistributionCredentialsClient for new code.
+    /// </remarks>
+    [Obsolete("Please use CreateSelfHostedDistributionCredentialsClient instead", false)]
     public static object CreateSelfHostedClient(int version, string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
         // Currently only a single version of the SelfHostedClient exists

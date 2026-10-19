@@ -11,7 +11,8 @@ namespace Deepgram.Models.Agent.v2.WebSocket;
 public record FunctionCall
 {
     /// <summary>
-    /// Unique identifier for this call. Echo it back as function_call_id in FunctionCallResponse.
+    /// Unique identifier for this call. Echo it back as <c>id</c> in
+    /// <see cref="AgentFunctionCallResponseSchema"/>.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("id")]
@@ -38,6 +39,13 @@ public record FunctionCall
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("client_side")]
     public bool? ClientSide { get; set; }
+
+    /// <summary>
+    /// Provider-specific function-call identifier required by some Gemini models.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("thought_signature")]
+    public string? ThoughtSignature { get; set; }
 
     /// <summary>
     /// Override ToString method to serialize the object

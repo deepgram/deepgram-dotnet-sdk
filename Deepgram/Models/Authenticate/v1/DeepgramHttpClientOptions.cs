@@ -84,6 +84,12 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     /// </summary>
     public bool OnPrem { get; set; } = false;
 
+    /// <summary>
+    /// True when the options target a public endpoint that accepts unauthenticated requests,
+    /// such as the Voice Agent Think-model catalog. Missing credentials are expected, not an error.
+    /// </summary>
+    internal bool AllowAnonymous { get; }
+
     /*****************************/
     // Manage
     /*****************************/
@@ -102,7 +108,13 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
     // Constructor
     /*****************************/
     public DeepgramHttpClientOptions(string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? options = null, Dictionary<string, string>? headers = null, string? accessToken = null)
+        : this(false, apiKey, baseAddress, onPrem, options, headers, accessToken)
     {
+    }
+
+    internal DeepgramHttpClientOptions(bool allowAnonymous, string? apiKey = null, string? baseAddress = null, bool? onPrem = null, Dictionary<string, string>? options = null, Dictionary<string, string>? headers = null, string? accessToken = null)
+    {
+        AllowAnonymous = allowAnonymous;
         Log.Verbose("DeepgramHttpClientOptions", "ENTER");
         Log.Debug("DeepgramHttpClientOptions", apiKey == null ? "API KEY is null" : "API KEY provided");
         Log.Debug("DeepgramHttpClientOptions", baseAddress == null ? "BaseAddress is null" : "BaseAddress provided");
@@ -159,14 +171,14 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
                 // AccessToken remains empty (cleared above)
                 Log.Information("DeepgramHttpClientOptions", "API KEY set from environment variable");
             }
-            else
+            else if (!AllowAnonymous)
             {
                 Log.Warning("DeepgramHttpClientOptions", "No authentication credentials found in parameters or environment variables");
             }
         }
 
         // Ensure we have some form of authentication for non-OnPrem deployments
-        if (!OnPrem && string.IsNullOrWhiteSpace(AccessToken) && string.IsNullOrWhiteSpace(ApiKey))
+        if (!OnPrem && !AllowAnonymous && string.IsNullOrWhiteSpace(AccessToken) && string.IsNullOrWhiteSpace(ApiKey))
         {
             var exStr = "Deepgram authentication is required. Please provide either an API Key or Access Token.";
             Log.Error("DeepgramHttpClientOptions", exStr);

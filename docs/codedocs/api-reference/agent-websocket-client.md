@@ -3,7 +3,7 @@ title: "AgentWebSocketClient"
 description: "Configure live agent sessions, subscribe to agent events, and send text or audio into the conversation."
 ---
 
-Source files: `Deepgram/AgentWebSocketClient.cs`, `Deepgram/Clients/Interfaces/v2/IAgentWebSocketClient.cs`, `Deepgram/Clients/Agent/v2/Websocket/Client.cs`.
+Source files: `Deepgram/AgentWebSocketClient.cs`, `Deepgram/AgentWebSocketClientExtensions.cs`, `Deepgram/Clients/Interfaces/v2/IAgentWebSocketClient.cs`, `Deepgram/Clients/Interfaces/v2/IAgentProtocolClient.cs`, `Deepgram/Clients/Agent/v2/Websocket/Client.cs`.
 
 Import paths:
 
@@ -53,6 +53,11 @@ Task<bool> Subscribe(EventHandler<PromptUpdatedResponse> eventHandler)
 Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler)
 ```
 
+`ClientFactory.CreateAgentProtocolClient()` returns `IAgentProtocolClient`, which additionally
+provides typed subscriptions for `ListenUpdatedResponse`, `ThinkUpdatedResponse`,
+`FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`,
+`AgentHistoryResponse`, `FunctionCallResponse`, and `CustomFromThinkProviderResponse`.
+
 ### Send and helper methods
 
 ```csharp
@@ -68,21 +73,34 @@ WebSocketState State()
 bool IsConnected()
 ```
 
+The following extension methods work with both `IAgentWebSocketClient` and
+`IAgentProtocolClient`: `SendUpdateListen`, `SendUpdateThink`, `SendUpdateSpeak`,
+`SendUpdatePrompt`, `SendInjectAgentMessage`, `SendFunctionCallResponse`, and
+`SendCustomToThinkProvider`.
+`SendForceEndTurn` is available on `IAgentProtocolClient` and, as an extension method, on the
+`IAgentWebSocketClient` returned by `ClientFactory.CreateAgentWebSocketClient()`; either way the
+SDK flushes queued audio before sending the control frame. The extension throws
+`NotSupportedException` for an `IAgentWebSocketClient` implementation that does not also
+implement `IAgentProtocolClient`.
+
 ## Main schema types
 
 | Type | Important fields | Notes |
 |-----------|------|-------------|
-| `SettingsSchema` | `Experimental`, `Tags`, `MipOptOut`, `Audio`, `Agent` | Initial settings payload sent immediately after connect. |
+| `SettingsSchema` | `Experimental`, `Tags`, `MipOptOut`, `Flags`, `Audio`, `Agent` | Initial settings payload sent immediately after connect; set `Flags.History` to control History event reporting. |
 | `Agent` | `Language`, `Listen`, `Think`, `Speak`, `Greeting` | Conversation behavior. |
 | `Input` | `Encoding`, `SampleRate` | Input audio format. |
 | `Output` | `Encoding`, `SampleRate`, `Bitrate`, `Container` | Output audio format. |
 | `InjectUserMessageSchema` | `Type`, `Content` | Text injection without microphone audio. |
-| `FunctionCallResponseSchema` | `FunctionCallId`, `Output` | Response message for function-calling flows. |
+| `AgentFunctionCallResponseSchema` | `Id`, `Name`, `Content` | Current response message for function-calling flows. |
+| `AgentInjectAgentMessageSchema` | `Message`, `Behavior` | Current Agent speech injection message. |
+| `AgentCustomToThinkProviderSchema` | `Content` | Experimental arbitrary JSON forwarded to a custom Think provider. |
+| `Function` | `DeferUntilEot` | Prevents speculative dispatch of irreversible functions. |
 
 ## Example
 
 ```csharp
-var client = ClientFactory.CreateAgentWebSocketClient();
+var client = ClientFactory.CreateAgentProtocolClient();
 
 var settings = new SettingsSchema();
 settings.Agent.Think.Provider.Type = "open_ai";
@@ -94,6 +112,25 @@ settings.Agent.Speak.Provider.Model = "aura-2-thalia-en";
 
 await client.Connect(settings);
 await client.SendInjectUserMessage("What is still unresolved in our queue?");
+await client.SendUpdatePrompt(new AgentUpdatePromptSchema { Prompt = "Answer in one sentence." });
+```
+
+## Custom Think providers
+
+Experimental custom Think messages require `settings.Agent.Think.Endpoint.Url` to use `wss://`.
+Their content is represented as `JsonElement` and forwarded unchanged, including JSON `null`.
+
+```csharp
+await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) =>
+{
+    Console.WriteLine(response.Content.GetRawText());
+}));
+
+using var payload = JsonDocument.Parse("""{"action":"continue"}""");
+await client.SendCustomToThinkProvider(new AgentCustomToThinkProviderSchema
+{
+    Content = payload.RootElement.Clone(),
+});
 ```
 
 Related pages: [Agent Conversations](/docs/agent-conversations), [Guides: Build a Voice Agent](/docs/guides/build-a-voice-agent).

@@ -45,12 +45,11 @@ Console.WriteLine(key);
 ### Inspect self-hosted credentials for the same project
 
 ```csharp
-using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.SelfHosted.v1;
 
-var selfHosted = ClientFactory.CreateSelfHostedClient(
-    options: new DeepgramHttpClientOptions(onPrem: false));
+var selfHosted = ClientFactory.CreateSelfHostedDistributionCredentialsClient();
 
-var credentials = await selfHosted.ListCredentials(project.ProjectId);
+var credentials = await selfHosted.ListDistributionCredentials(project.ProjectId);
 Console.WriteLine(credentials);
 
 Library.Terminate();
@@ -62,14 +61,14 @@ Library.Terminate();
 Important details from the SDK:
 
 - `ManageClient.CreateKey` throws if you set both `ExpirationDate` and `TimeToLiveInSeconds`.
-- Management APIs and self-hosted credential APIs use different clients, but they share the same REST abstraction and auth model.
+- Management APIs and current self-hosted distribution credential APIs use different clients, but they share the same REST abstraction and auth model.
 - Per-request `headers` and `addons` are available on every method if your admin workflow needs custom metadata.
 
 This workflow is intentionally split across two clients because the repository separates general project administration from self-hosted credential operations. That separation is useful in larger codebases: you can keep management-only permissions in one service while placing self-hosted credential operations behind a smaller operational boundary.
 
 Reusable Voice Agent configurations and their `DG_*` template variables use the separate `AgentManageClient`, not `ManageClient`. See [AgentManageClient](/docs/api-reference/agent-manage-client) before creating or deleting those project-scoped resources.
 
-If you only need reporting, the same `ManageClient` also exposes `GetUsageRequests`, `GetUsageSummary`, `GetUsageFields`, `GetBalances`, and `GetBalance`. Those methods follow the same parameter conventions shown here.
+For current usage, billing, field, and purchase reporting, use `ManagementReportingClient` from `ClientFactory.CreateManagementReportingClient()`. `ManageClient` still exposes `GetUsageRequests`, `GetUsageFields`, `GetBalances`, and `GetBalance`, which follow the same parameter conventions shown here. `ManageClient.GetUsageSummary` remains available for compatibility, but new integrations should use `GetUsageBreakdown` instead.
 
 For production automation, a common pattern is:
 

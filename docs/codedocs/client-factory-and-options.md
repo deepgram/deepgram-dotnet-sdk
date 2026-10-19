@@ -3,7 +3,7 @@ title: "Client Factory and Options"
 description: "How the SDK resolves credentials, chooses client versions, and configures REST or WebSocket behavior."
 ---
 
-`ClientFactory` is the main entry point for application code. It hides the versioned namespaces under `Deepgram.Clients.*` and returns interfaces such as `IListenRESTClient`, `IFluxWebSocketClient`, `IFluxSpeakRESTClient`, `IFluxSpeakWebSocketClient`, `IAgentManageClient`, and `IAgentWebSocketClient`. The companion option types, `DeepgramHttpClientOptions` and `DeepgramWsClientOptions`, control authentication, base addresses, global headers, global addons, keepalive, and autoflush behavior.
+`ClientFactory` is the main entry point for application code. It hides the versioned namespaces under `Deepgram.Clients.*` and returns interfaces such as `IListenRESTClient`, `IFluxWebSocketClient`, `IFluxSpeakRESTClient`, `IFluxSpeakWebSocketClient`, `IManagementReportingClient`, `IAgentCatalogClient`, `IAgentManageClient`, and `IAgentWebSocketClient`. The companion option types, `DeepgramHttpClientOptions` and `DeepgramWsClientOptions`, control authentication, base addresses, global headers, global addons, keepalive, and autoflush behavior.
 
 The implementation lives in `Deepgram/ClientFactory.cs`, `Deepgram/Models/Authenticate/v1/DeepgramHttpClientOptions.cs`, and `Deepgram/Models/Authenticate/v1/DeepgramWsClientOptions.cs`.
 
@@ -22,7 +22,7 @@ Without the factory, callers would need to know the current versioned client nam
 
 `ClientFactory.CreateListenRESTClient()` returns `new ListenRESTClient(apiKey, options, httpId)`, and that wrapper inherits the current versioned implementation from `Deepgram/Clients/Listen/v1/REST/Client.cs`. The same pattern appears for analyze, manage, auth, self-hosted, Aura speak REST and WebSocket, Flux STT, Flux TTS REST and WebSocket, Voice Agent management, and Voice Agent WebSocket clients.
 
-The version-specific overloads in `ClientFactory.cs` exist mainly for compatibility. For example, `CreateListenWebSocketClient(int version, ...)` can still return `Deepgram.Clients.Listen.v1.WebSocket.Client` or `Deepgram.Clients.Listen.v2.WebSocket.Client`, while the zero-version overload always returns the latest interface. Deprecated public wrappers such as `LiveClient`, `PreRecordedClient`, and `OnPremClient` still exist, but `ClientFactory` steers new code toward `ListenWebSocketClient`, `ListenRESTClient`, and `SelfHostedClient`.
+The version-specific overloads in `ClientFactory.cs` exist mainly for compatibility. For example, `CreateListenWebSocketClient(int version, ...)` can still return `Deepgram.Clients.Listen.v1.WebSocket.Client` or `Deepgram.Clients.Listen.v2.WebSocket.Client`, while the zero-version overload always returns the latest interface. Deprecated public wrappers such as `LiveClient`, `PreRecordedClient`, and `OnPremClient` still exist; point new code at `ListenWebSocketClient` and `ListenRESTClient`. `CreateSelfHostedClient()` and the `SelfHostedClient` it returns are obsolete. `SelfHostedClient` calls the older `onprem/distribution/credentials` route, which still responds but no longer appears in the API reference. Use `CreateSelfHostedDistributionCredentialsClient()` for new code.
 
 `DeepgramHttpClientOptions` and `DeepgramWsClientOptions` resolve credentials in this order:
 
