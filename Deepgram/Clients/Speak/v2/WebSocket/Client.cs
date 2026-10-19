@@ -19,7 +19,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     #region Fields
     private DateTime? _lastReceived = null;
     private int _flushCount = 0;
-    private readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+    internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -390,7 +390,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             switch (type)
             {
                 case Constants.Flush:
-                    IncrementCounter().Wait();
+                    IncrementFlushCount();
                     break;
                 case Constants.Speak:
                     InspectMessage();
@@ -436,10 +436,10 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     return;
                 }
 
-                // Decide under the lock, then flush after releasing it. Flush() goes through
-                // SendMessage -> IncrementCounter, which takes _mutexLastDatagram, so calling it
-                // while holding the lock deadlocks this thread and every later SendMessage caller.
-                var shouldFlush = false;
+                // Decide and enqueue the Flush under the same lock that InspectMessage takes, so
+                // no Speak can slip in between the decision and the Flush. This is safe because
+                // nothing on the Flush() path (SendMessage -> IncrementFlushCount ->
+                // EnqueueSendMessage) takes _mutexLastDatagram or awaits.
                 await _mutexLastDatagram.WaitAsync();
                 try
                 {
@@ -457,19 +457,14 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                         else
                         {
                             Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Flushing...");
+                            Flush();
                             _lastReceived = null;
-                            shouldFlush = true;
                         }
                     }
                 }
                 finally
                 {
                     _mutexLastDatagram.Release();
-                }
-
-                if (shouldFlush)
-                {
-                    Flush();
                 }
             }
 
@@ -596,7 +591,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     // auto flush
                     if (_deepgramClientOptions.InspectSpeakMessage())
                     {
-                        DecrementCounter().Wait();
+                        DecrementFlushCount();
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking FlushedResponse. event: {flushedResponse}");
@@ -673,7 +668,10 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         return new Uri($"{options.BaseAddress}/{UriSegments.SPEAK}?{queryString}");
     }
 
-    private async void InspectMessage()
+    // Synchronous on purpose: an async wait here posted the lock-holding continuation to the
+    // caller's SynchronizationContext, so a UI-thread SpeakWithText could take the lock and never
+    // release it. ProcessAutoFlush's critical section is synchronous, so this wait is short.
+    private void InspectMessage()
     {
         Log.Verbose("InspectMessage", "ENTER");
 
@@ -681,7 +679,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         {
             var now = DateTime.Now;
             Log.Debug("InspectMessage", $"AutoFlush last received. Time: {now}");
-            await _mutexLastDatagram.WaitAsync();
+            _mutexLastDatagram.Wait();
             try
             {
                 _lastReceived = now;
@@ -696,36 +694,19 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         Log.Verbose("InspectMessage", "LEAVE");
     }
 
-    private async Task<bool> DecrementCounter()
+    // The flush counter is only logged, so it uses Interlocked instead of _mutexLastDatagram.
+    // Taking the semaphore here made Flush() block on it, which deadlocked the autoflush thread
+    // and any caller on a blocking SynchronizationContext.
+    private void DecrementFlushCount()
     {
-        await _mutexLastDatagram.WaitAsync();
-        try
-        {
-            _flushCount -= 1;
-            Log.Debug("DecrementCounter", $"Decrement Flush count: {_flushCount}");
-        }
-        finally
-        {
-            _mutexLastDatagram.Release();
-        }
-
-        return true;
+        var count = Interlocked.Decrement(ref _flushCount);
+        Log.Debug("DecrementFlushCount", $"Decrement Flush count: {count}");
     }
 
-    private async Task<bool> IncrementCounter()
+    private void IncrementFlushCount()
     {
-        await _mutexLastDatagram.WaitAsync();
-        try
-        {
-            _flushCount += 1;
-            Log.Debug("IncrementCounter", $"Increment Flush count: {_flushCount}");
-        }
-        finally
-        {
-            _mutexLastDatagram.Release();
-        }
-
-        return true;
+        var count = Interlocked.Increment(ref _flushCount);
+        Log.Debug("IncrementFlushCount", $"Increment Flush count: {count}");
     }
 
     internal string GetMessageType(byte[] msg)

@@ -48,6 +48,109 @@ public class SpeakWebSocketAutoFlushTests
         }
     }
 
+    [Test]
+    public void SpeakClient_Flush_Should_Complete_On_A_Blocking_SynchronizationContext_While_The_Lock_Is_Held()
+    {
+        var options = new DeepgramWsClientOptions(apiKey: "test-api-key", onPrem: true)
+        {
+            AutoFlushSpeakDelta = 1,
+        };
+        var client = new SpeakWebSocketClient("test-api-key", options);
+        var mutex = client._mutexLastDatagram;
+
+        // Asserts Flush() never takes _mutexLastDatagram; the non-pumping context mirrors a UI caller.
+        mutex.Wait(0).Should().BeTrue();
+
+        var flushReturned = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var caller = new Thread(() =>
+        {
+            // A UI-style thread: it blocks inside Flush() and never pumps posted continuations.
+            SynchronizationContext.SetSynchronizationContext(new NonPumpingSynchronizationContext());
+            try
+            {
+                client.Flush();
+                flushReturned.TrySetResult(true);
+            }
+            catch (Exception ex)
+            {
+                flushReturned.TrySetException(ex);
+            }
+        })
+        {
+            IsBackground = true,
+        };
+
+        try
+        {
+            caller.Start();
+            flushReturned.Task.Wait(WaitTimeout).Should().BeTrue(
+                "Flush() must not wait on _mutexLastDatagram or on a continuation posted to the caller's context");
+        }
+        finally
+        {
+            mutex.Release();
+        }
+    }
+
+    [Test]
+    public void SpeakClient_SpeakWithText_On_A_Blocking_SynchronizationContext_Should_Not_Strand_The_Lock()
+    {
+        var options = new DeepgramWsClientOptions(apiKey: "test-api-key", onPrem: true)
+        {
+            AutoFlushSpeakDelta = 1,
+        };
+        var client = new SpeakWebSocketClient("test-api-key", options);
+        var mutex = client._mutexLastDatagram;
+
+        // The autoflush tick holds the lock while a UI-style caller sends a Speak.
+        mutex.Wait(0).Should().BeTrue();
+        var lockHeld = true;
+
+        var speakReturned = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var caller = new Thread(() =>
+        {
+            SynchronizationContext.SetSynchronizationContext(new NonPumpingSynchronizationContext());
+            try
+            {
+                client.SpeakWithText("Hello from a UI thread.");
+                speakReturned.TrySetResult(true);
+            }
+            catch (Exception ex)
+            {
+                speakReturned.TrySetException(ex);
+            }
+        })
+        {
+            IsBackground = true,
+        };
+
+        try
+        {
+            caller.Start();
+
+            // Release only once the caller is queued on the lock. On the old async InspectMessage,
+            // SpeakWithText returns only after WaitAsync has registered its waiter, so the return
+            // is an exact signal. On the fixed code the caller parks in Wait(); CallerProbe
+            // requires it to stay parked for a window, and its remarks give the residual risk.
+            CallerProbe.WaitUntilReturnedOrParked(caller, speakReturned.Task, WaitTimeout)
+                .Should().BeTrue("the caller should reach the lock");
+            mutex.Release();
+            lockHeld = false;
+
+            speakReturned.Task.Wait(TimeSpan.FromSeconds(2)).Should().BeTrue("SpeakWithText must return");
+            lockHeld = mutex.Wait(TimeSpan.FromSeconds(2));
+            lockHeld.Should().BeTrue(
+                "InspectMessage must release _mutexLastDatagram even when the caller's context never pumps");
+        }
+        finally
+        {
+            if (lockHeld)
+            {
+                mutex.Release();
+            }
+        }
+    }
+
     /// <summary>
     /// In-process WebSocket server on a port the OS assigns and keeps bound. It performs the
     /// RFC 6455 upgrade by hand, then counts the Flush text frames it receives.
@@ -121,9 +224,11 @@ public class SpeakWebSocketAutoFlushTests
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Server torn down (test cleanup) or client aborted; the test's gates time out instead.
+                // Surface a handshake or receive failure as the cause of the first gate. After the
+                // first Flush this is a no-op, so test cleanup tearing the server down is harmless.
+                _firstFlush.TrySetException(ex);
             }
         }
 
