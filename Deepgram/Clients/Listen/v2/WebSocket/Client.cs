@@ -50,7 +50,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// return, so an Open handler that waits for a message from the server blocks until its own
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
-    /// opens; the send methods' remarks say which ones are kept.
+    /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
+    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>

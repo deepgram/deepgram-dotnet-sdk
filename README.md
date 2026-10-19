@@ -347,6 +347,12 @@ For live audio, such as a microphone, that burst of stale audio is rarely what y
 sending while the client is disconnected and resume once `Connect()` returns `true`, or create a
 new client for the new connection.
 
+### Connection lifecycle
+
+- `Connect()` waits, within its connect timeout, while a previous connection is still closing or another `Connect()` is still opening one, and returns `true` only for an open connection. Await `Stop()` before reconnecting; a Flux STT or Flux TTS `Stop()` can take about 3 s.
+- Messages sent immediately rather than queued (`SendKeepAlive`, `SendFinalize`, `SendConfigure`, `SendForceEndTurn`, `SendInjectUserMessage`, the Flux TTS `SendText`/`SendFlush`/`SendInterrupt`, and `SendMessageImmediately`/`SendBinaryImmediately`) are dropped until `Connect()` has opened the connection.
+- For the Voice Agent, `Connect()` sends Settings before Open. If Settings cannot be sent, `Connect()` fails and neither Open nor Close fires.
+
 ## Flux - Conversational Speech Recognition (Preview)
 
 > Flux support is currently in preview. The API surface may change in a future release.
@@ -407,7 +413,7 @@ await fluxClient.Stop();
 
 [See our API reference for more info](https://developers.deepgram.com/reference/speech-to-text/listen-flux).
 
-Audio sent while the client is disconnected can stay queued and be sent on the next `Connect()`; see [Audio sent while disconnected](#audio-sent-while-disconnected).
+Audio sent while the client is disconnected can stay queued and be sent on the next `Connect()`; see [Audio sent while disconnected](#audio-sent-while-disconnected) and [Connection lifecycle](#connection-lifecycle).
 
 [See the Examples for more info](./examples/speech-to-text/websocket/flux/) - including a [bring-your-own-turn-detection version](./examples/speech-to-text/websocket/flux-force-end-turn/) and a [raw WebSocket version](./examples/speech-to-text/websocket/flux-raw/) that uses no SDK at all.
 
@@ -512,6 +518,8 @@ await speakClient.ToFile(
 ```
 
 [See our API reference for more info](https://developers.deepgram.com/reference/text-to-speech/speak-flux).
+
+`SendText`, `SendFlush`, `SendInterrupt` and `SendConfigure` are sent immediately, not queued; see [Connection lifecycle](#connection-lifecycle) for how they behave around `Connect()` and `Stop()`.
 
 [See the Examples for more info](./examples/text-to-speech/websocket/flux/) - and the [batch (REST) example](./examples/text-to-speech/rest/flux/).
 

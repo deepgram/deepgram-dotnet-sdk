@@ -1209,6 +1209,160 @@ public class WebSocketLifecycleTests
     }
 
     [Test]
+    public async Task Stop_Before_Open_Should_Fail_The_Connect_Without_Open_Or_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        var releaseSettings = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.ReleaseSettings = releaseSettings.Task;
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var logs = new SignalingLoggerProvider();
+        var releaseStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            // Hold the Stop() right after it has begun (marked the connection stopping) and before
+            // it does anything else.
+            const string stopBegun = "Using default disconnect cancellation token";
+            var stopHeld = logs.WhenLogged(stopBegun);
+            logs.HoldWhenLogged(stopBegun, releaseStop.Task);
+
+            // Connect() is held in its pre-open step, with the Settings message not yet sent. Its
+            // budget outlasts every gate, so a stall fails the test instead of passing it.
+            using var connectCts = new CancellationTokenSource(GateTimeout * 3);
+            var connect = client.Connect(new AgentModels.SettingsSchema(), connectCts);
+            await client.SettingsEntered.Task.WaitAsync(GateTimeout);
+
+            var stop = Task.Run(() => client.Stop());
+            await stopHeld.WaitAsync(GateTimeout);
+
+            // Settings goes out on a still-open socket, but a Stop() has begun: the connect fails.
+            releaseSettings.TrySetResult(true);
+            var connected = await connect.WaitAsync(GateTimeout);
+
+            releaseStop.TrySetResult(true);
+            var stopped = await stop.WaitAsync(GateTimeout);
+
+            using (new AssertionScope())
+            {
+                connected.Should().BeFalse("a Stop() began before the connection opened");
+                stopped.Should().BeTrue();
+                Volatile.Read(ref openEvents).Should().Be(0, "Open must not fire for a connection being stopped");
+                Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open");
+                client.IsConnected().Should().BeFalse();
+            }
+        }
+        finally
+        {
+            releaseSettings.TrySetResult(true);
+            releaseStop.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    [Test]
+    public async Task Stop_Should_Raise_Close_When_Logging_The_Close_Event_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+        using var connectCts = new CancellationTokenSource(GateTimeout);
+        (await client.Connect(server.Endpoint, connectCts).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // The provider throws on the log line that announces the Close event.
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(new ThrowingLoggerProvider("Sending CloseResponse event"));
+        }));
+        try
+        {
+            Func<Task<bool>> stop = () => client.Stop().WaitAsync(GateTimeout);
+            (await stop.Should().NotThrowAsync()).Subject.Should().BeTrue();
+        }
+        finally
+        {
+            Log.Reset();
+        }
+
+        using (new AssertionScope())
+        {
+            Volatile.Read(ref openEvents).Should().Be(1);
+            Volatile.Read(ref closeEvents).Should().Be(1, "a failing log provider must not suppress Close");
+        }
+    }
+
+    [Test]
+    public async Task Stop_Between_Sender_Start_And_Open_Should_Raise_Neither_Open_Nor_Close()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var logs = new SignalingLoggerProvider();
+        var releaseConnect = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            // Hold Connect() after its sender started, just before it marks the connection opened.
+            const string beforeMark = "Sending OpenResponse event";
+            var connectHeld = logs.WhenLogged(beforeMark);
+            logs.HoldWhenLogged(beforeMark, releaseConnect.Task);
+            using var connectCts = new CancellationTokenSource(GateTimeout * 3);
+            var connect = Task.Run(() => client.Connect(server.Endpoint, connectCts));
+            await connectHeld.WaitAsync(GateTimeout);
+
+            // A Stop() marks the connection stopping and is held right after, before any release.
+            const string stopBegun = "Using default disconnect cancellation token";
+            var stopHeld = logs.WhenLogged(stopBegun);
+            logs.HoldWhenLogged(stopBegun, releaseStop.Task);
+            var stop = Task.Run(() => client.Stop());
+            await stopHeld.WaitAsync(GateTimeout);
+
+            // The mark now fails on the stopping connection, so Open is never raised.
+            releaseConnect.TrySetResult(true);
+            var connected = await connect.WaitAsync(GateTimeout);
+            releaseStop.TrySetResult(true);
+            var stopped = await stop.WaitAsync(GateTimeout);
+
+            using (new AssertionScope())
+            {
+                connected.Should().BeFalse();
+                stopped.Should().BeTrue();
+                Volatile.Read(ref openEvents).Should().Be(0, "a Stop() began before the connection was marked opened");
+                Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open");
+            }
+        }
+        finally
+        {
+            releaseConnect.TrySetResult(true);
+            releaseStop.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    [Test]
     public async Task AgentClient_Concurrent_Connect_Should_Not_Release_The_First_Connection()
     {
         // Hold the first connection inside its handshake until the test lets it finish.
@@ -1227,15 +1381,17 @@ public class WebSocketLifecycleTests
         var firstConnect = client.Connect(settings);
         await upgradeRequested.Task.WaitAsync(GateTimeout);
 
-        // A second Connect() while the first is still in its handshake.
-        var secondConnected = await client.Connect(settings).WaitAsync(GateTimeout);
+        // A second Connect() while the first is still in its handshake waits for it.
+        var secondConnect = client.Connect(settings);
+        secondConnect.IsCompleted.Should().BeFalse("the connection is not ready while it is still handshaking");
 
         completeUpgrade.TrySetResult(true);
         var firstConnected = await firstConnect.WaitAsync(GateTimeout);
+        var secondConnected = await secondConnect.WaitAsync(GateTimeout);
 
         using (new AssertionScope())
         {
-            secondConnected.Should().BeTrue("the second Connect() keeps the \"already initialized\" result");
+            secondConnected.Should().BeTrue("the second Connect() returns true once the first connection is ready");
             firstConnected.Should().BeTrue("the second Connect() must not release the first connection");
             client.IsConnected().Should().BeTrue();
             server.AcceptedConnections.Should().Be(1);
@@ -1244,7 +1400,7 @@ public class WebSocketLifecycleTests
         // The Settings messages must all be on the wire before this KeepAlive.
         await client.SendKeepAlive();
         var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
-        var settingsMessages = 0;
+        var frames = new List<string>();
         while (true)
         {
             var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
@@ -1252,13 +1408,15 @@ public class WebSocketLifecycleTests
             {
                 break;
             }
-            if (frame.Text.Contains("\"Settings\""))
-            {
-                settingsMessages++;
-            }
+            frames.Add(frame.Text);
         }
 
-        settingsMessages.Should().Be(1, "only the Connect() that opened the connection sends Settings");
+        using (new AssertionScope())
+        {
+            frames.Count(f => f.Contains("\"Settings\"")).Should().Be(1, "only the Connect() that opened the connection sends Settings");
+            frames.Should().NotBeEmpty();
+            frames[0].Should().Contain("\"Settings\"", "Settings is the first frame");
+        }
 
         await client.Stop();
     }
@@ -1400,5 +1558,510 @@ public class WebSocketLifecycleTests
         {
             client.SendMutex.Release();
         }
+    }
+
+    [Test]
+    public async Task AgentClient_Stop_Before_Open_Should_Send_No_Close_Message()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        var releaseSettings = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.ReleaseSettings = releaseSettings.Task;
+
+        try
+        {
+            // Connect() is held in its pre-open step: the connection has not raised Open.
+            var connect = client.Connect(new AgentModels.SettingsSchema());
+            await client.SettingsEntered.Task.WaitAsync(GateTimeout);
+
+            // Stop() runs to completion on the never-opened connection.
+            (await Task.Run(() => client.Stop()).WaitAsync(GateTimeout)).Should().BeTrue();
+
+            releaseSettings.TrySetResult(true);
+            (await connect.WaitAsync(GateTimeout)).Should().BeFalse();
+
+            // The server has read everything up to the client's close frame.
+            var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+            await connection.CloseFrameReceived.WaitAsync(GateTimeout);
+
+            server.DataFrames.Should().BeEmpty(
+                "a connection that never raised Open gets no close message: nothing may reach the agent ahead of Settings");
+        }
+        finally
+        {
+            releaseSettings.TrySetResult(true);
+        }
+    }
+
+    [Test]
+    public async Task Connect_Stopping_Before_The_Sender_Starts_Should_Keep_Queued_Audio_For_The_Next_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var audio = new byte[] { 0xA7, 0xA7, 0xA7 };
+        var logs = new SignalingLoggerProvider();
+        var releaseConnect = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            // Audio queued before Connect().
+            client.SendBinary(audio);
+
+            // Hold Connect() right after it claimed the client, before its handshake.
+            const string claimed = "Connection claimed";
+            var connectHeld = logs.WhenLogged(claimed);
+            logs.HoldWhenLogged(claimed, releaseConnect.Task);
+            using var connectCts = new CancellationTokenSource(GateTimeout * 3);
+            var connect = Task.Run(() => client.Connect(server.Endpoint, connectCts));
+            await connectHeld.WaitAsync(GateTimeout);
+
+            // A Stop() marks the connection stopping and is held right after.
+            const string stopBegun = "Using default disconnect cancellation token";
+            var stopHeld = logs.WhenLogged(stopBegun);
+            logs.HoldWhenLogged(stopBegun, releaseStop.Task);
+            var stop = Task.Run(() => client.Stop());
+            await stopHeld.WaitAsync(GateTimeout);
+
+            // The handshake completes, but the connection is stopping: no sender starts.
+            releaseConnect.TrySetResult(true);
+            (await connect.WaitAsync(GateTimeout)).Should().BeFalse();
+
+            releaseStop.TrySetResult(true);
+            (await stop.WaitAsync(GateTimeout)).Should().BeTrue();
+
+            // Connection 1 received no data: its reader ends at the close frame, with nothing before it.
+            var first = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+            await first.Closed.WaitAsync(GateTimeout);
+            server.DataFrames.Should().BeEmpty("no sender ran for the stopped connection, so the queued audio was not sent on it");
+
+            // The audio stayed queued and goes out on the next successful Connect().
+            (await client.Connect(server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
+            var second = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+            var frame = await second.ReadFrameAsync().WaitAsync(GateTimeout);
+            frame.Payload.Should().Equal(audio);
+        }
+        finally
+        {
+            releaseConnect.TrySetResult(true);
+            releaseStop.TrySetResult(true);
+            Log.Reset();
+        }
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Connect_Should_Return_False_When_A_Stop_Begins_While_Open_Handlers_Run()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new GatedCloseClient(NewApiKey());
+        var events = new ConcurrentQueue<string>();
+        Task<bool>? stop = null;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) =>
+        {
+            events.Enqueue("open");
+            // Another thread's Stop() begins and is held in SendClose(): the connection is stopping
+            // but not yet released when Connect() returns.
+            stop = Task.Run(() => client.Stop());
+            client.FirstSendCloseEntered.Task.Wait(GateTimeout);
+        }));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => events.Enqueue("close")));
+
+        bool connected;
+        try
+        {
+            connected = await client.Connect(server.Endpoint).WaitAsync(GateTimeout);
+        }
+        finally
+        {
+            client.ReleaseFirstSendClose.TrySetResult(true);
+        }
+        (await stop!.WaitAsync(GateTimeout)).Should().BeTrue();
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeFalse("a Stop() had begun on the connection before Connect() returned");
+            events.Should().Equal(new[] { "open", "close" }, "Open was raised, so the Stop() raises Close once, after it");
+            client.IsConnected().Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Settings_Send_After_Stop_Closed_The_Socket_Should_Fail_The_Connect_Without_Throwing()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new OrderingAgentClient(apiKey, options);
+        var releaseSettings = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.ReleaseSettings = releaseSettings.Task;
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<AgentModels.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<AgentModels.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        var logs = new SignalingLoggerProvider();
+        var releaseStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            // Hold the Stop() after it has sent its close frame (the socket is CloseSent) and before
+            // it releases the connection.
+            const string releasing = "Releasing the connection...";
+            var stopHeld = logs.WhenLogged(releasing);
+            logs.HoldWhenLogged(releasing, releaseStop.Task);
+
+            // Connect() is held in its pre-open step, past its "stopping" check, before the send.
+            using var connectCts = new CancellationTokenSource(GateTimeout * 3);
+            var connect = client.Connect(new AgentModels.SettingsSchema(), connectCts);
+            await client.SettingsEntered.Task.WaitAsync(GateTimeout);
+
+            var stop = Task.Run(() => client.Stop());
+            await stopHeld.WaitAsync(GateTimeout);
+
+            // The Settings send now fails on the closing socket. That is the Stop()'s doing, so
+            // Connect() reports false instead of throwing.
+            releaseSettings.TrySetResult(true);
+            Func<Task<bool>> awaitConnect = () => connect.WaitAsync(GateTimeout);
+            var connected = (await awaitConnect.Should().NotThrowAsync()).Subject;
+
+            releaseStop.TrySetResult(true);
+            var stopped = await stop.WaitAsync(GateTimeout);
+
+            using (new AssertionScope())
+            {
+                connected.Should().BeFalse();
+                stopped.Should().BeTrue();
+                Volatile.Read(ref openEvents).Should().Be(0);
+                Volatile.Read(ref closeEvents).Should().Be(0);
+            }
+        }
+        finally
+        {
+            releaseSettings.TrySetResult(true);
+            releaseStop.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    [Test]
+    public async Task AgentClient_Stop_During_The_Handshake_Should_Keep_Settings_Off_The_Wire()
+    {
+        var upgradeRequested = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completeUpgrade = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(beforeUpgrade: async () =>
+        {
+            upgradeRequested.TrySetResult(true);
+            await completeUpgrade.Task;
+        });
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Agent.v2.WebSocket.Client(apiKey, options);
+
+        var logs = new SignalingLoggerProvider();
+        var releaseStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            using var connectCts = new CancellationTokenSource(GateTimeout * 3);
+            var connect = client.Connect(new AgentModels.SettingsSchema(), connectCts);
+            await upgradeRequested.Task.WaitAsync(GateTimeout);
+
+            // A Stop() marks the connection stopping during the handshake and is held right after.
+            const string stopBegun = "Using default disconnect cancellation token";
+            var stopHeld = logs.WhenLogged(stopBegun);
+            logs.HoldWhenLogged(stopBegun, releaseStop.Task);
+            var stop = Task.Run(() => client.Stop());
+            await stopHeld.WaitAsync(GateTimeout);
+
+            // The handshake completes on a connection that is already stopping.
+            completeUpgrade.TrySetResult(true);
+            (await connect.WaitAsync(GateTimeout)).Should().BeFalse();
+
+            releaseStop.TrySetResult(true);
+            (await stop.WaitAsync(GateTimeout)).Should().BeTrue();
+
+            var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+            await connection.Closed.WaitAsync(GateTimeout);
+            server.DataFrames.Should().BeEmpty("the Settings step checks for a Stop() before it sends");
+        }
+        finally
+        {
+            completeUpgrade.TrySetResult(true);
+            releaseStop.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    /// <summary>A log provider whose loggers throw when a log entry contains any of the given texts.</summary>
+    private sealed class ThrowingLoggerProvider(params string[] texts) : ILoggerProvider
+    {
+        public ILogger CreateLogger(string categoryName) => new ThrowingLogger(texts);
+
+        public void Dispose() { }
+
+        private sealed class ThrowingLogger(string[] texts) : ILogger
+        {
+            public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+            public bool IsEnabled(MelLogLevel logLevel) => logLevel != MelLogLevel.None;
+
+            public void Log<TState>(MelLogLevel logLevel, EventId eventId, TState state, Exception? exception,
+                Func<TState, Exception?, string> formatter)
+            {
+                var message = formatter(state, exception);
+                if (texts.Any(message.Contains))
+                {
+                    throw new InvalidOperationException("Simulated log provider failure");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public async Task Stop_Should_Release_The_Connection_When_A_Log_Provider_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        (await client.Connect(server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            // It also throws on the error log in Stop()'s catch block, as a full disk would.
+            builder.AddProvider(new ThrowingLoggerProvider("Using default disconnect cancellation token", " thrown "));
+        }));
+        try
+        {
+            // The provider throws inside Stop(), after the connection was marked stopping.
+            Func<Task> stop = () => client.Stop().WaitAsync(GateTimeout);
+            await stop.Should().ThrowAsync<InvalidOperationException>();
+        }
+        finally
+        {
+            Log.Reset();
+        }
+
+        // The stopping connection was still released, so the client can connect again.
+        using var connectCts = new CancellationTokenSource(GateTimeout);
+        var reconnected = await client.Connect(server.Endpoint, connectCts).WaitAsync(GateTimeout * 2);
+
+        using (new AssertionScope())
+        {
+            reconnected.Should().BeTrue("a Stop() that throws must still release its connection");
+            server.AcceptedConnections.Should().Be(2);
+        }
+
+        await client.Stop();
+    }
+
+    /// <summary>
+    /// Installs a log provider that throws on the given texts, runs <paramref name="act"/> (which
+    /// must throw), runs <paramref name="afterAct"/>, resets the log, then checks that the client
+    /// can connect again within the gate timeout.
+    /// </summary>
+    private static async Task AssertReleasedAfterThrowingLog(LoopbackWebSocketServer server,
+        Func<CancellationTokenSource, Task<bool>> reconnect, Func<Task> act, string[] texts, Action? afterAct = null)
+    {
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(new ThrowingLoggerProvider(texts));
+        }));
+        try
+        {
+            await act.Should().ThrowAsync<InvalidOperationException>();
+            afterAct?.Invoke();
+        }
+        finally
+        {
+            Log.Reset();
+        }
+
+        using var reconnectCts = new CancellationTokenSource(GateTimeout);
+        var reconnected = await reconnect(reconnectCts).WaitAsync(GateTimeout * 2);
+        using (new AssertionScope())
+        {
+            reconnected.Should().BeTrue("a connection whose teardown or connect threw in a log call must still be released");
+            server.AcceptedConnections.Should().BeGreaterThanOrEqualTo(1);
+        }
+    }
+
+    [Test]
+    public async Task Connect_Should_Release_The_Connection_When_A_Log_Provider_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+
+        // The provider throws during the handshake, and again on the error log in Connect()'s catch.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(server.Endpoint, cts),
+            () => client.Connect(server.Endpoint).WaitAsync(GateTimeout),
+            new[] { "Connecting to Deepgram API", " thrown " });
+
+        client.IsConnected().Should().BeTrue();
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Connect_Should_Release_The_Claim_When_A_Log_Provider_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+
+        // The provider throws right after the claim, before the handshake starts.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(server.Endpoint, cts),
+            () => client.Connect(server.Endpoint).WaitAsync(GateTimeout),
+            new[] { "Connection claimed" });
+
+        using (new AssertionScope())
+        {
+            client.IsConnected().Should().BeTrue();
+            server.AcceptedConnections.Should().Be(1, "the claim that threw never started a handshake");
+        }
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_Should_Release_The_Connection_When_A_Log_Provider_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.WebSocket.Client(apiKey, options);
+        var schema = new FluxSchema { Model = "flux-general-en" };
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // The provider throws while Stop() sends CloseStream, and again on the error log in its catch.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(schema, cts),
+            () => client.Stop().WaitAsync(GateTimeout),
+            new[] { "Sending Close Message Immediately", " thrown " });
+
+        server.AcceptedConnections.Should().Be(2);
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Stop_Should_Release_The_Connection_When_A_Log_Provider_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Flux.Speak.WebSocket.Client(apiKey, options);
+        var schema = new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" };
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // The provider throws while Stop() sends Close, and again on the error log in its catch.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(schema, cts),
+            () => client.Stop().WaitAsync(GateTimeout),
+            new[] { "Sending Close Message Immediately", " thrown " });
+
+        server.AcceptedConnections.Should().Be(2);
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Connect_Should_Raise_Neither_Open_Nor_Close_When_Logging_Throws_Before_Open()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        // The provider throws on the log line that announces Open delivery.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(server.Endpoint, cts),
+            () => client.Connect(server.Endpoint).WaitAsync(GateTimeout),
+            new[] { "Sending OpenResponse event" },
+            () =>
+            {
+                using (new AssertionScope())
+                {
+                    Volatile.Read(ref openEvents).Should().Be(0, "the connection never raised Open");
+                    Volatile.Read(ref closeEvents).Should().Be(0, "Close pairs with Open");
+                }
+            });
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Connect_Should_Raise_Close_When_Logging_Throws_After_Open()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var openEvents = 0;
+        var closeEvents = 0;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => Interlocked.Increment(ref openEvents)));
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => Interlocked.Increment(ref closeEvents)));
+
+        // The provider throws after the Open handlers ran, before the receive loop starts.
+        await AssertReleasedAfterThrowingLog(server,
+            cts => client.Connect(server.Endpoint, cts),
+            () => client.Connect(server.Endpoint).WaitAsync(GateTimeout),
+            new[] { "Starting Receiver Thread" },
+            () =>
+            {
+                using (new AssertionScope())
+                {
+                    Volatile.Read(ref openEvents).Should().Be(1);
+                    Volatile.Read(ref closeEvents).Should().Be(1, "the connection raised Open, so its release raises Close");
+                }
+            });
+
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task Open_Should_Reach_Every_Handler_When_Logging_A_Handler_Failure_Throws()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var secondHandlerRan = false;
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => throw new InvalidOperationException("Open handler failure")));
+        await client.Subscribe(new EventHandler<Common.OpenResponse>((_, _) => secondHandlerRan = true));
+
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(new ThrowingLoggerProvider("Exception occurred in Open event handler"));
+        }));
+        bool connected;
+        try
+        {
+            connected = await client.Connect(server.Endpoint).WaitAsync(GateTimeout);
+        }
+        finally
+        {
+            Log.Reset();
+        }
+
+        using (new AssertionScope())
+        {
+            connected.Should().BeTrue();
+            secondHandlerRan.Should().BeTrue("a failing log provider must not stop Open delivery");
+        }
+
+        await client.Stop();
     }
 }

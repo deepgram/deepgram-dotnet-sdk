@@ -26,7 +26,13 @@ public interface IFluxSpeakWebSocketClient
     /// period (<c>DefaultCloseGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
     /// logged at Error level and Connect() still returns true. SendText(), SendFlush(),
     /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected,
-    /// including while Connect() is still in progress, they are dropped.
+    /// including while Connect() is still in progress, they are dropped. If a previous connection is
+    /// still being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
     /// </remarks>
     public Task<bool> Connect(SpeakSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);

@@ -72,7 +72,12 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// period (<c>DefaultCloseStreamGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
     /// logged at Error level and Connect() still returns true. Messages still queued from earlier
     /// sends are sent as soon as the new connection opens; the send methods' remarks say which ones
-    /// are kept.
+    /// are kept. If a previous connection is still being released, Connect() waits for that to
+    /// finish (within its connect timeout) and then opens a new connection. If another Connect() is
+    /// still opening the connection or a Stop() is closing it, Connect() waits for it within the
+    /// same timeout and returns true only for an open connection that is not stopping.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio, <see cref="FluxSchema.Model"/> is required</param>
     /// <param name="cancelToken">Provide a cancel token to be used for the connect or use the internal one</param>
@@ -476,9 +481,34 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             return true;
         }
 
+        // From here on a Connect() still opening this connection fails, and a concurrent Connect()
+        // waits for this Stop() instead of reporting the connection as usable.
+        owned.MarkStopping();
+
         try
         {
-            if (owned.IsOpen)
+            return await StopOwnedConnection(owned, cancelToken, nullByte).ConfigureAwait(false);
+        }
+        finally
+        {
+            // A stopping connection is always released (I6), even if a log provider (user code)
+            // threw inside a catch block below. Idempotent with the releases below.
+            if (!owned.IsReleased)
+            {
+                await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The work of <see cref="Stop"/> for the connection it snapshotted, after it is marked stopping.
+    /// </summary>
+    private async Task<bool> StopOwnedConnection(ConnectionState owned, CancellationTokenSource? cancelToken, bool nullByte)
+    {
+        try
+        {
+            // A connection that never raised Open (stopped while connecting) gets no close message.
+            if (owned.IsOpened && owned.IsOpen)
             {
                 // Sends {"type":"CloseStream"} and waits (up to the grace period) for the
                 // server-side close.
@@ -540,6 +570,17 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             await ReleaseAndRaiseClose(owned);
             Log.Verbose("FluxWSClient.Stop", "LEAVE");
             return true;
+        }
+        catch (Exception ex)
+        {
+            // Anything else: still release this connection (raising Close if this call did the
+            // release), so a Stop() never leaves a stopping connection published, then rethrow.
+            Log.Error("Stop", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Stop", $"Exception: {ex}");
+            Log.Verbose("FluxWSClient.Stop", "LEAVE");
+
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            throw;
         }
     }
 

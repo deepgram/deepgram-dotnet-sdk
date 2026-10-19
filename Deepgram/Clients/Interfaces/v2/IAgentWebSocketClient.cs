@@ -20,11 +20,16 @@ public interface IAgentWebSocketClient
     /// return, so an Open handler that waits for a message from the server blocks until its own
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
-    /// opens; the send methods' remarks say which ones are kept. Connect() sends the Settings
-    /// message before raising Open and before any queued message; if Settings cannot be sent,
-    /// Connect() fails and raises neither Open nor Close. When Connect() returns true for a
-    /// connection that another Connect() opened, that connection keeps the Settings it was opened
-    /// with: this call's options are not sent.
+    /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
+    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping. Connect() sends the Settings message before raising Open and
+    /// before any queued message; if Settings cannot be sent, Connect() fails and raises neither Open
+    /// nor Close. When Connect() returns true for a connection that another Connect() opened, that
+    /// connection keeps the Settings it was opened with: this call's options are not sent.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
     /// </remarks>
     public Task<bool> Connect(SettingsSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
