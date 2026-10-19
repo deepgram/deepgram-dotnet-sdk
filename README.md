@@ -626,6 +626,54 @@ For a complete implementation, you would need to:
 3. Handle any function calls if your agent uses them
 4. Add proper error handling and connection management
 
+### Resuming a conversation with context
+
+`Agent.Context` seeds the agent with the conversation that happened before this session, so it
+resumes instead of starting cold. Messages are chronological, oldest first, and may mix spoken
+turns with the function calls the agent already made.
+
+```csharp
+using Deepgram.Models.Agent.v2.WebSocket;
+
+var settings = new SettingsSchema();
+
+settings.Agent.Context = new AgentContext
+{
+    Messages = new List<AgentHistoryMessage>
+    {
+        AgentHistoryMessage.FromConversation("user", "My name is Ada."),
+        AgentHistoryMessage.FromConversation("assistant", "Nice to meet you, Ada."),
+        AgentHistoryMessage.FromFunctionCalls(new[]
+        {
+            new HistoryFunctionCall
+            {
+                Id = "call-1",
+                Name = "get_weather",
+                ClientSide = true,
+                Arguments = "{\"city\":\"London\"}",
+                Response = "{\"temp_c\":11}",
+            },
+        }),
+    },
+};
+
+settings.Agent.Greeting = "Welcome back, Ada.";
+```
+
+A history entry is either conversation text (`Role` plus `Content`) or a record of function calls
+(`FunctionCalls`). Use `FromConversation` and `FromFunctionCalls` rather than setting both on one
+entry. `HistoryFunctionCall.ThoughtSignature` is only needed by some Gemini models.
+
+`Agent.Context` is not the same thing as `Flags.History`, which toggles whether the server reports
+`History` events back to you.
+
+Settings is logged on connect and `Library.Initialize()` writes `log.txt` by default, so seeded
+history — including function-call arguments and responses — is written to that log alongside the
+rest of the payload. Configure a quieter level or your own `ILoggerFactory` through
+`Library.Configure` if the conversation you are replaying should not reach disk.
+
+See `examples/agent/websocket/context`.
+
 ### Defining function-call parameters
 
 `Function.Parameters` is a JSON Schema expressed as a `Dictionary<string, object>`, so a function
