@@ -13,6 +13,14 @@ public record Agent
     [JsonPropertyName("language")]
     public string? Language { get; set; } = "en";
 
+    /// <summary>
+    /// Conversation context, including the history of messages and function calls that
+    /// happened before this session. Lets the agent resume rather than start cold.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("context")]
+    public AgentContext? Context { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("listen")]
     public Listen Listen { get; set; } = new Listen();
