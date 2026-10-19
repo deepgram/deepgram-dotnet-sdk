@@ -33,6 +33,10 @@ public interface IFluxSpeakWebSocketClient
     /// <summary>
     /// Subscribe to an Open event (raised locally when the connection opens).
     /// </summary>
+    /// <remarks>
+    /// The handler runs before Connect() returns. If it throws, the exception is logged at Error
+    /// level and the connection stays open; Connect() still returns true.
+    /// </remarks>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<OpenResponse> eventHandler);
 

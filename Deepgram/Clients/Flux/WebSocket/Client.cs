@@ -31,10 +31,6 @@ namespace Deepgram.Clients.Flux.WebSocket;
 public class Client : AbstractWebSocketClient, IFluxWebSocketClient
 {
     #region Fields
-    // Guards against the Close event being raised twice for one connection, which can happen
-    // when a user-initiated Stop() and the receive loop's server-close handling overlap.
-    private int _closeEventFired = 0;
-
     // Guards against CloseStream being sent twice for one connection (a user-initiated Stop()
     // calls SendClose, and the base Stop() would otherwise call it again).
     private int _closeStreamSent = 0;
@@ -89,7 +85,6 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
 
         try
         {
-            Interlocked.Exchange(ref _closeEventFired, 0);
             Interlocked.Exchange(ref _closeStreamSent, 0);
 
             var myURI = GetUri(_deepgramClientOptions, options, addons);
@@ -260,14 +255,6 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         // Create a new event handler that wraps the original one
         EventHandler<Common.CloseResponse> wrappedHandler = (sender, args) =>
         {
-            // A user-initiated Stop() and the receive loop's handling of the server close can
-            // overlap and both raise the base Close event; deliver only the first to subscribers.
-            if (Interlocked.Exchange(ref _closeEventFired, 1) == 1)
-            {
-                Log.Debug("CloseEvent", "Close event already delivered for this connection. Skipping...");
-                return;
-            }
-
             // Cast the event arguments to the desired type
             var castedArgs = new CloseResponse();
             castedArgs.Copy(args);
@@ -515,9 +502,8 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             // already happened, just not by us. Finish any remaining cleanup and report success.
             Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
             // Release only this connection: cancel before dispose, and leave any newer
-            // connection's fields alone (#455).
-            ReleaseConnection(owned);
-            await owned.ReleaseCompleted.ConfigureAwait(false);
+            // connection's fields alone. Raise Close if this call did the release (#455).
+            await ReleaseAndRaiseClose(owned);
             Log.Verbose("FluxWSClient.Stop", "LEAVE");
             return true;
         }
