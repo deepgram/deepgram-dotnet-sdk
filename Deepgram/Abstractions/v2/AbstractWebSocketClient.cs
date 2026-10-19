@@ -115,6 +115,13 @@ public abstract class AbstractWebSocketClient : IDisposable
             }
         }
 
+        // caller-supplied socket settings, applied last so they can override the SDK's own
+        if (_deepgramClientOptions is DeepgramWsClientOptions { ConfigureClientWebSocket: { } configureClientWebSocket })
+        {
+            Log.Debug("Connect", "Applying ConfigureClientWebSocket");
+            configureClientWebSocket(_clientWebSocket.Options);
+        }
+
         // internal cancellation token for internal threads
         _cancellationTokenSource = new CancellationTokenSource();
 
