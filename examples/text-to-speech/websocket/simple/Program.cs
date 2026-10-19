@@ -145,6 +145,9 @@ namespace SampleApp
                 {
                     Encoding = "linear16",
                     SampleRate = 48000,
+                    // Speaking-rate multiplier, 0.7 to 1.5, default 1.0. Not supported in every
+                    // language; the server rejects an unsupported value.
+                    Speed = 1.1,
                 };
                 bool bConnected = await speakClient.Connect(speakSchema);
                 if (!bConnected)

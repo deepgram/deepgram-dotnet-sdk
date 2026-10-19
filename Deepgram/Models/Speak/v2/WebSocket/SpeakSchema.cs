@@ -15,6 +15,16 @@ public class SpeakSchema
     public bool? MipOptOut { get; set; }
 
     /// <summary>
+    /// Speaking-rate multiplier that adjusts the pace of generated speech while preserving natural
+    /// prosody and voice quality. Accepted range is 0.7 to 1.5; the default is 1.0. Not supported
+    /// in every language, and an unsupported value is rejected by the server.
+    /// <see href="https://developers.deepgram.com/docs/tts-speed">
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("speed")]
+    public double? Speed { get; set; }
+
+    /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
