@@ -57,6 +57,7 @@ public class ListenStreamingEntitiesLiveIntegrationTests
         var client = new ListenWebSocketClient(apiKey);
         var errors = new List<ErrorResponse>();
         var entitiesSeen = new List<Entity>();
+        var entitiesOnInterimResult = false;
         var finalWithEntities = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => { lock (errors) { errors.Add(e); } }));
@@ -70,10 +71,16 @@ public class ListenStreamingEntitiesLiveIntegrationTests
             lock (entitiesSeen)
             {
                 entitiesSeen.AddRange(e.Entities);
+
+                // Record rather than assert: the client runs handlers through InvokeParallel,
+                // which catches and logs every exception, so an assertion thrown here would be
+                // swallowed and would only surface indirectly as a timeout below.
+                if (e.IsFinal != true)
+                {
+                    entitiesOnInterimResult = true;
+                }
             }
 
-            // Entities are documented as final-results-only; prove that on the live wire.
-            e.IsFinal.Should().BeTrue("entities must only appear on final results");
             finalWithEntities.TrySetResult(true);
         }));
 
@@ -105,6 +112,8 @@ public class ListenStreamingEntitiesLiveIntegrationTests
                 }
 
                 snapshot.Should().NotBeEmpty();
+                entitiesOnInterimResult.Should().BeFalse(
+                    "entities are documented as arriving on final results only");
                 snapshot.Should().AllSatisfy(entity =>
                 {
                     entity.Label.Should().NotBeNullOrWhiteSpace("every entity must carry a label");
