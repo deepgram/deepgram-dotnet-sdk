@@ -55,13 +55,15 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }
         Log.Verbose("ListenWSClient.Connect", "ENTER");
-        Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
+        // Connect payloads are redacted before logging so a credential-bearing field
+        // can never reach log.txt. See LogRedactionUtil.
+        Log.Information("Connect", $"options:\n{LogRedactionUtil.SerializeRedacted(options)}");
         Log.Debug("Connect", $"addons: {addons}");
 
         try
         {
             var myURI = GetUri(_deepgramClientOptions, options, addons);
-            Log.Debug("Connect", $"uri: {myURI}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(myURI)}");
             bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
             if (!bConnected)
             {

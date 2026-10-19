@@ -131,7 +131,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             if (Log.IsEnabled(LogLevel.Debug))
             {
-                Log.Debug("Connect", $"uri: {uri}");
+                Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(uri)}");
 
                 Log.Debug("Connect", "Connecting to Deepgram API...");
             }
