@@ -71,7 +71,10 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         {
             var myURI = GetUri(_deepgramClientOptions);
             Log.Debug("Connect", $"uri: {myURI}");
-            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
+            // owned is the connection this call opened. It is null when another connection was
+            // already published ("already initialized"): that connection's own Connect() runs
+            // its post-connect work, so this call does none (#455).
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -117,11 +120,11 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             var bytes = Encoding.UTF8.GetBytes(cleanedJson);
             await SendMessageImmediately(bytes);
 
-            // keepalive thread
-            if (_deepgramClientOptions.KeepAlive)
+            // keepalive thread, handed the connection it belongs to (#455)
+            if (_deepgramClientOptions.KeepAlive && owned != null)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
-                StartKeepAliveBackgroundThread();
+                StartKeepAliveBackgroundThread(owned);
             }
 
             Log.Debug("Connect", "Connect Succeeded");
@@ -145,7 +148,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             throw;
         }
 
-        void StartKeepAliveBackgroundThread() => Task.Run(async () => await ProcessKeepAlive());
+        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned));
     }
 
     #region Subscribe Event
@@ -640,9 +643,23 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+    public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
-        if (_clientWebSocket == null || !IsConnected())
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
+            return Task.CompletedTask;
+        }
+        return SendClose(owned, nullByte, _cancellationToken);
+    }
+
+    /// <summary>
+    /// Sends the close message on one connection's socket only, never on a newer connection (#455).
+    /// </summary>
+    private protected override async Task SendClose(ConnectionState owned, bool nullByte, CancellationTokenSource? _cancellationToken)
+    {
+        if (!owned.IsOpen)
         {
             Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
             return;
@@ -651,49 +668,38 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
-            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
-            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
-            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
-            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
-            var socket = _clientWebSocket;
-            if (socket == null || !IsConnected())
-            {
-                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
-                return;
-            }
-            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
-
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(token);
-            try
-            {
-                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
+            var token = _cancellationToken?.Token ?? owned.Token;
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token);
             return;
         }
 
         ControlMessage message = new ControlMessage(AgentClientTypes.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        // The caller's token bounds the send, so Stop(token) keeps its timeout.
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token);
     }
     #endregion
 
-    internal async Task ProcessKeepAlive()
+    /// <summary>SendKeepAlive() for one connection: the keepalive loop sends on its own connection only (#455).</summary>
+    private async Task SendKeepAlive(ConnectionState owned)
+    {
+        ControlMessage message = new ControlMessage(AgentClientTypes.KeepAlive);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token);
+    }
+
+    internal async Task ProcessKeepAlive(ConnectionState owned)
     {
         Log.Verbose("AgentWSClient.ProcessKeepAlive", "ENTER");
 
         try
         {
+            // Use the connection this loop was started for, never the fields, so it stops with that
+            // connection and never acts on a newer one (#390, #455).
+            var _cancelToken = owned.Token;
             while (true)
             {
-                // snapshot the token each iteration to avoid a teardown race (#390)
-                var _cancelToken = GetInternalCancellationToken();
-
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
                 await Task.Delay(5000, _cancelToken);
 
@@ -702,13 +708,13 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
                 }
-                if (!IsConnected())
+                if (!owned.IsOpen)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;
                 }
 
-                await SendKeepAlive();
+                await SendKeepAlive(owned);
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
