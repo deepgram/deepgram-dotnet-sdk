@@ -72,7 +72,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         try
         {
             var myURI = GetUri(_deepgramClientOptions);
-            Log.Debug("Connect", $"uri: {myURI}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(myURI)}");
             bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
             if (!bConnected)
             {
