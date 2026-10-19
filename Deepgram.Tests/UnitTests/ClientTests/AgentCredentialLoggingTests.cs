@@ -230,6 +230,63 @@ public class AgentCredentialLoggingTests
     }
 
     [Test]
+    public void SerializeRedacted_Should_Reach_Credentials_Inside_The_SpeakProviders_Array()
+    {
+        // The fallback-provider list nests endpoints one array deep. A walker that only
+        // recursed through objects would miss every header in it.
+        var settings = new SettingsSchema();
+        settings.Agent.Speak = new Speak
+        {
+            SpeakProviders = new List<SpeakProviderConfig>
+            {
+                new SpeakProviderConfig
+                {
+                    Provider = new DeepgramSpeakProvider { Model = "aura-2-zeus-en" },
+                },
+                new SpeakProviderConfig
+                {
+                    Provider = new OpenAiSpeakProvider { Model = "tts-1", Voice = "shimmer" },
+                    Endpoint = new Endpoint
+                    {
+                        URL = "https://api.openai.com/v1/audio/speech",
+                        Headers = new Dictionary<string, string> { { "authorization", EndpointHeaderSentinel } },
+                    },
+                },
+            },
+        };
+
+        var json = LogRedactionUtil.SerializeRedacted(settings);
+
+        using (new AssertionScope())
+        {
+            json.Should().NotContain(EndpointHeaderSentinel);
+            json.Should().Contain("aura-2-zeus-en").And.Contain("shimmer");
+        }
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Mask_Credentials_Supplied_Through_The_Untyped_Provider()
+    {
+        // Back-compat route: a caller on the pre-existing DynamicObject path can still put a
+        // secret in Settings. Redaction keys off the wire field name, so it must catch that too.
+        dynamic provider = new Provider();
+        provider.Type = "aws_bedrock";
+        provider.Model = "anthropic/claude-3-5-haiku-20240307-v1:0";
+        provider.SecretAccessKey = SecretKeySentinel;
+
+        var settings = new SettingsSchema();
+        settings.Agent.Think = new Think { Provider = provider };
+
+        var json = LogRedactionUtil.SerializeRedacted(settings);
+
+        using (new AssertionScope())
+        {
+            json.Should().NotContain(SecretKeySentinel);
+            json.Should().Contain("anthropic/claude-3-5-haiku-20240307-v1:0");
+        }
+    }
+
+    [Test]
     public void SerializeRedacted_Should_Handle_Null_And_Leave_Ordinary_Payloads_Intact()
     {
         using (new AssertionScope())
