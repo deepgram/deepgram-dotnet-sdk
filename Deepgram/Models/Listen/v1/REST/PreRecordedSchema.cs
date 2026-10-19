@@ -100,9 +100,9 @@ public class PreRecordedSchema
     public bool? Diarize { get; set; }
 
     /// <summary>
-    /// Select and enable a specific batch diarization model version, e.g. "latest", "v1", or "v2".
+    /// Select and enable a specific diarization model version, e.g. "latest", "v1", or "v2".
     /// Supersedes the deprecated <see cref="Diarize"/> boolean; if set, do not also set Diarize.
-    /// Batch/pre-recorded only - not accepted on streaming requests.
+    /// Streaming accepts "v1" and "latest"; "v2" is batch only and is rejected on streaming.
     /// <see href="https://developers.deepgram.com/docs/diarization">
     /// default is null
     /// </summary>

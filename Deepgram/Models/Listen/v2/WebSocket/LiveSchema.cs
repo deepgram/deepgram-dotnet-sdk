@@ -49,6 +49,16 @@ public class LiveSchema
     public int? Channels { get; set; }
 
     /// <summary>
+    /// Entity Detection identifies and extracts key entities from content in submitted audio.
+    /// Entities appear in final results. When enabled, Punctuation is also enabled by default.
+    /// <see href="https://developers.deepgram.com/docs/detect-entities">
+    /// default is false
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("detect_entities")]
+    public bool? DetectEntities { get; set; }
+
+    /// <summary>
     /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript. 
     /// <see href="https://developers.deepgram.com/docs/diarization">
     /// default is false
@@ -56,6 +66,18 @@ public class LiveSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
+
+    /// <summary>
+    /// Selects a specific diarization model version. Setting this enables diarization and selects the
+    /// model, so you do not need to also set <see cref="Diarize"/>. Supported values on streaming are
+    /// "v1" and "latest"; "v2" is batch only and is rejected on streaming with a validation error.
+    /// Supersedes the deprecated <see cref="DiarizeVersion"/>.
+    /// <see href="https://developers.deepgram.com/docs/diarization">
+    /// default is null
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("diarize_model")]
+    public string? DiarizeModel { get; set; }
 
     // <summary>
     /// <see href="https://developers.deepgram.com/docs/diarization">
