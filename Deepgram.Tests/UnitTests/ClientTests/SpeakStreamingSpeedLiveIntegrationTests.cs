@@ -8,8 +8,12 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 
 public class SpeakStreamingSpeedLiveIntegrationTests
 {
-    [Test]
-    public async Task Live_Speak_Streaming_Speed_Should_Be_Accepted_And_Synthesize_Audio()
+    // 1.2 exercises the fractional form; 1.0 is the default but .NET renders the double as
+    // "1", so the integer-rendered form needs its own live confirmation that the server
+    // accepts it rather than only a local URI-builder assertion.
+    [TestCase(1.2)]
+    [TestCase(1.0)]
+    public async Task Live_Speak_Streaming_Speed_Should_Be_Accepted_And_Synthesize_Audio(double speed)
     {
         var apiKey = GlobalTestEnvironment.DeepgramApiKeyAtStartup
             ?? Environment.GetEnvironmentVariable("DEEPGRAM_API_KEY");
@@ -38,7 +42,7 @@ public class SpeakStreamingSpeedLiveIntegrationTests
             Model = "aura-2-thalia-en",
             Encoding = "linear16",
             SampleRate = 24000,
-            Speed = 1.2,
+            Speed = speed,
         });
         connected.Should().BeTrue("the live Speak endpoint must accept the speed parameter");
 
@@ -53,7 +57,7 @@ public class SpeakStreamingSpeedLiveIntegrationTests
         {
             flushedInTime.Should().BeTrue("the server must acknowledge the flushed text");
             audioBytes.Should().BeGreaterThan(0, "a speed-adjusted request must still synthesize audio");
-            errors.Should().BeEmpty("speed within the 0.7 to 1.5 range must not raise an error");
+            errors.Should().BeEmpty($"speed {speed} is within the 0.7 to 1.5 range and must not raise an error");
         }
     }
 }
