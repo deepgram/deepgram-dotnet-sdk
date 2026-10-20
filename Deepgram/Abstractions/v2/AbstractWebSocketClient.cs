@@ -119,7 +119,19 @@ public abstract class AbstractWebSocketClient : IDisposable
         if (_deepgramClientOptions is DeepgramWsClientOptions { ConfigureClientWebSocket: { } configureClientWebSocket })
         {
             Log.Debug("Connect", "Applying ConfigureClientWebSocket");
-            configureClientWebSocket(_clientWebSocket.Options);
+            try
+            {
+                configureClientWebSocket(_clientWebSocket.Options);
+            }
+            catch (Exception ex)
+            {
+                // release the socket so a later Connect() isn't stopped by the "already initialized" check
+                Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}: {ex.Message}");
+                _clientWebSocket.Dispose();
+                _clientWebSocket = null;
+                Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+                throw;
+            }
         }
 
         // internal cancellation token for internal threads
