@@ -123,6 +123,20 @@ public abstract class AbstractWebSocketClient : IDisposable
                 }
             }
 
+            if (_deepgramClientOptions is DeepgramWsClientOptions { ConfigureClientWebSocket: { } configureClientWebSocket })
+            {
+                try
+                {
+                    configureClientWebSocket(socket.Options);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}");
+                    socket.Dispose();
+                    throw;
+                }
+            }
+
             connectionScope = Log.BeginScope("AbstractWebSocketClient",
                 new Dictionary<string, object> { ["dg.connection_id"] = connectionId });
             lock (_connectionLifecycleLock)

@@ -352,6 +352,14 @@ var options = new DeepgramWsClientOptions
 var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 ```
 
+`KeepAliveInterval` and `KeepAliveTimeout` control WebSocket ping frames. They are separate from
+the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
+doesn't close an idle stream.
+
+When a keep-alive timeout aborts the socket, the SDK doesn't currently raise a `Close` or `Error`
+event. `IsConnected()` returns `false`, and you need to call `Stop()` before calling `Connect()`
+again on the same client.
+
 ## Flux - Conversational Speech Recognition (Preview)
 
 > Flux support is currently in preview. The API surface may change in a future release.

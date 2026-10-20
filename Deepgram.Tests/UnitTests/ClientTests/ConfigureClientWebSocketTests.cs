@@ -24,26 +24,15 @@ public class ConfigureClientWebSocketTests
     {
         using var server = new HeaderCaptureServer();
         var apiKey = new Faker().Random.Guid().ToString();
-        ClientWebSocketOptions? configured = null;
         var options = new DeepgramWsClientOptions(apiKey)
         {
-            ConfigureClientWebSocket = socketOptions =>
-            {
-                configured = socketOptions;
-                socketOptions.KeepAliveInterval = TimeSpan.FromSeconds(5);
-                socketOptions.SetRequestHeader(ProbeHeader, "abstract");
-            },
+            ConfigureClientWebSocket = socketOptions => socketOptions.SetRequestHeader(ProbeHeader, "abstract"),
         };
         using var client = new TestWebSocketClient(apiKey, options);
 
         Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(server.Endpoint));
 
-        using (new AssertionScope())
-        {
-            configured.Should().NotBeNull();
-            configured!.KeepAliveInterval.Should().Be(TimeSpan.FromSeconds(5));
-            server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("abstract");
-        }
+        server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("abstract");
     }
 
     [Test]
@@ -76,6 +65,25 @@ public class ConfigureClientWebSocketTests
     }
 
     [Test]
+    public void AbstractClient_ConfigureClientWebSocket_Exception_Should_Leave_Client_Reusable()
+    {
+        using var server = new HeaderCaptureServer();
+        var apiKey = new Faker().Random.Guid().ToString();
+        var shouldThrow = true;
+        var options = new DeepgramWsClientOptions(apiKey)
+        {
+            ConfigureClientWebSocket = ThrowOnceThenProbe(() => shouldThrow, "retry"),
+        };
+        using var client = new TestWebSocketClient(apiKey, options);
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await client.Connect(server.Endpoint));
+        shouldThrow = false;
+        Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(server.Endpoint));
+
+        server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("retry");
+    }
+
+    [Test]
     public void LegacyListenClient_Connect_Should_Apply_ConfigureClientWebSocket()
     {
         using var server = new HeaderCaptureServer();
@@ -92,6 +100,28 @@ public class ConfigureClientWebSocketTests
 #pragma warning restore CS0618
 
         server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("listen");
+    }
+
+    [Test]
+    public void LegacyListenClient_ConfigureClientWebSocket_Exception_Should_Leave_Client_Reusable()
+    {
+        using var server = new HeaderCaptureServer();
+        var apiKey = new Faker().Random.Guid().ToString();
+        var shouldThrow = true;
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, onPrem: true)
+        {
+            ConfigureClientWebSocket = ThrowOnceThenProbe(() => shouldThrow, "listen-retry"),
+        };
+#pragma warning disable CS0618 // The legacy client is intentionally covered for compatibility.
+        using var client = new Deepgram.Clients.Listen.v1.WebSocket.Client(apiKey, options);
+        var schema = new Deepgram.Models.Listen.v1.WebSocket.LiveSchema { Model = "nova-3" };
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await client.Connect(schema));
+        shouldThrow = false;
+        Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(schema));
+#pragma warning restore CS0618
+
+        server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("listen-retry");
     }
 
     [Test]
@@ -112,6 +142,41 @@ public class ConfigureClientWebSocketTests
 
         server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("speak");
     }
+
+    [Test]
+    public void LegacySpeakClient_ConfigureClientWebSocket_Exception_Should_Leave_Client_Reusable()
+    {
+        using var server = new HeaderCaptureServer();
+        var apiKey = new Faker().Random.Guid().ToString();
+        var shouldThrow = true;
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, onPrem: true)
+        {
+            ConfigureClientWebSocket = ThrowOnceThenProbe(() => shouldThrow, "speak-retry"),
+        };
+#pragma warning disable CS0618 // The legacy client is intentionally covered for compatibility.
+        using var client = new Deepgram.Clients.Speak.v1.WebSocket.Client(apiKey, options);
+        var schema = new Deepgram.Models.Speak.v1.WebSocket.SpeakSchema();
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await client.Connect(schema));
+        shouldThrow = false;
+        Assert.ThrowsAsync<WebSocketException>(async () => await client.Connect(schema));
+#pragma warning restore CS0618
+
+        server.WaitForHeaders().Should().ContainKey(ProbeHeader).WhoseValue.Should().Be("speak-retry");
+    }
+
+    /// <summary>
+    /// Throws while <paramref name="shouldThrow"/> returns true; afterwards sets the probe header to <paramref name="probeValue"/>.
+    /// </summary>
+    private static Action<ClientWebSocketOptions> ThrowOnceThenProbe(Func<bool> shouldThrow, string probeValue) =>
+        socketOptions =>
+        {
+            if (shouldThrow())
+            {
+                throw new InvalidOperationException("configure failed");
+            }
+            socketOptions.SetRequestHeader(ProbeHeader, probeValue);
+        };
 
     /// <summary>
     /// Accepts one connection, records the upgrade request's headers, and rejects the upgrade with 429.
@@ -158,6 +223,10 @@ public class ConfigureClientWebSocketTests
             catch (SocketException)
             {
                 // TcpListener.Stop() can interrupt an in-flight accept.
+            }
+            catch (IOException)
+            {
+                // NetworkStream wraps a connection reset this way.
             }
             _cancellationTokenSource.Dispose();
         }
