@@ -329,6 +329,37 @@ catch (DeepgramWebSocketException exception)
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
 
+### Configuring the underlying WebSocket
+
+Set `ConfigureClientWebSocket` on `DeepgramWsClientOptions` to adjust the `ClientWebSocketOptions`
+the SDK creates on each `Connect`, for settings it does not expose itself. The callback runs after
+the SDK has applied its own headers. For example, on .NET 9 or later, a keep-alive timeout makes the
+client abort a connection whose network path has died without a close frame, instead of reporting
+it as open indefinitely:
+
+```csharp
+using Deepgram;
+using Deepgram.Models.Authenticate.v1;
+
+var options = new DeepgramWsClientOptions
+{
+    ConfigureClientWebSocket = socketOptions =>
+    {
+        socketOptions.KeepAliveInterval = TimeSpan.FromSeconds(5);
+        socketOptions.KeepAliveTimeout = TimeSpan.FromSeconds(5);
+    },
+};
+var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
+```
+
+`KeepAliveInterval` and `KeepAliveTimeout` control WebSocket ping frames. They are separate from
+the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
+doesn't close an idle stream.
+
+When a keep-alive timeout aborts the socket, the SDK doesn't currently raise a `Close` or `Error`
+event. `IsConnected()` returns `false`, and you need to call `Stop()` before calling `Connect()`
+again on the same client.
+
 ## Flux - Conversational Speech Recognition (Preview)
 
 > Flux support is currently in preview. The API surface may change in a future release.
