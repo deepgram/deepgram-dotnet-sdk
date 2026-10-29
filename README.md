@@ -332,7 +332,7 @@ catch (DeepgramWebSocketException exception)
 ### Configuring the underlying WebSocket
 
 Set `ConfigureClientWebSocket` on `DeepgramWsClientOptions` to adjust the `ClientWebSocketOptions`
-the SDK creates on each `Connect`, for settings it does not expose itself. The callback runs after
+the v2 WebSocket clients create on each `Connect`, for settings they do not expose themselves. The callback runs after
 the SDK has applied its own headers. For example, on .NET 9 or later, a keep-alive timeout makes the
 client abort a connection whose network path has died without a close frame, instead of reporting
 it as open indefinitely:

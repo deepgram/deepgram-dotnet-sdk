@@ -133,7 +133,6 @@ public abstract class AbstractWebSocketClient : IDisposable
                 catch (Exception ex)
                 {
                     callbackFailed = true;
-                    Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}");
                     socket.Dispose();
                     throw;
                 }
@@ -196,6 +195,14 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             return true;
         }
+        catch (Exception ex) when (callbackFailed)
+        {
+            Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}");
+            Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+
+            ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
+            throw;
+        }
         catch (TaskCanceledException ex)
         {
             Log.Debug("Connect", "Connect cancelled.");
@@ -220,9 +227,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error("Connect", callbackFailed
-                ? $"ConfigureClientWebSocket threw {ex.GetType()}"
-                : $"{ex.GetType()} thrown {ex.Message}");
+            Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 

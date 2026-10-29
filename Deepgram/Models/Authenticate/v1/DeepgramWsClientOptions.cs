@@ -65,7 +65,7 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     public bool ThrowDeepgramWebSocketExceptions { get; set; } = false;
 
     /// <summary>
-    /// Optional callback that configures the underlying <see cref="ClientWebSocketOptions"/> before each connect,
+    /// Optional callback that configures the underlying <see cref="ClientWebSocketOptions"/> before each v2 WebSocket connect,
     /// for settings the SDK does not expose, such as <c>KeepAliveInterval</c> and, on .NET 9 or later, <c>KeepAliveTimeout</c>.
     /// It runs after the SDK has applied its own headers, so it can override them. It can also override
     /// <c>CollectHttpResponseDetails</c>, which the SDK enables so that
