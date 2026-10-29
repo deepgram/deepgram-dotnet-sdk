@@ -57,6 +57,7 @@ public class WebSocketSynchronizationContextTests
                 result.TrySetException(ex);
             }
         });
+        thread.IsBackground = true;
         thread.Start();
         return result.Task;
     }
