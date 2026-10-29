@@ -130,7 +130,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 {
                     configureClientWebSocket(socket.Options);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     callbackFailed = true;
                     socket.Dispose();
