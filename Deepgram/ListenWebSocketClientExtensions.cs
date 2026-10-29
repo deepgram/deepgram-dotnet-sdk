@@ -23,6 +23,14 @@ public static class ListenWebSocketClientExtensions
         if (client is null) throw new ArgumentNullException(nameof(client));
         if (configure is null) throw new ArgumentNullException(nameof(configure));
 
+        // The SDK client keeps both steps on one connection. Custom implementations retain the
+        // interface's original Flush-then-send behavior.
+        if (client is Clients.Listen.v2.WebSocket.Client listenClient)
+        {
+            await listenClient.SendConfigure(configure).ConfigureAwait(false);
+            return;
+        }
+
         // Configure applies at an audio boundary. Drain preceding queued audio before sending its
         // immediate control frame so sequential Send(...) then SendConfigure(...) calls preserve order.
         await client.Flush();

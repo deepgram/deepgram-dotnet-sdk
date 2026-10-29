@@ -5,6 +5,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using Deepgram.Abstractions.v2;
+using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.WebSocket;
@@ -83,9 +84,9 @@ public class WebSocketLifecycleTests
 
         public TaskCompletionSource<bool> ReleaseFirstSendClose { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
             var isCloseStream = messageType == WebSocketMessageType.Text
                 && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream");
             if (isCloseStream && Interlocked.Increment(ref _closeStreamSends) == 1)
@@ -109,13 +110,13 @@ public class WebSocketLifecycleTests
 
         public FailingSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
 
-        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _failuresLeft, 0) == 1)
             {
                 throw new WebSocketException("Simulated Settings send failure");
             }
-            return base.SendOnConnection(owned, data, messageType, token);
+            return base.SendOnConnection(owned, data, messageType, token, allowStopping);
         }
     }
 
@@ -136,13 +137,13 @@ public class WebSocketLifecycleTests
 
         public TaskCompletionSource<bool> BinarySendStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             if (IsSettingsMessage(data, messageType))
             {
                 SettingsEntered.TrySetResult(true);
                 await ReleaseSettings.WaitAsync(GateTimeout);
-                await base.SendOnConnection(owned, data, messageType, token);
+                await base.SendOnConnection(owned, data, messageType, token, allowStopping);
                 Events.Enqueue("settings");
                 return;
             }
@@ -151,7 +152,7 @@ public class WebSocketLifecycleTests
                 Events.Enqueue("binary");
                 BinarySendStarted.TrySetResult(true);
             }
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
         }
     }
 
@@ -165,14 +166,14 @@ public class WebSocketLifecycleTests
 
         public DroppedDuringSettingsAgentClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
 
-        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             if (IsSettingsMessage(data, messageType) && Interlocked.Exchange(ref _drops, 0) == 1)
             {
                 owned.Socket.Abort();
                 return Task.CompletedTask;
             }
-            return base.SendOnConnection(owned, data, messageType, token);
+            return base.SendOnConnection(owned, data, messageType, token, allowStopping);
         }
     }
 
@@ -262,7 +263,7 @@ public class WebSocketLifecycleTests
         public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null) =>
             Task.CompletedTask;
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             if (data.Count == Marker.Length && data.SequenceEqual(Marker))
             {
@@ -270,7 +271,7 @@ public class WebSocketLifecycleTests
                 await ReleaseSender.Task;
                 return;
             }
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
         }
     }
 
@@ -459,11 +460,11 @@ public class WebSocketLifecycleTests
 
         public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             // The base send runs synchronously up to its wait for the held mutex, so once it has
             // returned its task, it is waiting there.
-            var send = base.SendOnConnection(owned, data, messageType, token);
+            var send = base.SendOnConnection(owned, data, messageType, token, allowStopping);
             if (messageType == WebSocketMessageType.Text
                 && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
             {
@@ -1556,11 +1557,11 @@ public class WebSocketLifecycleTests
 
         public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             // The base send runs synchronously up to its wait for the held mutex, so once it has
             // returned its task, it is waiting there.
-            var send = base.SendOnConnection(owned, data, messageType, token);
+            var send = base.SendOnConnection(owned, data, messageType, token, allowStopping);
             if (messageType == WebSocketMessageType.Text
                 && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
             {
@@ -2108,14 +2109,14 @@ public class WebSocketLifecycleTests
 
         public TaskCompletionSource<bool> ReleaseSender { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
             if (data.Count == Marker.Length && data.SequenceEqual(Marker))
             {
                 SenderBlocked.TrySetResult(true);
                 await ReleaseSender.Task;
             }
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
         }
     }
 
@@ -2169,6 +2170,105 @@ public class WebSocketLifecycleTests
         before.Should().NotContain(f => f.Contains("\"Finalize\""), "connection A's Finalize must not reach connection B");
 
         await client.Stop();
+    }
+
+    [Test]
+    public async Task ListenClient_PublicFinalize_For_A_Stopped_Connection_Should_Not_Reach_A_Newer_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new FinalizeListenClient(apiKey, options);
+        var schema = new ListenModels.LiveSchema { Model = "nova-3" };
+
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        client.SendBinary(FinalizeListenClient.Marker);
+        await client.SenderBlocked.Task.WaitAsync(GateTimeout);
+
+        var finalize = client.SendFinalize();
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+        client.ReleaseSender.TrySetResult(true);
+        await finalize.WaitAsync(GateTimeout);
+
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        client.SendMessage(Encoding.UTF8.GetBytes("{\"type\":\"Sentinel\"}"));
+        var connection = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var before = new List<string>();
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.IsText && frame.Text.Contains("\"Sentinel\""))
+            {
+                break;
+            }
+            if (frame.IsText)
+            {
+                before.Add(frame.Text);
+            }
+        }
+
+        before.Should().NotContain(f => f.Contains("\"Finalize\""), "a Finalize started on connection A must not reach connection B");
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task ListenClient_Configure_Extension_For_A_Stopped_Connection_Should_Not_Reach_A_Newer_Connection()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new FinalizeListenClient(apiKey, options);
+        IListenWebSocketClient interfaceClient = client;
+        var schema = new ListenModels.LiveSchema { Model = "nova-3" };
+
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        client.SendBinary(FinalizeListenClient.Marker);
+        await client.SenderBlocked.Task.WaitAsync(GateTimeout);
+
+        var configure = interfaceClient.SendConfigure(new ListenModels.ConfigureSchema { Features = new Dictionary<string, bool> { ["numerals"] = true } });
+        (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+        client.ReleaseSender.TrySetResult(true);
+        await configure.WaitAsync(GateTimeout);
+
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+        client.SendMessage(Encoding.UTF8.GetBytes("{\"type\":\"Sentinel\"}"));
+        var connection = await server.WaitForConnectionAsync(2).WaitAsync(GateTimeout);
+        var before = new List<string>();
+        while (true)
+        {
+            var frame = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+            if (frame.IsText && frame.Text.Contains("\"Sentinel\""))
+            {
+                break;
+            }
+            if (frame.IsText)
+            {
+                before.Add(frame.Text);
+            }
+        }
+
+        before.Should().NotContain(f => f.Contains("\"Configure\""), "a Configure started on connection A must not reach connection B");
+        await client.Stop();
+    }
+
+    [Test]
+    public async Task ListenClient_Should_Not_Send_KeepAlive_After_Stop_Begins()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new Deepgram.Clients.Listen.v2.WebSocket.Client(apiKey, options);
+        (await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" }).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        var stop = client.Stop();
+        var connection = await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout);
+        var close = await connection.ReadFrameAsync().WaitAsync(GateTimeout);
+        close.Text.Should().Contain("CloseStream");
+
+        await client.SendKeepAlive();
+        await stop.WaitAsync(GateTimeout);
+        server.DataFrames.Should().NotContain(frame => frame.IsText && frame.Text.Contains("KeepAlive"),
+            "only teardown traffic may use a connection once Stop() has begun");
     }
 
     /// <summary>A Speak client that exposes its current connection.</summary>

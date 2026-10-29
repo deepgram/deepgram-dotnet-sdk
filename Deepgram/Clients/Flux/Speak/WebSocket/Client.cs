@@ -545,7 +545,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         if (nullByte)
         {
             // send a close to Deepgram, on this connection's socket only
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
@@ -561,7 +561,7 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         ControlMessage message = new ControlMessage(Constants.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token).ConfigureAwait(false);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token, allowStopping: true).ConfigureAwait(false);
 
         // Flux drains remaining and queued audio and emits SessionMetadata AFTER Close, then
         // closes the connection from its side. Give it a grace period instead of tearing the

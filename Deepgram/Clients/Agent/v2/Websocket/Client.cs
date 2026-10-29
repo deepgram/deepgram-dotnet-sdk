@@ -745,8 +745,16 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     /// </remarks>
     public async Task SendForceEndTurn()
     {
-        await Flush();
-        await SendMessageImmediately(Encoding.UTF8.GetBytes(new AgentForceEndTurnSchema().ToString()));
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            await Flush().ConfigureAwait(false);
+            await SendMessageImmediately(Encoding.UTF8.GetBytes(new AgentForceEndTurnSchema().ToString())).ConfigureAwait(false);
+            return;
+        }
+
+        await FlushConnection(owned).ConfigureAwait(false);
+        await SendMessageImmediately(owned, Encoding.UTF8.GetBytes(new AgentForceEndTurnSchema().ToString())).ConfigureAwait(false);
     }
     /// <summary>
     /// Sends a Close message to Deepgram
@@ -778,14 +786,14 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(AgentClientTypes.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
     }
     #endregion
 
@@ -816,7 +824,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
                 }
-                if (!owned.IsOpen)
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;

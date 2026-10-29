@@ -1049,7 +1049,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     private protected async Task FlushConnection(ConnectionState owned)
     {
-        if (!owned.IsOpen)
+        if (!owned.IsOpen || owned.IsStopping)
         {
             Log.Debug("Flush", "WebSocket is not connected. Nothing to flush.");
             return;
@@ -1110,7 +1110,8 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     /// <remarks>
     /// The message is sent only on a connection that has finished opening (its Open event has been
-    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress
+    /// or after Stop() begins.
     /// </remarks>
     public virtual async Task SendBinaryImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
@@ -1125,36 +1126,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Debug("SendBinaryImmediately", "WebSocket is not connected. Exiting...");
             return;
         }
-        var socket = owned.Socket;
-
-        // the caller's token, or this connection's own
-        var token = _cancellationToken?.Token ?? owned.Token;
-
-        try
-        {
-            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
-            try
-            {
-                Log.Verbose("SendBinaryImmediately", "Sending binary message immediately...");
-                if (length == Constants.UseArrayLengthForSend)
-                {
-                    length = data.Length;
-                }
-                await socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
-        }
-        catch (ObjectDisposedException ex)
-        {
-            // A concurrent Stop()/Dispose() released the connection and disposed its socket (or
-            // its token source) after the check above. The connection is gone; nothing to send.
-            Log.Debug("SendBinaryImmediately", "WebSocket was disposed while sending. Exiting...");
-            Log.Verbose("SendBinaryImmediately", $"ObjectDisposedException: {ex}");
-        }
+        await SendBinaryImmediately(owned, data, length, _cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -1162,7 +1134,8 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     /// <remarks>
     /// The message is sent only on a connection that has finished opening (its Open event has been
-    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress.
+    /// or is being raised). Otherwise it is dropped, including while Connect() is still in progress
+    /// or after Stop() begins.
     /// </remarks>
     public virtual async Task SendMessageImmediately(byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? _cancellationToken = null)
     {
@@ -1177,47 +1150,52 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Debug("SendMessageImmediately", "WebSocket is not connected. Exiting...");
             return;
         }
-        var socket = owned.Socket;
+        await SendMessageImmediately(owned, data, length, _cancellationToken).ConfigureAwait(false);
+    }
 
-        // the caller's token, or this connection's own
-        var token = _cancellationToken?.Token ?? owned.Token;
+    /// <summary>Sends binary data on one opened, non-stopping connection only.</summary>
+    private protected async Task SendBinaryImmediately(ConnectionState owned, byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? cancellationToken = null)
+    {
+        if (!owned.IsOpened || !owned.IsOpen || owned.IsStopping)
+        {
+            Log.Debug("SendBinaryImmediately", "WebSocket is not connected. Exiting...");
+            return;
+        }
+        if (length == Constants.UseArrayLengthForSend)
+        {
+            length = data.Length;
+        }
+        Log.Verbose("SendBinaryImmediately", "Sending binary message immediately...");
+        await SendOnConnection(owned, new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Binary,
+            cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
+    }
 
-        try
+    /// <summary>Sends text data on one opened, non-stopping connection only.</summary>
+    private protected async Task SendMessageImmediately(ConnectionState owned, byte[] data, int length = Constants.UseArrayLengthForSend, CancellationTokenSource? cancellationToken = null)
+    {
+        if (!owned.IsOpened || !owned.IsOpen || owned.IsStopping)
         {
-            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
-            try
-            {
-                Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
-                if (length == Constants.UseArrayLengthForSend)
-                {
-                    length = data.Length;
-                }
-                await socket.SendAsync(new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
+            Log.Debug("SendMessageImmediately", "WebSocket is not connected. Exiting...");
+            return;
         }
-        catch (ObjectDisposedException ex)
+        if (length == Constants.UseArrayLengthForSend)
         {
-            // A concurrent Stop()/Dispose() released the connection and disposed its socket (or
-            // its token source) after the check above. The connection is gone; nothing to send.
-            Log.Debug("SendMessageImmediately", "WebSocket was disposed while sending. Exiting...");
-            Log.Verbose("SendMessageImmediately", $"ObjectDisposedException: {ex}");
+            length = data.Length;
         }
+        Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
+        await SendOnConnection(owned, new ArraySegment<byte>(data, 0, length), WebSocketMessageType.Text,
+            cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
     }
     #endregion
 
     /// <summary>
     /// Sends one message on the given connection's socket, never on a newer connection, holding
-    /// the send mutex. Does nothing once that connection is released; callers check the socket
-    /// state they need before calling.
+    /// the send mutex. Non-teardown sends do nothing once that connection is stopping or released;
+    /// Close paths set <paramref name="allowStopping"/> so they can finish teardown.
     /// </summary>
-    internal virtual async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+    internal virtual async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
     {
-        if (owned.IsReleased)
+        if (owned.IsReleased || (owned.IsStopping && !allowStopping))
         {
             Log.Debug("SendOnConnection", "The connection was released. Exiting...");
             return;
@@ -1228,6 +1206,11 @@ public abstract class AbstractWebSocketClient : IDisposable
             await _mutexSend.WaitAsync(token).ConfigureAwait(false);
             try
             {
+                if (owned.IsReleased || (owned.IsStopping && !allowStopping))
+                {
+                    Log.Debug("SendOnConnection", "The connection is stopping or released. Exiting...");
+                    return;
+                }
                 await owned.Socket.SendAsync(data, messageType, true, token)
                     .ConfigureAwait(false);
             }

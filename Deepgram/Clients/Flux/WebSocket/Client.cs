@@ -347,17 +347,25 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// </remarks>
     public async Task SendForceEndTurn()
     {
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            await Flush().ConfigureAwait(false);
+            await SendMessageImmediately(Encoding.ASCII.GetBytes(new ControlMessage(Constants.ForceEndTurn).ToString())).ConfigureAwait(false);
+            return;
+        }
+
         // Flush any buffered audio first so ForceEndTurn can't overtake audio still in the send
         // queue (it is sent immediately and would otherwise race ahead, ending the turn before
         // the final chunks reach Flux). Mirrors the SendFinalize fix in the v1 listen client.
         Log.Debug("SendForceEndTurn", "Flushing buffered audio before ForceEndTurn...");
-        await Flush();
+        await FlushConnection(owned).ConfigureAwait(false);
 
         ControlMessage message = new ControlMessage(Constants.ForceEndTurn);
 
         Log.Debug("SendForceEndTurn", "Sending ForceEndTurn Message Immediately...");
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        await SendMessageImmediately(owned, data).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -405,7 +413,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         if (nullByte)
         {
             // send a close to Deepgram, on this connection's socket only
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
@@ -421,7 +429,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         ControlMessage message = new ControlMessage(Constants.CloseStream);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token).ConfigureAwait(false);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token, allowStopping: true).ConfigureAwait(false);
 
         // Flux delivers the final turn results AFTER CloseStream and then closes the connection
         // from its side. Give it a grace period instead of tearing the socket down immediately.

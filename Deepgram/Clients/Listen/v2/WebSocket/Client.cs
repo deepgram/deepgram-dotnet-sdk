@@ -327,15 +327,24 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// </remarks>
     public async Task SendFinalize()
     {
-        // Flush any buffered audio first so Finalize can't overtake audio still in the send
-        // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
-        Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
-        await Flush();
+        var owned = CurrentConnection;
+        if (owned != null)
+        {
+            await SendFinalize(owned).ConfigureAwait(false);
+        }
+    }
 
-        Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
-        ControlMessage message = new ControlMessage(Constants.Finalize);
-        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+    /// <summary>Flushes and sends Configure on the connection that was current when the call began.</summary>
+    internal async Task SendConfigure(ConfigureSchema configure)
+    {
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            return;
+        }
+
+        await FlushConnection(owned).ConfigureAwait(false);
+        await SendMessageImmediately(owned, Encoding.UTF8.GetBytes(configure.ToString())).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -374,14 +383,14 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(Constants.CloseStream);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
         // The caller's token bounds the send, so Stop(token) keeps its timeout.
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
     }
     #endregion
 
@@ -430,7 +439,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
                 }
-                if (!owned.IsOpen)
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;
@@ -477,7 +486,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;
                 }
-                if (!owned.IsOpen)
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;

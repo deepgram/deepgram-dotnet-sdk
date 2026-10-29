@@ -386,9 +386,9 @@ public class WebSocketConcurrentConnectTests
 
         public TaskCompletionSource<bool> ReleaseStop { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
             if (IsText(data, messageType, "CloseStream") && CloseSent.TrySetResult(true))
             {
                 await ReleaseStop.Task;
@@ -405,9 +405,9 @@ public class WebSocketConcurrentConnectTests
 
         public TaskCompletionSource<bool> ReleaseStop { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
-            await base.SendOnConnection(owned, data, messageType, token);
+            await base.SendOnConnection(owned, data, messageType, token, allowStopping);
             if (IsText(data, messageType, "Close") && CloseSent.TrySetResult(true))
             {
                 await ReleaseStop.Task;
@@ -420,10 +420,10 @@ public class WebSocketConcurrentConnectTests
     {
         public ThrowingCloseFluxClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
 
-        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token) =>
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false) =>
             IsText(data, messageType, "CloseStream")
                 ? throw new InvalidOperationException("Simulated CloseStream failure")
-                : base.SendOnConnection(owned, data, messageType, token);
+                : base.SendOnConnection(owned, data, messageType, token, allowStopping);
     }
 
     /// <summary>A Flux TTS client whose Close send fails with an unexpected exception.</summary>
@@ -431,10 +431,10 @@ public class WebSocketConcurrentConnectTests
     {
         public ThrowingCloseFluxSpeakClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
 
-        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token) =>
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false) =>
             IsText(data, messageType, "Close")
                 ? throw new InvalidOperationException("Simulated Close failure")
-                : base.SendOnConnection(owned, data, messageType, token);
+                : base.SendOnConnection(owned, data, messageType, token, allowStopping);
     }
 
     [Test]

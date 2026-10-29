@@ -81,9 +81,9 @@ public class WebSocketSynchronizationContextTests
 
         public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
         {
-            var send = base.SendOnConnection(owned, data, messageType, token);
+            var send = base.SendOnConnection(owned, data, messageType, token, allowStopping);
             if (messageType == WebSocketMessageType.Text
                 && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
             {

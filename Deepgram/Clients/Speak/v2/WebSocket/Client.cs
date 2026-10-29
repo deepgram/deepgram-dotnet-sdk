@@ -386,13 +386,13 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         {
             // send a close to Deepgram
             var token = _cancellationToken?.Token ?? owned.Token;
-            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token).ConfigureAwait(false);
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(Constants.Close);
         byte[] data = Encoding.UTF8.GetBytes(message.ToString());
-        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token).ConfigureAwait(false);
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -466,7 +466,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;
                 }
-                if (!owned.IsOpen)
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     return;
