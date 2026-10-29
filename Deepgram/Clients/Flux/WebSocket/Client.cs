@@ -350,8 +350,6 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
         var owned = CurrentConnection;
         if (owned == null)
         {
-            await Flush().ConfigureAwait(false);
-            await SendMessageImmediately(Encoding.ASCII.GetBytes(new ControlMessage(Constants.ForceEndTurn).ToString())).ConfigureAwait(false);
             return;
         }
 

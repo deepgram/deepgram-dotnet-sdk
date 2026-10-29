@@ -748,8 +748,6 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         var owned = CurrentConnection;
         if (owned == null)
         {
-            await Flush().ConfigureAwait(false);
-            await SendMessageImmediately(Encoding.UTF8.GetBytes(new AgentForceEndTurnSchema().ToString())).ConfigureAwait(false);
             return;
         }
 
