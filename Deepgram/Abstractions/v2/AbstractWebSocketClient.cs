@@ -212,9 +212,17 @@ public abstract class AbstractWebSocketClient : IDisposable
     {
         // Clear only this attempt's published state. A Stop() can release this socket and a retry
         // can publish a new one before the original ConnectAsync failure is observed.
-        Interlocked.CompareExchange(ref _clientWebSocket, null, socket);
+        var ownsPublishedSocket = ReferenceEquals(Interlocked.CompareExchange(ref _clientWebSocket, null, socket), socket);
         Interlocked.CompareExchange(ref _cancellationTokenSource, null, internalCancellationTokenSource);
-        if (Interlocked.CompareExchange(ref _connectionScope, null, connectionScope) == connectionScope)
+        if (connectionScope != null && Interlocked.CompareExchange(ref _connectionScope, null, connectionScope) == connectionScope)
+        {
+            connectionScope.Dispose();
+            if (ownsPublishedSocket)
+            {
+                _connectionId = null;
+            }
+        }
+        else if (ownsPublishedSocket)
         {
             _connectionId = null;
         }

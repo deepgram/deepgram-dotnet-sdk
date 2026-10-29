@@ -6,9 +6,12 @@ using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Security.Cryptography;
 using Deepgram.Abstractions.v2;
+using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v2.WebSocket;
+using Microsoft.Extensions.Logging;
 using ListenV2 = Deepgram.Clients.Listen.v2.WebSocket;
+using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -17,6 +20,7 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 /// from the failed attempt stayed assigned, so the next Connect() hit the "already initialized"
 /// guard and returned true without opening a connection.
 /// </summary>
+[NonParallelizable]
 public class WebSocketConnectRetryTests
 {
     /// <summary>Holds an OS-assigned port bound but not listening, so TCP connects are refused.</summary>
@@ -120,6 +124,28 @@ public class WebSocketConnectRetryTests
 
         server.ReleaseFirstResponse.TrySetResult(true);
         await client.Stop();
+    }
+
+    [Test]
+    public async Task AbstractClient_Failed_Connect_Should_Dispose_Its_Logging_Scope()
+    {
+        var provider = new ScopeTrackingLoggerProvider();
+        Log.Reset();
+        Log.Configure(LoggerFactory.Create(builder => builder.AddProvider(provider)));
+        try
+        {
+            using var refusedEndpoint = new RefusedEndpoint();
+            using var client = new TestWebSocketClient(new Faker().Random.Guid().ToString());
+
+            Func<Task<bool>> connect = async () => await client.Connect(refusedEndpoint.Endpoint);
+            await connect.Should().ThrowAsync<WebSocketException>();
+
+            Volatile.Read(ref provider.DisposedScopes).Should().Be(1);
+        }
+        finally
+        {
+            Log.Reset();
+        }
     }
 
     [Test]
@@ -255,6 +281,30 @@ public class WebSocketConnectRetryTests
             }
 
             return Encoding.ASCII.GetString(bytes.ToArray());
+        }
+    }
+
+    private sealed class ScopeTrackingLoggerProvider : ILoggerProvider
+    {
+        public int DisposedScopes;
+
+        public ILogger CreateLogger(string categoryName) => new ScopeTrackingLogger(this);
+
+        public void Dispose() { }
+
+        private sealed class ScopeTrackingLogger(ScopeTrackingLoggerProvider provider) : ILogger
+        {
+            public IDisposable BeginScope<TState>(TState state) where TState : notnull => new Scope(provider);
+
+            public bool IsEnabled(MelLogLevel logLevel) => false;
+
+            public void Log<TState>(MelLogLevel logLevel, EventId eventId, TState state, Exception? exception,
+                Func<TState, Exception?, string> formatter) { }
+        }
+
+        private sealed class Scope(ScopeTrackingLoggerProvider provider) : IDisposable
+        {
+            public void Dispose() => Interlocked.Increment(ref provider.DisposedScopes);
         }
     }
 }
