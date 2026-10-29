@@ -25,6 +25,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     // back to the server's request_id.
     protected string? _connectionId;
     private IDisposable? _connectionScope;
+    private readonly object _connectionLifecycleLock = new();
 
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
@@ -72,14 +73,17 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
 
         // check if the client is disposed
-        if (_clientWebSocket != null)
+        lock (_connectionLifecycleLock)
         {
-            // client has already connected
-            var exStr = "Client has already been initialized";
-            Log.Error("Connect", exStr);
-            Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+            if (_clientWebSocket != null)
+            {
+                // client has already connected
+                var exStr = "Client has already been initialized";
+                Log.Error("Connect", exStr);
+                Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            return true;
+                return true;
+            }
         }
 
         using var defaultCancelToken = cancelToken == null
@@ -121,10 +125,21 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             connectionScope = Log.BeginScope("AbstractWebSocketClient",
                 new Dictionary<string, object> { ["dg.connection_id"] = connectionId });
-            _clientWebSocket = socket;
-            _cancellationTokenSource = internalCancellationTokenSource;
-            _connectionId = connectionId;
-            _connectionScope = connectionScope;
+            lock (_connectionLifecycleLock)
+            {
+                if (_clientWebSocket != null)
+                {
+                    connectionScope.Dispose();
+                    DisposeCancellationTokenSource(internalCancellationTokenSource);
+                    socket.Dispose();
+                    return true;
+                }
+
+                _clientWebSocket = socket;
+                _cancellationTokenSource = internalCancellationTokenSource;
+                _connectionId = connectionId;
+                _connectionScope = connectionScope;
+            }
 
             var myUri = new Uri(uri);
 
@@ -210,23 +225,29 @@ public abstract class AbstractWebSocketClient : IDisposable
     private void ResetFailedConnection(ClientWebSocket socket, CancellationTokenSource internalCancellationTokenSource,
         IDisposable? connectionScope)
     {
-        // Clear only this attempt's published state. A Stop() can release this socket and a retry
-        // can publish a new one before the original ConnectAsync failure is observed.
-        var ownsPublishedSocket = ReferenceEquals(Interlocked.CompareExchange(ref _clientWebSocket, null, socket), socket);
-        Interlocked.CompareExchange(ref _cancellationTokenSource, null, internalCancellationTokenSource);
-        if (connectionScope != null && Interlocked.CompareExchange(ref _connectionScope, null, connectionScope) == connectionScope)
+        IDisposable? scopeToDispose = null;
+        lock (_connectionLifecycleLock)
         {
-            connectionScope.Dispose();
-            if (ownsPublishedSocket)
+            // A retry cannot publish between clearing this attempt's socket and scope. If Stop()
+            // already released the attempt, its fields no longer match and a newer connection is
+            // left untouched.
+            if (ReferenceEquals(_clientWebSocket, socket))
             {
+                _clientWebSocket = null;
+                if (ReferenceEquals(_cancellationTokenSource, internalCancellationTokenSource))
+                {
+                    _cancellationTokenSource = null;
+                }
+                if (ReferenceEquals(_connectionScope, connectionScope))
+                {
+                    _connectionScope = null;
+                    scopeToDispose = connectionScope;
+                }
                 _connectionId = null;
             }
         }
-        else if (ownsPublishedSocket)
-        {
-            _connectionId = null;
-        }
 
+        scopeToDispose?.Dispose();
         DisposeCancellationTokenSource(internalCancellationTokenSource);
         socket.Dispose();
     }
