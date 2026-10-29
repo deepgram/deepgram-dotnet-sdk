@@ -25,6 +25,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     // back to the server's request_id.
     protected string? _connectionId;
     private IDisposable? _connectionScope;
+    private readonly object _connectionLifecycleLock = new();
 
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
@@ -72,61 +73,74 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
 
         // check if the client is disposed
-        if (_clientWebSocket != null)
+        lock (_connectionLifecycleLock)
         {
-            // client has already connected
-            var exStr = "Client has already been initialized";
-            Log.Error("Connect", exStr);
-            Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+            if (_clientWebSocket != null)
+            {
+                // client has already connected
+                var exStr = "Client has already been initialized";
+                Log.Error("Connect", exStr);
+                Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            return true;
+                return true;
+            }
         }
 
-        if (cancelToken == null)
+        using var defaultCancelToken = cancelToken == null
+            ? new CancellationTokenSource(Constants.DefaultConnectTimeout)
+            : null;
+        if (defaultCancelToken != null)
         {
             Log.Information("Connect", "Using default connect cancellation token");
-            cancelToken = new CancellationTokenSource(Constants.DefaultConnectTimeout);
+            cancelToken = defaultCancelToken;
         }
 
-        // create client
-        _clientWebSocket = new ClientWebSocket();
-        DeepgramWebSocketException.EnableHttpResponseDetails(_clientWebSocket);
-
-        // set headers
-        SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
-        if (_deepgramClientOptions.Headers is not null)
-        {
-            foreach (var header in _deepgramClientOptions.Headers)
-            {
-                // header names only: values may be credentials and are never logged
-
-                Log.Debug("Connect", $"Add Header {header.Key}");
-                _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
-            }
-        }
-        if (headers is not null)
-        {
-            foreach (var header in headers)
-            {
-                // header names only: values may be credentials and are never logged
-
-                Log.Debug("Connect", $"Add Header {header.Key}");
-                _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
-            }
-        }
-
-        // internal cancellation token for internal threads
-        _cancellationTokenSource = new CancellationTokenSource();
-
-        // open a connection-scoped correlation id so every log entry for this connection
-        // (including those from the sender/receiver background threads started below) can
-        // be grouped together. See #305.
-        _connectionId = Guid.NewGuid().ToString("N");
-        _connectionScope = Log.BeginScope("AbstractWebSocketClient",
-            new Dictionary<string, object> { ["dg.connection_id"] = _connectionId });
+        var socket = new ClientWebSocket();
+        var internalCancellationTokenSource = new CancellationTokenSource();
+        var connectionId = Guid.NewGuid().ToString("N");
+        IDisposable? connectionScope = null;
 
         try
         {
+            // Configure a local socket first. Header failures must not publish a half-built
+            // connection that makes a later retry report success without opening a socket.
+            DeepgramWebSocketException.EnableHttpResponseDetails(socket);
+            SetAuthenticationHeader(socket, _deepgramClientOptions);
+            if (_deepgramClientOptions.Headers is not null)
+            {
+                foreach (var header in _deepgramClientOptions.Headers)
+                {
+                    Log.Debug("Connect", $"Add Header {header.Key}");
+                    socket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+            if (headers is not null)
+            {
+                foreach (var header in headers)
+                {
+                    Log.Debug("Connect", $"Add Header {header.Key}");
+                    socket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+
+            connectionScope = Log.BeginScope("AbstractWebSocketClient",
+                new Dictionary<string, object> { ["dg.connection_id"] = connectionId });
+            lock (_connectionLifecycleLock)
+            {
+                if (_clientWebSocket != null)
+                {
+                    connectionScope.Dispose();
+                    DisposeCancellationTokenSource(internalCancellationTokenSource);
+                    socket.Dispose();
+                    return true;
+                }
+
+                _clientWebSocket = socket;
+                _cancellationTokenSource = internalCancellationTokenSource;
+                _connectionId = connectionId;
+                _connectionScope = connectionScope;
+            }
+
             var myUri = new Uri(uri);
 
             if (Log.IsEnabled(LogLevel.Debug))
@@ -135,14 +149,14 @@ public abstract class AbstractWebSocketClient : IDisposable
 
                 Log.Debug("Connect", "Connecting to Deepgram API...");
             }
-            await _clientWebSocket.ConnectAsync(myUri, cancelToken.Token).ConfigureAwait(false);
+            await socket.ConnectAsync(myUri, cancelToken.Token).ConfigureAwait(false);
 
-            if (!IsConnected())
+            if (socket.State != WebSocketState.Open)
             {
                 Log.Error("Connect", "Failed to connect to Deepgram API");
                 Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-                CloseConnectionScope();
+                ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
                 return false;
             }
 
@@ -172,7 +186,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
             return false;
         }
         catch (WebSocketException ex) when (_deepgramClientOptions is DeepgramWsClientOptions { ThrowDeepgramWebSocketExceptions: true })
@@ -181,10 +195,11 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            var httpStatusCode = DeepgramWebSocketException.GetHttpStatusCode(socket);
+            ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
             throw new DeepgramWebSocketException(
                 "Failed to connect to Deepgram API",
-                DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket),
+                httpStatusCode,
                 ex);
         }
         catch (Exception ex)
@@ -193,13 +208,60 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-            CloseConnectionScope();
+            ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
             throw;
         }
 
         void StartSenderBackgroundThread() => Task.Run(() => ProcessSendQueue());
 
         void StartReceiverBackgroundThread() => Task.Run(() => ProcessReceiveQueue());
+    }
+
+    /// <summary>
+    /// Returns the client to its pre-connect state after a failed <see cref="Connect"/>, so the
+    /// caller can retry. Without this, the half-initialized socket stays assigned and the next
+    /// Connect() call returns true without opening a connection.
+    /// </summary>
+    private void ResetFailedConnection(ClientWebSocket socket, CancellationTokenSource internalCancellationTokenSource,
+        IDisposable? connectionScope)
+        => ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
+
+    /// <summary>
+    /// Releases resources for one connection attempt only. A newer connection may have been
+    /// published while a stale Connect or Stop was awaiting, so shared fields are changed only
+    /// when they still reference this attempt.
+    /// </summary>
+    private void ReleaseConnection(ClientWebSocket socket, CancellationTokenSource? internalCancellationTokenSource,
+        IDisposable? connectionScope)
+    {
+        IDisposable? scopeToDispose = null;
+        lock (_connectionLifecycleLock)
+        {
+            // A retry cannot publish between clearing this attempt's socket and scope. If this
+            // attempt was already released, its fields no longer match and a newer connection is
+            // left untouched.
+            if (ReferenceEquals(_clientWebSocket, socket))
+            {
+                _clientWebSocket = null;
+                if (ReferenceEquals(_cancellationTokenSource, internalCancellationTokenSource))
+                {
+                    _cancellationTokenSource = null;
+                }
+                if (ReferenceEquals(_connectionScope, connectionScope))
+                {
+                    _connectionScope = null;
+                    scopeToDispose = connectionScope;
+                }
+                _connectionId = null;
+            }
+        }
+
+        scopeToDispose?.Dispose();
+        if (internalCancellationTokenSource != null)
+        {
+            DisposeCancellationTokenSource(internalCancellationTokenSource);
+        }
+        socket.Dispose();
     }
 
     /// <summary>
@@ -740,8 +802,16 @@ public abstract class AbstractWebSocketClient : IDisposable
     {
         Log.Verbose("AbstractWebSocketClient.Stop", "ENTER");
 
-        // client is already disposed
-        if (_clientWebSocket == null)
+        ClientWebSocket? socket;
+        CancellationTokenSource? internalCancellationTokenSource;
+        IDisposable? connectionScope;
+        lock (_connectionLifecycleLock)
+        {
+            socket = _clientWebSocket;
+            internalCancellationTokenSource = _cancellationTokenSource;
+            connectionScope = _connectionScope;
+        }
+        if (socket == null)
         {
             Log.Information("Stop", "Client has already been disposed");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
@@ -752,17 +822,6 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             Log.Information("Stop", "Using default disconnect cancellation token");
             cancelToken = new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
-        }
-
-        // Snapshot the socket so a concurrent Stop() (e.g. one triggered by a server-initiated
-        // Close while the caller also calls Stop) that nulls the field can't cause a
-        // NullReferenceException on the derefs after the awaits below. See #390.
-        var socket = _clientWebSocket;
-        if (socket == null)
-        {
-            Log.Information("Stop", "Client has already been disposed");
-            Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
-            return true;
         }
 
         try
@@ -808,18 +867,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 _mutexSend.Release();
             }
 
-            // clean up internal token — cancel-before-dispose so background loops
-            // (keepalive/autoflush/send/receive) observe cancellation and exit cleanly, and
-            // atomic-claim so a concurrent Stop()/Dispose() can't race on the field. See #390.
-            Log.Debug("Stop", "Disposing internal token...");
-            DisposeCancellationTokenSource();
-
-            // release the socket
-            Log.Debug("Stop", "Disposing WebSocket socket...");
-            _clientWebSocket = null;
-
-            // close the connection-scoped correlation id
-            CloseConnectionScope();
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
@@ -834,6 +882,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
             return true;
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException)
@@ -846,6 +895,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
             return true;
         }
         catch (Exception ex)
@@ -899,6 +949,11 @@ public abstract class AbstractWebSocketClient : IDisposable
             return;
         }
 
+        DisposeCancellationTokenSource(cts);
+    }
+
+    private static void DisposeCancellationTokenSource(CancellationTokenSource cts)
+    {
         try
         {
             if (!cts.IsCancellationRequested)
