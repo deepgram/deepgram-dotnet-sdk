@@ -99,6 +99,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         var internalCancellationTokenSource = new CancellationTokenSource();
         var connectionId = Guid.NewGuid().ToString("N");
         IDisposable? connectionScope = null;
+        var callbackFailed = false;
 
         try
         {
@@ -131,6 +132,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 }
                 catch (Exception ex)
                 {
+                    callbackFailed = true;
                     Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}");
                     socket.Dispose();
                     throw;
@@ -218,7 +220,9 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Error("Connect", callbackFailed
+                ? $"ConfigureClientWebSocket threw {ex.GetType()}"
+                : $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
