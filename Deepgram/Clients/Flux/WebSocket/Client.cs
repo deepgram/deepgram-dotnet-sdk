@@ -502,6 +502,8 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     {
         try
         {
+            var token = cancelToken?.Token ?? owned.Token;
+
             // A connection that never raised Open (stopped while connecting) gets no close message.
             if (owned.IsOpened && owned.IsOpen)
             {
@@ -534,7 +536,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
                 {
                     // torn down concurrently; treat like the released case on the next pass
                 }
-                await Task.Delay(50).ConfigureAwait(false);
+                await Task.Delay(50, token).ConfigureAwait(false);
                 waited += 50;
             }
 

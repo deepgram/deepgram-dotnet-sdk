@@ -1552,6 +1552,8 @@ public class WebSocketLifecycleTests
 
         public SemaphoreSlim SendMutex => _mutexSend;
 
+        public ConnectionState? Current => CurrentConnection;
+
         public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         internal override async Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
@@ -1565,6 +1567,108 @@ public class WebSocketLifecycleTests
                 CloseStreamWaitingForMutex.TrySetResult(true);
             }
             await send;
+        }
+    }
+
+    /// <summary>A Flux TTS client that exposes its send mutex and current connection.</summary>
+    private sealed class MutexGatedFluxSpeakClient : Deepgram.Clients.Flux.Speak.WebSocket.Client
+    {
+        public MutexGatedFluxSpeakClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public SemaphoreSlim SendMutex => _mutexSend;
+
+        public ConnectionState? Current => CurrentConnection;
+    }
+
+    [Test]
+    public async Task FluxClient_Stop_Should_Honor_The_Caller_Token_While_Receive_Teardown_Is_Blocked()
+    {
+        var closeCommandReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sendServerClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(async connection =>
+        {
+            while (true)
+            {
+                var frame = await connection.ReadFrameAsync();
+                if (frame.IsText && frame.Text.Contains("CloseStream"))
+                {
+                    closeCommandReceived.TrySetResult(true);
+                    await sendServerClose.Task;
+                    await connection.SendCloseAsync();
+                    return;
+                }
+            }
+        });
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new MutexGatedFluxClient(apiKey, options);
+        (await client.Connect(new FluxSchema { Model = "flux-general-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        var stop = client.Stop(cancelled);
+        await closeCommandReceived.Task.WaitAsync(GateTimeout);
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            sendServerClose.TrySetResult(true);
+            (await Task.Run(() => SpinWait.SpinUntil(
+                () => client.Current?.Socket.State == WebSocketState.CloseReceived,
+                GateTimeout))).Should().BeTrue();
+
+            cancelled.Cancel();
+            (await stop.WaitAsync(TimeSpan.FromSeconds(1))).Should().BeTrue(
+                "the caller's token cancels the Flux STT receive-teardown coordination wait");
+        }
+        finally
+        {
+            sendServerClose.TrySetResult(true);
+            client.SendMutex.Release();
+        }
+    }
+
+    [Test]
+    public async Task FluxSpeakClient_Stop_Should_Honor_The_Caller_Token_While_Receive_Teardown_Is_Blocked()
+    {
+        var closeCommandReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sendServerClose = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var server = new LoopbackWebSocketServer(async connection =>
+        {
+            while (true)
+            {
+                var frame = await connection.ReadFrameAsync();
+                if (frame.IsText && frame.Text.Contains("\"Close\""))
+                {
+                    closeCommandReceived.TrySetResult(true);
+                    await sendServerClose.Task;
+                    await connection.SendCloseAsync();
+                    return;
+                }
+            }
+        });
+        var apiKey = NewApiKey();
+        var options = new DeepgramWsClientOptions(apiKey, server.Endpoint, keepAlive: false, onPrem: true);
+        using var client = new MutexGatedFluxSpeakClient(apiKey, options);
+        (await client.Connect(new FluxSpeak.SpeakSchema { Model = "flux-alexis-en" })).Should().BeTrue();
+
+        using var cancelled = new CancellationTokenSource();
+        var stop = client.Stop(cancelled);
+        await closeCommandReceived.Task.WaitAsync(GateTimeout);
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            sendServerClose.TrySetResult(true);
+            (await Task.Run(() => SpinWait.SpinUntil(
+                () => client.Current?.Socket.State == WebSocketState.CloseReceived,
+                GateTimeout))).Should().BeTrue();
+
+            cancelled.Cancel();
+            (await stop.WaitAsync(TimeSpan.FromSeconds(1))).Should().BeTrue(
+                "the caller's token cancels the Flux TTS receive-teardown coordination wait");
+        }
+        finally
+        {
+            sendServerClose.TrySetResult(true);
+            client.SendMutex.Release();
         }
     }
 

@@ -41,28 +41,21 @@ public class WebSocketSynchronizationContextTests
             throw new NotSupportedException("The blocked thread cannot run callbacks.");
     }
 
-    /// <summary>Runs <paramref name="call"/> on a new thread that has the blocked context installed.</summary>
-    private static bool RunOnBlockedThread(Func<bool> call)
-    {
-        var result = false;
-        var thread = new Thread(() =>
-        {
-            SynchronizationContext.SetSynchronizationContext(new BlockedThreadSynchronizationContext());
-            result = call();
-        });
-        thread.Start();
-        thread.Join();
-        return result;
-    }
-
     /// <summary>Runs a blocking call on a UI-like thread without blocking the test thread.</summary>
     private static Task<bool> RunOnBlockedThreadAsync(Func<bool> call)
     {
         var result = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
         {
-            SynchronizationContext.SetSynchronizationContext(new BlockedThreadSynchronizationContext());
-            result.TrySetResult(call());
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(new BlockedThreadSynchronizationContext());
+                result.TrySetResult(call());
+            }
+            catch (Exception ex)
+            {
+                result.TrySetException(ex);
+            }
         });
         thread.Start();
         return result.Task;
@@ -170,13 +163,13 @@ public class WebSocketSynchronizationContextTests
         using var client = kind.Create(server.Endpoint);
         (await kind.Connect(client, server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
 
-        var returned = RunOnBlockedThread(() =>
+        var returned = RunOnBlockedThreadAsync(() =>
         {
             var stop = kind.Stop(client);
             return stop.Wait(GateTimeout) && stop.Result;
         });
 
-        returned.Should().BeTrue("Stop().Wait() on a blocked UI-like thread must not deadlock");
+        (await returned.WaitAsync(GateTimeout)).Should().BeTrue("Stop().Wait() on a blocked UI-like thread must not deadlock");
     }
 
     [Test]
@@ -221,13 +214,13 @@ public class WebSocketSynchronizationContextTests
         using var server = ServerFor(kind);
         using var client = kind.Create(server.Endpoint);
 
-        var returned = RunOnBlockedThread(() =>
+        var returned = RunOnBlockedThreadAsync(() =>
         {
             var connect = kind.Connect(client, server.Endpoint);
             return connect.Wait(GateTimeout) && connect.Result;
         });
 
-        returned.Should().BeTrue("Connect().Wait() on a blocked UI-like thread must not deadlock");
+        (await returned.WaitAsync(GateTimeout)).Should().BeTrue("Connect().Wait() on a blocked UI-like thread must not deadlock");
         await kind.Stop(client).WaitAsync(GateTimeout);
     }
 }
