@@ -350,23 +350,13 @@ public abstract class AbstractWebSocketClient : IDisposable
             if (priorSender != null && !priorSender.IsCompleted)
             {
                 Log.Debug("Connect", "Waiting for the previous sender to finish...");
-                using var delayCts = new CancellationTokenSource();
-                try
+                if (!await WaitOrCancelledAsync(priorSender, connectToken).ConfigureAwait(false))
                 {
-                    var finished = await Task.WhenAny(priorSender, Task.Delay(Constants.DefaultDisconnectTimeout, delayCts.Token))
-                        .ConfigureAwait(false);
-                    if (finished != priorSender)
-                    {
-                        Log.Warning("Connect", "The previous connection's sender did not finish. Not connecting.");
-                        Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+                    Log.Warning("Connect", "The previous connection's sender did not finish. Not connecting.");
+                    Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
-                        ResetFailedConnection(owned);
-                        return (false, null);
-                    }
-                }
-                finally
-                {
-                    delayCts.Cancel();
+                    ResetFailedConnection(owned);
+                    return (false, null);
                 }
             }
 
@@ -1142,7 +1132,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         try
         {
-            await _mutexSend.WaitAsync(token);
+            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
             try
             {
                 Log.Verbose("SendBinaryImmediately", "Sending binary message immediately...");
@@ -1194,7 +1184,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         try
         {
-            await _mutexSend.WaitAsync(token);
+            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
             try
             {
                 Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
@@ -1235,7 +1225,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
         try
         {
-            await _mutexSend.WaitAsync(token);
+            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
             try
             {
                 await owned.Socket.SendAsync(data, messageType, true, token)

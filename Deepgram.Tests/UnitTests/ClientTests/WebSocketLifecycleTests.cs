@@ -367,6 +367,41 @@ public class WebSocketLifecycleTests
     }
 
     [Test]
+    public async Task Connect_Should_Honor_The_Caller_Token_While_Waiting_For_The_Previous_Sender()
+    {
+        using var server = new LoopbackWebSocketServer();
+        using var client = new BlockingSenderClient(NewApiKey());
+        var logs = new SignalingLoggerProvider();
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(logs);
+        }));
+        try
+        {
+            var waitingForSender = logs.WhenLogged("Waiting for the previous sender to finish");
+
+            (await client.Connect(server.Endpoint)).Should().BeTrue();
+            client.SendBinary(BlockingSenderClient.Marker);
+            await client.SenderBlocked.Task.WaitAsync(GateTimeout);
+            (await client.Stop().WaitAsync(GateTimeout)).Should().BeTrue();
+
+            using var timeout = new CancellationTokenSource();
+            var secondConnect = client.Connect(server.Endpoint, timeout);
+            await waitingForSender.WaitAsync(GateTimeout);
+
+            timeout.Cancel();
+            (await secondConnect.WaitAsync(TimeSpan.FromSeconds(1))).Should().BeFalse(
+                "the caller's Connect cancellation token bounds the previous-sender wait");
+        }
+        finally
+        {
+            client.ReleaseSender.TrySetResult(true);
+            Log.Reset();
+        }
+    }
+
+    [Test]
     public async Task Stale_Connect_Should_Not_Unpublish_A_Newer_Connection()
     {
         using var server = new LoopbackWebSocketServer();

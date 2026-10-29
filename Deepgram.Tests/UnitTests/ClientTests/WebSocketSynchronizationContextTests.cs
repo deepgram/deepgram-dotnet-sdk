@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Net.WebSockets;
 using Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
 using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
@@ -54,6 +55,19 @@ public class WebSocketSynchronizationContextTests
         return result;
     }
 
+    /// <summary>Runs a blocking call on a UI-like thread without blocking the test thread.</summary>
+    private static Task<bool> RunOnBlockedThreadAsync(Func<bool> call)
+    {
+        var result = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var thread = new Thread(() =>
+        {
+            SynchronizationContext.SetSynchronizationContext(new BlockedThreadSynchronizationContext());
+            result.TrySetResult(call());
+        });
+        thread.Start();
+        return result.Task;
+    }
+
     /// <summary>A base client whose SendClose() sends nothing.</summary>
     private sealed class BaseClient : AbstractWebSocketClient
     {
@@ -62,6 +76,27 @@ public class WebSocketSynchronizationContextTests
 
         public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null) =>
             Task.CompletedTask;
+    }
+
+    /// <summary>A Listen client that exposes and signals contention on its shared send mutex.</summary>
+    private sealed class MutexGatedListenClient : Deepgram.Clients.Listen.v2.WebSocket.Client
+    {
+        public MutexGatedListenClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public SemaphoreSlim SendMutex => _mutexSend;
+
+        public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token)
+        {
+            var send = base.SendOnConnection(owned, data, messageType, token);
+            if (messageType == WebSocketMessageType.Text
+                && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
+            {
+                CloseStreamWaitingForMutex.TrySetResult(true);
+            }
+            return send;
+        }
     }
 
     /// <summary>Drives one kind of v2 WebSocket client.</summary>
@@ -142,6 +177,41 @@ public class WebSocketSynchronizationContextTests
         });
 
         returned.Should().BeTrue("Stop().Wait() on a blocked UI-like thread must not deadlock");
+    }
+
+    [Test]
+    public async Task Stop_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock_When_Send_Is_In_Progress()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = Options(apiKey, server.Endpoint);
+        using var client = new MutexGatedListenClient(apiKey, options);
+        var schema = new ListenModels.LiveSchema { Model = "nova-3" };
+        var mutexReleased = false;
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            var stop = RunOnBlockedThreadAsync(() =>
+            {
+                var task = client.Stop();
+                return task.Wait(GateTimeout) && task.Result;
+            });
+            await client.CloseStreamWaitingForMutex.Task.WaitAsync(GateTimeout);
+
+            client.SendMutex.Release();
+            mutexReleased = true;
+            (await stop.WaitAsync(GateTimeout)).Should().BeTrue(
+                "Stop().Wait() on a blocked UI-like thread must resume after an active send releases the mutex");
+        }
+        finally
+        {
+            if (!mutexReleased)
+            {
+                client.SendMutex.Release();
+            }
+        }
     }
 
     [TestCaseSource(nameof(ConnectKinds))]
