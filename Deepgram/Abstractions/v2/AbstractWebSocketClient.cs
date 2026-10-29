@@ -224,12 +224,21 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     private void ResetFailedConnection(ClientWebSocket socket, CancellationTokenSource internalCancellationTokenSource,
         IDisposable? connectionScope)
+        => ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
+
+    /// <summary>
+    /// Releases resources for one connection attempt only. A newer connection may have been
+    /// published while a stale Connect or Stop was awaiting, so shared fields are changed only
+    /// when they still reference this attempt.
+    /// </summary>
+    private void ReleaseConnection(ClientWebSocket socket, CancellationTokenSource? internalCancellationTokenSource,
+        IDisposable? connectionScope)
     {
         IDisposable? scopeToDispose = null;
         lock (_connectionLifecycleLock)
         {
-            // A retry cannot publish between clearing this attempt's socket and scope. If Stop()
-            // already released the attempt, its fields no longer match and a newer connection is
+            // A retry cannot publish between clearing this attempt's socket and scope. If this
+            // attempt was already released, its fields no longer match and a newer connection is
             // left untouched.
             if (ReferenceEquals(_clientWebSocket, socket))
             {
@@ -248,7 +257,10 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
 
         scopeToDispose?.Dispose();
-        DisposeCancellationTokenSource(internalCancellationTokenSource);
+        if (internalCancellationTokenSource != null)
+        {
+            DisposeCancellationTokenSource(internalCancellationTokenSource);
+        }
         socket.Dispose();
     }
 
@@ -790,8 +802,16 @@ public abstract class AbstractWebSocketClient : IDisposable
     {
         Log.Verbose("AbstractWebSocketClient.Stop", "ENTER");
 
-        // client is already disposed
-        if (_clientWebSocket == null)
+        ClientWebSocket? socket;
+        CancellationTokenSource? internalCancellationTokenSource;
+        IDisposable? connectionScope;
+        lock (_connectionLifecycleLock)
+        {
+            socket = _clientWebSocket;
+            internalCancellationTokenSource = _cancellationTokenSource;
+            connectionScope = _connectionScope;
+        }
+        if (socket == null)
         {
             Log.Information("Stop", "Client has already been disposed");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
@@ -802,17 +822,6 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             Log.Information("Stop", "Using default disconnect cancellation token");
             cancelToken = new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
-        }
-
-        // Snapshot the socket so a concurrent Stop() (e.g. one triggered by a server-initiated
-        // Close while the caller also calls Stop) that nulls the field can't cause a
-        // NullReferenceException on the derefs after the awaits below. See #390.
-        var socket = _clientWebSocket;
-        if (socket == null)
-        {
-            Log.Information("Stop", "Client has already been disposed");
-            Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
-            return true;
         }
 
         try
@@ -858,18 +867,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                 _mutexSend.Release();
             }
 
-            // clean up internal token — cancel-before-dispose so background loops
-            // (keepalive/autoflush/send/receive) observe cancellation and exit cleanly, and
-            // atomic-claim so a concurrent Stop()/Dispose() can't race on the field. See #390.
-            Log.Debug("Stop", "Disposing internal token...");
-            DisposeCancellationTokenSource();
-
-            // release the socket
-            Log.Debug("Stop", "Disposing WebSocket socket...");
-            _clientWebSocket = null;
-
-            // close the connection-scoped correlation id
-            CloseConnectionScope();
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
@@ -884,6 +882,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
             return true;
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException)
@@ -896,6 +895,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("AbstractWebSocketClient.Stop", "LEAVE");
 
+            ReleaseConnection(socket, internalCancellationTokenSource, connectionScope);
             return true;
         }
         catch (Exception ex)
