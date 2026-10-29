@@ -573,84 +573,8 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// concurrently; this method coordinates with it instead of faulting on the disposed socket.
     /// </summary>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    public new async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
-    {
-        Log.Verbose("FluxSpeakWSClient.Stop", "ENTER");
-
-        if (_clientWebSocket == null)
-        {
-            Log.Information("Stop", "Client has already been disposed");
-            Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
-            return true;
-        }
-
-        try
-        {
-            if (IsConnected())
-            {
-                // Sends {"type":"Close"} and waits (up to the grace period) for the server-side close.
-                await SendClose(nullByte, cancelToken);
-            }
-
-            // If the server closed during the grace period, the receive loop is performing the
-            // full teardown (including raising the Close event). Give it a moment to finish.
-            var waited = 0;
-            while (waited < 2000)
-            {
-                var socket = _clientWebSocket;
-                if (socket == null)
-                {
-                    Log.Debug("Stop", "Receive loop completed the teardown");
-                    Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
-                    return true;
-                }
-                try
-                {
-                    if (socket.State != WebSocketState.CloseReceived && socket.State != WebSocketState.CloseSent)
-                    {
-                        break;
-                    }
-                }
-                catch (ObjectDisposedException)
-                {
-                    // torn down concurrently; treat like the socket-null case on the next pass
-                }
-                await Task.Delay(50).ConfigureAwait(false);
-                waited += 50;
-            }
-
-            if (_clientWebSocket == null)
-            {
-                Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
-                return true;
-            }
-
-            // Server did not close (or teardown stalled): fall back to the base teardown.
-            // SendClose will not re-send Close (guarded by _closeSent).
-            Log.Debug("Stop", "Falling back to base Stop...");
-            var result = await base.Stop(cancelToken, nullByte);
-            Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
-            return result;
-        }
-        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException)
-        {
-            // The receive loop tore the connection down while we were stopping - the shutdown
-            // already happened, just not by us. Finish any remaining cleanup and report success.
-            Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
-            try
-            {
-                _cancellationTokenSource?.Dispose();
-            }
-            catch
-            {
-                // already disposed by the concurrent teardown
-            }
-            _cancellationTokenSource = null;
-            _clientWebSocket = null;
-            Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
-            return true;
-        }
-    }
+    public new Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false) =>
+        base.Stop(cancelToken, nullByte);
 
     internal override void ProcessBinaryMessage(WebSocketReceiveResult result, MemoryStream ms)
     {
