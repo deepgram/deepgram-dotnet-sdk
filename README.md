@@ -352,7 +352,7 @@ var options = new DeepgramWsClientOptions
 var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 ```
 
-`KeepAliveInterval` and `KeepAliveTimeout` control WebSocket ping frames. They are separate from
+With a finite `KeepAliveTimeout`, these settings make .NET use WebSocket ping/pong keep-alives. They are separate from
 the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
 doesn't close an idle stream.
 
