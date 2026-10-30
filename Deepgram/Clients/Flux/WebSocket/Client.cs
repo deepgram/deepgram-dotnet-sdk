@@ -67,11 +67,15 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// logged at Error level and Connect() still returns true. Messages still queued from earlier
     /// sends are sent as soon as the new connection opens; the send methods' remarks say which ones
     /// are kept. If a previous connection is still being released, Connect() waits for that to
-    /// finish (within its connect timeout) and then opens a new connection. If another Connect() is
+    /// finish (within its connect token) and then opens a new connection. If another Connect() is
     /// still opening the connection or a Stop() is closing it, Connect() waits for it within the
     /// same timeout and returns true only for an open connection that is not stopping.
     /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
     /// Connect() return false even after Open fired; Close then follows.
+    /// If the previous connection's Close handlers are still running once it is released,
+    /// Connect() waits for them only up to its connect token or a fresh disconnect timeout (5 s),
+    /// whichever comes first. Then it logs a Warning and opens the new connection anyway, so the
+    /// new connection's Open can be raised while the old Close handler is still running.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio, <see cref="FluxSchema.Model"/> is required</param>
     /// <param name="cancelToken">Provide a cancel token to be used for the connect or use the internal one</param>
@@ -259,10 +263,13 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
     /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
     /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
-    /// A Close handler must not block on a different Stop() call that is still in progress for the
-    /// same connection: that Stop() returns only after Close has been delivered, so the handler
-    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
-    /// connection has opened since; then it stops that connection.
+    /// Keep Close handlers short. A different Stop() of the same connection waits for Close to be
+    /// delivered only up to its own token or the disconnect timeout (5 s), whichever comes first,
+    /// then logs a Warning and returns true. So a handler that blocks on such a Stop() waits at
+    /// most that long, and a Stop() that races a slow handler can return while it still runs. The
+    /// Stop() or server close that raised Close still waits for its handlers. A Stop() called from
+    /// inside the handler returns at once, unless a newer connection has opened since; then it
+    /// stops that connection.
     /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
@@ -466,6 +473,11 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// whose Open handlers are still running: then it returns without waiting for them, and Close
     /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
     /// the new connection's Open. Dispose() raises no Close.
+    /// If another Stop() or a server close is delivering Close for the same connection, this Stop()
+    /// waits until the connection is released, then waits for that Close only up to its own token
+    /// or the disconnect timeout (5 s), whichever comes first. If that runs out, it logs a Warning
+    /// and returns true while the Close handler may still be running, so Stop() followed by
+    /// Connect() can raise the new connection's Open before the old Close handler has finished.
     /// </remarks>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public new async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
@@ -506,9 +518,13 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
     /// </summary>
     private async Task<bool> StopOwnedConnection(ConnectionState owned, CancellationTokenSource? cancelToken, bool nullByte)
     {
+        // Declared outside the try so the catches below can bound their wait for another
+        // teardown's Close with it (#468). With no caller token it is the connection's own token,
+        // already cancelled by then, so that wait falls back to a fresh disconnect timeout.
+        CancellationToken token = default;
         try
         {
-            var token = cancelToken?.Token ?? owned.Token;
+            token = cancelToken?.Token ?? owned.Token;
 
             // A connection that never raised Open (stopped while connecting) gets no close message.
             if (owned.IsOpened && owned.IsOpen)
@@ -525,7 +541,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             {
                 if (owned.IsReleased)
                 {
-                    await owned.ReleaseCompleted.ConfigureAwait(false);
+                    await WaitForOtherTeardownAsync(owned, token).ConfigureAwait(false);
                     Log.Debug("Stop", "Receive loop completed the teardown");
                     Log.Verbose("FluxWSClient.Stop", "LEAVE");
                     return true;
@@ -548,7 +564,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
 
             if (owned.IsReleased)
             {
-                await owned.ReleaseCompleted.ConfigureAwait(false);
+                await WaitForOtherTeardownAsync(owned, token).ConfigureAwait(false);
                 Log.Verbose("FluxWSClient.Stop", "LEAVE");
                 return true;
             }
@@ -570,7 +586,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
             // Release only this connection: cancel before dispose, and leave any newer
             // connection's fields alone. Raise Close if this call did the release (#455).
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, token).ConfigureAwait(false);
             Log.Verbose("FluxWSClient.Stop", "LEAVE");
             return true;
         }
@@ -582,7 +598,7 @@ public class Client : AbstractWebSocketClient, IFluxWebSocketClient
             Log.Verbose("Stop", $"Exception: {ex}");
             Log.Verbose("FluxWSClient.Stop", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, token).ConfigureAwait(false);
             throw;
         }
     }
