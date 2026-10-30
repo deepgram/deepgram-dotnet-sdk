@@ -431,34 +431,15 @@ public abstract class AbstractWebSocketClient : IDisposable
             try
             {
                 // Send the OpenResponse event. Handlers run one at a time, in subscription order,
-                // each in its own try/catch: an exception is logged and the next handler still
-                // runs, the same as for every other event (InvokeParallel). A throwing handler
+                // each in its own try/catch (InvokeEachIsolated): an exception is logged and the
+                // next handler still runs. Close is delivered the same way. A throwing handler
                 // used to fail Connect() after the background loops had started, leaving them
                 // behind.
                 if (openHandlers != null)
                 {
                     var data = new OpenResponse();
                     data.Type = WebSocketType.Open;
-                    foreach (var handler in openHandlers.GetInvocationList().Cast<EventHandler<OpenResponse>>())
-                    {
-                        try
-                        {
-                            handler(null, data);
-                        }
-                        catch (Exception ex)
-                        {
-                            try
-                            {
-                                Log.Error("Connect", $"Exception occurred in Open event handler: {ex.GetType()} {ex.Message}");
-                                Log.Verbose("Connect", $"Exception: {ex}");
-                            }
-                            catch
-                            {
-                                // A failing log provider must not stop Open delivery: the handlers
-                                // after this one still receive Open.
-                            }
-                        }
-                    }
+                    InvokeEachIsolated(openHandlers, data, "Connect", "Open");
                 }
             }
             finally
@@ -699,7 +680,62 @@ public abstract class AbstractWebSocketClient : IDisposable
             }
             var data = new CloseResponse();
             data.Type = WebSocketType.Close;
-            InvokeParallel(_closeReceived, data);
+
+            // One at a time, each handler isolated, as for Open: Close fires once per connection,
+            // so every handler must receive it even when an earlier one throws.
+            InvokeEachIsolated(_closeReceived, data, "Stop", "Close");
+        }
+    }
+
+    /// <summary>
+    /// Invokes each handler of <paramref name="eventHandler"/> in subscription order, each in its
+    /// own try/catch. An exception from one handler is logged and the next handler still runs.
+    /// Used for the lifecycle events (Open, Close), which fire once per connection.
+    /// </summary>
+    internal static void InvokeEachIsolated<T>(EventHandler<T>? eventHandler, T e, string module, string eventName)
+    {
+        if (eventHandler == null)
+        {
+            return;
+        }
+
+        foreach (var handler in eventHandler.GetInvocationList().Cast<EventHandler<T>>())
+        {
+            InvokeIsolated(handler, e, module, eventName);
+        }
+    }
+
+    /// <summary>
+    /// Invokes one event handler. An exception from it is logged, never rethrown.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Event handlers are user code; one that throws must not stop delivery to the others.")]
+    private static void InvokeIsolated<T>(EventHandler<T> handler, T e, string module, string eventName)
+    {
+        try
+        {
+            handler(null, e);
+        }
+        catch (Exception ex)
+        {
+            LogHandlerException(module, eventName, ex);
+        }
+    }
+
+    /// <summary>
+    /// Logs an exception thrown by an event handler. Log providers are user code: a provider that
+    /// throws here must not stop delivery to the remaining handlers.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Log providers are user code; one that throws must not stop event delivery.")]
+    private static void LogHandlerException(string module, string eventName, Exception ex)
+    {
+        try
+        {
+            Log.Error(module, $"Exception occurred in {eventName} event handler: {ex.GetType()} {ex.Message}");
+            Log.Verbose(module, $"Exception: {ex}");
+        }
+        catch
+        {
+            // A failing log provider must not stop event delivery.
         }
     }
 
@@ -1853,21 +1889,12 @@ public abstract class AbstractWebSocketClient : IDisposable
     {
         if (eventHandler != null)
         {
-            try
-            {
-                Parallel.ForEach(
-                    eventHandler.GetInvocationList().Cast<EventHandler<T>>(),
-                    (handler) =>
-                        handler(null, e));
-            }
-            catch (AggregateException ae)
-            {
-                Log.Error("InvokeParallel", $"AggregateException occurred in one or more event handlers: {ae}");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("InvokeParallel", $"Exception occurred in event handler: {ex}");
-            }
+            // Each handler is isolated: Parallel.ForEach stops starting new iterations once one
+            // throws, so an unguarded throwing handler could keep later handlers from receiving
+            // the event at all. InvokeIsolated never throws, so the loop has nothing to catch.
+            Parallel.ForEach(
+                eventHandler.GetInvocationList().Cast<EventHandler<T>>(),
+                (handler) => InvokeIsolated(handler, e, "InvokeParallel", typeof(T).Name));
         }
     }
 

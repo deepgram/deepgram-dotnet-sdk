@@ -2510,4 +2510,77 @@ public class WebSocketLifecycleTests
 
         await client.Stop();
     }
+
+    /// <summary>
+    /// Close fires once per connection, so a throwing Close handler must not keep any other handler
+    /// from receiving it. The server closes each connection; the throwing handler is subscribed first.
+    /// Repeated so a skipped handler cannot pass by luck of scheduling.
+    /// </summary>
+    [Test]
+    public async Task Close_Should_Reach_Every_Handler_When_One_Throws()
+    {
+        const int iterations = 200;
+        const int goodHandlers = 4;
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var received = new int[goodHandlers];
+        var pending = 0;
+        var allReceived = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+            throw new InvalidOperationException("Simulated Close handler failure")));
+        for (var h = 0; h < goodHandlers; h++)
+        {
+            var index = h;
+            await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) =>
+            {
+                Interlocked.Increment(ref received[index]);
+                if (Interlocked.Decrement(ref pending) == 0)
+                {
+                    Volatile.Read(ref allReceived).TrySetResult(true);
+                }
+            }));
+        }
+
+        for (var i = 1; i <= iterations; i++)
+        {
+            Volatile.Write(ref allReceived, new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously));
+            Volatile.Write(ref pending, goodHandlers);
+
+            (await client.Connect(server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
+            var connection = await server.WaitForConnectionAsync(i).WaitAsync(GateTimeout);
+            await connection.SendCloseAsync();
+
+            var delivered = await Task.WhenAny(allReceived.Task, Task.Delay(GateTimeout)) == allReceived.Task;
+            delivered.Should().BeTrue($"every good Close handler must run (iteration {i}, counts {string.Join(",", received)})");
+        }
+
+        received.Should().AllSatisfy(count => count.Should().Be(iterations));
+    }
+
+    /// <summary>
+    /// The same guarantee for every other event: InvokeParallel isolates each handler, so one
+    /// that throws cannot stop Parallel.ForEach from starting the others.
+    /// </summary>
+    [Test]
+    public void InvokeParallel_Should_Reach_Every_Handler_When_One_Throws()
+    {
+        const int iterations = 200;
+        const int goodHandlers = 8;
+        using var client = new ExposedClient(NewApiKey());
+
+        for (var i = 0; i < iterations; i++)
+        {
+            var calls = 0;
+            EventHandler<Common.ErrorResponse>? handlers = (_, _) => throw new InvalidOperationException("Simulated handler failure");
+            for (var h = 0; h < goodHandlers; h++)
+            {
+                handlers += (_, _) => Interlocked.Increment(ref calls);
+            }
+
+            client.InvokeParallel(handlers, new Common.ErrorResponse());
+
+            Volatile.Read(ref calls).Should().Be(goodHandlers, $"iteration {i}");
+        }
+    }
 }
