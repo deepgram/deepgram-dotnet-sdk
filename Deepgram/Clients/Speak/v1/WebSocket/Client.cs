@@ -159,7 +159,11 @@ public class Client : IDisposable, ISpeakWebSocketClient
                 Log.Debug("Connect", "Sending OpenResponse event...");
                 var data = new OpenResponse();
                 data.Type = SpeakType.Open;
-                _openReceived.Invoke(null, data);
+
+                // One at a time, in subscription order, each handler isolated: a throwing Open
+                // handler used to stop the handlers after it and make Connect() throw while the
+                // socket and the background loops kept running.
+                InvokeEachIsolated(_openReceived, data, "Connect", "Open");
             }
 
             Log.Debug("Connect", "Connect Succeeded");
@@ -1004,7 +1008,10 @@ public class Client : IDisposable, ISpeakWebSocketClient
                 Log.Debug("Stop", "Sending CloseResponse event...");
                 var data = new CloseResponse();
                 data.Type = SpeakType.Close;
-                InvokeParallel(_closeReceived, data);
+
+                // One at a time, in subscription order, each handler isolated, as for Open: Close
+                // fires once per connection, so every handler must receive it.
+                InvokeEachIsolated(_closeReceived, data, "Stop", "Close");
             }
 
             // attempt to stop the connection. NOTE: this v1 client guards its sends with
@@ -1113,21 +1120,65 @@ public class Client : IDisposable, ISpeakWebSocketClient
     {
         if (eventHandler != null)
         {
-            try
-            {
-                Parallel.ForEach(
-                    eventHandler.GetInvocationList().Cast<EventHandler<T>>(),
-                    (handler) =>
-                        handler(null, e));
-            }
-            catch (AggregateException ae)
-            {
-                Log.Error("InvokeParallel", $"AggregateException occurred in one or more event handlers: {ae}");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("InvokeParallel", $"Exception occurred in event handler: {ex}");
-            }
+            // Each handler is isolated: Parallel.ForEach stops starting new iterations once one
+            // throws, so an unguarded throwing handler could keep other handlers from receiving
+            // the event at all. InvokeIsolated never throws, so the loop has nothing to catch.
+            Parallel.ForEach(
+                eventHandler.GetInvocationList().Cast<EventHandler<T>>(),
+                (handler) => InvokeIsolated(handler, e, "InvokeParallel", typeof(T).Name));
+        }
+    }
+
+    /// <summary>
+    /// Invokes each handler of <paramref name="eventHandler"/> one at a time, in subscription order,
+    /// each in its own try/catch. An exception from one handler is logged and the next handler still
+    /// runs. Used for the lifecycle events (Open, Close), which fire once per connection.
+    /// </summary>
+    private static void InvokeEachIsolated<T>(EventHandler<T>? eventHandler, T e, string module, string eventName)
+    {
+        if (eventHandler == null)
+        {
+            return;
+        }
+
+        foreach (var handler in eventHandler.GetInvocationList().Cast<EventHandler<T>>())
+        {
+            InvokeIsolated(handler, e, module, eventName);
+        }
+    }
+
+    /// <summary>
+    /// Invokes one event handler. Handlers are user code: an exception from one is logged, never
+    /// rethrown, so it cannot stop delivery to the others.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Event handlers are user code; one that throws must not stop delivery to the others.")]
+    private static void InvokeIsolated<T>(EventHandler<T> handler, T e, string module, string eventName)
+    {
+        try
+        {
+            handler(null, e);
+        }
+        catch (Exception ex)
+        {
+            LogHandlerException(module, eventName, ex);
+        }
+    }
+
+    /// <summary>
+    /// Logs an exception thrown by an event handler. Log providers are user code too: a provider
+    /// that throws here must not stop delivery to the remaining handlers.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Log providers are user code; one that throws must not stop event delivery.")]
+    private static void LogHandlerException(string module, string eventName, Exception ex)
+    {
+        try
+        {
+            Log.Error(module, $"Exception occurred in {eventName} event handler: {ex.GetType()} {ex.Message}");
+            Log.Verbose(module, $"Exception: {ex}");
+        }
+        catch
+        {
+            // A failing log provider must not stop event delivery.
         }
     }
 
