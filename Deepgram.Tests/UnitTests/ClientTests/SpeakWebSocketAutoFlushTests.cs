@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
@@ -80,6 +81,21 @@ public class SpeakWebSocketAutoFlushTests
     }
 
     [Test]
+    public void SpeakWebSocketClient_AutoFlush_Conversions_Should_Clamp_Instead_Of_Overflowing()
+    {
+        // The threshold is computed outside ProcessAutoFlush's try on a fire-and-forget task, so
+        // an OverflowException there would end autoflush silently.
+        var huge = () => SpeakWebSocketClient.MillisecondsToStopwatchTicks(decimal.MaxValue);
+        huge.Should().NotThrow();
+        huge().Should().Be(long.MaxValue);
+        SpeakWebSocketClient.MillisecondsToStopwatchTicks(-1).Should().Be(0);
+        SpeakWebSocketClient.MillisecondsToStopwatchTicks(1000).Should().Be(Stopwatch.Frequency);
+
+        SpeakWebSocketClient.StopwatchTicksToMilliseconds(long.MaxValue).Should().BePositive("the conversion must not wrap");
+        SpeakWebSocketClient.StopwatchTicksToMilliseconds(Stopwatch.Frequency).Should().BeApproximately(1000, 0.001);
+    }
+
+    [Test]
     public void SpeakClient_Flush_Should_Complete_On_A_Blocking_SynchronizationContext_While_The_Lock_Is_Held()
     {
         var options = new DeepgramWsClientOptions(apiKey: "test-api-key", onPrem: true)
@@ -136,6 +152,7 @@ public class SpeakWebSocketAutoFlushTests
         // The autoflush tick holds the lock while a UI-style caller sends a Speak.
         mutex.Wait(0).Should().BeTrue();
         var lockHeld = true;
+        var startTimestamp = Stopwatch.GetTimestamp();
 
         var speakReturned = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var caller = new Thread(() =>
@@ -169,7 +186,7 @@ public class SpeakWebSocketAutoFlushTests
             // caller to still be blocked on the held lock, with _lastReceived not yet set.
             speakReturned.Task.IsCompleted.Should().BeFalse(
                 "SpeakWithText must block on the held _mutexLastDatagram, not bypass InspectMessage");
-            client._lastReceived.Should().BeNull("InspectMessage must not set _lastReceived before the lock is free");
+            client.LastReceivedTimestamp.Should().BeNull("InspectMessage must not set _lastReceived before the lock is free");
 
             mutex.Release();
             lockHeld = false;
@@ -178,7 +195,9 @@ public class SpeakWebSocketAutoFlushTests
             lockHeld = mutex.Wait(TimeSpan.FromSeconds(2));
             lockHeld.Should().BeTrue(
                 "InspectMessage must release _mutexLastDatagram even when the caller's context never pumps");
-            client._lastReceived.Should().NotBeNull("InspectMessage must set _lastReceived under the lock");
+            client.LastReceivedTimestamp.Should().NotBeNull("InspectMessage must set _lastReceived under the lock");
+            client.LastReceivedTimestamp!.Value.Should().BeInRange(startTimestamp, Stopwatch.GetTimestamp(),
+                "_lastReceived must be a monotonic Stopwatch timestamp");
         }
         finally
         {
