@@ -178,7 +178,8 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
 
         // Re-serialize the cleaned object
         var cleanedJson = root.ToJsonString();
-        Log.Debug("Connect", $"cleanedJson: {cleanedJson}");
+        // The Settings JSON can carry provider credentials and prompts: log its size only.
+        Log.Debug("Connect", $"Settings payload: {cleanedJson.Length} chars");
         return Encoding.UTF8.GetBytes(cleanedJson);
     }
 
@@ -815,7 +816,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
             while (true)
             {
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancelToken);
+                await Task.Delay(5000, _cancelToken).ConfigureAwait(false);
 
                 if (_cancelToken.IsCancellationRequested)
                 {

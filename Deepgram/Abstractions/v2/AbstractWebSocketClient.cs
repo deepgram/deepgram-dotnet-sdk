@@ -964,7 +964,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<OpenResponse> eventHandler)
     {
-        await _mutexSubscribe.WaitAsync();
+        await _mutexSubscribe.WaitAsync().ConfigureAwait(false);
         try
         {
             _openReceived += (sender, e) => eventHandler(sender, e);
@@ -993,7 +993,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
     {
-        await _mutexSubscribe.WaitAsync();
+        await _mutexSubscribe.WaitAsync().ConfigureAwait(false);
         try
         {
             _closeReceived += (sender, e) => eventHandler(sender, e);
@@ -1011,7 +1011,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<UnhandledResponse> eventHandler)
     {
-        await _mutexSubscribe.WaitAsync();
+        await _mutexSubscribe.WaitAsync().ConfigureAwait(false);
         try
         {
             _unhandledReceived += (sender, e) => eventHandler(sender, e);
@@ -1029,7 +1029,7 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<ErrorResponse> eventHandler)
     {
-        await _mutexSubscribe.WaitAsync();
+        await _mutexSubscribe.WaitAsync().ConfigureAwait(false);
         try
         {
             _errorReceived += (sender, e) => eventHandler(sender, e);
@@ -1388,7 +1388,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                     do
                     {
                         // get the result of the receive operation
-                        result = await socket.ReceiveAsync(buffer, token);
+                        result = await socket.ReceiveAsync(buffer, token).ConfigureAwait(false);
 
                         ms.Write(
                             buffer.Array ?? throw new InvalidOperationException("buffer cannot be null"),
@@ -1415,8 +1415,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                     return;
                 }
             }
-            catch (TaskCanceledException ex)
+            catch (OperationCanceledException ex)
             {
+                // ReceiveAsync on net8 throws a bare OperationCanceledException when the
+                // connection's token is cancelled by a normal Stop(); it is not an error.
                 Log.Debug("ProcessReceiveQueue", "ReceiveThread cancelled.");
                 Log.Verbose("ProcessReceiveQueue", $"ReceiveThread cancelled. Info: {ex}");
                 Log.Verbose("AbstractWebSocketClient.ProcessReceiveQueue", "LEAVE");

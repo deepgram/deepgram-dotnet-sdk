@@ -432,7 +432,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             while (true)
             {
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancelToken);
+                await Task.Delay(5000, _cancelToken).ConfigureAwait(false);
 
                 if (_cancelToken.IsCancellationRequested)
                 {
@@ -479,7 +479,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             while (true)
             {
                 Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken).ConfigureAwait(false);
 
                 if (_cancelToken.IsCancellationRequested)
                 {
