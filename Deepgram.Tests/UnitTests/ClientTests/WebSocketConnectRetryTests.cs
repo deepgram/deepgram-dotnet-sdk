@@ -101,6 +101,7 @@ public class WebSocketConnectRetryTests
         client.State().Should().Be(WebSocketState.None, "an invalid header must not publish a socket");
 
         (await client.Connect(server.Endpoint)).Should().BeTrue();
+        client.IsConnected().Should().BeTrue("the retry must open a new connection");
         server.AcceptedConnections.Should().Be(1);
         await client.Stop();
     }
@@ -130,8 +131,7 @@ public class WebSocketConnectRetryTests
     public async Task AbstractClient_Failed_Connect_Should_Dispose_Its_Logging_Scope()
     {
         var provider = new ScopeTrackingLoggerProvider();
-        Log.Reset();
-        Log.Configure(LoggerFactory.Create(builder => builder.AddProvider(provider)));
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder => builder.AddProvider(provider)));
         try
         {
             using var refusedEndpoint = new RefusedEndpoint();

@@ -206,6 +206,29 @@ public sealed class Log
     }
 
     /// <summary>
+    /// Test-only seam: clears the current factory and installs <paramref name="factory"/> in one
+    /// step under the lock. A separate <see cref="Reset"/> then <see cref="Configure"/> leaves a
+    /// window in which any log call (from a background task of an earlier test, say) creates the
+    /// default factory, and Configure is then ignored because it is first-wins.
+    /// </summary>
+    internal static void ResetAndConfigureForTests(ILoggerFactory factory)
+    {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+
+        lock (_sync)
+        {
+            if (_ownsFactory)
+            {
+                _factory?.Dispose();
+            }
+
+            _factory = factory;
+            _ownsFactory = false;
+            _loggers.Clear();
+        }
+    }
+
+    /// <summary>
     /// Clears the configured factory and cached loggers. Test-only seam so each test can start
     /// from a clean logging state.
     /// </summary>

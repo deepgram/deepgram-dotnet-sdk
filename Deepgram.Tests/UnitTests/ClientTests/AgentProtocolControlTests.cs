@@ -152,15 +152,13 @@ public class AgentProtocolControlTests
     }
 
     [Test]
-    public async Task AgentProtocolClient_Should_Await_ForceEndTurn_Send()
+    public async Task AgentProtocolClient_Should_Not_Send_ForceEndTurn_While_Disconnected()
     {
         var options = new DeepgramWsClientOptions("test-api-key") { OnPrem = true };
         var client = Substitute.For<Deepgram.Clients.Agent.v2.WebSocket.Client>("test-api-key", options);
-        client.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()).Returns(Task.CompletedTask);
-
         await client.SendForceEndTurn();
 
-        await client.Received(1).SendMessageImmediately(
+        await client.DidNotReceive().SendMessageImmediately(
             Arg.Is<byte[]>(payload => JsonDocument.Parse(Encoding.UTF8.GetString(payload), default).RootElement.GetProperty("type").GetString() == "ForceEndTurn"),
             AgentConstants.UseArrayLengthForSend, null);
     }

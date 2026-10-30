@@ -1,0 +1,227 @@
+// Copyright 2026 Deepgram .NET SDK contributors. All Rights Reserved.
+// Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+// SPDX-License-Identifier: MIT
+
+using System.Net.WebSockets;
+using Deepgram.Abstractions.v2;
+using Deepgram.Models.Authenticate.v1;
+using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
+using FluxModels = Deepgram.Models.Flux.WebSocket;
+using FluxSpeakModels = Deepgram.Models.Flux.Speak.WebSocket;
+using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
+using SpeakModels = Deepgram.Models.Speak.v2.WebSocket;
+
+namespace Deepgram.Tests.UnitTests.ClientTests;
+
+/// <summary>
+/// Blocking calls (<c>Stop().Wait()</c>, <c>Connect().Wait()</c>) on a thread whose
+/// SynchronizationContext never runs posted callbacks, as on a UI thread that is blocked in the
+/// call. Every await on these paths must use ConfigureAwait(false), or its continuation is posted
+/// to that context and the call never returns.
+/// </summary>
+[NonParallelizable]
+public class WebSocketSynchronizationContextTests
+{
+    // Upper bound for any single wait; reached only when a test is about to fail.
+    private static readonly TimeSpan GateTimeout = TimeSpan.FromSeconds(10);
+
+    private static string NewApiKey() => new Faker().Random.Guid().ToString();
+
+    private static DeepgramWsClientOptions Options(string apiKey, string endpoint) =>
+        new(apiKey, endpoint, keepAlive: false, onPrem: true);
+
+    /// <summary>A UI-like context whose only thread is blocked: posted callbacks never run.</summary>
+    private sealed class BlockedThreadSynchronizationContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state)
+        {
+        }
+
+        public override void Send(SendOrPostCallback d, object? state) =>
+            throw new NotSupportedException("The blocked thread cannot run callbacks.");
+    }
+
+    /// <summary>Runs a blocking call on a UI-like thread without blocking the test thread.</summary>
+    private static Task<bool> RunOnBlockedThreadAsync(Func<bool> call)
+    {
+        var result = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(new BlockedThreadSynchronizationContext());
+                result.TrySetResult(call());
+            }
+            catch (Exception ex)
+            {
+                result.TrySetException(ex);
+            }
+        });
+        thread.IsBackground = true;
+        thread.Start();
+        return result.Task;
+    }
+
+    /// <summary>A base client whose SendClose() sends nothing.</summary>
+    private sealed class BaseClient : AbstractWebSocketClient
+    {
+        public BaseClient(string apiKey)
+            : base(apiKey, new DeepgramWsClientOptions(apiKey) { KeepAlive = false }) { }
+
+        public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null) =>
+            Task.CompletedTask;
+    }
+
+    /// <summary>A Listen client that exposes and signals contention on its shared send mutex.</summary>
+    private sealed class MutexGatedListenClient : Deepgram.Clients.Listen.v2.WebSocket.Client
+    {
+        public MutexGatedListenClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public SemaphoreSlim SendMutex => _mutexSend;
+
+        public TaskCompletionSource<bool> CloseStreamWaitingForMutex { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        internal override Task SendOnConnection(ConnectionState owned, ArraySegment<byte> data, WebSocketMessageType messageType, CancellationToken token, bool allowStopping = false)
+        {
+            var send = base.SendOnConnection(owned, data, messageType, token, allowStopping);
+            if (messageType == WebSocketMessageType.Text
+                && Encoding.UTF8.GetString(data.Array!, data.Offset, data.Count).Contains("CloseStream"))
+            {
+                CloseStreamWaitingForMutex.TrySetResult(true);
+            }
+            return send;
+        }
+    }
+
+    /// <summary>Drives one kind of v2 WebSocket client.</summary>
+    public sealed record ClientKind(
+        string Name,
+        Func<string, AbstractWebSocketClient> Create,
+        Func<AbstractWebSocketClient, string, Task<bool>> Connect,
+        Func<AbstractWebSocketClient, Task<bool>> Stop,
+        string? ServerClosesOn = null)
+    {
+        public override string ToString() => Name;
+    }
+
+    private static readonly ClientKind[] Kinds =
+    {
+        new("Base", _ => new BaseClient(NewApiKey()), (c, endpoint) => c.Connect(endpoint), c => c.Stop()),
+        new("Listen",
+            endpoint => { var key = NewApiKey(); return new Deepgram.Clients.Listen.v2.WebSocket.Client(key, Options(key, endpoint)); },
+            (c, _) => ((Deepgram.Clients.Listen.v2.WebSocket.Client)c).Connect(new ListenModels.LiveSchema { Model = "nova-3" }),
+            c => ((Deepgram.Clients.Listen.v2.WebSocket.Client)c).Stop()),
+        new("Speak",
+            endpoint => { var key = NewApiKey(); return new Deepgram.Clients.Speak.v2.WebSocket.Client(key, Options(key, endpoint)); },
+            (c, _) => ((Deepgram.Clients.Speak.v2.WebSocket.Client)c).Connect(new SpeakModels.SpeakSchema()),
+            c => ((Deepgram.Clients.Speak.v2.WebSocket.Client)c).Stop()),
+        new("Agent",
+            endpoint => { var key = NewApiKey(); return new Deepgram.Clients.Agent.v2.WebSocket.Client(key, Options(key, endpoint)); },
+            (c, _) => ((Deepgram.Clients.Agent.v2.WebSocket.Client)c).Connect(new AgentModels.SettingsSchema()),
+            c => ((Deepgram.Clients.Agent.v2.WebSocket.Client)c).Stop()),
+        // The Flux STT/TTS servers close on CloseStream/Close, as the services do, so Stop() does not
+        // wait out its grace period.
+        new("FluxSTT",
+            endpoint => { var key = NewApiKey(); return new Deepgram.Clients.Flux.WebSocket.Client(key, Options(key, endpoint)); },
+            (c, _) => ((Deepgram.Clients.Flux.WebSocket.Client)c).Connect(new FluxModels.FluxSchema { Model = "flux-general-en" }),
+            c => ((Deepgram.Clients.Flux.WebSocket.Client)c).Stop(),
+            "CloseStream"),
+        new("FluxTTS",
+            endpoint => { var key = NewApiKey(); return new Deepgram.Clients.Flux.Speak.WebSocket.Client(key, Options(key, endpoint)); },
+            (c, _) => ((Deepgram.Clients.Flux.Speak.WebSocket.Client)c).Connect(new FluxSpeakModels.SpeakSchema { Model = "flux-alexis-en" }),
+            c => ((Deepgram.Clients.Flux.Speak.WebSocket.Client)c).Stop(),
+            "Close"),
+    };
+
+    private static LoopbackWebSocketServer ServerFor(ClientKind kind) => kind.ServerClosesOn is null
+        ? new LoopbackWebSocketServer()
+        : new LoopbackWebSocketServer(async connection =>
+        {
+            while (true)
+            {
+                var frame = await connection.ReadFrameAsync();
+                if (frame.IsText && frame.Text.Contains($"\"{kind.ServerClosesOn}\""))
+                {
+                    await connection.SendCloseAsync();
+                    return;
+                }
+            }
+        });
+
+    public static IEnumerable<TestCaseData> StopKinds() =>
+        Kinds.Select(kind => new TestCaseData(kind.Name)
+            .SetName($"Stop_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock_{kind.Name}"));
+
+    public static IEnumerable<TestCaseData> ConnectKinds() =>
+        Kinds.Select(kind => new TestCaseData(kind.Name)
+            .SetName($"Connect_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock_{kind.Name}"));
+
+    [TestCaseSource(nameof(StopKinds))]
+    public async Task Stop_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock(string kindName)
+    {
+        var kind = Kinds.Single(k => k.Name == kindName);
+        using var server = ServerFor(kind);
+        using var client = kind.Create(server.Endpoint);
+        (await kind.Connect(client, server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        var returned = RunOnBlockedThreadAsync(() =>
+        {
+            var stop = kind.Stop(client);
+            return stop.Wait(GateTimeout) && stop.Result;
+        });
+
+        (await returned.WaitAsync(GateTimeout)).Should().BeTrue("Stop().Wait() on a blocked UI-like thread must not deadlock");
+    }
+
+    [Test]
+    public async Task Stop_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock_When_Send_Is_In_Progress()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var apiKey = NewApiKey();
+        var options = Options(apiKey, server.Endpoint);
+        using var client = new MutexGatedListenClient(apiKey, options);
+        var schema = new ListenModels.LiveSchema { Model = "nova-3" };
+        var mutexReleased = false;
+        (await client.Connect(schema).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        (await client.SendMutex.WaitAsync(GateTimeout)).Should().BeTrue();
+        try
+        {
+            var stop = RunOnBlockedThreadAsync(() =>
+            {
+                var task = client.Stop();
+                return task.Wait(GateTimeout) && task.Result;
+            });
+            await client.CloseStreamWaitingForMutex.Task.WaitAsync(GateTimeout);
+
+            client.SendMutex.Release();
+            mutexReleased = true;
+            (await stop.WaitAsync(GateTimeout)).Should().BeTrue(
+                "Stop().Wait() on a blocked UI-like thread must resume after an active send releases the mutex");
+        }
+        finally
+        {
+            if (!mutexReleased)
+            {
+                client.SendMutex.Release();
+            }
+        }
+    }
+
+    [TestCaseSource(nameof(ConnectKinds))]
+    public async Task Connect_Wait_On_A_Blocking_SynchronizationContext_Should_Not_Deadlock(string kindName)
+    {
+        var kind = Kinds.Single(k => k.Name == kindName);
+        using var server = ServerFor(kind);
+        using var client = kind.Create(server.Endpoint);
+
+        var returned = RunOnBlockedThreadAsync(() =>
+        {
+            var connect = kind.Connect(client, server.Endpoint);
+            return connect.Wait(GateTimeout) && connect.Result;
+        });
+
+        (await returned.WaitAsync(GateTimeout)).Should().BeTrue("Connect().Wait() on a blocked UI-like thread must not deadlock");
+        await kind.Stop(client).WaitAsync(GateTimeout);
+    }
+}
