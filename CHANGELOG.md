@@ -1,5 +1,17 @@
 # Changelog
 
+## [7.2.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.2.0...7.2.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **flux:** scope stale stop cleanup ([a8d4d2d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a8d4d2d13f0caae9e48f0bebce26868201f9bee8))
+* **websocket:** dispose failed connect scopes ([ddf0eec](https://github.com/deepgram/deepgram-dotnet-sdk/commit/ddf0eec2fd7622cbca06d429a0e9815a473d709c))
+* **websocket:** isolate failed connect cleanup ([9ed3624](https://github.com/deepgram/deepgram-dotnet-sdk/commit/9ed3624a4685a5cdca26c31904b1ef53270a7e7e))
+* **websocket:** let Connect retry after a failed connection attempt ([8cd512f](https://github.com/deepgram/deepgram-dotnet-sdk/commit/8cd512fd767cb1b6fa8a3e55022c61d74dad4823))
+* **websocket:** scope stale stop cleanup ([c0c11bf](https://github.com/deepgram/deepgram-dotnet-sdk/commit/c0c11bf01c3fbb1cdcb5fd7e691cf827aa953d8c))
+* **websocket:** serialize retry cleanup publication ([d9b1e1e](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d9b1e1e7a86159cf405315d1d3f51859f5729178))
+
 ## [7.2.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.1.3...7.2.0) (2026-10-13)
 
 
