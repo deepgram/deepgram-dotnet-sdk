@@ -51,12 +51,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
     /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
-    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// being released, Connect() waits for that to finish (within its connect token) and then
     /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
     /// closing it, Connect() waits for it within the same timeout and returns true only for an open
     /// connection that is not stopping.
     /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
     /// Connect() return false even after Open fired; Close then follows.
+    /// If the previous connection's Close handlers are still running once it is released,
+    /// Connect() waits for them only up to its connect token or a fresh disconnect timeout (5 s),
+    /// whichever comes first. Then it logs a Warning and opens the new connection anyway, so the
+    /// new connection's Open can be raised while the old Close handler is still running.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
@@ -230,10 +234,13 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
     /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
     /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
-    /// A Close handler must not block on a different Stop() call that is still in progress for the
-    /// same connection: that Stop() returns only after Close has been delivered, so the handler
-    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
-    /// connection has opened since; then it stops that connection.
+    /// Keep Close handlers short. A different Stop() of the same connection waits for Close to be
+    /// delivered only up to its own token or the disconnect timeout (5 s), whichever comes first,
+    /// then logs a Warning and returns true. So a handler that blocks on such a Stop() waits at
+    /// most that long, and a Stop() that races a slow handler can return while it still runs. The
+    /// Stop() or server close that raised Close still waits for its handlers. A Stop() called from
+    /// inside the handler returns at once, unless a newer connection has opened since; then it
+    /// stops that connection.
     /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>

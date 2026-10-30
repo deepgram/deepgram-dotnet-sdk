@@ -82,12 +82,16 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
     /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
     /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
-    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// being released, Connect() waits for that to finish (within its connect token) and then
     /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
     /// closing it, Connect() waits for it within the same timeout and returns true only for an open
     /// connection that is not stopping.
     /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
     /// Connect() return false even after Open fired; Close then follows.
+    /// If the previous connection's Close handlers are still running once it is released,
+    /// Connect() waits for them only up to its connect token or a fresh disconnect timeout (5 s),
+    /// whichever comes first. Then it logs a Warning and opens the new connection anyway, so the
+    /// new connection's Open can be raised while the old Close handler is still running.
     /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
@@ -191,9 +195,12 @@ public abstract class AbstractWebSocketClient : IDisposable
         // - opened, not stopping, but its socket closed or dropped before any receive loop saw
         //   it: stop it here, as the receive loop would, then try again;
         // - still handshaking or preparing (not yet opened): wait until it opens or is released;
-        // - stopping or released: wait for the release to finish.
+        // - stopping or released: wait for the release to finish, then for its Close to be
+        //   delivered.
         // Waits are bounded by the connect token, happen outside the lock and loop back to
-        // re-read the state.
+        // re-read the state. The wait for Close is bounded by the connect token or a fresh
+        // disconnect timeout, whichever fires first, and running out of it does not fail this
+        // Connect() (#468): the old connection is already released.
         while (true)
         {
             ConnectionState? existing;
@@ -283,6 +290,10 @@ public abstract class AbstractWebSocketClient : IDisposable
                 owned.TokenSource.Dispose();
                 socket.Dispose();
                 return (false, null);
+            }
+            if (existing.ReleaseCompleted.IsCompleted)
+            {
+                await WaitForCloseDeliveryAsync(existing, "Connect", connectToken).ConfigureAwait(false);
             }
         }
         // A connection-scoped correlation id, so every log entry for this connection can be
@@ -479,7 +490,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // Stop() or Dispose() released (or a Stop() began closing) this connection while it was
             // connecting, which surfaces here as the socket's exception. Report a failed connect.
             // Every catch below releases before it logs: log providers are user code and can throw.
-            await ReleaseFailedConnect(owned).ConfigureAwait(false);
+            await ReleaseFailedConnect(owned, connectToken).ConfigureAwait(false);
             Log.Warning("Connect", "Connection was stopped while connecting");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
@@ -488,7 +499,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         catch (TaskCanceledException ex)
         {
-            await ReleaseFailedConnect(owned).ConfigureAwait(false);
+            await ReleaseFailedConnect(owned, connectToken).ConfigureAwait(false);
             Log.Debug("Connect", "Connect cancelled.");
             Log.Verbose("Connect", $"Connect cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
@@ -499,7 +510,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             // Read the handshake's status code before the release disposes the socket.
             var httpStatusCode = DeepgramWebSocketException.GetHttpStatusCode(socket);
-            await ReleaseFailedConnect(owned).ConfigureAwait(false);
+            await ReleaseFailedConnect(owned, connectToken).ConfigureAwait(false);
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
@@ -511,7 +522,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         catch (Exception ex)
         {
-            await ReleaseFailedConnect(owned).ConfigureAwait(false);
+            await ReleaseFailedConnect(owned, connectToken).ConfigureAwait(false);
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
@@ -525,11 +536,11 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// that already raised Open (a log call after Open threw, say) gets its Close, as I3 requires;
     /// one that did not is released without events. Idempotent.
     /// </summary>
-    private async Task ReleaseFailedConnect(ConnectionState owned)
+    private async Task ReleaseFailedConnect(ConnectionState owned, CancellationToken connectToken)
     {
         if (owned.IsOpened)
         {
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, "Connect", connectToken).ConfigureAwait(false);
         }
         else
         {
@@ -588,7 +599,8 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         finally
         {
-            owned.CompleteRelease();
+            // No Close on this path, so both signals complete together.
+            owned.CompleteCloseDelivery();
         }
 
         return true;
@@ -635,19 +647,34 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// A connection that never reached its Open event (stopped during the handshake) gets no
     /// Close either.
     /// </summary>
-    private protected async Task ReleaseAndRaiseClose(ConnectionState owned)
+    private protected Task ReleaseAndRaiseClose(ConnectionState owned, CancellationToken callerToken = default) =>
+        ReleaseAndRaiseClose(owned, "Stop", callerToken);
+
+    /// <inheritdoc cref="ReleaseAndRaiseClose(ConnectionState, CancellationToken)"/>
+    /// <param name="owned">The connection to release.</param>
+    /// <param name="caller">The log category for the Warning when the wait for Close runs out.</param>
+    /// <param name="callerToken">Bounds the wait for another teardown's Close, with the disconnect timeout.</param>
+    private async Task ReleaseAndRaiseClose(ConnectionState owned, string caller, CancellationToken callerToken)
     {
         if (!owned.TryBeginRelease())
         {
-            // Another teardown is releasing this connection and raises Close if needed. Wait
-            // until it has finished, Close included, so this caller returns after it.
-            await owned.ReleaseCompleted.ConfigureAwait(false);
+            // Another teardown is releasing this connection and raises Close if needed. Wait for
+            // its release, then for its Close delivery within a bound (#468).
+            await WaitForOtherTeardownAsync(owned, caller, callerToken).ConfigureAwait(false);
             return;
         }
 
         try
         {
-            ReleaseOwnedState(owned);
+            try
+            {
+                ReleaseOwnedState(owned);
+            }
+            finally
+            {
+                // The release steps are done: losing teardowns stop waiting unbounded here.
+                owned.CompleteRelease();
+            }
 
             // Close follows Open. If the Open handlers are still running, Close is owed and the
             // Open delivery raises it when they return; nobody waits for that, so a Stop() from
@@ -659,14 +686,98 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
         finally
         {
-            // Completed after Close when this call raised it: a Stop() that waits for another
-            // teardown's release returns only once that Close has been delivered. When Close is
+            // Completed after Close when this call raised it, and on every other path too (a
+            // throwing release or Close log included), so no waiter is left behind. When Close is
             // owed to a running Open delivery, it completes without waiting for it.
-            owned.CompleteRelease();
+            owned.CompleteCloseDelivery();
         }
     }
 
-    private void RaiseClose()
+    /// <summary>
+    /// Test seam for the fallback bound of <see cref="WaitForCloseDeliveryAsync"/>. Called once per
+    /// bounded wait with the waiting caller's token; returns the source whose cancellation ends the
+    /// wait. Null (the default) means a fresh <see cref="Constants.DefaultDisconnectTimeout"/>.
+    /// </summary>
+    internal Func<CancellationToken, CancellationTokenSource>? CloseDeliveryTimeoutFactory { get; set; }
+
+    /// <summary>
+    /// Waits for a teardown of <paramref name="owned"/> that another caller won (#468). It always
+    /// waits for the release, which runs no Close handler, so the caller never returns before the
+    /// connection is released. It then waits for the Close delivery within a bound; see
+    /// <see cref="WaitForCloseDeliveryAsync"/>.
+    /// </summary>
+    /// <returns>
+    /// True when Close was delivered, or none was owed; false when the bound ran out first. The
+    /// connection is released either way; only its Close handlers can still be running.
+    /// </returns>
+    private protected Task<bool> WaitForOtherTeardownAsync(ConnectionState owned, CancellationToken callerToken) =>
+        WaitForOtherTeardownAsync(owned, "Stop", callerToken);
+
+    private async Task<bool> WaitForOtherTeardownAsync(ConnectionState owned, string caller, CancellationToken callerToken)
+    {
+        await owned.ReleaseCompleted.ConfigureAwait(false);
+        return await WaitForCloseDeliveryAsync(owned, caller, callerToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Waits for the Close delivery of a connection whose release has finished, until whichever
+    /// comes first: <paramref name="callerToken"/> (when it can still fire) or a fresh disconnect
+    /// timeout. The fresh timeout means an expired caller token does not skip the wait, and a
+    /// caller token that never fires does not make it unbounded. When the bound runs out it logs a
+    /// Warning under <paramref name="caller"/> and returns false.
+    /// </summary>
+    private async Task<bool> WaitForCloseDeliveryAsync(ConnectionState owned, string caller, CancellationToken callerToken)
+    {
+        if (owned.CloseDelivered.IsCompleted)
+        {
+            return true;
+        }
+
+        // Decide whether the caller's token takes part before creating the fallback bound: the
+        // token can fire at any moment, and a token that fires after this check still ends the wait
+        // through the linked source.
+        var callerTokenLive = callerToken.CanBeCanceled && !callerToken.IsCancellationRequested;
+        using var budget = CreateCloseDeliveryBudget(callerToken);
+        using var linked = callerTokenLive
+            ? CancellationTokenSource.CreateLinkedTokenSource(callerToken, budget.Token)
+            : null;
+        var delivered = await WaitOrCancelledAsync(owned.CloseDelivered, (linked ?? budget).Token).ConfigureAwait(false);
+        if (!delivered)
+        {
+            LogCloseDeliveryNotAwaited(caller);
+        }
+        return delivered;
+    }
+
+    private CancellationTokenSource CreateCloseDeliveryBudget(CancellationToken callerToken)
+    {
+        var factory = CloseDeliveryTimeoutFactory;
+        if (factory != null)
+        {
+            return factory(callerToken);
+        }
+        return new CancellationTokenSource(Constants.DefaultDisconnectTimeout);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Log providers are user code; one that throws must not turn a bounded return into a throw.")]
+    private static void LogCloseDeliveryNotAwaited(string caller)
+    {
+        try
+        {
+            Log.Warning(caller, "A Close handler from another teardown of this connection is still running. Continuing without waiting for it.");
+        }
+        catch
+        {
+            // A failing log provider must not turn a bounded return into a throw.
+        }
+    }
+
+    /// <summary>
+    /// Delivers Close to every handler, each isolated. Internal and virtual only as a test seam:
+    /// nothing in it throws today, and tests override it to prove that the release's waiters are
+    /// still released when the Close path throws.
+    /// </summary>
+    internal virtual void RaiseClose()
     {
         if (_closeReceived != null)
         {
@@ -770,6 +881,9 @@ public abstract class AbstractWebSocketClient : IDisposable
         // Set once the Flux STT CloseStream / Flux TTS Close message has been sent on this connection.
         private int _closeMessageSent;
         private readonly TaskCompletionSource<bool> _released = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        // Completed after the release's Close event, when it raises one. Kept apart from _released
+        // so a teardown that lost the race can wait for the release without waiting on user code.
+        private readonly TaskCompletionSource<bool> _closeDelivered = new(TaskCreationOptions.RunContinuationsAsynchronously);
         // Completed when the connection is marked opened. Continuations run asynchronously, so a
         // waiting Connect() never runs inline on the opening thread before Open is delivered.
         private readonly TaskCompletionSource<bool> _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -794,8 +908,21 @@ public abstract class AbstractWebSocketClient : IDisposable
         /// <summary>True once a release has started.</summary>
         internal bool IsReleased => (Volatile.Read(ref _flags) & ReleasedFlag) != 0;
 
-        /// <summary>Completes when the release has finished, including its Close event if it raises one.</summary>
+        /// <summary>
+        /// Completes when the release steps have finished: the token is cancelled, the connection
+        /// is unpublished, and its token source and socket are disposed. No Close handler runs
+        /// before it completes. Cancelling the token can still run the SDK's own loop continuations
+        /// inline, and those log, so a log provider that blocks can delay it.
+        /// </summary>
         internal Task ReleaseCompleted => _released.Task;
+
+        /// <summary>
+        /// Completes after <see cref="ReleaseCompleted"/>, once the release's Close handlers have
+        /// returned, or at once when the release raises no Close (the connection never opened,
+        /// Close is owed to a running Open delivery, or the release came from Dispose()). It
+        /// completes on every path, even if the Close path throws.
+        /// </summary>
+        internal Task CloseDelivered => _closeDelivered.Task;
 
         /// <summary>True while this connection is not released and its socket is open.</summary>
         internal bool IsOpen
@@ -948,6 +1075,16 @@ public abstract class AbstractWebSocketClient : IDisposable
         }
 
         internal void CompleteRelease() => _released.TrySetResult(true);
+
+        /// <summary>
+        /// Completes <see cref="CloseDelivered"/>, and <see cref="ReleaseCompleted"/> with it, so a
+        /// delivered Close always implies a finished release.
+        /// </summary>
+        internal void CompleteCloseDelivery()
+        {
+            _released.TrySetResult(true);
+            _closeDelivered.TrySetResult(true);
+        }
     }
 
     #region Subscribe Event
@@ -985,10 +1122,13 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
     /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
     /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
-    /// A Close handler must not block on a different Stop() call that is still in progress for the
-    /// same connection: that Stop() returns only after Close has been delivered, so the handler
-    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
-    /// connection has opened since; then it stops that connection.
+    /// Keep Close handlers short. A different Stop() of the same connection waits for Close to be
+    /// delivered only up to its own token or the disconnect timeout (5 s), whichever comes first,
+    /// then logs a Warning and returns true. So a handler that blocks on such a Stop() waits at
+    /// most that long, and a Stop() that races a slow handler can return while it still runs. The
+    /// Stop() or server close that raised Close still waits for its handlers. A Stop() called from
+    /// inside the handler returns at once, unless a newer connection has opened since; then it
+    /// stops that connection.
     /// </remarks>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
@@ -1643,6 +1783,11 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// whose Open handlers are still running: then it returns without waiting for them, and Close
     /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
     /// the new connection's Open. Dispose() raises no Close.
+    /// If another Stop() or a server close is delivering Close for the same connection, this Stop()
+    /// waits until the connection is released, then waits for that Close only up to its own token
+    /// or the disconnect timeout (5 s), whichever comes first. If that runs out, it logs a Warning
+    /// and returns true while the Close handler may still be running, so Stop() followed by
+    /// Connect() can raise the new connection's Open before the old Close handler has finished.
     /// </remarks>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
@@ -1697,27 +1842,37 @@ public abstract class AbstractWebSocketClient : IDisposable
     /// </summary>
     private async Task<bool> StopConnectionCore(ConnectionState owned, CancellationTokenSource? cancelToken, bool nullByte)
     {
+        // The default disconnect-timeout source is owned by this call and declared at method
+        // scope, so it is still undisposed when the catch blocks below pass its token on: a token
+        // from a disposed source looks live but never fires, which would leave the wait for another
+        // teardown's Close unbounded (#468). The using declaration disposes it on every exit path.
+        using var defaultCancelToken = cancelToken == null
+            ? new CancellationTokenSource(Constants.DefaultDisconnectTimeout)
+            : null;
+        CancellationToken stopToken = default;
+
         Log.Verbose("AbstractWebSocketClient.StopConnection", "ENTER");
 
         try
         {
+            if (defaultCancelToken != null)
+            {
+                cancelToken = defaultCancelToken;
+            }
+            // Read inside the try: a caller-disposed source lands in the catches, as before.
+            stopToken = cancelToken!.Token;
+
             if (owned.IsReleased)
             {
-                await owned.ReleaseCompleted.ConfigureAwait(false);
+                await WaitForOtherTeardownAsync(owned, stopToken).ConfigureAwait(false);
                 Log.Information("Stop", "Client has already been disposed");
                 Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
                 return true;
             }
 
-            // The default disconnect-timeout source is owned by this call: the using declaration
-            // disposes it on every exit path.
-            using var defaultCancelToken = cancelToken == null
-                ? new CancellationTokenSource(Constants.DefaultDisconnectTimeout)
-                : null;
             if (defaultCancelToken != null)
             {
                 Log.Information("Stop", "Using default disconnect cancellation token");
-                cancelToken = defaultCancelToken;
             }
 
             var socket = owned.Socket;
@@ -1735,7 +1890,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // Another teardown may have released this connection while SendClose ran.
             if (owned.IsReleased)
             {
-                await owned.ReleaseCompleted.ConfigureAwait(false);
+                await WaitForOtherTeardownAsync(owned, stopToken).ConfigureAwait(false);
                 Log.Debug("Stop", "Connection was released by another teardown");
                 Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
                 return true;
@@ -1751,7 +1906,7 @@ public abstract class AbstractWebSocketClient : IDisposable
 
             if (owned.IsReleased)
             {
-                await owned.ReleaseCompleted.ConfigureAwait(false);
+                await WaitForOtherTeardownAsync(owned, stopToken).ConfigureAwait(false);
                 Log.Debug("Stop", "Connection was released by another teardown");
                 Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
                 return true;
@@ -1783,7 +1938,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // observe cancellation and exit cleanly, compare-before-clear so a newer connection's
             // fields are left alone, and dispose the socket. Then raise Close, once. See #390, #455.
             Log.Debug("Stop", "Releasing the connection...");
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, stopToken).ConfigureAwait(false);
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
@@ -1798,7 +1953,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, stopToken).ConfigureAwait(false);
             return true;
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException)
@@ -1811,7 +1966,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"{ex.GetType().Name}: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, stopToken).ConfigureAwait(false);
             return true;
         }
         catch (Exception ex)
@@ -1820,7 +1975,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("Stop", $"Exception: {ex}");
             Log.Verbose("AbstractWebSocketClient.StopConnection", "LEAVE");
 
-            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            await ReleaseAndRaiseClose(owned, stopToken).ConfigureAwait(false);
             throw;
         }
     }

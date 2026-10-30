@@ -349,9 +349,10 @@ new client for the new connection.
 
 ### Connection lifecycle
 
-- `Connect()` waits, within its connect timeout, while a previous connection is still closing or another `Connect()` is still opening one, and returns `true` only for an open connection. Await `Stop()` before reconnecting; a Flux STT or Flux TTS `Stop()` can take about 3 s.
+- `Connect()` waits, within its connect token, while a previous connection is still closing or another `Connect()` is still opening one, and returns `true` only for an open connection. Await `Stop()` before reconnecting; a Flux STT or Flux TTS `Stop()` can take about 3 s.
 - Messages sent immediately rather than queued (`SendKeepAlive`, `SendFinalize`, `SendConfigure`, `SendForceEndTurn`, `SendInjectUserMessage`, the Flux TTS `SendText`/`SendFlush`/`SendInterrupt`, and `SendMessageImmediately`/`SendBinaryImmediately`) are dropped until `Connect()` has opened the connection.
 - For the Voice Agent, `Connect()` sends Settings before Open. If Settings cannot be sent, `Connect()` fails and neither Open nor Close fires.
+- Keep Close handlers short. When two teardowns race (two `Stop()` calls, or a `Stop()` and a server close), the one that raises Close waits for its handlers, but the other waits for them only up to its own token or the disconnect timeout (5 s), whichever comes first. It then logs a Warning and returns `true` while the handler may still be running. A `Connect()` that waits for a previous connection does the same with its connect token: it then opens the new connection anyway. Either way, the new connection's Open can be raised before the old Close handler has finished.
 
 ## Flux - Conversational Speech Recognition (Preview)
 
