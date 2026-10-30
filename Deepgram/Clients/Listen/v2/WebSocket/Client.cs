@@ -18,8 +18,8 @@ namespace Deepgram.Clients.Listen.v2.WebSocket;
 public class Client : AbstractWebSocketClient, IListenWebSocketClient
 {
     #region Fields
-    private DateTime? _lastReceived = null;
-    private readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+    internal DateTime? _lastReceived = null;
+    internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -428,7 +428,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     break;
                 }
 
-                await _mutexLastDatagram.WaitAsync();
+                await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     if (_lastReceived == null)
@@ -677,7 +677,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         {
                             var now = DateTime.Now;
                             Log.Debug("InspectMessage", $"AutoFlush IsFinal received. Time: {now}");
-                            await _mutexLastDatagram.WaitAsync();
+                            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                             try
                             {
                                 _lastReceived = null;
@@ -691,7 +691,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         {
                             var now = DateTime.Now;
                             Log.Debug("InspectMessage", $"AutoFlush Interim received. Time: {now}");
-                            await _mutexLastDatagram.WaitAsync();
+                            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                             try
                             {
                                 _lastReceived = now;
