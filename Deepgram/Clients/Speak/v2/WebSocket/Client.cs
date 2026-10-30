@@ -17,12 +17,17 @@ namespace Deepgram.Clients.Speak.v2.WebSocket;
 public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 {
     #region Fields
-    internal DateTime? _lastReceived = null;
+    // Stopwatch.GetTimestamp() of the last datagram not yet flushed; null when nothing is pending.
+    // Monotonic, so a wall-clock change (a DST fall-back) cannot make the elapsed time negative.
+    private long? _lastReceived = null;
     private int _flushCount = 0;
     internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
 
     // Test seam: runs after InspectMessage enqueues a Speak, while it still holds _mutexLastDatagram.
     internal Action? OnSpeakEnqueued { get; set; }
+
+    // Read-only view for tests; writes stay under _mutexLastDatagram.
+    internal long? LastReceivedTimestamp => _lastReceived;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -419,7 +424,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     {
         Log.Verbose("LiveClient.ProcessAutoFlush", "ENTER");
 
-        var diffTicks = TimeSpan.FromMilliseconds((double)_deepgramClientOptions.AutoFlushSpeakDelta);
+        var thresholdTicks = MillisecondsToStopwatchTicks(_deepgramClientOptions.AutoFlushSpeakDelta);
 
         try
         {
@@ -457,14 +462,14 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     }
                     else
                     {
-                        var deltaTicks = DateTime.Now - _lastReceived;
-                        if (deltaTicks < diffTicks)
+                        var elapsedTicks = System.Diagnostics.Stopwatch.GetTimestamp() - _lastReceived.Value;
+                        if (elapsedTicks < thresholdTicks)
                         {
-                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Skipping...");
                         }
                         else
                         {
-                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Flushing...");
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Flushing...");
                             Flush();
                             _lastReceived = null;
                         }
@@ -687,8 +692,8 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 
         if (_deepgramClientOptions.AutoFlushSpeakDelta > 0)
         {
-            var now = DateTime.Now;
-            Log.Debug("InspectMessage", $"AutoFlush last received. Time: {now}");
+            var now = System.Diagnostics.Stopwatch.GetTimestamp();
+            Log.Debug("InspectMessage", $"AutoFlush last received. Time: {DateTime.Now}");
             _mutexLastDatagram.Wait();
             try
             {
@@ -709,6 +714,25 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         Log.Debug("InspectMessage", "Succeeded");
         Log.Verbose("InspectMessage", "LEAVE");
     }
+
+    // Autoflush times with Stopwatch timestamps; these convert between them and milliseconds.
+    // The threshold clamps instead of throwing: it is computed outside ProcessAutoFlush's try, on a
+    // fire-and-forget task, so an OverflowException for a huge delta would silently end autoflush.
+    internal static long MillisecondsToStopwatchTicks(decimal milliseconds)
+    {
+        if (milliseconds <= 0)
+        {
+            return 0;
+        }
+
+        var maxMilliseconds = long.MaxValue / (decimal)System.Diagnostics.Stopwatch.Frequency * 1000m;
+        return milliseconds >= maxMilliseconds
+            ? long.MaxValue
+            : (long)(milliseconds * System.Diagnostics.Stopwatch.Frequency / 1000m);
+    }
+
+    internal static double StopwatchTicksToMilliseconds(long ticks) =>
+        ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0);
 
     // The flush counter is only logged, so it uses Interlocked instead of _mutexLastDatagram.
     // Taking the semaphore here made Flush() block on it, which deadlocked the autoflush thread
