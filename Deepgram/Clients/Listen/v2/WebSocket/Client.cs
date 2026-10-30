@@ -497,28 +497,41 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     break;
                 }
 
+                // Decide and clear under the lock, then send outside it. The receive loop blocks on
+                // this lock in InspectMessage, and SendFinalize waits for queued audio to drain and
+                // for the send lock, so holding it across the send stalled every inbound message.
+                // Clearing before the send keeps an interim that arrives mid-send: it sets a new
+                // timestamp and a later tick finalizes it.
+                var shouldFinalize = false;
                 await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     if (_lastReceived == null)
                     {
                         Log.Debug("ProcessAutoFlush", "No datagram received. Skipping...");
-                        continue;
                     }
-
-                    var elapsedTicks = System.Diagnostics.Stopwatch.GetTimestamp() - _lastReceived.Value;
-                    if (elapsedTicks < thresholdTicks)
+                    else
                     {
-                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Skipping...");
-                        continue;
+                        var elapsedTicks = System.Diagnostics.Stopwatch.GetTimestamp() - _lastReceived.Value;
+                        if (elapsedTicks < thresholdTicks)
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Skipping...");
+                        }
+                        else
+                        {
+                            shouldFinalize = true;
+                            _lastReceived = null;
+                        }
                     }
-
-                    await SendFinalize(owned).ConfigureAwait(false);
-                    _lastReceived = null;
                 }
                 finally
                 {
                     _mutexLastDatagram.Release();
+                }
+
+                if (shouldFinalize)
+                {
+                    await SendFinalize(owned).ConfigureAwait(false);
                 }
             }
 
