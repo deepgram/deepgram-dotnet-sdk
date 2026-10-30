@@ -99,6 +99,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         var internalCancellationTokenSource = new CancellationTokenSource();
         var connectionId = Guid.NewGuid().ToString("N");
         IDisposable? connectionScope = null;
+        var callbackFailed = false;
 
         try
         {
@@ -120,6 +121,20 @@ public abstract class AbstractWebSocketClient : IDisposable
                 {
                     Log.Debug("Connect", $"Add Header {header.Key}");
                     socket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+
+            if (_deepgramClientOptions is DeepgramWsClientOptions { ConfigureClientWebSocket: { } configureClientWebSocket })
+            {
+                try
+                {
+                    configureClientWebSocket(socket.Options);
+                }
+                catch (Exception)
+                {
+                    callbackFailed = true;
+                    socket.Dispose();
+                    throw;
                 }
             }
 
@@ -179,6 +194,14 @@ public abstract class AbstractWebSocketClient : IDisposable
             Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
 
             return true;
+        }
+        catch (Exception ex) when (callbackFailed)
+        {
+            Log.Error("Connect", $"ConfigureClientWebSocket threw {ex.GetType()}");
+            Log.Verbose("AbstractWebSocketClient.Connect", "LEAVE");
+
+            ResetFailedConnection(socket, internalCancellationTokenSource, connectionScope);
+            throw;
         }
         catch (TaskCanceledException ex)
         {
