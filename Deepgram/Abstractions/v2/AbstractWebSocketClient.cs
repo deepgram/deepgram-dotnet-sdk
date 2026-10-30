@@ -455,7 +455,7 @@ public abstract class AbstractWebSocketClient : IDisposable
             // Start reading only after the Open handlers have run, so a server close (and the
             // Close event it raises) cannot overtake Open.
             Log.Debug("Connect", "Starting Receiver Thread...");
-            _ = Task.Run(() => ProcessReceiveQueue(owned));
+            _ = Task.Run(() => RunReceiveLoop(owned));
 
             // A Stop() or Dispose() (from an Open handler, say) may have released the connection
             // meanwhile, or a Stop() may still be closing it (a Flux STT/TTS close grace period). A
@@ -1435,8 +1435,58 @@ public abstract class AbstractWebSocketClient : IDisposable
         // "already initialized" guard. A no-op when a teardown already released it.
         if (!owned.IsReleased)
         {
+            await TearDownDroppedConnection(owned).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
+    /// Stops a connection whose socket dropped, from the receive loop. Nothing awaits the receive
+    /// loop, and StopConnection always releases the connection (and raises Close) before it
+    /// rethrows, so a failure here only needs to be logged.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Runs on the fire-and-forget receive task; nothing observes its exceptions.")]
+    private async Task TearDownDroppedConnection(ConnectionState owned)
+    {
+        try
+        {
             Log.Information("ProcessReceiveQueue", "WebSocket is no longer open. Tearing down the connection...");
             await StopConnection(owned).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            LogReceiveLoopException("teardown", ex);
+        }
+    }
+
+    /// <summary>
+    /// Runs <see cref="ProcessReceiveQueue"/> for the fire-and-forget receive task. Nothing awaits
+    /// that task, so any exception that reaches here (a throwing log provider in a catch block,
+    /// say) is logged instead of becoming an unobserved task exception.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Runs on the fire-and-forget receive task; nothing observes its exceptions.")]
+    private async Task RunReceiveLoop(ConnectionState owned)
+    {
+        try
+        {
+            await ProcessReceiveQueue(owned).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            LogReceiveLoopException("loop", ex);
+        }
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Log providers are user code; one that throws must not fault the fire-and-forget receive task.")]
+    private static void LogReceiveLoopException(string stage, Exception ex)
+    {
+        try
+        {
+            Log.Error("ProcessReceiveQueue", $"Receive {stage} failed: {ex.GetType()} {ex.Message}");
+            Log.Verbose("ProcessReceiveQueue", $"Exception: {ex}");
+        }
+        catch
+        {
+            // A failing log provider must not fault the fire-and-forget receive task.
         }
     }
 

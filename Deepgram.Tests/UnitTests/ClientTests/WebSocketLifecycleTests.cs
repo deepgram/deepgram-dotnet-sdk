@@ -2583,4 +2583,69 @@ public class WebSocketLifecycleTests
             Volatile.Read(ref calls).Should().Be(goodHandlers, $"iteration {i}");
         }
     }
+
+    /// <summary>
+    /// The receive loop runs fire-and-forget. When the socket drops it tears the connection down
+    /// itself; if that teardown throws (here a log provider throws inside Stop), the failure must
+    /// be caught and logged, not left as an unobserved task exception.
+    /// </summary>
+    [Test]
+    public async Task Receive_Loop_Teardown_Failure_Should_Not_Go_Unobserved()
+    {
+        const string failure = "Simulated log provider failure";
+        using var server = new LoopbackWebSocketServer();
+        using var client = new ExposedClient(NewApiKey());
+        var closed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<Common.CloseResponse>((_, _) => closed.TrySetResult(true)));
+
+        (await client.Connect(server.Endpoint).WaitAsync(GateTimeout)).Should().BeTrue();
+
+        // Finalize leftovers from earlier tests before listening, so only this test's tasks count.
+        CollectGarbage();
+        var unobserved = new ConcurrentQueue<Exception>();
+        EventHandler<UnobservedTaskExceptionEventArgs> onUnobserved = (_, args) =>
+        {
+            if (args.Exception.Flatten().InnerExceptions.Any(ex => ex.Message.Contains(failure)))
+            {
+                unobserved.Enqueue(args.Exception);
+                args.SetObserved();
+            }
+        };
+        TaskScheduler.UnobservedTaskException += onUnobserved;
+
+        // Throws on the release step of Stop() and again on the error log in Stop()'s catch block,
+        // so StopConnection throws out of the receive loop's teardown.
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
+        {
+            builder.SetMinimumLevel(MelLogLevel.Trace);
+            builder.AddProvider(new ThrowingLoggerProvider("Releasing the connection", failure));
+        }));
+        try
+        {
+            // Drop the TCP connection: no close frame, so the receive loop runs its own teardown.
+            (await server.WaitForConnectionAsync(1).WaitAsync(GateTimeout)).Abort();
+            await closed.Task.WaitAsync(GateTimeout);
+
+            // Give the receive task time to finish, then make its exception (if any) surface.
+            for (var i = 0; i < 20 && unobserved.IsEmpty; i++)
+            {
+                await Task.Delay(50);
+                CollectGarbage();
+            }
+        }
+        finally
+        {
+            TaskScheduler.UnobservedTaskException -= onUnobserved;
+            Log.Reset();
+        }
+
+        unobserved.Should().BeEmpty("the receive loop must observe its own teardown failures");
+    }
+
+    private static void CollectGarbage()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+    }
 }
