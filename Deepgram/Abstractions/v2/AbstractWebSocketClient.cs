@@ -43,6 +43,9 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
+
+    // Read-only view for tests.
+    internal SemaphoreSlim SendLock => _mutexSend;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
