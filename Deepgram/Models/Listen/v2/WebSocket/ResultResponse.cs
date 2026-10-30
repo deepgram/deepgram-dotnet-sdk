@@ -42,6 +42,14 @@ public record ResultResponse
     public bool? FromFinalize { get; set; }
 
     /// <summary>
+    /// Entities extracted from the transcript when DetectEntities is enabled.
+    /// Only present on final results; an empty list means no entities were detected.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("entities")]
+    public IReadOnlyList<Entity>? Entities { get; set; }
+
+    /// <summary>
     /// Metadata information.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
