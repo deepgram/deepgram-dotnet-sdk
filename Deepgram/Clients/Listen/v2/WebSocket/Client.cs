@@ -18,8 +18,13 @@ namespace Deepgram.Clients.Listen.v2.WebSocket;
 public class Client : AbstractWebSocketClient, IListenWebSocketClient
 {
     #region Fields
-    private DateTime? _lastReceived = null;
-    private readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+    // Stopwatch.GetTimestamp() of the last datagram not yet flushed; null when nothing is pending.
+    // Monotonic, so a wall-clock change (a DST fall-back) cannot make the elapsed time negative.
+    private long? _lastReceived = null;
+    internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+
+    // Read-only view for tests; writes stay under _mutexLastDatagram.
+    internal long? LastReceivedTimestamp => _lastReceived;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -296,12 +301,12 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         // Flush any buffered audio first so Finalize can't overtake audio still in the send
         // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
         Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
-        await Flush();
+        await Flush().ConfigureAwait(false);
 
         Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
         ControlMessage message = new ControlMessage(Constants.Finalize);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        await SendMessageImmediately(data).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -405,7 +410,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     {
         Log.Verbose("ListenWSClient.ProcessAutoFlush", "ENTER");
 
-        var diffTicks = TimeSpan.FromMilliseconds((double)_deepgramClientOptions.AutoFlushReplyDelta);
+        var thresholdTicks = MillisecondsToStopwatchTicks(_deepgramClientOptions.AutoFlushReplyDelta);
 
         try
         {
@@ -428,28 +433,41 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     break;
                 }
 
-                await _mutexLastDatagram.WaitAsync();
+                // Decide and clear under the lock, then send outside it. The receive loop blocks on
+                // this lock in InspectMessage, and SendFinalize waits for queued audio to drain and
+                // for the send lock, so holding it across the send stalled every inbound message.
+                // Clearing before the send keeps an interim that arrives mid-send: it sets a new
+                // timestamp and a later tick finalizes it.
+                var shouldFinalize = false;
+                await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     if (_lastReceived == null)
                     {
                         Log.Debug("ProcessAutoFlush", "No datagram received. Skipping...");
-                        continue;
                     }
-
-                    var deltaTicks = DateTime.Now - _lastReceived;
-                    if (deltaTicks < diffTicks)
+                    else
                     {
-                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
-                        continue;
+                        var elapsedTicks = System.Diagnostics.Stopwatch.GetTimestamp() - _lastReceived.Value;
+                        if (elapsedTicks < thresholdTicks)
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Skipping...");
+                        }
+                        else
+                        {
+                            shouldFinalize = true;
+                            _lastReceived = null;
+                        }
                     }
-
-                    await SendFinalize();
-                    _lastReceived = null;
                 }
                 finally
                 {
                     _mutexLastDatagram.Release();
+                }
+
+                if (shouldFinalize)
+                {
+                    await SendFinalize().ConfigureAwait(false);
                 }
             }
 
@@ -646,6 +664,25 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         return new Uri($"{options.BaseAddress}/{UriSegments.LISTEN}?{queryString}");
     }
 
+    // Autoflush times with Stopwatch timestamps; these convert between them and milliseconds.
+    // The threshold clamps instead of throwing: it is computed outside ProcessAutoFlush's try, on a
+    // fire-and-forget task, so an OverflowException for a huge delta would silently end autoflush.
+    internal static long MillisecondsToStopwatchTicks(decimal milliseconds)
+    {
+        if (milliseconds <= 0)
+        {
+            return 0;
+        }
+
+        var maxMilliseconds = long.MaxValue / (decimal)System.Diagnostics.Stopwatch.Frequency * 1000m;
+        return milliseconds >= maxMilliseconds
+            ? long.MaxValue
+            : (long)(milliseconds * System.Diagnostics.Stopwatch.Frequency / 1000m);
+    }
+
+    internal static double StopwatchTicksToMilliseconds(long ticks) =>
+        ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0);
+
     private async Task InspectMessage(object type, JsonDocument data)
     {
         Log.Verbose("InspectMessage", "ENTER");
@@ -675,9 +712,8 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                     {
                         if ((bool)resultResponse.IsFinal)
                         {
-                            var now = DateTime.Now;
-                            Log.Debug("InspectMessage", $"AutoFlush IsFinal received. Time: {now}");
-                            await _mutexLastDatagram.WaitAsync();
+                            Log.Debug("InspectMessage", $"AutoFlush IsFinal received. Time: {DateTime.Now}");
+                            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                             try
                             {
                                 _lastReceived = null;
@@ -689,9 +725,9 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         }
                         else
                         {
-                            var now = DateTime.Now;
-                            Log.Debug("InspectMessage", $"AutoFlush Interim received. Time: {now}");
-                            await _mutexLastDatagram.WaitAsync();
+                            var now = System.Diagnostics.Stopwatch.GetTimestamp();
+                            Log.Debug("InspectMessage", $"AutoFlush Interim received. Time: {DateTime.Now}");
+                            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                             try
                             {
                                 _lastReceived = now;

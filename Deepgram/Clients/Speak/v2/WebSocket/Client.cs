@@ -17,9 +17,17 @@ namespace Deepgram.Clients.Speak.v2.WebSocket;
 public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 {
     #region Fields
-    private DateTime? _lastReceived = null;
+    // Stopwatch.GetTimestamp() of the last datagram not yet flushed; null when nothing is pending.
+    // Monotonic, so a wall-clock change (a DST fall-back) cannot make the elapsed time negative.
+    private long? _lastReceived = null;
     private int _flushCount = 0;
-    private readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+    internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
+
+    // Test seam: runs after InspectMessage enqueues a Speak, while it still holds _mutexLastDatagram.
+    internal Action? OnSpeakEnqueued { get; set; }
+
+    // Read-only view for tests; writes stay under _mutexLastDatagram.
+    internal long? LastReceivedTimestamp => _lastReceived;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -326,6 +334,8 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     /// </summary>
     public void Close(bool nullByte = false)
     {
+        // Every await on this path uses ConfigureAwait(false), so blocking here does not deadlock
+        // a caller on a single-threaded SynchronizationContext (a UI thread).
         SendClose(nullByte).Wait();
     }
 
@@ -357,7 +367,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
 
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(token);
+            await _mutexSend.WaitAsync(token).ConfigureAwait(false);
             try
             {
                 await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
@@ -374,7 +384,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         byte[] data = Encoding.UTF8.GetBytes(controlMessage.ToString());
         // Pass the caller token through; when null, SendMessageImmediately falls back to the
         // teardown-safe GetInternalCancellationToken() rather than a possibly-disposed field.
-        await SendMessageImmediately(data, Constants.UseArrayLengthForSend, _cancellationToken);
+        await SendMessageImmediately(data, Constants.UseArrayLengthForSend, _cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -390,11 +400,12 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             switch (type)
             {
                 case Constants.Flush:
-                    IncrementCounter().Wait();
+                    IncrementFlushCount();
                     break;
                 case Constants.Speak:
-                    InspectMessage();
-                    break;
+                    // Records the Speak and enqueues it under the autoflush lock.
+                    InspectMessage(new WebSocketMessage(data, WebSocketMessageType.Text, length));
+                    return;
             }
         }
 
@@ -413,7 +424,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     {
         Log.Verbose("LiveClient.ProcessAutoFlush", "ENTER");
 
-        var diffTicks = TimeSpan.FromMilliseconds((double)_deepgramClientOptions.AutoFlushSpeakDelta);
+        var thresholdTicks = MillisecondsToStopwatchTicks(_deepgramClientOptions.AutoFlushSpeakDelta);
 
         try
         {
@@ -436,25 +447,33 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     return;
                 }
 
-                await _mutexLastDatagram.WaitAsync();
+                // Decide and enqueue the Flush under the same lock that InspectMessage holds while
+                // it records a Speak and enqueues it, so every Speak recorded in _lastReceived is
+                // already queued ahead of the Flush that covers it. This is safe because nothing on
+                // the Flush() path (SendMessage -> IncrementFlushCount -> EnqueueSendMessage) takes
+                // _mutexLastDatagram or awaits. Once rebased on #456, this will call
+                // SendAutoFlush(owned) after an in-lock owned.IsOpen check, instead of Flush().
+                await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     if (_lastReceived == null)
                     {
                         Log.Debug("ProcessAutoFlush", "No datagram received. Skipping...");
-                        continue;
                     }
-
-                    var deltaTicks = DateTime.Now - _lastReceived;
-                    if (deltaTicks < diffTicks)
+                    else
                     {
-                        Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {deltaTicks}. Skipping...");
-                        continue;
+                        var elapsedTicks = System.Diagnostics.Stopwatch.GetTimestamp() - _lastReceived.Value;
+                        if (elapsedTicks < thresholdTicks)
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta is less than threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Skipping...");
+                        }
+                        else
+                        {
+                            Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Flushing...");
+                            Flush();
+                            _lastReceived = null;
+                        }
                     }
-
-                    Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Skipping...");
-                    Flush();
-                    _lastReceived = null;
                 }
                 finally
                 {
@@ -585,7 +604,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     // auto flush
                     if (_deepgramClientOptions.InspectSpeakMessage())
                     {
-                        DecrementCounter().Wait();
+                        DecrementFlushCount();
                     }
 
                     Log.Debug("ProcessDataReceived", $"Invoking FlushedResponse. event: {flushedResponse}");
@@ -662,59 +681,72 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         return new Uri($"{options.BaseAddress}/{UriSegments.SPEAK}?{queryString}");
     }
 
-    private async void InspectMessage()
+    // Synchronous on purpose: an async wait here posted the lock-holding continuation to the
+    // caller's SynchronizationContext, so a UI-thread SpeakWithText could take the lock and never
+    // release it. ProcessAutoFlush's critical section is synchronous, so this wait is short.
+    // The Speak is enqueued inside the lock: enqueuing after the release let an autoflush tick
+    // send its Flush ahead of this Speak and clear _lastReceived, so the Speak was never flushed.
+    private void InspectMessage(WebSocketMessage speak)
     {
         Log.Verbose("InspectMessage", "ENTER");
 
         if (_deepgramClientOptions.AutoFlushSpeakDelta > 0)
         {
-            var now = DateTime.Now;
-            Log.Debug("InspectMessage", $"AutoFlush last received. Time: {now}");
-            await _mutexLastDatagram.WaitAsync();
+            var now = System.Diagnostics.Stopwatch.GetTimestamp();
+            Log.Debug("InspectMessage", $"AutoFlush last received. Time: {DateTime.Now}");
+            _mutexLastDatagram.Wait();
             try
             {
                 _lastReceived = now;
+                EnqueueSendMessage(speak);
+                OnSpeakEnqueued?.Invoke();
             }
             finally
             {
                 _mutexLastDatagram.Release();
             }
         }
+        else
+        {
+            EnqueueSendMessage(speak);
+        }
 
         Log.Debug("InspectMessage", "Succeeded");
         Log.Verbose("InspectMessage", "LEAVE");
     }
 
-    private async Task<bool> DecrementCounter()
+    // Autoflush times with Stopwatch timestamps; these convert between them and milliseconds.
+    // The threshold clamps instead of throwing: it is computed outside ProcessAutoFlush's try, on a
+    // fire-and-forget task, so an OverflowException for a huge delta would silently end autoflush.
+    internal static long MillisecondsToStopwatchTicks(decimal milliseconds)
     {
-        await _mutexLastDatagram.WaitAsync();
-        try
+        if (milliseconds <= 0)
         {
-            _flushCount -= 1;
-            Log.Debug("DecrementCounter", $"Decrement Flush count: {_flushCount}");
-        }
-        finally
-        {
-            _mutexLastDatagram.Release();
+            return 0;
         }
 
-        return true;
+        var maxMilliseconds = long.MaxValue / (decimal)System.Diagnostics.Stopwatch.Frequency * 1000m;
+        return milliseconds >= maxMilliseconds
+            ? long.MaxValue
+            : (long)(milliseconds * System.Diagnostics.Stopwatch.Frequency / 1000m);
     }
 
-    private async Task<bool> IncrementCounter()
-    {
-        await _mutexLastDatagram.WaitAsync();
-        try
-        {
-            _flushCount += 1;
-            Log.Debug("IncrementCounter", $"Increment Flush count: {_flushCount}");
-        }
-        finally
-        {
-            _mutexLastDatagram.Release();
-        }
+    internal static double StopwatchTicksToMilliseconds(long ticks) =>
+        ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0);
 
-        return true;
+    // The flush counter is only logged, so it uses Interlocked instead of _mutexLastDatagram.
+    // Taking the semaphore here made Flush() block on it, which deadlocked the autoflush thread
+    // and any caller on a blocking SynchronizationContext.
+    private void DecrementFlushCount()
+    {
+        var count = Interlocked.Decrement(ref _flushCount);
+        Log.Debug("DecrementFlushCount", $"Decrement Flush count: {count}");
+    }
+
+    private void IncrementFlushCount()
+    {
+        var count = Interlocked.Increment(ref _flushCount);
+        Log.Debug("IncrementFlushCount", $"Increment Flush count: {count}");
     }
 
     internal string GetMessageType(byte[] msg)

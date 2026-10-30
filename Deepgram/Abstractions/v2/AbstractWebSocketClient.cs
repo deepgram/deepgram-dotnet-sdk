@@ -29,6 +29,9 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
+
+    // Read-only view for tests.
+    internal SemaphoreSlim SendLock => _mutexSend;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -459,7 +462,7 @@ public abstract class AbstractWebSocketClient : IDisposable
         // provide a cancellation token, or use the teardown-safe one in the class
         var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
 
-        await _mutexSend.WaitAsync(token);
+        await _mutexSend.WaitAsync(token).ConfigureAwait(false);
         try
         {
             Log.Verbose("SendMessageImmediately", "Sending text message immediately...");
