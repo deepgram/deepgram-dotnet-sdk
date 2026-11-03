@@ -24,6 +24,26 @@ public class SpeakClientTests
         };
     }
 
+    [Test]
+    public async Task ToStream_Should_Return_Stream_Positioned_At_Start()
+    {
+        // Arrange
+        const string audio = "fake-mp3-bytes";
+        var speakClient = new SpeakRESTClient(_apiKey, _options);
+        speakClient._httpClient = MockHttpClient.CreateHttpClientWithRawResult(audio);
+
+        // Act
+        var result = await speakClient.ToStream(new TextSource("Hello World!"), new SpeakSchema());
+
+        // Assert
+        using (new AssertionScope())
+        {
+            result.Stream.Should().NotBeNull();
+            result.Stream!.Position.Should().Be(0);
+            new StreamReader(result.Stream).ReadToEnd().Should().Be(audio);
+        }
+    }
+
     //[Test]
     //public async Task SpeakStream_Should_Call_PostFileAsync_Returning_SyncResponse()
     //{
