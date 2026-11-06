@@ -65,12 +65,24 @@ public class DeepgramWsClientOptions : IDeepgramClientOptions
     public bool ThrowDeepgramWebSocketExceptions { get; set; } = false;
 
     /// <summary>
-    /// Optional callback that configures the underlying <see cref="ClientWebSocketOptions"/> before each v2 WebSocket connect,
-    /// for settings the SDK does not expose, such as <c>KeepAliveInterval</c> and, on .NET 9 or later, <c>KeepAliveTimeout</c>.
-    /// It runs after the SDK has applied its own headers, so it can override them. It can also override
+    /// Optional callback that configures the underlying <see cref="ClientWebSocketOptions"/> before each connect on the
+    /// Listen, Speak, Agent, Flux STT, and Flux TTS WebSocket clients, for settings the SDK does not expose, such as
+    /// <c>KeepAliveInterval</c> and, on .NET 9 or later, <c>KeepAliveTimeout</c>. The deprecated v1 WebSocket clients
+    /// ignore it. Defaults to null, which leaves the socket configuration unchanged.
+    /// <para>
+    /// Those settings are WebSocket ping/pong keep-alives, separate from <see cref="KeepAlive"/>, the SDK option that
+    /// makes the Listen and Agent clients send Deepgram's <c>{"type":"KeepAlive"}</c> message.
+    /// </para>
+    /// <para>
+    /// When a keep-alive timeout aborts the socket, no <c>Close</c> or <c>Error</c> event is raised:
+    /// <c>IsConnected()</c> returns false, and <c>Stop()</c> must be called before <c>Connect()</c> on the same client.
+    /// <c>Stop()</c> then raises the <c>Close</c> event.
+    /// </para>
+    /// <para>
+    /// The callback runs after the SDK has applied its own headers, so it can override them. It can also override
     /// <c>CollectHttpResponseDetails</c>, which the SDK enables so that
     /// <see cref="Deepgram.Models.Exceptions.v1.DeepgramWebSocketException.HttpStatusCode"/> is populated.
-    /// Defaults to null, which leaves the socket configuration unchanged.
+    /// </para>
     /// </summary>
     public Action<ClientWebSocketOptions>? ConfigureClientWebSocket { get; set; }
 
