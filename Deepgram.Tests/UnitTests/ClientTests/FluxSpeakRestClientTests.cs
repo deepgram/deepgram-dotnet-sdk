@@ -167,6 +167,23 @@ public class FluxSpeakRestClientTests
 
     #region Dual response mode dispatch
     [Test]
+    public async Task ToStream_Should_Return_Stream_Positioned_At_Start()
+    {
+        const string audio = "fake-mp3-bytes";
+        var client = new FluxSpeakRESTClient(_apiKey, _options);
+        client._httpClient = MockHttpClient.CreateHttpClientWithRawResult(audio);
+
+        var result = await client.ToStream(new TextSource("hi"), new SpeakSchema { Model = "flux-alexis-en" });
+
+        using (new AssertionScope())
+        {
+            result.Stream.Should().NotBeNull();
+            result.Stream!.Position.Should().Be(0);
+            new StreamReader(result.Stream).ReadToEnd().Should().Be(audio);
+        }
+    }
+
+    [Test]
     public void ToStream_With_CallBack_In_Schema_Should_Throw()
     {
         // ToStream is the synchronous/binary path; supplying a callback belongs to StreamCallBack.
