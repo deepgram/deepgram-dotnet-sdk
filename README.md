@@ -334,9 +334,9 @@ catch (DeepgramWebSocketException exception)
 
 ### Detecting dead WebSocket connections
 
-If a streaming connection stays open after a network drop, set `KeepAliveInterval` and
-`KeepAliveTimeout` through `DeepgramWsClientOptions.ConfigureClientWebSocket`. The callback receives
-the `ClientWebSocketOptions` that the Listen, Speak, Agent, Flux STT, and Flux TTS WebSocket clients
+If a streaming connection stays open after a network drop, set `KeepAliveTimeout` through
+`DeepgramWsClientOptions.ConfigureClientWebSocket`. The callback receives the
+`ClientWebSocketOptions` that the Listen, Speak, Agent, Flux STT, and Flux TTS WebSocket clients
 create on each `Connect`, for settings those clients do not expose themselves. It runs after the SDK
 has applied its own headers. With a keep-alive timeout set, the client aborts a connection whose
 network path has died without a close frame, instead of reporting it as open indefinitely.
@@ -362,19 +362,23 @@ var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 `KeepAliveTimeout` was added in .NET 9, so omit that line unless your application targets .NET 9 or
 later. The SDK itself targets `net8.0` and `netstandard2.0`, neither of which has the property.
 
-With a finite `KeepAliveTimeout`, .NET sends a ping and aborts the socket when no pong answers it.
-With the default infinite timeout, `KeepAliveInterval` sends unsolicited pongs and nothing detects a
-dead path. Both are separate from the SDK's `KeepAlive` option, which sends Deepgram's
-`{"type":"KeepAlive"}` message so the server doesn't close an idle stream.
+`KeepAliveTimeout` is the setting that does the work. With a finite value, .NET sends a ping once
+`KeepAliveInterval` has passed with no traffic from the server, and aborts the socket when no pong
+answers within the timeout. Leave it unset and `ClientWebSocket` still sends a one-way heartbeat on
+that interval, but nothing short of the operating system's TCP timeout notices that the server has
+stopped answering. `KeepAliveInterval` is optional: it defaults to about 30 seconds, and the sample
+sets it only to detect a dead path sooner. Neither setting is the SDK's own `KeepAlive` option, which
+sends Deepgram's `{"type":"KeepAlive"}` message so the server doesn't close an idle stream.
 
 After an abort, `IsConnected()` returns `false` and you need to call `Stop()` before `Connect()` will
 open a new socket on the same client. Calling `Connect()` without `Stop()` logs an error and returns
 `true` without reconnecting.
 
-The callback reaches the current WebSocket clients only. The deprecated `version: 1` overload of
-`ClientFactory.CreateListenWebSocketClient` accepts the options object and ignores this setting, and
-the versioned `ClientFactory.CreateSpeakWebSocketClient(version, ...)` overload takes
-`DeepgramHttpClientOptions`, so it cannot carry this setting on either version. Use the default
+The callback reaches the current WebSocket clients only. The `version: 1` overload of
+`ClientFactory.CreateListenWebSocketClient` and the deprecated `ClientFactory.CreateLiveClient` both
+accept the options object and ignore this setting, because they return v1 clients that build their
+own socket. The versioned `ClientFactory.CreateSpeakWebSocketClient(version, ...)` overload takes
+`DeepgramHttpClientOptions`, so it cannot carry the setting on either version. Use the default
 `ClientFactory.CreateListenWebSocketClient(...)` and `ClientFactory.CreateSpeakWebSocketClient(...)`,
 which return the current clients.
 
