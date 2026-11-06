@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.3.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.2.1...7.3.0) (2026-11-06)
+
+
+### Features
+
+* add ConfigureClientWebSocket option for WebSocket clients ([ad6d7c9](https://github.com/deepgram/deepgram-dotnet-sdk/commit/ad6d7c9cb26093dc139327b7341eb969d8a56f06))
+
 ## [7.2.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.2.0...7.2.1) (2026-10-30)
 
 
