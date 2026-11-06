@@ -368,11 +368,12 @@ answers within the timeout. Leave it unset and `ClientWebSocket` still sends a o
 that interval, but nothing short of the operating system's TCP timeout notices that the server has
 stopped answering. `KeepAliveInterval` is optional: it defaults to about 30 seconds, and the sample
 sets it only to detect a dead path sooner. Neither setting is the SDK's own `KeepAlive` option, which
-sends Deepgram's `{"type":"KeepAlive"}` message so the server doesn't close an idle stream.
+the Listen and Agent clients use to send Deepgram's `{"type":"KeepAlive"}` message so the server
+doesn't close an idle stream.
 
-After an abort, `IsConnected()` returns `false` and you need to call `Stop()` before `Connect()` will
-open a new socket on the same client. Calling `Connect()` without `Stop()` logs an error and returns
-`true` without reconnecting.
+Calling `Connect()` after an abort without `Stop()` logs an error and returns `true` without
+reconnecting. `Stop()` raises the `Close` event, so a `Close` handler runs after you call `Stop()`,
+not when the socket aborts.
 
 The callback reaches the current WebSocket clients only. The `version: 1` overload of
 `ClientFactory.CreateListenWebSocketClient` and the deprecated `ClientFactory.CreateLiveClient` both
