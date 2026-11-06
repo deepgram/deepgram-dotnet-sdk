@@ -20,7 +20,10 @@ Power your apps with world-class speech and Language AI models.
   - [Pre-Recorded (Asynchronous / Callbacks)](#pre-recorded-asynchronous--callbacks)
     - [Remote Files (Asynchronous)](#remote-files-asynchronous)
     - [Local Files (Asynchronous)](#local-files-asynchronous)
+    - [Callback method compatibility](#callback-method-compatibility)
   - [Streaming Audio](#streaming-audio)
+    - [WebSocket handshake errors](#websocket-handshake-errors)
+    - [Detecting dead WebSocket connections](#detecting-dead-websocket-connections)
   - [Flux - Conversational Speech Recognition (Preview)](#flux---conversational-speech-recognition-preview)
   - [Flux Text to Speech](#flux-text-to-speech)
   - [Voice Agent](#voice-agent)
@@ -329,17 +332,17 @@ catch (DeepgramWebSocketException exception)
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
 
-### Detecting dead WebSocket connections (KeepAliveInterval and KeepAliveTimeout)
+### Detecting dead WebSocket connections
 
 If a streaming connection stays open after a network drop, set `KeepAliveInterval` and
-`KeepAliveTimeout` through `DeepgramWsClientOptions.ConfigureClientWebSocket`. The callback adjusts
+`KeepAliveTimeout` through `DeepgramWsClientOptions.ConfigureClientWebSocket`. The callback receives
 the `ClientWebSocketOptions` that the Listen, Speak, Agent, Flux STT, and Flux TTS WebSocket clients
-create on each `Connect`, for settings they do not expose themselves, and it runs after the SDK has
-applied its own headers. With a keep-alive timeout set, the client aborts a connection whose network
-path has died without a close frame, instead of reporting it as open indefinitely.
+create on each `Connect`, for settings those clients do not expose themselves. It runs after the SDK
+has applied its own headers. With a keep-alive timeout set, the client aborts a connection whose
+network path has died without a close frame, instead of reporting it as open indefinitely.
 
-A keep-alive timeout aborts the socket without raising a `Close` or `Error` event, so poll
-`IsConnected()` and call `Stop()` before reconnecting (details below).
+Detection is not recovery. A keep-alive timeout aborts the socket without raising a `Close` or
+`Error` event, so poll `IsConnected()` and call `Stop()` before reconnecting (details below).
 
 ```csharp
 using Deepgram;
@@ -356,19 +359,24 @@ var options = new DeepgramWsClientOptions
 var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 ```
 
-`KeepAliveTimeout` was added in .NET 9 and does not exist on `net8.0` or `netstandard2.0`, which this
-SDK also targets, so omit that line if your application targets either. With a finite
-`KeepAliveTimeout`, these settings make .NET use WebSocket ping/pong keep-alives. They are separate
-from the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
-doesn't close an idle stream.
+`KeepAliveTimeout` was added in .NET 9, so omit that line unless your application targets .NET 9 or
+later. The SDK itself targets `net8.0` and `netstandard2.0`, neither of which has the property.
 
-When a keep-alive timeout aborts the socket, the SDK doesn't currently raise a `Close` or `Error`
-event. `IsConnected()` returns `false`, and you need to call `Stop()` before calling `Connect()`
-again on the same client.
+With a finite `KeepAliveTimeout`, .NET sends a ping and aborts the socket when no pong answers it.
+With the default infinite timeout, `KeepAliveInterval` sends unsolicited pongs and nothing detects a
+dead path. Both are separate from the SDK's `KeepAlive` option, which sends Deepgram's
+`{"type":"KeepAlive"}` message so the server doesn't close an idle stream.
+
+After an abort, `IsConnected()` returns `false` and you need to call `Stop()` before `Connect()` will
+open a new socket on the same client. Calling `Connect()` without `Stop()` logs an error and returns
+`true` without reconnecting.
 
 The callback reaches the current WebSocket clients only. The deprecated `version: 1` overload of
-`ClientFactory.CreateListenWebSocketClient` accepts the options object but ignores this setting; use
-the default `ClientFactory.CreateListenWebSocketClient(...)`, which returns the current client.
+`ClientFactory.CreateListenWebSocketClient` accepts the options object and ignores this setting, and
+the versioned `ClientFactory.CreateSpeakWebSocketClient(version, ...)` overload takes
+`DeepgramHttpClientOptions`, so it cannot carry this setting on either version. Use the default
+`ClientFactory.CreateListenWebSocketClient(...)` and `ClientFactory.CreateSpeakWebSocketClient(...)`,
+which return the current clients.
 
 ## Flux - Conversational Speech Recognition (Preview)
 
