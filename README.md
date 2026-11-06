@@ -329,13 +329,17 @@ catch (DeepgramWebSocketException exception)
 
 [See the Examples for more info](./examples/speech-to-text/websocket/).
 
-### Configuring the underlying WebSocket
+### Detecting dead WebSocket connections (KeepAliveInterval and KeepAliveTimeout)
 
-Set `ConfigureClientWebSocket` on `DeepgramWsClientOptions` to adjust the `ClientWebSocketOptions`
-the v2 WebSocket clients create on each `Connect`, for settings they do not expose themselves. The callback runs after
-the SDK has applied its own headers. For example, on .NET 9 or later, a keep-alive timeout makes the
-client abort a connection whose network path has died without a close frame, instead of reporting
-it as open indefinitely:
+If a streaming connection stays open after a network drop, set `KeepAliveInterval` and
+`KeepAliveTimeout` through `DeepgramWsClientOptions.ConfigureClientWebSocket`. The callback adjusts
+the `ClientWebSocketOptions` that the Listen, Speak, Agent, Flux STT, and Flux TTS WebSocket clients
+create on each `Connect`, for settings they do not expose themselves, and it runs after the SDK has
+applied its own headers. With a keep-alive timeout set, the client aborts a connection whose network
+path has died without a close frame, instead of reporting it as open indefinitely.
+
+A keep-alive timeout aborts the socket without raising a `Close` or `Error` event, so poll
+`IsConnected()` and call `Stop()` before reconnecting (details below).
 
 ```csharp
 using Deepgram;
@@ -346,19 +350,25 @@ var options = new DeepgramWsClientOptions
     ConfigureClientWebSocket = socketOptions =>
     {
         socketOptions.KeepAliveInterval = TimeSpan.FromSeconds(5);
-        socketOptions.KeepAliveTimeout = TimeSpan.FromSeconds(5);
+        socketOptions.KeepAliveTimeout = TimeSpan.FromSeconds(5); // .NET 9+ only
     },
 };
 var liveClient = ClientFactory.CreateListenWebSocketClient(options: options);
 ```
 
-With a finite `KeepAliveTimeout`, these settings make .NET use WebSocket ping/pong keep-alives. They are separate from
-the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
+`KeepAliveTimeout` was added in .NET 9 and does not exist on `net8.0` or `netstandard2.0`, which this
+SDK also targets, so omit that line if your application targets either. With a finite
+`KeepAliveTimeout`, these settings make .NET use WebSocket ping/pong keep-alives. They are separate
+from the SDK's `KeepAlive` option, which sends Deepgram's `{"type":"KeepAlive"}` message so the server
 doesn't close an idle stream.
 
 When a keep-alive timeout aborts the socket, the SDK doesn't currently raise a `Close` or `Error`
 event. `IsConnected()` returns `false`, and you need to call `Stop()` before calling `Connect()`
 again on the same client.
+
+The callback reaches the current WebSocket clients only. The deprecated `version: 1` overload of
+`ClientFactory.CreateListenWebSocketClient` accepts the options object but ignores this setting; use
+the default `ClientFactory.CreateListenWebSocketClient(...)`, which returns the current client.
 
 ## Flux - Conversational Speech Recognition (Preview)
 
