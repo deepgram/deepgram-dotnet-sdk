@@ -230,16 +230,12 @@ public class FluxClientTests
     }
 
     [Test]
-    public async Task SendForceEndTurn_Should_Send_ForceEndTurn_Message()
+    public async Task SendForceEndTurn_Should_Not_Send_ForceEndTurn_Message_While_Disconnected()
     {
         var fluxClient = Substitute.For<Client>(_apiKey, _options);
-        fluxClient.When(x => x.SendMessageImmediately(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<CancellationTokenSource>()))
-                  .DoNotCallBase();
-
         await fluxClient.SendForceEndTurn();
 
-        // The wire shape is {"type":"ForceEndTurn"} with no additional fields.
-        await fluxClient.Received(1).SendMessageImmediately(
+        await fluxClient.DidNotReceive().SendMessageImmediately(
             Arg.Is<byte[]>(d => IsForceEndTurnMessage(d)),
             Arg.Any<int>(), Arg.Any<CancellationTokenSource>());
     }

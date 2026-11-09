@@ -107,8 +107,7 @@ public class AgentCatalogClientTests
     {
         using var credentials = new ClearedCredentials();
         var provider = new RecordingLoggerProvider();
-        Log.Reset();
-        Log.Configure(LoggerFactory.Create(builder =>
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(MelLogLevel.Trace);
             builder.AddProvider(provider);
@@ -140,8 +139,7 @@ public class AgentCatalogClientTests
     {
         using var credentials = new ClearedCredentials();
         var provider = new RecordingLoggerProvider();
-        Log.Reset();
-        Log.Configure(LoggerFactory.Create(builder =>
+        Log.ResetAndConfigureForTests(LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(MelLogLevel.Trace);
             builder.AddProvider(provider);
