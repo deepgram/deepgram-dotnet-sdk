@@ -166,6 +166,18 @@ public class AgentTypedProviderTests
     }
 
     [Test]
+    public void DeepgramThinkProvider_Should_Serialize()
+    {
+        var json = Serialize(new DeepgramThinkProvider { Model = "think-fast" });
+
+        using (new AssertionScope())
+        {
+            json.GetProperty("type").GetString().Should().Be("deepgram");
+            json.GetProperty("model").GetString().Should().Be("think-fast");
+        }
+    }
+
+    [Test]
     public void GroqThinkProvider_Should_Serialize()
     {
         var json = Serialize(new GroqThinkProvider { Model = "openai/gpt-oss-20b", ReasoningMode = "low" });
@@ -330,6 +342,7 @@ public class AgentTypedProviderTests
             new DeepgramListenProviderV2(),
             new AnthropicThinkProvider(),
             new AwsBedrockThinkProvider(),
+            new DeepgramThinkProvider(),
             new GoogleThinkProvider(),
             new GroqThinkProvider(),
             new OpenAiThinkProvider(),
