@@ -46,7 +46,7 @@ public class LogTests
     {
         // Arrange
         var provider = new RecordingLoggerProvider();
-        Log.Configure(BuildFactory(provider, MelLogLevel.Trace));
+        Log.ResetAndConfigureForTests(BuildFactory(provider, MelLogLevel.Trace));
 
         // Act
         Log.Information("ListenWSClient", "hello world");
@@ -61,13 +61,13 @@ public class LogTests
     public void Log_Should_Use_A_Distinct_Category_Per_Identifier()
     {
         var provider = new RecordingLoggerProvider();
-        Log.Configure(BuildFactory(provider, MelLogLevel.Trace));
+        Log.ResetAndConfigureForTests(BuildFactory(provider, MelLogLevel.Trace));
 
         Log.Debug("ComponentA", "a");
         Log.Debug("ComponentB", "b");
 
-        // Filter out the "Logger initialized." entry Configure emits under the default category.
-        provider.Entries.Where(e => e.Category != Log.DefaultCategory)
+        // Only the entries this test wrote: a background task of an earlier test may log too.
+        provider.Entries.Where(e => e.Message is "a" or "b")
             .Select(e => e.Category)
             .Should().BeEquivalentTo(new[] { "ComponentA", "ComponentB" });
     }
@@ -76,25 +76,27 @@ public class LogTests
     public void Log_Should_Respect_The_Factory_Minimum_Level()
     {
         var provider = new RecordingLoggerProvider();
-        Log.Configure(BuildFactory(provider, MelLogLevel.Warning));
+        Log.ResetAndConfigureForTests(BuildFactory(provider, MelLogLevel.Warning));
 
         Log.Information("X", "should be filtered");
         Log.Error("X", "should pass");
 
-        provider.Entries.Should().ContainSingle().Which.Message.Should().Be("should pass");
+        // Only the category this test wrote: a background task of an earlier test may log too.
+        provider.Entries.Where(e => e.Category == "X")
+            .Should().ContainSingle().Which.Message.Should().Be("should pass");
     }
 
     [Test]
     public void IsEnabled_Should_Return_False_For_Disable()
     {
-        Log.Configure(BuildFactory(new RecordingLoggerProvider(), MelLogLevel.Trace));
+        Log.ResetAndConfigureForTests(BuildFactory(new RecordingLoggerProvider(), MelLogLevel.Trace));
         Log.IsEnabled(DeepgramLogLevel.Disable).Should().BeFalse();
     }
 
     [Test]
     public void IsEnabled_Should_Reflect_The_Factory_Minimum_Level()
     {
-        Log.Configure(BuildFactory(new RecordingLoggerProvider(), MelLogLevel.Warning));
+        Log.ResetAndConfigureForTests(BuildFactory(new RecordingLoggerProvider(), MelLogLevel.Warning));
 
         using (new AssertionScope())
         {
@@ -109,7 +111,7 @@ public class LogTests
     {
         var first = new RecordingLoggerProvider();
         var second = new RecordingLoggerProvider();
-        Log.Configure(BuildFactory(first, MelLogLevel.Trace));
+        Log.ResetAndConfigureForTests(BuildFactory(first, MelLogLevel.Trace));
         Log.Configure(BuildFactory(second, MelLogLevel.Trace));
 
         Log.Information("X", "routed to first");
@@ -119,10 +121,27 @@ public class LogTests
     }
 
     [Test]
+    public void ResetAndConfigureForTests_Should_Replace_A_Factory_Created_By_An_Earlier_Log_Call()
+    {
+        // A log call with no factory installed creates the default one, as a background task of
+        // an earlier test can between Reset() and Configure(). The seam must still take effect.
+        Log.Information("Earlier", "creates the default factory");
+        var provider = new RecordingLoggerProvider();
+        Log.ResetAndConfigureForTests(BuildFactory(provider, MelLogLevel.Warning));
+
+        using (new AssertionScope())
+        {
+            Log.IsEnabled(DeepgramLogLevel.Information).Should().BeFalse();
+            Log.Error("Y", "after the seam");
+            provider.Entries.Should().ContainSingle(e => e.Message == "after the seam");
+        }
+    }
+
+    [Test]
     public void BeginScope_Should_Attach_State_To_Entries_Written_Within_It()
     {
         var provider = new RecordingLoggerProvider();
-        Log.Configure(BuildFactory(provider, MelLogLevel.Trace));
+        Log.ResetAndConfigureForTests(BuildFactory(provider, MelLogLevel.Trace));
 
         using (Log.BeginScope("ListenWSClient",
             new Dictionary<string, object> { ["dg.connection_id"] = "abc123" }))

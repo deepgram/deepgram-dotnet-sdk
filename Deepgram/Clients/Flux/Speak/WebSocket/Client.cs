@@ -28,16 +28,6 @@ namespace Deepgram.Clients.Flux.Speak.WebSocket;
 /// </summary>
 public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 {
-    #region Fields
-    // Guards against the Close event being raised twice for one connection, which can happen
-    // when a user-initiated Stop() and the receive loop's server-close handling overlap.
-    private int _closeEventFired = 0;
-
-    // Guards against the Close message being sent twice for one connection (a user-initiated
-    // Stop() calls SendClose, and the base Stop() would otherwise call it again).
-    private int _closeSent = 0;
-    #endregion
-
     /// <param name="apiKey">Required DeepgramApiKey</param>
     /// <param name="options"><see cref="IDeepgramClientOptions"/> for WebSocket Configuration</param>
     public Client(string? apiKey = null, IDeepgramClientOptions? options = null) : base(apiKey, options)
@@ -72,6 +62,21 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// <summary>
     /// Connect to the Deepgram Flux (v2 speak) WebSocket to begin synthesizing text
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. A blocking Stop().Wait() inside an Open handler waits out this client's close grace
+    /// period (<c>DefaultCloseGracePeriodMs</c>, 3 s). An exception thrown by an Open handler is
+    /// logged at Error level and Connect() still returns true. SendText(), SendFlush(),
+    /// SendInterrupt() and SendConfigure() are not queued: while the client is not connected,
+    /// including while Connect() is still in progress, they are dropped. If a previous connection is
+    /// still being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
+    /// </remarks>
     /// <param name="options">Options to use when synthesizing, <see cref="SpeakSchema.Model"/> is required</param>
     /// <param name="cancelToken">Provide a cancel token to be used for the connect or use the internal one</param>
     /// <param name="addons">Additional query parameters to pass to the API</param>
@@ -92,12 +97,9 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 
         try
         {
-            Interlocked.Exchange(ref _closeEventFired, 0);
-            Interlocked.Exchange(ref _closeSent, 0);
-
             var myURI = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {myURI}");
-            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
+            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -356,19 +358,21 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// <summary>
     /// Subscribe to a Close event from the Deepgram API
     /// </summary>
+    /// <remarks>
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
+    /// </remarks>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
     {
         EventHandler<Common.CloseResponse> wrappedHandler = (sender, args) =>
         {
-            // A user-initiated Stop() and the receive loop's handling of the server close can
-            // overlap and both raise the base Close event; deliver only the first to subscribers.
-            if (Interlocked.Exchange(ref _closeEventFired, 1) == 1)
-            {
-                Log.Debug("CloseEvent", "Close event already delivered for this connection. Skipping...");
-                return;
-            }
-
             var castedArgs = new CloseResponse();
             castedArgs.Copy(args);
             if (castedArgs != null)
@@ -403,6 +407,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// <summary>
     /// Sends a Speak message ({"type":"Speak","text":...}) to synthesize text into the active turn.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="text">The text to synthesize</param>
     public async Task SendText(string text)
     {
@@ -421,6 +429,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// Sends a Flush message ({"type":"Flush"}) to end the active turn and generate the remaining
     /// audio. The server replies with Flushed, then SpeechMetadata once the turn's audio is sent.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendFlush()
     {
         var message = new ControlMessage(Constants.Flush);
@@ -436,6 +448,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// SpeechInterrupted, or a Warning if it cannot act on the interrupt (no audio generated yet,
     /// an earlier interrupt still in flight, a non-advancing offset, or no active turn).
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="interrupt">
     /// The interrupt to send. Include <see cref="InterruptSchema.PlaybackOffset"/> so the server
     /// can compute the text_spoken/text_remaining split; omit it (or pass null for a bare
@@ -455,6 +471,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// Sends an Interrupt message carrying a playback offset. Convenience overload of
     /// <see cref="SendInterrupt(InterruptSchema?)"/> for the common case.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="playbackOffsetMs">
     /// Milliseconds of audio played, cumulative from the start of the session (not the current
     /// turn). Each interrupt's offset must advance past the position established by the previous
@@ -469,6 +489,10 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// The server responds with ConfigureSuccess (echoing what it applied) or ConfigureFailure
     /// (e.g. code SPEED_OUT_OF_RANGE) - speed is not range-checked client-side.
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     /// <param name="configure">The configuration update to send</param>
     public async Task SendConfigure(ConfigureSchema configure)
     {
@@ -491,44 +515,44 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// </summary>
     /// <param name="nullByte">Send a null byte instead of the Close message</param>
     /// <param name="_cancellationToken">Provide a cancel token to be used for the send or use the internal one</param>
-    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+    public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
-        if (_clientWebSocket == null || !IsConnected())
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
+            return Task.CompletedTask;
+        }
+        return SendClose(owned, nullByte, _cancellationToken);
+    }
+
+    /// <summary>
+    /// SendClose() for one connection. Stop() passes the connection it snapshotted on entry, so
+    /// the Close message and the grace-period wait never reach a newer connection (#455).
+    /// </summary>
+    private protected override async Task SendClose(ConnectionState owned, bool nullByte, CancellationTokenSource? _cancellationToken)
+    {
+        if (!owned.IsOpen)
         {
             Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
             return;
         }
 
-        // Use the teardown-safe token: a concurrent Stop()/Dispose() nulls _cancellationTokenSource
-        // outside _mutexSend, so dereferencing the raw field after an await could throw NRE - which
-        // is not in Stop()'s benign catch set and would escape (#390).
-        var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
+        // The caller's token, or this connection's own token (#390, #455).
+        var token = _cancellationToken?.Token ?? owned.Token;
 
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
-            // Snapshot the socket too - a concurrent Dispose() can null it while we hold the mutex.
-            var socket = _clientWebSocket;
-            if (socket == null || !IsConnected())
-            {
-                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
-                return;
-            }
-
-            await _mutexSend.WaitAsync(token);
-            try
-            {
-                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
+            // send a close to Deepgram, on this connection's socket only
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
-        if (Interlocked.Exchange(ref _closeSent, 1) == 1)
+        // At most once per connection: a user Stop() calls SendClose, and its fallback to the base
+        // teardown would otherwise send it again. The mark lives on the connection, so a Connect()
+        // that returns the current connection cannot reset it (#455).
+        if (!owned.TryMarkCloseMessageSent())
         {
             Log.Debug("SendClose", "Close already sent for this connection. Skipping...");
             return;
@@ -536,7 +560,8 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
 
         ControlMessage message = new ControlMessage(Constants.Close);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        // The caller's token bounds the send, so Stop(token) keeps its timeout.
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, token, allowStopping: true).ConfigureAwait(false);
 
         // Flux drains remaining and queued audio and emits SessionMetadata AFTER Close, then
         // closes the connection from its side. Give it a grace period instead of tearing the
@@ -544,14 +569,12 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
         try
         {
             var deadline = Constants.DefaultCloseGracePeriodMs;
-            // Re-snapshot each iteration so a concurrent Dispose() nulling the field can't turn the
-            // condition into a check-then-act NRE (see #390).
-            var socket = _clientWebSocket;
-            while (deadline > 0 && socket != null && socket.State == WebSocketState.Open)
+            // Watch this connection only: IsOpen turns false once the server closes it or a
+            // teardown releases it (#390, #455).
+            while (deadline > 0 && owned.IsOpen)
             {
                 await Task.Delay(50, token).ConfigureAwait(false);
                 deadline -= 50;
-                socket = _clientWebSocket;
             }
             Log.Debug("SendClose", deadline > 0 ? "Server closed the connection" : "Grace period elapsed");
         }
@@ -572,24 +595,60 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
     /// When the server closes during that wait, the receive loop performs the full teardown
     /// concurrently; this method coordinates with it instead of faulting on the disposed socket.
     /// </summary>
+    /// <remarks>
+    /// Stop() returns after the Close event has been delivered, except when it ends a connection
+    /// whose Open handlers are still running: then it returns without waiting for them, and Close
+    /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
+    /// the new connection's Open. Dispose() raises no Close.
+    /// </remarks>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public new async Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false)
     {
         Log.Verbose("FluxSpeakWSClient.Stop", "ENTER");
 
-        if (_clientWebSocket == null)
+        // Snapshot the connection on entry: this Stop() tears down only that connection, even if
+        // a newer one is published while it waits (#455).
+        var owned = CurrentConnection;
+        if (owned == null)
         {
             Log.Information("Stop", "Client has already been disposed");
             Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
             return true;
         }
 
+        // From here on a Connect() still opening this connection fails, and a concurrent Connect()
+        // waits for this Stop() instead of reporting the connection as usable.
+        owned.MarkStopping();
+
         try
         {
-            if (IsConnected())
+            return await StopOwnedConnection(owned, cancelToken, nullByte).ConfigureAwait(false);
+        }
+        finally
+        {
+            // A stopping connection is always released (I6), even if a log provider (user code)
+            // threw inside a catch block below. Idempotent with the releases below.
+            if (!owned.IsReleased)
+            {
+                await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// The work of <see cref="Stop"/> for the connection it snapshotted, after it is marked stopping.
+    /// </summary>
+    private async Task<bool> StopOwnedConnection(ConnectionState owned, CancellationTokenSource? cancelToken, bool nullByte)
+    {
+        try
+        {
+            var token = cancelToken?.Token ?? owned.Token;
+
+            // A connection that never raised Open (stopped while connecting) gets no close message.
+            if (owned.IsOpened && owned.IsOpen)
             {
                 // Sends {"type":"Close"} and waits (up to the grace period) for the server-side close.
-                await SendClose(nullByte, cancelToken);
+                await SendClose(owned, nullByte, cancelToken).ConfigureAwait(false);
             }
 
             // If the server closed during the grace period, the receive loop is performing the
@@ -597,58 +656,67 @@ public class Client : AbstractWebSocketClient, IFluxSpeakWebSocketClient
             var waited = 0;
             while (waited < 2000)
             {
-                var socket = _clientWebSocket;
-                if (socket == null)
+                if (owned.IsReleased)
                 {
+                    await owned.ReleaseCompleted.ConfigureAwait(false);
                     Log.Debug("Stop", "Receive loop completed the teardown");
                     Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
                     return true;
                 }
                 try
                 {
-                    if (socket.State != WebSocketState.CloseReceived && socket.State != WebSocketState.CloseSent)
+                    var state = owned.Socket.State;
+                    if (state != WebSocketState.CloseReceived && state != WebSocketState.CloseSent)
                     {
                         break;
                     }
                 }
                 catch (ObjectDisposedException)
                 {
-                    // torn down concurrently; treat like the socket-null case on the next pass
+                    // torn down concurrently; treat like the released case on the next pass
                 }
-                await Task.Delay(50).ConfigureAwait(false);
+                await Task.Delay(50, token).ConfigureAwait(false);
                 waited += 50;
             }
 
-            if (_clientWebSocket == null)
+            if (owned.IsReleased)
             {
+                await owned.ReleaseCompleted.ConfigureAwait(false);
                 Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
                 return true;
             }
 
             // Server did not close (or teardown stalled): fall back to the base teardown.
-            // SendClose will not re-send Close (guarded by _closeSent).
+            // SendClose will not re-send Close (sent at most once per connection).
             Log.Debug("Stop", "Falling back to base Stop...");
-            var result = await base.Stop(cancelToken, nullByte);
+            // Stop this connection only; base.Stop() would act on whatever is current by now.
+            var result = await StopConnection(owned, cancelToken, nullByte).ConfigureAwait(false);
             Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
             return result;
         }
-        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException)
+        catch (Exception ex) when (ex is WebSocketException || ex is ObjectDisposedException || ex is NullReferenceException
+            || ex is OperationCanceledException)
         {
             // The receive loop tore the connection down while we were stopping - the shutdown
-            // already happened, just not by us. Finish any remaining cleanup and report success.
+            // already happened, just not by us - or the caller's token cancelled the close
+            // handshake. Finish the teardown and report success, as the base Stop() does.
             Log.Debug("Stop", $"Connection was torn down concurrently: {ex.GetType()}");
-            try
-            {
-                _cancellationTokenSource?.Dispose();
-            }
-            catch
-            {
-                // already disposed by the concurrent teardown
-            }
-            _cancellationTokenSource = null;
-            _clientWebSocket = null;
+            // Release only this connection: cancel before dispose, and leave any newer
+            // connection's fields alone. Raise Close if this call did the release (#455).
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
             Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
             return true;
+        }
+        catch (Exception ex)
+        {
+            // Anything else: still release this connection (raising Close if this call did the
+            // release), so a Stop() never leaves a stopping connection published, then rethrow.
+            Log.Error("Stop", $"{ex.GetType()} thrown {ex.Message}");
+            Log.Verbose("Stop", $"Exception: {ex}");
+            Log.Verbose("FluxSpeakWSClient.Stop", "LEAVE");
+
+            await ReleaseAndRaiseClose(owned).ConfigureAwait(false);
+            throw;
         }
     }
 

@@ -45,6 +45,19 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Connect to a Deepgram API Web Socket to begin transcribing audio
     /// </summary>
+    /// <remarks>
+    /// Open event handlers run before Connect() returns, and the receive loop starts only after they
+    /// return, so an Open handler that waits for a message from the server blocks until its own
+    /// timeout. An exception thrown by an Open handler is logged at Error level and Connect() still
+    /// returns true. Messages still queued from earlier sends are sent as soon as the new connection
+    /// opens; the send methods' remarks say which ones are kept. If a previous connection is still
+    /// being released, Connect() waits for that to finish (within its connect timeout) and then
+    /// opens a new connection. If another Connect() is still opening the connection or a Stop() is
+    /// closing it, Connect() waits for it within the same timeout and returns true only for an open
+    /// connection that is not stopping.
+    /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
+    /// Connect() return false even after Open fired; Close then follows.
+    /// </remarks>
     /// <param name="options">Options to use when transcribing audio</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
     public async Task<bool> Connect(LiveSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
@@ -62,7 +75,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             var myURI = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {myURI}");
-            bool bConnected = await base.Connect(myURI.ToString(), cancelToken, headers);
+            // owned is the connection this call opened. It is null when another connection was
+            // already published ("already initialized"): that connection's own Connect() runs
+            // its post-connect work, so this call does none (#455).
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
@@ -70,16 +86,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                 return false;
             }
 
-            if (_deepgramClientOptions.KeepAlive)
+            if (_deepgramClientOptions.KeepAlive && owned != null)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");
-                StartKeepAliveBackgroundThread();
+                StartKeepAliveBackgroundThread(owned);
             }
 
-            if (_deepgramClientOptions.AutoFlushReplyDelta > 0)
+            if (_deepgramClientOptions.AutoFlushReplyDelta > 0 && owned != null)
             {
                 Log.Debug("Connect", "Starting AutoFlush Thread...");
-                StartAutoFlushBackgroundThread();
+                StartAutoFlushBackgroundThread(owned);
             }
 
             Log.Debug("Connect", "Connect Succeeded");
@@ -103,9 +119,9 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             throw;
         }
 
-        void StartKeepAliveBackgroundThread() => Task.Run(async () => await ProcessKeepAlive());
+        void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned).ConfigureAwait(false));
 
-        void StartAutoFlushBackgroundThread() => Task.Run(async () => await ProcessAutoFlush());
+        void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned).ConfigureAwait(false));
     }
 
     #region Subscribe Event
@@ -209,6 +225,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Subscribe to an Close event from the Deepgram API
     /// </summary>
+    /// <remarks>
+    /// Close fires once for each connection that raised Open, always after Open, when Stop(), a
+    /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
+    /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
+    /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
+    /// A Close handler must not block on a different Stop() call that is still in progress for the
+    /// same connection: that Stop() returns only after Close has been delivered, so the handler
+    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
+    /// connection has opened since; then it stops that connection.
+    /// </remarks>
     /// <param name="eventHandler"></param>
     /// <returns>True if successful</returns>
     public async Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler)
@@ -280,6 +306,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a KeepAlive message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendKeepAlive()
     {
         Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
@@ -291,17 +321,30 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a Finalize message to Deepgram
     /// </summary>
+    /// <remarks>
+    /// Sent immediately, not queued: dropped while the client is not connected, including while
+    /// Connect() is still in progress.
+    /// </remarks>
     public async Task SendFinalize()
     {
-        // Flush any buffered audio first so Finalize can't overtake audio still in the send
-        // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
-        Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
-        await Flush();
+        var owned = CurrentConnection;
+        if (owned != null)
+        {
+            await SendFinalize(owned).ConfigureAwait(false);
+        }
+    }
 
-        Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
-        ControlMessage message = new ControlMessage(Constants.Finalize);
-        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+    /// <summary>Flushes and sends Configure on the connection that was current when the call began.</summary>
+    internal async Task SendConfigure(ConfigureSchema configure)
+    {
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            return;
+        }
+
+        await FlushConnection(owned).ConfigureAwait(false);
+        await SendMessageImmediately(owned, Encoding.UTF8.GetBytes(configure.ToString())).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -313,9 +356,23 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
     /// <summary>
     /// Sends a Close message to Deepgram
     /// </summary>
-    public override async Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
+    public override Task SendClose(bool nullByte = false, CancellationTokenSource? _cancellationToken = null)
     {
-        if (_clientWebSocket == null || !IsConnected())
+        var owned = CurrentConnection;
+        if (owned == null)
+        {
+            Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
+            return Task.CompletedTask;
+        }
+        return SendClose(owned, nullByte, _cancellationToken);
+    }
+
+    /// <summary>
+    /// Sends the close message on one connection's socket only, never on a newer connection (#455).
+    /// </summary>
+    private protected override async Task SendClose(ConnectionState owned, bool nullByte, CancellationTokenSource? _cancellationToken)
+    {
+        if (!owned.IsOpen)
         {
             Log.Warning("SendClose", "ClientWebSocket is null or not connected. Skipping...");
             return;
@@ -324,64 +381,71 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         Log.Debug("SendClose", "Sending Close Message Immediately...");
         if (nullByte)
         {
-            // Snapshot the socket and use the teardown-safe token: a concurrent Stop()/Dispose()
-            // nulls both _clientWebSocket and _cancellationTokenSource outside _mutexSend, so
-            // dereferencing the raw fields after the await could throw NRE - which is not in Stop()'s
-            // benign catch set and would escape (#390). Mirrors SendBinaryImmediately/SendMessageImmediately.
-            var socket = _clientWebSocket;
-            if (socket == null || !IsConnected())
-            {
-                Log.Debug("SendClose", "WebSocket is not connected. Exiting...");
-                return;
-            }
-            var token = _cancellationToken?.Token ?? GetInternalCancellationToken();
-
             // send a close to Deepgram
-            await _mutexSend.WaitAsync(token);
-            try
-            {
-                await socket.SendAsync(new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, true, token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _mutexSend.Release();
-            }
+            var token = _cancellationToken?.Token ?? owned.Token;
+            await SendOnConnection(owned, new ArraySegment<byte>(new byte[1] { 0 }), WebSocketMessageType.Binary, token, allowStopping: true).ConfigureAwait(false);
             return;
         }
 
         ControlMessage message = new ControlMessage(Constants.CloseStream);
         byte[] data = Encoding.ASCII.GetBytes(message.ToString());
-        await SendMessageImmediately(data);
+        // The caller's token bounds the send, so Stop(token) keeps its timeout.
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
     }
     #endregion
 
-    internal async Task ProcessKeepAlive()
+    /// <summary>SendKeepAlive() for one connection: the keepalive loop sends on its own connection only (#455).</summary>
+    private async Task SendKeepAlive(ConnectionState owned)
+    {
+        Log.Debug("SendKeepAlive", "Sending KeepAlive Message Immediately...");
+        ControlMessage message = new ControlMessage(Constants.KeepAlive);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// SendFinalize() for one connection: the autoflush loop flushes and sends on its own connection
+    /// only, so it never waits on, or sends to, a newer connection (#455).
+    /// </summary>
+    internal async Task SendFinalize(ConnectionState owned)
+    {
+        // Flush any buffered audio first so Finalize can't overtake audio still in the send
+        // queue (Finalize is sent immediately and would otherwise race ahead). See #358.
+        Log.Debug("SendFinalize", "Flushing buffered audio before Finalize...");
+        await FlushConnection(owned).ConfigureAwait(false);
+
+        Log.Debug("SendFinalize", "Sending Finalize Message Immediately...");
+        ControlMessage message = new ControlMessage(Constants.Finalize);
+        byte[] data = Encoding.ASCII.GetBytes(message.ToString());
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, owned.Token).ConfigureAwait(false);
+    }
+
+    internal async Task ProcessKeepAlive(ConnectionState owned)
     {
         Log.Verbose("ListenWSClient.ProcessKeepAlive", "ENTER");
 
         try
         {
+            // Use the connection this loop was started for, never the fields, so it stops with that
+            // connection and never acts on a newer one (#390, #455).
+            var _cancelToken = owned.Token;
             while (true)
             {
-                // snapshot the token each iteration to avoid a teardown race (#390)
-                var _cancelToken = GetInternalCancellationToken();
-
                 Log.Verbose("ProcessKeepAlive", "Waiting for KeepAlive...");
-                await Task.Delay(5000, _cancelToken);
+                await Task.Delay(5000, _cancelToken).ConfigureAwait(false);
 
                 if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessKeepAlive", "KeepAliveThread cancelled");
                     break;
                 }
-                if (!IsConnected())
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;
                 }
 
-                await SendKeepAlive();
+                await SendKeepAlive(owned).ConfigureAwait(false);
             }
 
             Log.Verbose("ProcessKeepAlive", "Exit");
@@ -401,7 +465,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         }
     }
 
-    internal async Task ProcessAutoFlush()
+    internal async Task ProcessAutoFlush(ConnectionState owned)
     {
         Log.Verbose("ListenWSClient.ProcessAutoFlush", "ENTER");
 
@@ -409,20 +473,20 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
 
         try
         {
+            // Use the connection this loop was started for, never the fields, so it stops with that
+            // connection and never acts on a newer one (#390, #455).
+            var _cancelToken = owned.Token;
             while (true)
             {
-                // snapshot the token each iteration to avoid a teardown race (#390)
-                var _cancelToken = GetInternalCancellationToken();
-
                 Log.Verbose("ProcessAutoFlush", "Waiting for AutoFlush...");
-                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken);
+                await Task.Delay(Constants.DefaultFlushPeriodInMs, _cancelToken).ConfigureAwait(false);
 
                 if (_cancelToken.IsCancellationRequested)
                 {
                     Log.Information("ProcessAutoFlush", "ProcessAutoFlush cancelled");
                     break;
                 }
-                if (!IsConnected())
+                if (!owned.IsOpen || owned.IsStopping)
                 {
                     Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
                     break;
@@ -444,7 +508,7 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                         continue;
                     }
 
-                    await SendFinalize();
+                    await SendFinalize(owned).ConfigureAwait(false);
                     _lastReceived = null;
                 }
                 finally
