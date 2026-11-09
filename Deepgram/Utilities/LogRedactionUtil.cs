@@ -37,6 +37,8 @@ internal static class LogRedactionUtil
     private static readonly HashSet<string> SensitiveContainers = new(StringComparer.OrdinalIgnoreCase)
     {
         "headers",
+        "extra",
+        "tag",
     };
 
     /// <summary>
@@ -89,6 +91,8 @@ internal static class LogRedactionUtil
 
         try
         {
+            var builder = new UriBuilder(uri) { UserName = string.Empty, Password = string.Empty };
+            uri = builder.Uri;
             if (string.IsNullOrEmpty(uri.Query))
             {
                 return uri.ToString();
