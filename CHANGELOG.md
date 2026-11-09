@@ -5,7 +5,7 @@
 
 ### Features
 
-* add ConfigureClientWebSocket option for WebSocket clients ([ad6d7c9](https://github.com/deepgram/deepgram-dotnet-sdk/commit/ad6d7c9cb26093dc139327b7341eb969d8a56f06))
+* **websocket:** Add `DeepgramWsClientOptions.ConfigureClientWebSocket` to configure the underlying `ClientWebSocketOptions` before every connection on current Listen, Speak, Agent, Flux STT, and Flux TTS clients. This supports settings the SDK does not expose, including WebSocket ping/pong keep-alive settings; the callback runs after SDK headers and a thrown callback leaves the client reusable. Deprecated v1 WebSocket clients ignore the option. ([ad6d7c9](https://github.com/deepgram/deepgram-dotnet-sdk/commit/ad6d7c9cb26093dc139327b7341eb969d8a56f06))
 
 ## [7.2.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.2.0...7.2.1) (2026-10-30)
 
