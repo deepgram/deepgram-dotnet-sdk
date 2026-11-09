@@ -1,5 +1,13 @@
 # Changelog
 
+## [7.3.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.0...7.3.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* **websocket:** close retry and teardown gaps in the v2 WebSocket clients ([18c8e35](https://github.com/deepgram/deepgram-dotnet-sdk/commit/18c8e35ff4d5252813aea45d780a2cd79c0947aa))
+* **websocket:** rebase lifecycle cleanup on main ([46aecb6](https://github.com/deepgram/deepgram-dotnet-sdk/commit/46aecb67ee4ce252e4e20f773b89092f46a6dca5))
+
 ## [7.3.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.2.1...7.3.0) (2026-11-09)
 
 
