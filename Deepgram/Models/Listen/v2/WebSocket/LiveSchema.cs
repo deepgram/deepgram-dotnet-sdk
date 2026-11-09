@@ -59,7 +59,8 @@ public class LiveSchema
     public bool? DetectEntities { get; set; }
 
     /// <summary>
-    /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript. 
+    /// Diarize recognizes speaker changes and assigns a speaker to each word in the transcript.
+    /// Deprecated; use <see cref="DiarizeModel"/> instead.
     /// <see href="https://developers.deepgram.com/docs/diarization">
     /// default is false
     /// </summary>
