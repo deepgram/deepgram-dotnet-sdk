@@ -30,7 +30,7 @@ public record GoogleThinkProvider
     public string? Version { get; set; }
 
     /// <summary>
-    /// Google model to use, e.g. "gemini-2.0-flash", "gemini-2.0-flash-lite"
+    /// Google model to use.
     /// or "gemini-2.5-flash".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

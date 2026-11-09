@@ -747,7 +747,7 @@ Available providers:
 | Section | Types |
 | --- | --- |
 | `Listen` | `DeepgramListenProviderV1` (Nova), `DeepgramListenProviderV2` (Flux STT) |
-| `Think` | `AnthropicThinkProvider`, `AwsBedrockThinkProvider`, `GoogleThinkProvider`, `GroqThinkProvider`, `OpenAiThinkProvider` |
+| `Think` | `AnthropicThinkProvider`, `AwsBedrockThinkProvider`, `DeepgramThinkProvider`, `GoogleThinkProvider`, `GroqThinkProvider`, `OpenAiThinkProvider` |
 | `Speak` | `DeepgramSpeakProvider`, `AwsPollySpeakProvider`, `CartesiaSpeakProvider`, `ElevenLabsSpeakProvider`, `OpenAiSpeakProvider` |
 
 `AwsBedrockThinkProvider` and `AwsPollySpeakProvider` take an `AwsCredentials` block; set

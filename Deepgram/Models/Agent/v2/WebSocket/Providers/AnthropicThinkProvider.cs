@@ -27,7 +27,7 @@ public record AnthropicThinkProvider
     public string? Version { get; set; }
 
     /// <summary>
-    /// Anthropic model to use, e.g. "claude-3-5-haiku-latest" or
+    /// Anthropic model to use.
     /// "claude-sonnet-4-20250514".
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
