@@ -68,6 +68,7 @@ jobs:
     if: ${{ needs.release-please.outputs.release_created }}
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout release
         uses: actions/checkout@v4
@@ -87,10 +88,13 @@ jobs:
         env:
           RELEASE_TAG: ${{ needs.release-please.outputs.release_tag }}
         run: dotnet pack Deepgram.sln --configuration Release --no-build --output ./dist -p:Version="$RELEASE_TAG"
+      - name: Authenticate to NuGet
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: Publish packages
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push "./dist/*.nupkg" --source nuget.org --api-key "$NUGET_API_KEY" --skip-duplicate
+        run: dotnet nuget push "./dist/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --skip-duplicate
 
   context7:
     name: Update Context7 Documentation
