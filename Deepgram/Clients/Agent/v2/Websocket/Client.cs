@@ -80,9 +80,7 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         Dictionary<string, string>? headers = null)
     {
         Log.Verbose("AgentWSClient.Connect", "ENTER");
-        // Settings can carry provider credentials and endpoint auth headers, so it is
-        // redacted before logging. See LogRedactionUtil.
-        Log.Information("Connect", $"options:\n{LogRedactionUtil.SerializeRedacted(options)}");
+        Log.Information("Connect", $"Agent Settings: {options.Agent.Context?.Messages?.Count ?? 0} history entries");
         Log.Debug("Connect", $"addons: {addons}");
 
         try

@@ -86,6 +86,14 @@ public class AgentContextTests
     }
 
     [Test]
+    public void HistoryFunctionCall_Should_Omit_ClientSide_When_Unset()
+    {
+        var json = Serialize(new HistoryFunctionCall { Id = "c", Name = "n" });
+
+        json.TryGetProperty("client_side", out _).Should().BeFalse();
+    }
+
+    [Test]
     public void HistoryFunctionCall_Should_Carry_ThoughtSignature_When_Set()
     {
         var json = Serialize(new HistoryFunctionCall { Id = "c", Name = "n", ThoughtSignature = "sig" });
