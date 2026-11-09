@@ -91,6 +91,16 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                 return false;
             }
 
+            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                _lastReceived = null;
+            }
+            finally
+            {
+                _mutexLastDatagram.Release();
+            }
+
             if (_deepgramClientOptions.KeepAlive && owned != null)
             {
                 Log.Debug("Connect", "Starting KeepAlive Thread...");

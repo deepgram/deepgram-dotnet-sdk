@@ -90,6 +90,16 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                 return false;
             }
 
+            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                _lastReceived = null;
+            }
+            finally
+            {
+                _mutexLastDatagram.Release();
+            }
+
             if (_deepgramClientOptions.AutoFlushSpeakDelta > 0 && owned != null)
             {
                 Log.Debug("Connect", "Starting AutoFlush Thread...");
@@ -489,6 +499,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                 // the Flush() path (SendMessage -> IncrementFlushCount -> EnqueueSendMessage) takes
                 // _mutexLastDatagram or awaits. Once rebased on #456, this will call
                 // SendAutoFlush(owned) after an in-lock owned.IsOpen check, instead of Flush().
+                var shouldFlush = false;
                 await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
@@ -506,27 +517,19 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                         else
                         {
                             Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Flushing...");
-                            Flush();
+                            shouldFlush = owned.IsOpen;
                             _lastReceived = null;
                         }
                     }
-                    // Flush goes through the send queue on purpose, so it stays behind the queued
-                    // text. Enqueue it only while this loop's connection is still open; it is
-                    // tagged with that connection, so if the connection ends before it is sent, a
-                    // newer connection's sender drops it (#455).
-                    if (!owned.IsOpen)
-                    {
-                        Log.Debug("ProcessAutoFlush", "WebSocket is not connected. Exiting...");
-                        return;
-                    }
-
-                    Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {deltaTicks}. Skipping...");
-                    SendAutoFlush(owned);
-                    _lastReceived = null;
                 }
                 finally
                 {
                     _mutexLastDatagram.Release();
+                }
+
+                if (shouldFlush)
+                {
+                    SendAutoFlush(owned);
                 }
             }
 
