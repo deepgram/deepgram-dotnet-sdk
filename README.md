@@ -810,10 +810,8 @@ entry. `HistoryFunctionCall.ThoughtSignature` is only needed by some Gemini mode
 `Agent.Context` is not the same thing as `Flags.History`, which toggles whether the server reports
 `History` events back to you.
 
-Settings is logged on connect and `Library.Initialize()` writes `log.txt` by default, so seeded
-history — including function-call arguments and responses — is written to that log alongside the
-rest of the payload. Configure a quieter level or your own `ILoggerFactory` through
-`Library.Configure` if the conversation you are replaying should not reach disk.
+When the client connects, its log records only the number of seeded history entries. Conversation
+text and function-call details are not written to the default log.
 
 See `examples/agent/websocket/context`.
 
