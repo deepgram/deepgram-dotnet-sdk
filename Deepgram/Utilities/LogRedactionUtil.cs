@@ -27,6 +27,7 @@ internal static class LogRedactionUtil
         "access_key_id",
         "secret_access_key",
         "session_token",
+        "callback",
     };
 
     /// <summary>
@@ -39,6 +40,7 @@ internal static class LogRedactionUtil
         "headers",
         "extra",
         "tag",
+        "callback",
     };
 
     /// <summary>
@@ -182,6 +184,22 @@ internal static class LogRedactionUtil
                             container[headerName] = RedactedPlaceholder;
                         }
 
+                        continue;
+                    }
+
+                    if (SensitiveContainers.Contains(name) && value is JsonArray list)
+                    {
+                        for (var i = 0; i < list.Count; i++)
+                        {
+                            list[i] = RedactedPlaceholder;
+                        }
+
+                        continue;
+                    }
+
+                    if (SensitiveContainers.Contains(name) && value is JsonValue)
+                    {
+                        obj[name] = RedactedPlaceholder;
                         continue;
                     }
 

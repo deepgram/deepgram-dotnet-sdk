@@ -33,6 +33,10 @@ namespace Deepgram.Tests.UnitTests.ClientTests;
 public class ConnectLogRedactionTests
 {
     private const string Sentinel = "SENTINEL_CONNECT_LOG_do_not_log_6b2d";
+    private const string TagSecret = "TAGSECRET";
+    private const string ExtraSecret = "EXTRASECRET";
+    private const string CallbackPassword = "CBPASS";
+    private const string CallbackToken = "CBTOKEN";
 
     private RecordingLoggerProvider _provider = null!;
     private DeepgramWsClientOptions _options = null!;
@@ -180,6 +184,39 @@ public class ConnectLogRedactionTests
             redacted.Should().Contain("model=nova-3", "typed options must stay readable");
             redacted.Should().Contain("sample_rate=16000");
             redacted.Should().Contain("api.deepgram.com/v1/listen");
+        }
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Mask_Sensitive_Container_Scalars_And_Arrays()
+    {
+        var payloads = new object[]
+        {
+            new Dictionary<string, object> { ["tag"] = new List<string> { TagSecret } },
+            new Dictionary<string, object> { ["tag"] = TagSecret },
+            new Dictionary<string, object> { ["extra"] = new List<string> { ExtraSecret } },
+        };
+
+        foreach (var payload in payloads)
+        {
+            var serialized = LogRedactionUtil.SerializeRedacted(payload);
+
+            serialized.Should().NotContain(TagSecret).And.NotContain(ExtraSecret);
+        }
+    }
+
+    [Test]
+    public void Redaction_Should_Mask_Callback_Urls_In_Payloads_And_Connect_Urls()
+    {
+        var callback = $"https://user:{CallbackPassword}@example.com/hook?token={CallbackToken}";
+        var payload = LogRedactionUtil.SerializeRedacted(new Dictionary<string, string> { ["callback"] = callback });
+        var uri = LogRedactionUtil.RedactUri(new Uri($"wss://api.deepgram.com/v1/listen?callback={Uri.EscapeDataString(callback)}"));
+
+        using (new AssertionScope())
+        {
+            payload.Should().NotContain(CallbackPassword).And.NotContain(CallbackToken);
+            uri.Should().NotContain(CallbackPassword).And.NotContain(CallbackToken);
+            uri.Should().Contain($"callback={LogRedactionUtil.RedactedPlaceholder}");
         }
     }
 
