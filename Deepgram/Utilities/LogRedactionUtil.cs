@@ -20,7 +20,8 @@ internal static class LogRedactionUtil
     internal const string RedactedPlaceholder = "***REDACTED***";
 
     /// <summary>
-    /// Property names whose value is a credential wherever they appear.
+    /// Property names whose value is a credential wherever they appear. Matching is on the exact
+    /// name, case-insensitive, so lookalikes such as max_tokens or token_count stay readable.
     /// </summary>
     private static readonly HashSet<string> SensitiveKeys = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -28,6 +29,15 @@ internal static class LogRedactionUtil
         "secret_access_key",
         "session_token",
         "callback",
+        "access_token",
+        "api_key",
+        "apikey",
+        "x-api-key",
+        "token",
+        "authorization",
+        "password",
+        "client_secret",
+        "secret",
     };
 
     /// <summary>
@@ -171,7 +181,8 @@ internal static class LogRedactionUtil
                         continue;
                     }
 
-                    if (SensitiveKeys.Contains(name) && value is JsonValue)
+                    // Whatever shape the value has (string, object, array), the whole node is replaced.
+                    if (SensitiveKeys.Contains(name) && value is not null)
                     {
                         obj[name] = RedactedPlaceholder;
                         continue;

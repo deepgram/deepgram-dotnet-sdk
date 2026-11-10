@@ -220,6 +220,116 @@ public class ConnectLogRedactionTests
         }
     }
 
+    private static readonly string[] CredentialNames =
+    {
+        "access_token", "api_key", "apikey", "token", "authorization", "password",
+        "x-api-key", "client_secret", "secret",
+    };
+
+    [Test]
+    public void RedactUri_Should_Mask_Credential_Named_Query_Parameters_In_Any_Case()
+    {
+        foreach (var name in CredentialNames)
+        {
+            foreach (var variant in new[] { name, name.ToUpperInvariant(), char.ToUpperInvariant(name[0]) + name.Substring(1) })
+            {
+                var uri = LogRedactionUtil.RedactUri(
+                    new Uri($"wss://api.deepgram.com/v1/listen?model=nova-3&{variant}={Sentinel}&sample_rate=16000"));
+
+                using (new AssertionScope())
+                {
+                    uri.Should().NotContain(Sentinel, $"{variant} is a credential name");
+                    uri.Should().Contain($"{variant}={LogRedactionUtil.RedactedPlaceholder}");
+                    uri.Should().Contain("model=nova-3").And.Contain("sample_rate=16000");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void RedactUri_Should_Keep_Lookalike_Query_Parameters_Readable()
+    {
+        var uri = LogRedactionUtil.RedactUri(
+            new Uri("wss://api.deepgram.com/v1/listen?max_tokens=50&token_count=3&keywords=secretary&endpointing=300"));
+
+        uri.Should().Contain("max_tokens=50").And.Contain("token_count=3")
+            .And.Contain("keywords=secretary").And.Contain("endpointing=300");
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Mask_Credential_Named_Keys_At_Top_Level_And_Nested()
+    {
+        foreach (var name in CredentialNames)
+        {
+            foreach (var variant in new[] { name, name.ToUpperInvariant() })
+            {
+                var payload = new Dictionary<string, object>
+                {
+                    [variant] = Sentinel,
+                    ["model"] = "nova-3",
+                    ["nested"] = new Dictionary<string, object> { [variant] = Sentinel, ["language"] = "en" },
+                    ["list"] = new List<object> { new Dictionary<string, object> { [variant] = Sentinel } },
+                };
+
+                var serialized = LogRedactionUtil.SerializeRedacted(payload);
+
+                using (new AssertionScope())
+                {
+                    serialized.Should().NotContain(Sentinel, $"{variant} is a credential name");
+                    serialized.Should().Contain("nova-3").And.Contain("language");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Mask_Object_And_Array_Values_Of_Credential_Names()
+    {
+        foreach (var name in CredentialNames)
+        {
+            var objectValue = LogRedactionUtil.SerializeRedacted(
+                new Dictionary<string, object> { [name] = new Dictionary<string, object> { ["v"] = Sentinel } });
+            var arrayValue = LogRedactionUtil.SerializeRedacted(
+                new Dictionary<string, object> { [name] = new List<object> { Sentinel, new Dictionary<string, object> { ["v"] = Sentinel } } });
+
+            using (new AssertionScope())
+            {
+                objectValue.Should().NotContain(Sentinel, $"{name} with an object value");
+                arrayValue.Should().NotContain(Sentinel, $"{name} with an array value");
+            }
+        }
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Keep_Lookalike_Keys_Readable()
+    {
+        var serialized = LogRedactionUtil.SerializeRedacted(new Dictionary<string, object>
+        {
+            ["max_tokens"] = 50,
+            ["token_count"] = 3,
+            ["secretary"] = "kept",
+            ["model"] = "nova-3",
+        });
+
+        var parsed = System.Text.Json.Nodes.JsonNode.Parse(serialized)!;
+
+        using (new AssertionScope())
+        {
+            ((int)parsed["max_tokens"]!).Should().Be(50);
+            ((int)parsed["token_count"]!).Should().Be(3);
+            ((string)parsed["secretary"]!).Should().Be("kept");
+            ((string)parsed["model"]!).Should().Be("nova-3");
+        }
+    }
+
+    [Test]
+    public void SerializeRedacted_Should_Keep_Typed_Options_Readable()
+    {
+        var serialized = LogRedactionUtil.SerializeRedacted(new ListenSchema { Model = "flux-general-en", SampleRate = 16000 });
+
+        serialized.Should().Contain("flux-general-en").And.Contain("16000");
+    }
+
     [Test]
     public void RedactUri_Should_Leave_A_Query_Free_Url_Untouched()
     {
