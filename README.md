@@ -810,8 +810,8 @@ entry. `HistoryFunctionCall.ThoughtSignature` is only needed by some Gemini mode
 `Agent.Context` is not the same thing as `Flags.History`, which toggles whether the server reports
 `History` events back to you.
 
-When the client connects, its log records only the number of seeded history entries. Conversation
-text and function-call details are not written to the default log.
+When the client connects, its log retains safe provider configuration for diagnostics while redacting
+the entire context, including conversation text and function-call arguments and responses.
 
 See `examples/agent/websocket/context`.
 
