@@ -30,6 +30,8 @@ public class AgentCredentialLoggingTests
     private const string SecretKeySentinel = "SENTINEL_SECRET_KEY_do_not_log_8c2e";
     private const string SessionTokenSentinel = "SENTINEL_SESSION_TOKEN_do_not_log_5d9b";
     private const string EndpointHeaderSentinel = "SENTINEL_BEARER_do_not_log_1f4c";
+    private const string PromptSentinel = "SENTINEL_PROMPT_do_not_log_2e6c";
+    private const string GreetingSentinel = "SENTINEL_GREETING_do_not_log_7d3a";
 
     private static readonly string[] CredentialSentinels =
     {
@@ -161,6 +163,34 @@ public class AgentCredentialLoggingTests
         {
             logged.Should().Contain("flux-general-en");
             logged.Should().NotContain(LogRedactionUtil.RedactedPlaceholder);
+        }
+    }
+
+    [Test]
+    public async Task Connect_Should_Not_Log_Prompt_Or_Greeting_At_Any_Level()
+    {
+        var options = new DeepgramWsClientOptions("a-key", "ws://127.0.0.1:1", keepAlive: false, onPrem: true);
+        var client = new AgentWebSocketClient("a-key", options);
+        var settings = new SettingsSchema();
+        settings.Agent.Think = new Think { Prompt = PromptSentinel };
+        settings.Agent.Greeting = GreetingSentinel;
+
+        try
+        {
+            await client.Connect(settings);
+        }
+        catch (Exception)
+        {
+            // Connection failure is expected; the options log line is the subject.
+        }
+
+        var logged = string.Join("\n", _provider.Entries.Select(e => e.Message));
+
+        using (new AssertionScope())
+        {
+            logged.Should().NotContain(PromptSentinel);
+            logged.Should().NotContain(GreetingSentinel);
+            logged.Should().Contain(LogRedactionUtil.RedactedPlaceholder);
         }
     }
 
