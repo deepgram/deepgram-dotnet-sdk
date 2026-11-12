@@ -10,8 +10,8 @@ namespace Deepgram.Utilities;
 /// Masks credential-bearing fields before a payload is written to the log.
 ///
 /// The Voice Agent Settings payload is the one connect payload that carries secrets: provider
-/// credentials (AWS access keys and STS session tokens), per-provider endpoint headers, and seeded
-/// conversation context. Settings is logged on connect, and
+/// credentials (AWS access keys and STS session tokens), per-provider endpoint headers, and caller
+/// conversation content. Settings is logged on connect, and
 /// <see cref="Library.Initialize(Logger.LogLevel, string?)"/> writes log.txt by default, so an
 /// unredacted payload puts secrets and conversation content on disk.
 /// </summary>
@@ -60,6 +60,8 @@ internal static class LogRedactionUtil
     private static readonly HashSet<string> SensitivePayloads = new(StringComparer.OrdinalIgnoreCase)
     {
         "context",
+        "prompt",
+        "greeting",
     };
 
     /// <summary>
