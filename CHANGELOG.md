@@ -1,5 +1,19 @@
 # Changelog
 
+## [7.4.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.1...7.4.0) (2026-11-12)
+
+
+### Features
+
+* **agent:** Add typed Listen, Think, and Speak provider settings to Voice Agent configuration. ([d44f2e4](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d44f2e47f765e79d55b9f1a13961cf34517d9747))
+* **agent:** Add optional conversation context to Voice Agent settings so callers can provide session context at startup. ([a58fa16](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a58fa16172a9ff2993c6344eb1415b521dbad0f7))
+
+
+### Bug Fixes
+
+* **agent:** Redact conversation context from settings logs and omit the field when no client-side context is configured. ([a58fa16](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a58fa16172a9ff2993c6344eb1415b521dbad0f7))
+* **websocket:** Redact API keys, bearer tokens, callback values, and sensitive connection options from WebSocket connect logs across all current clients. ([488a669](https://github.com/deepgram/deepgram-dotnet-sdk/commit/488a669e19f33482cd065dea22d0c25b3a7e7cd5))
+
 ## [7.3.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.0...7.3.1) (2026-11-09)
 
 
