@@ -1,5 +1,25 @@
 # Changelog
 
+## [7.4.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.1...7.4.0) (2026-11-12)
+
+
+### Features
+
+* **agent:** add conversation context to Settings ([a58fa16](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a58fa16172a9ff2993c6344eb1415b521dbad0f7))
+* **agent:** add conversation context to Settings ([fa80b62](https://github.com/deepgram/deepgram-dotnet-sdk/commit/fa80b62de822f7868a64ab0b08a1d9bfa5b110dc))
+* **agent:** add typed listen, think and speak providers ([d44f2e4](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d44f2e47f765e79d55b9f1a13961cf34517d9747))
+
+
+### Bug Fixes
+
+* **agent:** redact context and omit unset client side ([3e91e67](https://github.com/deepgram/deepgram-dotnet-sdk/commit/3e91e677bb00b96ce9ac909347b582617f2a7598))
+* **agent:** redact seeded context in settings logs ([11e331f](https://github.com/deepgram/deepgram-dotnet-sdk/commit/11e331fcac17933e8059409282f6e9337db1f81a))
+* **websocket:** mask credential-named keys and query parameters in connect logs ([89f3033](https://github.com/deepgram/deepgram-dotnet-sdk/commit/89f3033e8a52c3f4b981fa8df0c5e8942f3243a8))
+* **websocket:** redact callback values in connect logs ([e59f345](https://github.com/deepgram/deepgram-dotnet-sdk/commit/e59f345f3ea69285fe5567788978597ebbec9987))
+* **websocket:** redact connect logs across every client ([e084914](https://github.com/deepgram/deepgram-dotnet-sdk/commit/e084914c0be7bf4d899ac1b5c089b237c6b38354))
+* **websocket:** redact free-form connect options ([8883ce7](https://github.com/deepgram/deepgram-dotnet-sdk/commit/8883ce79a5cd3e6e6c7c10840ae8ae8481b1e45d))
+* **websocket:** redact secrets in WebSocket connect logs ([488a669](https://github.com/deepgram/deepgram-dotnet-sdk/commit/488a669e19f33482cd065dea22d0c25b3a7e7cd5))
+
 ## [7.3.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.0...7.3.1) (2026-11-09)
 
 
