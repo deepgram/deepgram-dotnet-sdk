@@ -153,6 +153,7 @@ public record HistoryFunctionCall
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("client_side")]
     public bool? ClientSide { get; set; }
 

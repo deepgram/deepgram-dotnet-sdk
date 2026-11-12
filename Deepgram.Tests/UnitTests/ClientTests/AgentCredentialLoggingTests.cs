@@ -230,6 +230,45 @@ public class AgentCredentialLoggingTests
     }
 
     [Test]
+    public void SerializeRedacted_Should_Mask_Seeded_Context_While_Keeping_Provider_Diagnostics()
+    {
+        const string ConversationSentinel = "SENTINEL_CONVERSATION_do_not_log_4b8e";
+        const string ArgumentsSentinel = "SENTINEL_ARGUMENTS_do_not_log_9c1d";
+        const string ResponseSentinel = "SENTINEL_RESPONSE_do_not_log_7e2a";
+
+        var settings = new SettingsSchema();
+        settings.Agent.Listen = new Listen { Provider = new DeepgramListenProviderV2 { Model = "flux-general-en" } };
+        settings.Agent.Context = new AgentContext
+        {
+            Messages = new List<AgentHistoryMessage>
+            {
+                AgentHistoryMessage.FromConversation("user", ConversationSentinel),
+                AgentHistoryMessage.FromFunctionCalls(new[]
+                {
+                    new HistoryFunctionCall
+                    {
+                        Id = "call-1",
+                        Name = "lookup",
+                        Arguments = ArgumentsSentinel,
+                        Response = ResponseSentinel,
+                    },
+                }),
+            },
+        };
+
+        var json = LogRedactionUtil.SerializeRedacted(settings);
+
+        using (new AssertionScope())
+        {
+            json.Should().NotContain(ConversationSentinel)
+                .And.NotContain(ArgumentsSentinel)
+                .And.NotContain(ResponseSentinel);
+            json.Should().Contain("flux-general-en", "safe provider diagnostics must survive");
+            json.Should().Contain(LogRedactionUtil.RedactedPlaceholder);
+        }
+    }
+
+    [Test]
     public void SerializeRedacted_Should_Reach_Credentials_Inside_The_SpeakProviders_Array()
     {
         // The fallback-provider list nests endpoints one array deep. A walker that only

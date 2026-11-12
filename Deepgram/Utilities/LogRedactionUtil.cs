@@ -10,10 +10,10 @@ namespace Deepgram.Utilities;
 /// Masks credential-bearing fields before a payload is written to the log.
 ///
 /// The Voice Agent Settings payload is the one connect payload that carries secrets: provider
-/// credentials (AWS access keys and STS session tokens) and per-provider endpoint headers, which
-/// is where a third-party bearer token for OpenAI, Anthropic or ElevenLabs is supplied. Settings
-/// is logged on connect, and <see cref="Library.Initialize(Logger.LogLevel, string?)"/> writes
-/// log.txt by default, so an unredacted payload puts those secrets on disk.
+/// credentials (AWS access keys and STS session tokens), per-provider endpoint headers, and seeded
+/// conversation context. Settings is logged on connect, and
+/// <see cref="Library.Initialize(Logger.LogLevel, string?)"/> writes log.txt by default, so an
+/// unredacted payload puts secrets and conversation content on disk.
 /// </summary>
 internal static class LogRedactionUtil
 {
@@ -37,6 +37,15 @@ internal static class LogRedactionUtil
     private static readonly HashSet<string> SensitiveContainers = new(StringComparer.OrdinalIgnoreCase)
     {
         "headers",
+    };
+
+    /// <summary>
+    /// Property names whose entire payload is caller-supplied and should not be logged. Unlike
+    /// headers, these have no diagnostic substructure worth retaining.
+    /// </summary>
+    private static readonly HashSet<string> SensitivePayloads = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "context",
     };
 
     /// <summary>
@@ -79,6 +88,12 @@ internal static class LogRedactionUtil
                 foreach (var name in obj.Select(property => property.Key).ToList())
                 {
                     var value = obj[name];
+
+                    if (SensitivePayloads.Contains(name))
+                    {
+                        obj[name] = RedactedPlaceholder;
+                        continue;
+                    }
 
                     if (SensitiveKeys.Contains(name) && value is JsonValue)
                     {
