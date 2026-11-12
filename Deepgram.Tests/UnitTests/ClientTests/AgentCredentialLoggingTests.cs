@@ -184,13 +184,19 @@ public class AgentCredentialLoggingTests
             // Connection failure is expected; the options log line is the subject.
         }
 
-        var logged = string.Join("\n", _provider.Entries.Select(e => e.Message));
+        var entries = _provider.Entries.ToArray();
+        var logged = string.Join("\n", entries.Select(e => e.Message));
+        var informationOptions = entries.Single(e =>
+            e.Level == MelLogLevel.Information && e.Message.StartsWith("options:\n", StringComparison.Ordinal)).Message;
 
         using (new AssertionScope())
         {
             logged.Should().NotContain(PromptSentinel);
             logged.Should().NotContain(GreetingSentinel);
             logged.Should().Contain(LogRedactionUtil.RedactedPlaceholder);
+            informationOptions.Should().NotContain(PromptSentinel);
+            informationOptions.Should().NotContain(GreetingSentinel);
+            informationOptions.Should().Contain(LogRedactionUtil.RedactedPlaceholder);
         }
     }
 
