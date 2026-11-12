@@ -64,13 +64,15 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         Dictionary<string, string>? headers = null)
     {
         Log.Verbose("SpeakWSClient.Connect", "ENTER");
-        Log.Information("Connect", $"options:\n{JsonSerializer.Serialize(options, JsonSerializeOptions.DefaultOptions)}");
+        // Connect payloads are redacted before logging so a credential-bearing field
+        // can never reach log.txt. See LogRedactionUtil.
+        Log.Information("Connect", $"options:\n{LogRedactionUtil.SerializeRedacted(options)}");
         Log.Debug("Connect", $"addons: {addons}");
 
         try
         {
             var myURI = GetUri(_deepgramClientOptions, options, addons);
-            Log.Debug("Connect", $"uri: {myURI}");
+            Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(myURI)}");
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() runs
             // its post-connect work, so this call does none (#455).

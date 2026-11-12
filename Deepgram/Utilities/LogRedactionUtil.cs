@@ -20,13 +20,24 @@ internal static class LogRedactionUtil
     internal const string RedactedPlaceholder = "***REDACTED***";
 
     /// <summary>
-    /// Property names whose value is a credential wherever they appear.
+    /// Property names whose value is a credential wherever they appear. Matching is on the exact
+    /// name, case-insensitive, so lookalikes such as max_tokens or token_count stay readable.
     /// </summary>
     private static readonly HashSet<string> SensitiveKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "access_key_id",
         "secret_access_key",
         "session_token",
+        "callback",
+        "access_token",
+        "api_key",
+        "apikey",
+        "x-api-key",
+        "token",
+        "authorization",
+        "password",
+        "client_secret",
+        "secret",
     };
 
     /// <summary>
@@ -37,6 +48,9 @@ internal static class LogRedactionUtil
     private static readonly HashSet<string> SensitiveContainers = new(StringComparer.OrdinalIgnoreCase)
     {
         "headers",
+        "extra",
+        "tag",
+        "callback",
     };
 
     /// <summary>
@@ -47,6 +61,78 @@ internal static class LogRedactionUtil
     {
         "context",
     };
+
+    /// <summary>
+    /// String overload of <see cref="RedactUri(Uri)"/> for call sites that hold the URL as text.
+    /// A value that does not parse as an absolute URI is returned masked rather than raw.
+    /// </summary>
+    public static string RedactUri(string? uri)
+    {
+        if (string.IsNullOrEmpty(uri))
+        {
+            return "null";
+        }
+
+        return Uri.TryCreate(uri, UriKind.Absolute, out var parsed)
+            ? RedactUri(parsed)
+            : "<unparsable uri, redacted>";
+    }
+
+    /// <summary>
+    /// Query parameters whose value is free-form caller content. A caller can put anything in
+    /// them, including a secret, and nothing in the name signals that — so their values are
+    /// masked in logged URLs while every typed Deepgram option stays visible.
+    /// </summary>
+    private static readonly HashSet<string> FreeFormQueryParameters = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "extra",
+        "tag",
+    };
+
+    /// <summary>
+    /// Returns <paramref name="uri"/> with the values of free-form and credential-bearing query
+    /// parameters masked. Typed options such as model or sample_rate stay readable, so the logged
+    /// URL is still useful for confirming what reached the wire.
+    /// </summary>
+    public static string RedactUri(Uri? uri)
+    {
+        if (uri is null)
+        {
+            return "null";
+        }
+
+        try
+        {
+            var builder = new UriBuilder(uri) { UserName = string.Empty, Password = string.Empty };
+            uri = builder.Uri;
+            if (string.IsNullOrEmpty(uri.Query))
+            {
+                return uri.ToString();
+            }
+
+            var parts = uri.Query.TrimStart('?').Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+            var rebuilt = parts.Select(part =>
+            {
+                var separator = part.IndexOf('=');
+                if (separator < 0)
+                {
+                    return part;
+                }
+
+                var name = Uri.UnescapeDataString(part.Substring(0, separator));
+                return FreeFormQueryParameters.Contains(name) || SensitiveKeys.Contains(name)
+                    ? $"{part.Substring(0, separator)}={RedactedPlaceholder}"
+                    : part;
+            });
+
+            return $"{uri.GetLeftPart(UriPartial.Path)}?{string.Join("&", rebuilt)}";
+        }
+        catch (Exception)
+        {
+            // Never risk emitting an unredacted URL because parsing went wrong.
+            return "<unparsable uri, redacted>";
+        }
+    }
 
     /// <summary>
     /// Serializes <paramref name="payload"/> and returns it with every credential-bearing value
@@ -95,7 +181,8 @@ internal static class LogRedactionUtil
                         continue;
                     }
 
-                    if (SensitiveKeys.Contains(name) && value is JsonValue)
+                    // Whatever shape the value has (string, object, array), the whole node is replaced.
+                    if (SensitiveKeys.Contains(name) && value is not null)
                     {
                         obj[name] = RedactedPlaceholder;
                         continue;
@@ -108,6 +195,22 @@ internal static class LogRedactionUtil
                             container[headerName] = RedactedPlaceholder;
                         }
 
+                        continue;
+                    }
+
+                    if (SensitiveContainers.Contains(name) && value is JsonArray list)
+                    {
+                        for (var i = 0; i < list.Count; i++)
+                        {
+                            list[i] = RedactedPlaceholder;
+                        }
+
+                        continue;
+                    }
+
+                    if (SensitiveContainers.Contains(name) && value is JsonValue)
+                    {
+                        obj[name] = RedactedPlaceholder;
                         continue;
                     }
 
