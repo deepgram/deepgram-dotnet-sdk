@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.4.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.4.0...7.4.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **agent:** redact prompt and greeting from settings logs ([0066fa7](https://github.com/deepgram/deepgram-dotnet-sdk/commit/0066fa7311f8a1686b44fade72108357072b6241))
+
 ## [7.4.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.1...7.4.0) (2026-11-12)
 
 
