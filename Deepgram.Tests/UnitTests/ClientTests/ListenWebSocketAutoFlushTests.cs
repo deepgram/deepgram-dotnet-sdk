@@ -209,7 +209,7 @@ public class ListenWebSocketAutoFlushTests
         {
             AutoFlushReplyDelta = 1,
         };
-        using var client = new ListenWebSocketClient("test-api-key", options);
+        using var client = new ExposedListenClient("test-api-key", options);
         var interimHandled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
         {
@@ -223,6 +223,7 @@ public class ListenWebSocketAutoFlushTests
         {
             (await client.Connect(new LiveSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
             var connectionA = await server.WaitForConnectionAsync(1).WaitAsync(WaitTimeout);
+            var stateA = client.Current!;
             await connectionA.SendTextAsync(InterimResults);
             await interimHandled.Task.WaitAsync(WaitTimeout);
             client.LastReceivedTimestamp.Should().NotBeNull("the interim result must arm autoflush on connection A");
@@ -233,6 +234,13 @@ public class ListenWebSocketAutoFlushTests
             client.OnAutoFlushProcessed = finalized => autoFlush.TrySetResult(finalized);
             (await client.Connect(new LiveSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
             await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            var stalePayload = Encoding.UTF8.GetBytes(InterimResults);
+            using var staleFrame = new MemoryStream(stalePayload);
+            client.ProcessDataReceived(
+                stateA,
+                new WebSocketReceiveResult(stalePayload.Length, WebSocketMessageType.Text, true),
+                staleFrame);
+            client.LastReceivedTimestamp.Should().BeNull("a frame from connection A must not arm autoflush on connection B");
             (await autoFlush.Task.WaitAsync(WaitTimeout)).Should().BeFalse(
                 "an interim result from connection A must not schedule a Finalize on connection B");
         }
@@ -240,6 +248,13 @@ public class ListenWebSocketAutoFlushTests
         {
             await client.Stop().WaitAsync(WaitTimeout);
         }
+    }
+
+    private sealed class ExposedListenClient : ListenWebSocketClient
+    {
+        public ExposedListenClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public ConnectionState? Current => CurrentConnection;
     }
 
     /// <summary>

@@ -1411,7 +1411,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                         {
                             Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
                         }
-                        ProcessDataReceived(result, ms);
+                        ProcessDataReceived(owned, result, ms);
                     }
                 }
 
@@ -1514,6 +1514,21 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             ProcessTextMessage(result, ms);
         }
+    }
+
+    /// <summary>
+    /// Dispatches a frame received on one connection. A frame already read when that connection
+    /// stops must not update state or raise events for a newer connection.
+    /// </summary>
+    internal virtual void ProcessDataReceived(ConnectionState owned, WebSocketReceiveResult result, MemoryStream ms)
+    {
+        if (!ReferenceEquals(CurrentConnection, owned) || owned.IsStopping || owned.IsReleased)
+        {
+            Log.Debug("ProcessDataReceived", "Dropping a frame from a stale connection.");
+            return;
+        }
+
+        ProcessDataReceived(result, ms);
     }
 
     internal virtual void ProcessBinaryMessage(WebSocketReceiveResult result, MemoryStream ms)
