@@ -57,6 +57,8 @@ public class RequestResponseFieldTests
     public void Current_Response_Fields_Should_Deserialize()
     {
         var metadata = JsonSerializer.Deserialize<ListenMetadata>("""{"diarize_info":{"model_uuid":"model-uuid","arch":"v2"},"tags":["release","dotnet-sdk"]}""");
+        var multilingualAlternative = JsonSerializer.Deserialize<Deepgram.Models.Listen.v1.REST.Alternative>(
+            """{"transcript":"Hello","languages":["en"],"languages_hinted":["en","es"]}""");
         var project = JsonSerializer.Deserialize<ProjectResponse>("""{"mip_opt_out":true}""");
         var request = JsonSerializer.Deserialize<UsageRequest>("""{"code":429,"deployment":"self-hosted"}""");
         var balance = JsonSerializer.Deserialize<BalanceResponse>("""{"purchase_order_id":"po-123","purchase":"legacy"}""");
@@ -66,6 +68,8 @@ public class RequestResponseFieldTests
             metadata!.DiarizeInfo!.ModelUuid.Should().Be("model-uuid");
             metadata.DiarizeInfo.Arch.Should().Be("v2");
             metadata.Tags.Should().Equal("release", "dotnet-sdk");
+            multilingualAlternative!.Languages.Should().Equal("en");
+            multilingualAlternative.LanguagesHinted.Should().Equal("en", "es");
             project!.MipOptOut.Should().BeTrue();
             request!.Code.Should().Be(429d);
             request.Deployment.Should().Be("self-hosted");

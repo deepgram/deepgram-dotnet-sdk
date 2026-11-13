@@ -34,7 +34,13 @@ namespace SampleApp
                 // Start the connection
                 var liveSchema = new LiveSchema()
                 {
-                    Model = "nova-2",
+                    // Nova-3 multilingual accepts one or more language hints. Each hint is sent
+                    // as a repeated language_hint query parameter.
+                    Model = "nova-3",
+                    Language = "multi",
+                    LanguageHint = new List<string> { "en", "es" },
+                    // Redacts supplied keyterms and other user text from usage records only.
+                    RedactUsage = true,
                     Punctuate = true,
                     SmartFormat = true,
                 };
