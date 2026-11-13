@@ -54,4 +54,59 @@ public class ListenWebSocketConnectValidationTests
 
         await act.Should().ThrowAsync<DeepgramException>().WithMessage("*Nova 3*");
     }
+
+    [Test]
+    public async Task Connect_With_LanguageHint_And_Without_A_Model_Should_Not_Throw_NullReferenceException()
+    {
+        var client = NewClient();
+
+        Func<Task> act = async () => await client.Connect(new LiveSchema { LanguageHint = new List<string> { "en" } });
+
+        await act.Should().NotThrowAsync<NullReferenceException>(
+            "the language hint check must skip an unset model instead of dereferencing it");
+    }
+
+    [Test]
+    public async Task Connect_With_LanguageHint_And_A_Non_Nova3_Model_Should_Throw_DeepgramException()
+    {
+        var client = NewClient();
+
+        Func<Task> act = async () => await client.Connect(new LiveSchema
+        {
+            Model = "nova-2",
+            Language = "multi",
+            LanguageHint = new List<string> { "en" },
+        });
+
+        await act.Should().ThrowAsync<DeepgramException>().WithMessage("*LanguageHint*");
+    }
+
+    [Test]
+    public async Task Connect_With_LanguageHint_And_Without_Multilingual_Language_Should_Throw_DeepgramException()
+    {
+        var client = NewClient();
+
+        Func<Task> act = async () => await client.Connect(new LiveSchema
+        {
+            Model = "nova-3",
+            LanguageHint = new List<string> { "en" },
+        });
+
+        await act.Should().ThrowAsync<DeepgramException>().WithMessage("*LanguageHint*");
+    }
+
+    [Test]
+    public async Task Connect_With_LanguageHint_And_Nova3_Multi_Should_Not_Throw_DeepgramException()
+    {
+        var client = NewClient();
+
+        Func<Task> act = async () => await client.Connect(new LiveSchema
+        {
+            Model = "nova-3",
+            Language = "multi",
+            LanguageHint = new List<string> { "en", "es" },
+        });
+
+        await act.Should().NotThrowAsync<DeepgramException>();
+    }
 }

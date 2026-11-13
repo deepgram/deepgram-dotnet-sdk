@@ -79,6 +79,10 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         {
             throw new DeepgramException("Keyterm is only supported in Nova 3 models.");
         }
+        if (options.LanguageHint?.Count > 0 && (options.Model is null || !options.Model.StartsWith("nova-3") || options.Language != "multi"))
+        {
+            throw new DeepgramException("LanguageHint is only supported with Model=\"nova-3\" and Language=\"multi\".");
+        }
         Log.Verbose("ListenWSClient.Connect", "ENTER");
         // Connect payloads are redacted before logging so a credential-bearing field
         // can never reach log.txt. See LogRedactionUtil.

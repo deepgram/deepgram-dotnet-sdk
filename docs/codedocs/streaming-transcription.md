@@ -19,7 +19,7 @@ Live transcription needs stateful connection management that a REST request cann
 
 ## How it works internally
 
-`ListenWebSocketClient` inherits the current implementation from `Deepgram.Clients.Listen.v2.WebSocket.Client`. `Connect(LiveSchema, ...)` first checks one notable invariant in `Client.cs`: if the model does not start with `nova-3` and you set `Keyterm`, the method throws `DeepgramException`, because keyterm prompting is restricted to Nova 3 models in this implementation.
+`ListenWebSocketClient` inherits the current implementation from `Deepgram.Clients.Listen.v2.WebSocket.Client`. `Connect(LiveSchema, ...)` first checks two notable invariants in `Client.cs`: if the model does not start with `nova-3` and you set `Keyterm`, or if you set `LanguageHint` without both `Model = "nova-3"` and `Language = "multi"`, the method throws `DeepgramException`, because both are restricted to Nova-3 multilingual streaming in this implementation.
 
 For Nova-3 multilingual connections, use `Language = "multi"` and populate
 `LanguageHint`; each item becomes a separate `language_hint` URL parameter. Use
