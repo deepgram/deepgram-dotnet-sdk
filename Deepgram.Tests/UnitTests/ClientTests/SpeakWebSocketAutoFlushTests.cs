@@ -122,6 +122,53 @@ public class SpeakWebSocketAutoFlushTests
     }
 
     [Test]
+    public async Task SpeakClient_Queued_While_Stopping_Should_Not_AutoFlush_After_Reconnect()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var options = new DeepgramWsClientOptions(
+            apiKey: "test-api-key",
+            baseAddress: server.Endpoint,
+            onPrem: true)
+        {
+            AutoFlushSpeakDelta = 1,
+        };
+        using var client = new ExposedSpeakClient("test-api-key", options);
+        var sendLock = client.SendLock;
+        var lockHeld = false;
+
+        try
+        {
+            (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            lockHeld = sendLock.Wait(WaitTimeout);
+            lockHeld.Should().BeTrue();
+
+            var stop = client.Stop();
+            SpinWait.SpinUntil(() => client.IsCurrentConnectionStopping, WaitTimeout).Should().BeTrue(
+                "Stop must mark connection A as stopping before a later Speak is queued");
+            client.SpeakWithText("queued while stopping");
+
+            sendLock.Release();
+            lockHeld = false;
+            await stop.WaitAsync(WaitTimeout);
+
+            (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            var connection = await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            var frame = connection.ReadFrameAsync();
+            (await Task.WhenAny(frame, Task.Delay(TimeSpan.FromSeconds(1)))).Should().NotBe(frame,
+                "a Speak discarded while connection A stops must not schedule a Flush on connection B");
+        }
+        finally
+        {
+            if (lockHeld)
+            {
+                sendLock.Release();
+            }
+
+            await client.Stop().WaitAsync(WaitTimeout);
+        }
+    }
+
+    [Test]
     public void SpeakWebSocketClient_AutoFlush_Conversions_Should_Clamp_Instead_Of_Overflowing()
     {
         // The threshold is computed outside ProcessAutoFlush's try on a fire-and-forget task, so
@@ -314,6 +361,13 @@ public class SpeakWebSocketAutoFlushTests
             // on that lock; bound the cleanup so the failure is reported instead of hanging the run.
             await client.Stop().WaitAsync(WaitTimeout);
         }
+    }
+
+    private sealed class ExposedSpeakClient : SpeakWebSocketClient
+    {
+        public ExposedSpeakClient(string apiKey, DeepgramWsClientOptions options) : base(apiKey, options) { }
+
+        public bool IsCurrentConnectionStopping => CurrentConnection?.IsStopping == true;
     }
 
     /// <summary>

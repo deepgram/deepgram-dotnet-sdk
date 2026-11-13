@@ -765,8 +765,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             try
             {
                 _lastReceived = now;
-                var current = CurrentConnection;
-                _lastReceivedConnection = current is { IsOpen: true, IsStopping: false } ? current : null;
+                _lastReceivedConnection = CurrentConnection;
                 EnqueueSendMessage(speak);
                 OnSpeakEnqueued?.Invoke();
             }
