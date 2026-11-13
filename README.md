@@ -1018,6 +1018,8 @@ var speakSchema = new SpeakSchema()
     Model = "aura-2-thalia-en",
     Encoding = "linear16",
     SampleRate = 16000,
+    // Speaking-rate multiplier, 0.7 to 1.5, default 1.0. Values outside that range are rejected.
+    Speed = 1.1,
 };
 
 // Connect to Deepgram
