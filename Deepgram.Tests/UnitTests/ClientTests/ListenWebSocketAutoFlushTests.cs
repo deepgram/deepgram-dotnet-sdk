@@ -198,6 +198,49 @@ public class ListenWebSocketAutoFlushTests
         }
     }
 
+    [Test]
+    public async Task ListenClient_Interim_On_Stopped_Connection_Should_Not_Finalize_After_Reconnect()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var options = new DeepgramWsClientOptions(
+            apiKey: "test-api-key",
+            baseAddress: server.Endpoint,
+            onPrem: true)
+        {
+            AutoFlushReplyDelta = 1,
+        };
+        using var client = new ListenWebSocketClient("test-api-key", options);
+        var interimHandled = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
+        {
+            if (e.IsFinal != true)
+            {
+                interimHandled.TrySetResult(true);
+            }
+        }));
+
+        try
+        {
+            (await client.Connect(new LiveSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            var connectionA = await server.WaitForConnectionAsync(1).WaitAsync(WaitTimeout);
+            await connectionA.SendTextAsync(InterimResults);
+            await interimHandled.Task.WaitAsync(WaitTimeout);
+            client.LastReceivedTimestamp.Should().NotBeNull("the interim result must arm autoflush on connection A");
+
+            await client.Stop().WaitAsync(WaitTimeout);
+
+            (await client.Connect(new LiveSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            var connectionB = await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            var frame = connectionB.ReadFrameAsync();
+            (await Task.WhenAny(frame, Task.Delay(TimeSpan.FromSeconds(1)))).Should().NotBe(frame,
+                "an interim result from connection A must not schedule a Finalize on connection B");
+        }
+        finally
+        {
+            await client.Stop().WaitAsync(WaitTimeout);
+        }
+    }
+
     /// <summary>
     /// In-process WebSocket server on a port the OS assigns and keeps bound. It performs the
     /// RFC 6455 upgrade by hand, sends text frames on request, and counts the Finalize frames it
