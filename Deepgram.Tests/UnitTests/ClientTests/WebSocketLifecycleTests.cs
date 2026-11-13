@@ -2583,7 +2583,6 @@ public class WebSocketLifecycleTests
             Volatile.Read(ref calls).Should().Be(goodHandlers, $"iteration {i}");
         }
     }
-
     /// <summary>
     /// The receive loop runs fire-and-forget. When the socket drops it tears the connection down
     /// itself; if that teardown throws (here a log provider throws inside Stop), the failure must

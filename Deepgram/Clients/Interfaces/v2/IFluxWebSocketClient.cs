@@ -28,11 +28,15 @@ public interface IFluxWebSocketClient
     /// logged at Error level and Connect() still returns true. Messages still queued from earlier
     /// sends are sent as soon as the new connection opens; the send methods' remarks say which ones
     /// are kept. If a previous connection is still being released, Connect() waits for that to
-    /// finish (within its connect timeout) and then opens a new connection. If another Connect() is
+    /// finish (within its connect token) and then opens a new connection. If another Connect() is
     /// still opening the connection or a Stop() is closing it, Connect() waits for it within the
     /// same timeout and returns true only for an open connection that is not stopping.
     /// A Stop() that begins before Connect() returns (for example, from an Open handler) makes
     /// Connect() return false even after Open fired; Close then follows.
+    /// If the previous connection's Close handlers are still running once it is released,
+    /// Connect() waits for them only up to its connect token or a fresh disconnect timeout (5 s),
+    /// whichever comes first. Then it logs a Warning and opens the new connection anyway, so the
+    /// new connection's Open can be raised while the old Close handler is still running.
     /// </remarks>
     public Task<bool> Connect(FluxSchema options, CancellationTokenSource? cancelToken = null, Dictionary<string, string>? addons = null,
         Dictionary<string, string>? headers = null);
@@ -45,6 +49,11 @@ public interface IFluxWebSocketClient
     /// whose Open handlers are still running: then it returns without waiting for them, and Close
     /// fires as soon as they return. If a new Connect() runs before then, that Close can arrive after
     /// the new connection's Open. Dispose() raises no Close.
+    /// If another Stop() or a server close is delivering Close for the same connection, this Stop()
+    /// waits until the connection is released, then waits for that Close only up to its own token
+    /// or the disconnect timeout (5 s), whichever comes first. If that runs out, it logs a Warning
+    /// and returns true while the Close handler may still be running, so Stop() followed by
+    /// Connect() can raise the new connection's Open before the old Close handler has finished.
     /// </remarks>
     public Task<bool> Stop(CancellationTokenSource? cancelToken = null, bool nullByte = false);
     #endregion
@@ -105,10 +114,13 @@ public interface IFluxWebSocketClient
     /// server close or a dropped connection ends it. If a Stop() ends the connection while Open
     /// handlers are still running, Close fires as soon as they return; if a new Connect() runs before
     /// then, that Close can arrive after the new connection's Open. Dispose() raises no Close.
-    /// A Close handler must not block on a different Stop() call that is still in progress for the
-    /// same connection: that Stop() returns only after Close has been delivered, so the handler
-    /// waits forever. A Stop() called from inside the handler returns at once, unless a newer
-    /// connection has opened since; then it stops that connection.
+    /// Keep Close handlers short. A different Stop() of the same connection waits for Close to be
+    /// delivered only up to its own token or the disconnect timeout (5 s), whichever comes first,
+    /// then logs a Warning and returns true. So a handler that blocks on such a Stop() waits at
+    /// most that long, and a Stop() that races a slow handler can return while it still runs. The
+    /// Stop() or server close that raised Close still waits for its handlers. A Stop() called from
+    /// inside the handler returns at once, unless a newer connection has opened since; then it
+    /// stops that connection.
     /// </remarks>
     /// <returns>True if successful</returns>
     public Task<bool> Subscribe(EventHandler<CloseResponse> eventHandler);
