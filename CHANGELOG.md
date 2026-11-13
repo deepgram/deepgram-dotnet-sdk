@@ -1,5 +1,12 @@
 # Changelog
 
+## [7.4.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.4.0...7.4.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* **agent:** Redact the caller-supplied Voice Agent prompt and greeting from connection settings logs. This prevents conversation content from being written to the SDK's default `log.txt` while retaining safe configuration details for troubleshooting. ([0066fa7](https://github.com/deepgram/deepgram-dotnet-sdk/commit/0066fa7311f8a1686b44fade72108357072b6241))
+
 ## [7.4.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.3.1...7.4.0) (2026-11-12)
 
 
