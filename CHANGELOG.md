@@ -5,16 +5,14 @@
 
 ### Features
 
-* **listen:** add detect_entities and diarize_model to Nova streaming ([3b7735d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/3b7735d883870801e102fb0646e55c728caa9338))
-* **listen:** add detect_entities and diarize_model to Nova streaming ([76333f6](https://github.com/deepgram/deepgram-dotnet-sdk/commit/76333f65d5fb79dfa8d6c854df98baac2ab18d8f))
-* **speak:** add speed to Aura TTS streaming ([7cc1c29](https://github.com/deepgram/deepgram-dotnet-sdk/commit/7cc1c29b9bc3101f250de209f287c1c2042afef9))
+* **listen:** Add `DetectEntities` to Nova streaming requests. Final transcript results now expose typed entities with their label, normalized value, optional raw spoken value, confidence, and word span. Add `DiarizeModel` to select the `v1` or `latest` diarization model; setting it enables diarization without also setting `Diarize`. ([3b7735d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/3b7735d883870801e102fb0646e55c728caa9338))
+* **speak:** Add the `Speed` option to Aura streaming TTS connections so callers can control synthesis speed. ([7cc1c29](https://github.com/deepgram/deepgram-dotnet-sdk/commit/7cc1c29b9bc3101f250de209f287c1c2042afef9))
 
 
 ### Bug Fixes
 
-* **listen:** address entities review feedback ([d55bc5c](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d55bc5c2b351c4383d66da374467551969c6ddf6))
-* **listen:** address streaming entities review ([5c6e695](https://github.com/deepgram/deepgram-dotnet-sdk/commit/5c6e695366b53b49abbfa472fc2addd9919d5015))
-* **speak:** rewind the ToStream audio stream before returning it ([865e727](https://github.com/deepgram/deepgram-dotnet-sdk/commit/865e7279138f037fd6dcf8582559ceebce5432e1))
+* **listen:** Make the streaming entity-detection example independent of the caller's working directory and ensure the live test waits for final transcription before checking entity results. ([d55bc5c](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d55bc5c2b351c4383d66da374467551969c6ddf6))
+* **speak:** Return audio streams from REST TTS `ToStream` APIs rewound to the beginning so callers can read them immediately. ([865e727](https://github.com/deepgram/deepgram-dotnet-sdk/commit/865e7279138f037fd6dcf8582559ceebce5432e1))
 
 ## [7.4.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.4.0...7.4.1) (2026-11-12)
 
