@@ -96,11 +96,14 @@ public class SpeakWebSocketAutoFlushTests
             AutoFlushSpeakDelta = 1,
         };
         using var client = new SpeakWebSocketClient("test-api-key", options);
+        var senderStopping = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.OnSendQueueStopped = () => senderStopping.TrySetResult(true);
 
         try
         {
             (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
             await client.Stop().WaitAsync(WaitTimeout);
+            await senderStopping.Task.WaitAsync(WaitTimeout);
 
             client.SpeakWithText("queued while disconnected");
 

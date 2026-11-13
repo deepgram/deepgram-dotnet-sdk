@@ -1365,6 +1365,8 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 pending.FlushSignal?.TrySetResult(false);
             }
+
+            OnSendQueueStopped?.Invoke();
         }
     }
 
@@ -1959,6 +1961,9 @@ public abstract class AbstractWebSocketClient : IDisposable
     // (Flush/SendFinalize) from a different thread. A single background reader drains the queue.
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false, });
+
+    // Test seam: runs after a sender has drained its queue and is about to stop.
+    internal Action? OnSendQueueStopped { get; set; }
 
     internal void InvokeParallel<T>(EventHandler<T>? eventHandler, T e)
     {
