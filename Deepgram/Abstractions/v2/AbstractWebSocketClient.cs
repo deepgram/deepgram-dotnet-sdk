@@ -43,6 +43,9 @@ public abstract class AbstractWebSocketClient : IDisposable
 
     protected readonly SemaphoreSlim _mutexSubscribe = new SemaphoreSlim(1, 1);
     protected readonly SemaphoreSlim _mutexSend = new SemaphoreSlim(1, 1);
+
+    // Read-only view for tests.
+    internal SemaphoreSlim SendLock => _mutexSend;
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -1362,6 +1365,8 @@ public abstract class AbstractWebSocketClient : IDisposable
             {
                 pending.FlushSignal?.TrySetResult(false);
             }
+
+            OnSendQueueStopped?.Invoke();
         }
     }
 
@@ -1408,7 +1413,7 @@ public abstract class AbstractWebSocketClient : IDisposable
                         {
                             Log.Verbose("ProcessReceiveQueue", $"Received message: {result} / {ms}");
                         }
-                        ProcessDataReceived(result, ms);
+                        ProcessDataReceived(owned, result, ms);
                     }
                 }
 
@@ -1511,6 +1516,21 @@ public abstract class AbstractWebSocketClient : IDisposable
         {
             ProcessTextMessage(result, ms);
         }
+    }
+
+    /// <summary>
+    /// Dispatches a frame received on one connection. A frame already read when that connection
+    /// stops must not update state or raise events for a newer connection.
+    /// </summary>
+    internal virtual void ProcessDataReceived(ConnectionState owned, WebSocketReceiveResult result, MemoryStream ms)
+    {
+        if (!ReferenceEquals(CurrentConnection, owned) || owned.IsStopping || owned.IsReleased)
+        {
+            Log.Debug("ProcessDataReceived", "Dropping a frame from a stale connection.");
+            return;
+        }
+
+        ProcessDataReceived(result, ms);
     }
 
     internal virtual void ProcessBinaryMessage(WebSocketReceiveResult result, MemoryStream ms)
@@ -1941,6 +1961,9 @@ public abstract class AbstractWebSocketClient : IDisposable
     // (Flush/SendFinalize) from a different thread. A single background reader drains the queue.
     internal readonly Channel<WebSocketMessage> _sendChannel = System.Threading.Channels.Channel
        .CreateUnbounded<WebSocketMessage>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false, });
+
+    // Test seam: runs after a sender has drained its queue and is about to stop.
+    internal Action? OnSendQueueStopped { get; set; }
 
     internal void InvokeParallel<T>(EventHandler<T>? eventHandler, T e)
     {
