@@ -43,6 +43,14 @@ public class ConfigureSchema
     public List<string>? LanguageHints { get; set; }
 
     /// <summary>
+    /// Redacts keyterms in this and subsequent Configure messages from usage records. Once
+    /// enabled, it remains enabled for the current connection.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("redact_usage")]
+    public bool? RedactUsage { get; set; }
+
+    /// <summary>
     /// Enables or disables numeral formatting for subsequent transcripts. Null keeps the current
     /// setting.
     /// </summary>

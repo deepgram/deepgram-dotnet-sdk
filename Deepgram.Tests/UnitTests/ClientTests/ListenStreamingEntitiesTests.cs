@@ -46,6 +46,26 @@ public class ListenStreamingEntitiesTests
     }
 
     [Test]
+    public void GetUri_Should_Repeat_LanguageHints_And_Lowercase_RedactUsage_On_Streaming()
+    {
+        var uri = Client.GetUri(_options, new LiveSchema
+        {
+            Model = "nova-3",
+            Language = "multi",
+            LanguageHint = ["en", "es"],
+            RedactUsage = true,
+        });
+        var parameters = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
+
+        using (new AssertionScope())
+        {
+            parameters.Count(parameter => parameter == "language_hint=en").Should().Be(1);
+            parameters.Count(parameter => parameter == "language_hint=es").Should().Be(1);
+            parameters.Count(parameter => parameter == "redact_usage=true").Should().Be(1);
+        }
+    }
+
+    [Test]
     public void GetUri_Should_Send_DetectEntities_And_DiarizeModel_Once_On_Streaming()
     {
         var uri = Client.GetUri(_options, new LiveSchema
@@ -72,6 +92,8 @@ public class ListenStreamingEntitiesTests
         {
             uri.Query.Should().NotContain("detect_entities");
             uri.Query.Should().NotContain("diarize_model");
+            uri.Query.Should().NotContain("language_hint");
+            uri.Query.Should().NotContain("redact_usage");
         }
     }
 

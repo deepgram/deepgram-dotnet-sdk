@@ -30,6 +30,11 @@ Uploading or referencing prerecorded audio has different requirements from live 
 
 Inside `Client.cs`, synchronous methods call `VerifyNoCallBack` to reject any schema that already contains `CallBack`. Async callback methods call `VerifyOneCallBackSet` to ensure you set a callback exactly once, either in the explicit `callBack` argument or in `PreRecordedSchema.CallBack`. After that validation, the client builds the `listen` URI and delegates to `PostAsync` from `AbstractRestClient`.
 
+For Nova-3 multilingual requests, set `Language = "multi"` and provide one or more
+`LanguageHint` values. The SDK sends each value as a separate `language_hint` query
+parameter. Set `RedactUsage = true` to redact supplied keyterms and other user text
+from usage records; it does not redact the transcription response.
+
 That means the request lifecycle is:
 
 ```mermaid

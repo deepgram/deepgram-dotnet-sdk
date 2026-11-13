@@ -105,6 +105,7 @@ public class FluxClientTests
             MipOptOut = true,
             ProfanityFilter = false,
             Numerals = true,
+            RedactUsage = true,
         };
 
         var query = Client.BuildQueryString(schema);
@@ -112,6 +113,7 @@ public class FluxClientTests
         query.Should().Contain("mip_opt_out=true");
         query.Should().Contain("profanity_filter=false");
         query.Should().Contain("numerals=true");
+        query.Should().Contain("redact_usage=true");
     }
 
     [Test]
@@ -260,6 +262,7 @@ public class FluxClientTests
             },
             Keyterms = new List<string> { "Deepgram" },
             LanguageHints = new List<string> { "en", "es" },
+            RedactUsage = true,
             Numerals = true,
         };
 
@@ -271,6 +274,7 @@ public class FluxClientTests
         doc.RootElement.GetProperty("thresholds").GetProperty("eot_timeout_ms").GetInt32().Should().Be(4000);
         doc.RootElement.GetProperty("keyterms")[0].GetString().Should().Be("Deepgram");
         doc.RootElement.GetProperty("language_hints")[1].GetString().Should().Be("es");
+        doc.RootElement.GetProperty("redact_usage").GetBoolean().Should().BeTrue();
         doc.RootElement.GetProperty("numerals").GetBoolean().Should().BeTrue();
     }
 
@@ -286,6 +290,7 @@ public class FluxClientTests
 
         doc.RootElement.TryGetProperty("keyterms", out _).Should().BeFalse();
         doc.RootElement.TryGetProperty("language_hints", out _).Should().BeFalse();
+        doc.RootElement.TryGetProperty("redact_usage", out _).Should().BeFalse();
         doc.RootElement.TryGetProperty("numerals", out _).Should().BeFalse();
         doc.RootElement.GetProperty("thresholds").TryGetProperty("eager_eot_threshold", out _).Should().BeFalse();
         doc.RootElement.GetProperty("thresholds").TryGetProperty("eot_timeout_ms", out _).Should().BeFalse();

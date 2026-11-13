@@ -84,6 +84,8 @@ namespace SampleApp
                     EagerEotThreshold = 0.5,
                     // Flux STT supports only number redaction, not entity redaction.
                     Redact = "numbers",
+                    // Redacts supplied keyterms from usage records without changing the transcript.
+                    RedactUsage = true,
                 };
                 bool bConnected = await fluxClient.Connect(fluxSchema);
                 if (!bConnected)
@@ -92,9 +94,10 @@ namespace SampleApp
                     return;
                 }
 
-                // Numeral formatting can change during a session. This applies to subsequent
-                // transcripts only; the server confirms the active value with ConfigureSuccess.
-                await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true });
+                // Numeral formatting can change during a session. Usage redaction can also be
+                // enabled for later Configure keyterms; both active values arrive in
+                // ConfigureSuccess.
+                await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true, RedactUsage = true });
 
                 // Stream the raw PCM (skipping the 44-byte WAV header) in ~80ms chunks,
                 // paced like a live microphone.
