@@ -28,8 +28,8 @@ files.
 | `/v1/listen` WebSocket `redact_usage` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Lowercase connection-query serialization plus a gated live multilingual stream. |
 | Flux STT connection `redact_usage` | `FluxSchema` | Supported | Lowercase `/v2/listen` query serialization plus a gated live Flux session. |
 | Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | Configure-frame serialization and a gated live ConfigureSuccess assertion. |
-| Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Pending | The `/v2/speak` URL emits a lowercase boolean. |
-| Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Pending | The `/v2/speak` WebSocket URL emits a lowercase boolean. |
+| Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Supported | Lowercase URL serialization, omission when unset, and a gated live batch request. |
+| Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Supported | Lowercase connection-query serialization, omission when unset, and a gated live stream. |
 | Voice Agent Think Live settings | `Agent`, typed provider models | Pending | Settings serialization preserves the complete provider payload. |
 | Voice Agent `UpdateThink_Live` | protocol schema, client, and interface | Pending | The exact control frame is sent and `ThinkLiveUpdated` dispatches to a typed subscriber. |
 | Voice Agent `FrustrationDetected` | protocol response, client, and interface | Pending | The typed payload dispatches; unknown frames remain non-fatal. |

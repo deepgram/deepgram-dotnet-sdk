@@ -68,6 +68,7 @@ public class FluxSpeakRestClientTests
             SampleRate = 24000,
             BitRate = 48000,
             MipOptOut = false,
+            NormalizeVolume = false,
             Tag = new List<string> { "prod" },
             Priority = "low",
         };
@@ -83,6 +84,7 @@ public class FluxSpeakRestClientTests
             url.Should().Contain("sample_rate=24000");
             url.Should().Contain("bit_rate=48000");
             url.Should().Contain("mip_opt_out=false");
+            url.Should().Contain("normalize_volume=false");
             url.Should().Contain("tag=prod");
             url.Should().Contain("priority=low");
         }
@@ -140,7 +142,7 @@ public class FluxSpeakRestClientTests
     }
 
     [Test]
-    public void Request_Url_Should_Omit_Speed_And_Expressivity_When_Null()
+    public void Request_Url_Should_Omit_Optional_Controls_When_Null()
     {
         var schema = new SpeakSchema { Model = "flux-alexis-en" };
 
@@ -150,6 +152,7 @@ public class FluxSpeakRestClientTests
         {
             url.Should().NotContain("speed=");
             url.Should().NotContain("expressivity=");
+            url.Should().NotContain("normalize_volume=");
         }
     }
 

@@ -26,7 +26,8 @@ namespace SampleApp
 
             // Synthesize a complete block of text into a single audio file. Model is required and
             // must be a flux-* voice. Speed (0.85-1.15 in 0.05 steps) and Expressivity (beta,
-            // -2 to 2) are optional GA params, available on both transports.
+            // -2 to 2) are optional GA params, available on both transports. Volume normalization
+            // defaults to on; set NormalizeVolume to false to opt out while retaining peak limiting.
             var mp3 = await speakClient.ToFile(
                 new TextSource($"Take {FluxSpeakTextControls.Pronunciation("dupilumab", "duːˈpɪljuːmæb")} twice daily."),
                 "output.mp3",
@@ -35,6 +36,7 @@ namespace SampleApp
                     Model = "flux-alexis-en",
                     Encoding = "mp3",
                     BitRate = 48000,
+                    NormalizeVolume = false,
                 });
             Console.WriteLine($"Wrote output.mp3 (request {mp3.RequestId}, {mp3.Characters} chars)");
 

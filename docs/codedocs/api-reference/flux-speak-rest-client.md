@@ -24,7 +24,7 @@ Task<AsyncResponse> StreamCallBack(TextSource source, string? callBack, SpeakSch
     Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
 ```
 
-`SpeakSchema.Model` is required and must be a Flux TTS model such as `flux-alexis-en`. Batch requests support `linear16`, `flac`, `mulaw`, `alaw`, `mp3`, `opus`, and `aac`, plus compatible `container`, `sample_rate`, and `bit_rate` options. `Speed` accepts 0.85 through 1.15 in 0.05 increments; `Expressivity` is beta and accepts -2 through 2.
+`SpeakSchema.Model` is required and must be a Flux TTS model such as `flux-alexis-en`. Batch requests support `linear16`, `flac`, `mulaw`, `alaw`, `mp3`, `opus`, and `aac`, plus compatible `container`, `sample_rate`, and `bit_rate` options. `Speed` accepts 0.85 through 1.15 in 0.05 increments; `Expressivity` is beta and accepts -2 through 2. `NormalizeVolume` defaults to `true`; set it to `false` to opt out while peak limiting remains active.
 
 ```csharp
 var client = ClientFactory.CreateFluxSpeakRESTClient();
