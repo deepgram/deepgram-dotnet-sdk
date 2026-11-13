@@ -32,6 +32,9 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     // Test seam: runs after ProcessAutoFlush queues its Flush, while it still holds _mutexLastDatagram.
     internal Action? OnAutoFlushEnqueued { get; set; }
 
+    // Test seam: reports whether one autoflush cycle queued a Flush.
+    internal Action<bool>? OnAutoFlushProcessed { get; set; }
+
     // Read-only view for tests; writes stay under _mutexLastDatagram.
     internal long? LastReceivedTimestamp => _lastReceived;
     #endregion
@@ -512,6 +515,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                 // it records a Speak and enqueues it, so every Speak recorded in _lastReceived is
                 // already queued ahead of the Flush that covers it. SendAutoFlush only increments
                 // an interlocked counter and queues the marker; it neither awaits nor takes this lock.
+                var flushed = false;
                 await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
@@ -538,6 +542,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                             _lastReceivedConnection = null;
                             SendAutoFlush(owned);
                             OnAutoFlushEnqueued?.Invoke();
+                            flushed = true;
                         }
                     }
                 }
@@ -546,6 +551,7 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     _mutexLastDatagram.Release();
                 }
 
+                OnAutoFlushProcessed?.Invoke(flushed);
             }
 
             Log.Verbose("ProcessAutoFlush", "Exit");

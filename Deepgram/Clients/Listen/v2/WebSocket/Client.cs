@@ -25,6 +25,9 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
 
     // Read-only view for tests; writes stay under _mutexLastDatagram.
     internal long? LastReceivedTimestamp => _lastReceived;
+
+    // Test seam: reports whether one autoflush cycle sent a Finalize.
+    internal Action<bool>? OnAutoFlushProcessed { get; set; }
     #endregion
 
     /// <param name="apiKey">Required DeepgramApiKey</param>
@@ -548,6 +551,8 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
                 {
                     await SendFinalize(owned).ConfigureAwait(false);
                 }
+
+                OnAutoFlushProcessed?.Invoke(shouldFinalize);
             }
 
             Log.Verbose("ProcessAutoFlush", "Exit");

@@ -229,10 +229,11 @@ public class ListenWebSocketAutoFlushTests
 
             await client.Stop().WaitAsync(WaitTimeout);
 
+            var autoFlush = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            client.OnAutoFlushProcessed = finalized => autoFlush.TrySetResult(finalized);
             (await client.Connect(new LiveSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
-            var connectionB = await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
-            var frame = connectionB.ReadFrameAsync();
-            (await Task.WhenAny(frame, Task.Delay(TimeSpan.FromSeconds(1)))).Should().NotBe(frame,
+            await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            (await autoFlush.Task.WaitAsync(WaitTimeout)).Should().BeFalse(
                 "an interim result from connection A must not schedule a Finalize on connection B");
         }
         finally

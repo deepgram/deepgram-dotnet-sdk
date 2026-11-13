@@ -151,10 +151,11 @@ public class SpeakWebSocketAutoFlushTests
             lockHeld = false;
             await stop.WaitAsync(WaitTimeout);
 
+            var autoFlush = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            client.OnAutoFlushProcessed = flushed => autoFlush.TrySetResult(flushed);
             (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
-            var connection = await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
-            var frame = connection.ReadFrameAsync();
-            (await Task.WhenAny(frame, Task.Delay(TimeSpan.FromSeconds(1)))).Should().NotBe(frame,
+            await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            (await autoFlush.Task.WaitAsync(WaitTimeout)).Should().BeFalse(
                 "a Speak discarded while connection A stops must not schedule a Flush on connection B");
         }
         finally
