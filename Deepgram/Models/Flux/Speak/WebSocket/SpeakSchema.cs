@@ -47,6 +47,14 @@ public class SpeakSchema
     public bool? MipOptOut { get; set; }
 
     /// <summary>
+    /// Normalizes generated-speech loudness across voices and requests. Enabled by default; set to
+    /// <c>false</c> to opt out. Peak limiting still applies.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("normalize_volume")]
+    public bool? NormalizeVolume { get; set; }
+
+    /// <summary>
     /// Label your requests for the purpose of identification during usage reporting. Sent as a
     /// repeated query parameter, one per tag.
     /// </summary>

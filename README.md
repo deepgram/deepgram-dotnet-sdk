@@ -531,6 +531,7 @@ var schema = new SpeakSchema()
     SampleRate = 24000,
     Speed = 1.0,          // optional: 0.85–1.15 in 0.05 steps
     // Expressivity = 1,  // optional (beta): -2 (calmer) to 2 (more animated)
+    NormalizeVolume = false, // optional: default true; peak limiting remains on when false
 };
 await speakClient.Connect(schema);
 

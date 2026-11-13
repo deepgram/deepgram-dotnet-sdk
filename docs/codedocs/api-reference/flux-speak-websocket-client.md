@@ -12,7 +12,7 @@ Imports:
 
 ## Lifecycle And Flush
 
-`Connect()` requires a `SpeakSchema` with a Flux TTS `Model`. Use `SendText()` to add text to the active turn. `await SendFlush()` ends that turn and asks Deepgram to generate the remaining audio; it does not close the session. The server emits `Flushed`, then `SpeechMetadata` after all audio for that turn has been sent. Subscribe before connecting and await `SpeechMetadataResponse` before closing or consuming a completed file.
+`Connect()` requires a `SpeakSchema` with a Flux TTS `Model`. `NormalizeVolume` defaults to `true`; set it to `false` to opt out while peak limiting remains active. Use `SendText()` to add text to the active turn. `await SendFlush()` ends that turn and asks Deepgram to generate the remaining audio; it does not close the session. The server emits `Flushed`, then `SpeechMetadata` after all audio for that turn has been sent. Subscribe before connecting and await `SpeechMetadataResponse` before closing or consuming a completed file.
 
 ```csharp
 var client = ClientFactory.CreateFluxSpeakWebSocketClient();

@@ -99,11 +99,17 @@ public class FluxSpeakClientTests
     [Test]
     public void BuildQueryString_Should_Lowercase_Booleans()
     {
-        var schema = new SpeakSchema { Model = "flux-alexis-en", MipOptOut = true };
+        var schema = new SpeakSchema
+        {
+            Model = "flux-alexis-en",
+            MipOptOut = true,
+            NormalizeVolume = false,
+        };
 
         var query = Client.BuildQueryString(schema);
 
         query.Should().Contain("mip_opt_out=true");
+        query.Should().Contain("normalize_volume=false");
     }
 
     [Test]
@@ -146,6 +152,7 @@ public class FluxSpeakClientTests
             Encoding = "linear16",
             SampleRate = 24000,
             MipOptOut = false,
+            NormalizeVolume = true,
             Tag = new List<string> { "prod" },
         };
 
@@ -157,6 +164,7 @@ public class FluxSpeakClientTests
             query.Should().Contain("encoding=linear16");
             query.Should().Contain("sample_rate=24000");
             query.Should().Contain("mip_opt_out=false");
+            query.Should().Contain("normalize_volume=true");
             query.Should().Contain("tag=prod");
         }
     }
@@ -200,8 +208,9 @@ public class FluxSpeakClientTests
 
         var query = Client.BuildQueryString(schema);
 
-        query.Should().NotContain("speed=");
-        query.Should().NotContain("expressivity=");
+            query.Should().NotContain("speed=");
+            query.Should().NotContain("expressivity=");
+            query.Should().NotContain("normalize_volume=");
     }
     #endregion
 

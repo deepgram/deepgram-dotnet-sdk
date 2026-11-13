@@ -81,6 +81,14 @@ public class SpeakSchema
     public bool? MipOptOut { get; set; }
 
     /// <summary>
+    /// Normalizes generated-speech loudness across voices and requests. Enabled by default; set to
+    /// <c>false</c> to opt out. Peak limiting still applies.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("normalize_volume")]
+    public bool? NormalizeVolume { get; set; }
+
+    /// <summary>
     /// Processing priority for asynchronous (callback) requests. The only supported value is "low".
     /// Applies only when a callback is supplied.
     /// </summary>

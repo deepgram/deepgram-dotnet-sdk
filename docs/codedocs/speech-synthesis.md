@@ -86,7 +86,7 @@ await client.Stop();
 
 ## Flux TTS
 
-Use `ClientFactory.CreateFluxSpeakRESTClient()` to synthesize a complete Flux TTS response with `POST /v2/speak`, or `ClientFactory.CreateFluxSpeakWebSocketClient()` for turn-based v2 streaming. Flux TTS requires a `flux-*` model, such as `flux-alexis-en`; Aura model names belong on the v1 clients. The REST client supports batch encodings and containers, while the Flux TTS WebSocket emits raw `linear16`, `mulaw`, or `alaw` audio.
+Use `ClientFactory.CreateFluxSpeakRESTClient()` to synthesize a complete Flux TTS response with `POST /v2/speak`, or `ClientFactory.CreateFluxSpeakWebSocketClient()` for turn-based v2 streaming. Flux TTS requires a `flux-*` model, such as `flux-alexis-en`; Aura model names belong on the v1 clients. The REST client supports batch encodings and containers, while the Flux TTS WebSocket emits raw `linear16`, `mulaw`, or `alaw` audio. Both schemas expose `NormalizeVolume`; it defaults to `true`, and `false` opts out while retaining peak limiting.
 
 For WebSocket turns, `SendText()` adds text to the active turn and `await SendFlush()` ends that turn. The server emits `Flushed`, then `SpeechMetadata` after every audio chunk for the turn has been sent. Wait for `SpeechMetadata` before starting dependent work or closing the connection. See [FluxSpeakRESTClient](/docs/api-reference/flux-speak-rest-client) and [FluxSpeakWebSocketClient](/docs/api-reference/flux-speak-websocket-client).
 
