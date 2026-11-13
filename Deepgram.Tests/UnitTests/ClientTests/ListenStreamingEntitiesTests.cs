@@ -116,6 +116,23 @@ public class ListenStreamingEntitiesTests
     }
 
     [Test]
+    public void ResultResponse_Should_Deserialize_Normalized_LanguageHints()
+    {
+        var response = JsonSerializer.Deserialize<ResultResponse>(
+            """{"type":"Results","channel":{"alternatives":[{"transcript":"Hello","languages":["en"],"languages_hinted":["en","es"]}]}}""");
+
+        using (new AssertionScope())
+        {
+            response.Should().NotBeNull();
+            var alternative = response!.Channel?.Alternatives?.FirstOrDefault();
+            alternative.Should().NotBeNull();
+            var parsedAlternative = alternative!;
+            parsedAlternative.Languages.Should().Equal("en");
+            parsedAlternative.LanguagesHinted.Should().Equal("en", "es");
+        }
+    }
+
+    [Test]
     public async Task ProcessTextMessage_Should_Surface_Entities_On_Final_Results()
     {
         var client = new Client(_apiKey, _options);

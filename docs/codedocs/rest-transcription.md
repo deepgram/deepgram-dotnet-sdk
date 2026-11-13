@@ -34,6 +34,8 @@ For Nova-3 multilingual requests, set `Language = "multi"` and provide one or mo
 `LanguageHint` values. The SDK sends each value as a separate `language_hint` query
 parameter. Set `RedactUsage = true` to redact supplied keyterms and other user text
 from usage records; it does not redact the transcription response.
+Nova-3 multilingual alternatives expose the service-normalized hints through
+`LanguagesHinted`.
 
 That means the request lifecycle is:
 

@@ -25,6 +25,8 @@ For Nova-3 multilingual connections, use `Language = "multi"` and populate
 `LanguageHint`; each item becomes a separate `language_hint` URL parameter. Use
 `RedactUsage = true` to redact supplied keyterms and other user text from usage
 records without changing transcription results.
+Each Nova-3 multilingual result exposes the service-normalized hints through
+`Alternative.LanguagesHinted`.
 
 Once validation passes, the client builds the WebSocket URI from the schema and `DeepgramWsClientOptions`, then calls `AbstractWebSocketClient.Connect`. The base class sets auth headers, opens `ClientWebSocket`, and starts sender and receiver background threads. The listen-specific client may start two more loops:
 

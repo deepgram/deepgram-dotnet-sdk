@@ -62,6 +62,7 @@ public class RequestOptionsLiveIntegrationTests
             alternative.Should().NotBeNull();
             alternative!.Languages.Should().NotBeEmpty(
                 "Nova-3 multilingual must accept the requested language hints");
+            alternative.LanguagesHinted.Should().Equal("en", "es");
             analysis.Results.Should().NotBeNull();
         }
     }

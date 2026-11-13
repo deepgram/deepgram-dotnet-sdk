@@ -34,6 +34,14 @@ public record Alternative
     public IReadOnlyList<string>? Languages { get; set; }
 
     /// <summary>
+    /// The normalized <c>language_hint</c> values supplied when a Nova-3 multilingual stream
+    /// connected.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages_hinted")]
+    public IReadOnlyList<string>? LanguagesHinted { get; set; }
+
+    /// <summary>
     /// Override ToString method to serialize the object
     /// </summary>
     public override string ToString()

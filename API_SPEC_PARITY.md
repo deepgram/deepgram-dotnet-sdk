@@ -22,9 +22,9 @@ files.
 
 | API surface | SDK model or client | Status | Required regression coverage |
 | --- | --- | --- | --- |
-| `/v1/listen` REST `language_hint` | `PreRecordedSchema` | Supported | Exact repeated-query serialization plus a gated live Nova-3 multilingual request. |
+| `/v1/listen` REST `language_hint` | `PreRecordedSchema`, `Alternative` | Supported | Exact repeated-query serialization plus normalized `LanguagesHinted` unit and gated live assertions. |
 | `/v1/listen` REST `redact_usage` | `PreRecordedSchema` | Supported | Lowercase serialization plus a gated live Nova-3 request. |
-| `/v1/listen` WebSocket `language_hint` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Repeated connection-query serialization plus a gated live multilingual stream. |
+| `/v1/listen` WebSocket `language_hint` | `Models/Listen/v2/WebSocket/LiveSchema`, `Alternative` | Supported | Repeated connection-query serialization plus normalized `LanguagesHinted` unit and gated live assertions. |
 | `/v1/listen` WebSocket `redact_usage` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Lowercase connection-query serialization plus a gated live multilingual stream. |
 | Flux STT connection `redact_usage` | `FluxSchema` | Supported | Lowercase `/v2/listen` query serialization plus a gated live Flux session. |
 | Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | Configure-frame serialization and a gated live ConfigureSuccess assertion. |

@@ -236,6 +236,7 @@ public class ListenStreamingEntitiesLiveIntegrationTests
             alternative.Should().NotBeNull();
             alternative!.Languages.Should().NotBeEmpty(
                 "the server must report the language detected from the multilingual request");
+            alternative.LanguagesHinted.Should().Equal("en", "es");
         }
         finally
         {
