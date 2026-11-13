@@ -59,29 +59,33 @@ public class ListenStreamingEntitiesLiveIntegrationTests
         var entitiesSeen = new List<Entity>();
         var entitiesOnInterimResult = false;
         var finalWithEntities = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var streamDrained = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => { lock (errors) { errors.Add(e); } }));
         await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
         {
-            if (e.Entities is null || e.Entities.Count == 0)
+            if (e.SpeechFinal == true)
             {
-                return;
+                streamDrained.TrySetResult(true);
             }
 
-            lock (entitiesSeen)
+            if (e.Entities is not null && e.Entities.Count > 0)
             {
-                entitiesSeen.AddRange(e.Entities);
-
-                // Record rather than assert: the client runs handlers through InvokeParallel,
-                // which catches and logs every exception, so an assertion thrown here would be
-                // swallowed and would only surface indirectly as a timeout below.
-                if (e.IsFinal != true)
+                lock (entitiesSeen)
                 {
-                    entitiesOnInterimResult = true;
-                }
-            }
+                    entitiesSeen.AddRange(e.Entities);
 
-            finalWithEntities.TrySetResult(true);
+                    // Record rather than assert: the client runs handlers through InvokeParallel,
+                    // which catches and logs every exception, so an assertion thrown here would be
+                    // swallowed and would only surface indirectly as a timeout below.
+                    if (e.IsFinal != true)
+                    {
+                        entitiesOnInterimResult = true;
+                    }
+                }
+
+                finalWithEntities.TrySetResult(true);
+            }
         }));
 
         try
@@ -98,11 +102,14 @@ public class ListenStreamingEntitiesLiveIntegrationTests
 
             await StreamWav(client, audioPath);
 
+            await client.SendFinalize();
+            var completedStream = await Task.WhenAny(streamDrained.Task, Task.Delay(20000)) == streamDrained.Task;
             var sawEntities = await Task.WhenAny(finalWithEntities.Task, Task.Delay(20000)) == finalWithEntities.Task;
 
             using (new AssertionScope())
             {
                 errors.Should().BeEmpty();
+                completedStream.Should().BeTrue("the server must finish processing the finalized stream");
                 sawEntities.Should().BeTrue("detect_entities must surface at least one entity for the preamble audio");
 
                 List<Entity> snapshot;

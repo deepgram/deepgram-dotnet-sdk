@@ -72,7 +72,7 @@ namespace SampleApp
                 }
 
                 // Send some audio data
-                var audioData = File.ReadAllBytes(Path.Combine("..", "file", "preamble.wav"));
+                var audioData = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "preamble.wav"));
                 liveClient.Send(audioData);
 
                 // Wait for a while to receive responses

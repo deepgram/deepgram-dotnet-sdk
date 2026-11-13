@@ -80,9 +80,10 @@ public class LiveSchema
     [JsonPropertyName("diarize_model")]
     public string? DiarizeModel { get; set; }
 
-    // <summary>
+    /// <summary>
+    /// Deprecated; use <see cref="DiarizeModel"/> instead.
     /// <see href="https://developers.deepgram.com/docs/diarization">
-    /// default is null, only applies if Diarize is set to true
+    /// Default is null and only applies if <see cref="Diarize"/> is set to <c>true</c>.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("diarize_version")]

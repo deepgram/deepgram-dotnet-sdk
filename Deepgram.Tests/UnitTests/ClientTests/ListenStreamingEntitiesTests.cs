@@ -46,6 +46,24 @@ public class ListenStreamingEntitiesTests
     }
 
     [Test]
+    public void GetUri_Should_Send_DetectEntities_And_DiarizeModel_Once_On_Streaming()
+    {
+        var uri = Client.GetUri(_options, new LiveSchema
+        {
+            Model = "nova-3",
+            DetectEntities = true,
+            DiarizeModel = "latest",
+        });
+        var parameters = uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries);
+
+        using (new AssertionScope())
+        {
+            parameters.Count(parameter => parameter == "detect_entities=true").Should().Be(1);
+            parameters.Count(parameter => parameter == "diarize_model=latest").Should().Be(1);
+        }
+    }
+
+    [Test]
     public void GetUri_Should_Omit_New_Parameters_When_Unset()
     {
         var uri = Client.GetUri(_options, new LiveSchema { Model = "nova-3" });
