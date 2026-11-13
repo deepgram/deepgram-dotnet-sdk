@@ -20,11 +20,17 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
     // Stopwatch.GetTimestamp() of the last datagram not yet flushed; null when nothing is pending.
     // Monotonic, so a wall-clock change (a DST fall-back) cannot make the elapsed time negative.
     private long? _lastReceived = null;
+    // Null means the Speak was queued while no connection was usable and must retain its timer when
+    // the next connection opens. A non-null connection is stale when another connection opens.
+    private ConnectionState? _lastReceivedConnection;
     private int _flushCount = 0;
     internal readonly SemaphoreSlim _mutexLastDatagram = new SemaphoreSlim(1, 1);
 
     // Test seam: runs after InspectMessage enqueues a Speak, while it still holds _mutexLastDatagram.
     internal Action? OnSpeakEnqueued { get; set; }
+
+    // Test seam: runs after ProcessAutoFlush queues its Flush, while it still holds _mutexLastDatagram.
+    internal Action? OnAutoFlushEnqueued { get; set; }
 
     // Read-only view for tests; writes stay under _mutexLastDatagram.
     internal long? LastReceivedTimestamp => _lastReceived;
@@ -82,22 +88,12 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() runs
             // its post-connect work, so this call does none (#455).
-            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers, ResetAutoFlushState).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
                 Log.Verbose("SpeakWSClient.Connect", "LEAVE");
                 return false;
-            }
-
-            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                _lastReceived = null;
-            }
-            finally
-            {
-                _mutexLastDatagram.Release();
             }
 
             if (_deepgramClientOptions.AutoFlushSpeakDelta > 0 && owned != null)
@@ -128,6 +124,25 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         }
 
         void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned).ConfigureAwait(false));
+    }
+
+    private async Task<bool> ResetAutoFlushState(ConnectionState owned, CancellationToken _)
+    {
+        await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_lastReceivedConnection is not null && !ReferenceEquals(_lastReceivedConnection, owned))
+            {
+                _lastReceived = null;
+                _lastReceivedConnection = null;
+            }
+        }
+        finally
+        {
+            _mutexLastDatagram.Release();
+        }
+
+        return true;
     }
 
     #region Subscribe Event
@@ -495,11 +510,8 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
 
                 // Decide and enqueue the Flush under the same lock that InspectMessage holds while
                 // it records a Speak and enqueues it, so every Speak recorded in _lastReceived is
-                // already queued ahead of the Flush that covers it. This is safe because nothing on
-                // the Flush() path (SendMessage -> IncrementFlushCount -> EnqueueSendMessage) takes
-                // _mutexLastDatagram or awaits. Once rebased on #456, this will call
-                // SendAutoFlush(owned) after an in-lock owned.IsOpen check, instead of Flush().
-                var shouldFlush = false;
+                // already queued ahead of the Flush that covers it. SendAutoFlush only increments
+                // an interlocked counter and queues the marker; it neither awaits nor takes this lock.
                 await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
                 try
                 {
@@ -517,8 +529,15 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                         else
                         {
                             Log.Debug("ProcessAutoFlush", $"AutoFlush delta exceeded threshold: {StopwatchTicksToMilliseconds(elapsedTicks):F0} ms. Flushing...");
-                            shouldFlush = owned.IsOpen;
+                            if (!owned.IsOpen || owned.IsStopping)
+                            {
+                                return;
+                            }
+
                             _lastReceived = null;
+                            _lastReceivedConnection = null;
+                            SendAutoFlush(owned);
+                            OnAutoFlushEnqueued?.Invoke();
                         }
                     }
                 }
@@ -527,10 +546,6 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
                     _mutexLastDatagram.Release();
                 }
 
-                if (shouldFlush)
-                {
-                    SendAutoFlush(owned);
-                }
             }
 
             Log.Verbose("ProcessAutoFlush", "Exit");
@@ -750,6 +765,8 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
             try
             {
                 _lastReceived = now;
+                var current = CurrentConnection;
+                _lastReceivedConnection = current is { IsOpen: true, IsStopping: false } ? current : null;
                 EnqueueSendMessage(speak);
                 OnSpeakEnqueued?.Invoke();
             }

@@ -29,6 +29,8 @@ public class SpeakWebSocketAutoFlushTests
             AutoFlushSpeakDelta = 1,
         };
         var client = new SpeakWebSocketClient("test-api-key", options);
+        var flushQueued = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.OnAutoFlushEnqueued = () => flushQueued.TrySetResult(client._mutexLastDatagram.CurrentCount == 0);
 
         try
         {
@@ -38,6 +40,8 @@ public class SpeakWebSocketAutoFlushTests
 
             // The autoflush thread must put a Flush frame on the wire.
             await server.FirstFlush.WaitAsync(WaitTimeout);
+            (await flushQueued.Task.WaitAsync(WaitTimeout)).Should().BeTrue(
+                "the Flush marker must be queued while the autoflush lock is held");
 
             // A user Flush after autoflush must not block on the autoflush lock.
             await Task.Run(() => client.Flush()).WaitAsync(WaitTimeout);
@@ -45,7 +49,7 @@ public class SpeakWebSocketAutoFlushTests
         }
         finally
         {
-            await client.Stop();
+            await client.Stop().WaitAsync(WaitTimeout);
         }
     }
 
@@ -78,6 +82,43 @@ public class SpeakWebSocketAutoFlushTests
 
         lockHeldAtSeam.Should().BeTrue("the Speak must be enqueued before _mutexLastDatagram is released");
         queuedType.Should().Be("Speak", "the Speak must already be in the send channel while the lock is held");
+    }
+
+    [Test]
+    public async Task SpeakClient_Queued_While_Disconnected_Should_AutoFlush_After_Reconnect()
+    {
+        using var server = new LoopbackWebSocketServer();
+        var options = new DeepgramWsClientOptions(
+            apiKey: "test-api-key",
+            baseAddress: server.Endpoint,
+            onPrem: true)
+        {
+            AutoFlushSpeakDelta = 1,
+        };
+        using var client = new SpeakWebSocketClient("test-api-key", options);
+
+        try
+        {
+            (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            await client.Stop().WaitAsync(WaitTimeout);
+
+            client.SpeakWithText("queued while disconnected");
+
+            (await client.Connect(new SpeakSchema()).WaitAsync(WaitTimeout)).Should().BeTrue();
+            var connection = await server.WaitForConnectionAsync(2).WaitAsync(WaitTimeout);
+            var speak = await connection.ReadFrameAsync().WaitAsync(WaitTimeout);
+            var flush = await connection.ReadFrameAsync().WaitAsync(WaitTimeout);
+
+            using (new AssertionScope())
+            {
+                speak.Text.Should().Contain("queued while disconnected");
+                flush.Text.Should().Contain("\"Flush\"");
+            }
+        }
+        finally
+        {
+            await client.Stop().WaitAsync(WaitTimeout);
+        }
     }
 
     [Test]
@@ -271,7 +312,7 @@ public class SpeakWebSocketAutoFlushTests
 
             // A regression strands _mutexSend with a continuation that never runs, and Stop() waits
             // on that lock; bound the cleanup so the failure is reported instead of hanging the run.
-            await Task.WhenAny(client.Stop(), Task.Delay(WaitTimeout));
+            await client.Stop().WaitAsync(WaitTimeout);
         }
     }
 

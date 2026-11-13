@@ -83,22 +83,12 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
             // owned is the connection this call opened. It is null when another connection was
             // already published ("already initialized"): that connection's own Connect() runs
             // its post-connect work, so this call does none (#455).
-            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers).ConfigureAwait(false);
+            var (bConnected, owned) = await ConnectCore(myURI.ToString(), cancelToken, headers, ResetAutoFlushState).ConfigureAwait(false);
             if (!bConnected)
             {
                 Log.Warning("Connect", "Connect failed");
                 Log.Verbose("ListenWSClient.Connect", "LEAVE");
                 return false;
-            }
-
-            await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                _lastReceived = null;
-            }
-            finally
-            {
-                _mutexLastDatagram.Release();
             }
 
             if (_deepgramClientOptions.KeepAlive && owned != null)
@@ -137,6 +127,21 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
         void StartKeepAliveBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessKeepAlive(owned).ConfigureAwait(false));
 
         void StartAutoFlushBackgroundThread(ConnectionState owned) => Task.Run(async () => await ProcessAutoFlush(owned).ConfigureAwait(false));
+    }
+
+    private async Task<bool> ResetAutoFlushState(ConnectionState _, CancellationToken __)
+    {
+        await _mutexLastDatagram.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            _lastReceived = null;
+        }
+        finally
+        {
+            _mutexLastDatagram.Release();
+        }
+
+        return true;
     }
 
     #region Subscribe Event

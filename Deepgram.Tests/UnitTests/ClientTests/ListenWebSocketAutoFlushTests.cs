@@ -194,7 +194,7 @@ public class ListenWebSocketAutoFlushTests
                 sendLock.Release();
             }
 
-            await Task.WhenAny(client.Stop(), Task.Delay(WaitTimeout));
+            await client.Stop().WaitAsync(WaitTimeout);
         }
     }
 
