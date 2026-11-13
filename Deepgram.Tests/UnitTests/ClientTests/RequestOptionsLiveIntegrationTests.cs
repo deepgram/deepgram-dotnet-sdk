@@ -36,7 +36,10 @@ public class RequestOptionsLiveIntegrationTests
         var transcript = await listen.TranscribeUrl(new ListenUrlSource("https://dpgr.am/bueller.wav"), new PreRecordedSchema
         {
             Model = "nova-3",
+            Language = "multi",
+            LanguageHint = new List<string> { "en", "es" },
             MipOptOut = true,
+            RedactUsage = true,
         });
 
         var analyze = ClientFactory.CreateAnalyzeClient(apiKey);
@@ -52,6 +55,13 @@ public class RequestOptionsLiveIntegrationTests
             audio.Stream.Should().NotBeNull();
             audio.Stream!.Length.Should().BeGreaterThan(0);
             transcript.Results.Should().NotBeNull();
+            transcript.Results!.Channels.Should().NotBeEmpty();
+            var channel = transcript.Results.Channels?.FirstOrDefault();
+            channel.Should().NotBeNull();
+            var alternative = channel?.Alternatives?.FirstOrDefault();
+            alternative.Should().NotBeNull();
+            alternative!.Languages.Should().NotBeEmpty(
+                "Nova-3 multilingual must accept the requested language hints");
             analysis.Results.Should().NotBeNull();
         }
     }

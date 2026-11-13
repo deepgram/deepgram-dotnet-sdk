@@ -22,12 +22,12 @@ files.
 
 | API surface | SDK model or client | Status | Required regression coverage |
 | --- | --- | --- | --- |
-| `/v1/listen` REST `language_hint` | `PreRecordedSchema` | Supported | Repeated query values preserve order and serialize as `language_hint=en&language_hint=es`. |
-| `/v1/listen` REST `redact_usage` | `PreRecordedSchema` | Supported | The optional boolean serializes lowercase and is omitted when unset. |
-| `/v1/listen` WebSocket `language_hint` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | The connection URL repeats language hints. |
-| `/v1/listen` WebSocket `redact_usage` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | The connection URL emits a lowercase boolean. |
-| Flux STT connection `redact_usage` | `FluxSchema` | Supported | The `/v2/listen` URL emits a lowercase boolean. |
-| Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | The outgoing `Configure` frame has a boolean field; `ConfigureSuccess` already deserializes it. |
+| `/v1/listen` REST `language_hint` | `PreRecordedSchema` | Supported | Exact repeated-query serialization plus a gated live Nova-3 multilingual request. |
+| `/v1/listen` REST `redact_usage` | `PreRecordedSchema` | Supported | Lowercase serialization plus a gated live Nova-3 request. |
+| `/v1/listen` WebSocket `language_hint` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Repeated connection-query serialization plus a gated live multilingual stream. |
+| `/v1/listen` WebSocket `redact_usage` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Lowercase connection-query serialization plus a gated live multilingual stream. |
+| Flux STT connection `redact_usage` | `FluxSchema` | Supported | Lowercase `/v2/listen` query serialization plus a gated live Flux session. |
+| Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | Configure-frame serialization and a gated live ConfigureSuccess assertion. |
 | Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Pending | The `/v2/speak` URL emits a lowercase boolean. |
 | Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Pending | The `/v2/speak` WebSocket URL emits a lowercase boolean. |
 | Voice Agent Think Live settings | `Agent`, typed provider models | Pending | Settings serialization preserves the complete provider payload. |

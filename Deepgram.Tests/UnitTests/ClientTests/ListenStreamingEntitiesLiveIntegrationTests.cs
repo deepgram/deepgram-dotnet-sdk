@@ -181,4 +181,65 @@ public class ListenStreamingEntitiesLiveIntegrationTests
             await client.Stop();
         }
     }
+
+    [Test]
+    public async Task Live_Streaming_MultilingualLanguageHints_And_UsageRedaction_Should_Be_Accepted()
+    {
+        var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping streaming language-hint integration test.");
+        var audioPath = RequireAudioFixture();
+
+        var client = new ListenWebSocketClient(apiKey);
+        var errors = new List<ErrorResponse>();
+        var finalResult = new TaskCompletionSource<ResultResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => { lock (errors) { errors.Add(e); } }));
+        await client.Subscribe(new EventHandler<ResultResponse>((_, e) =>
+        {
+            if (e.SpeechFinal == true)
+            {
+                finalResult.TrySetResult(e);
+            }
+        }));
+
+        try
+        {
+            var connected = await client.Connect(new LiveSchema
+            {
+                Model = "nova-3",
+                Language = "multi",
+                LanguageHint = new List<string> { "en", "es" },
+                RedactUsage = true,
+                Encoding = "linear16",
+                SampleRate = 16000,
+                InterimResults = true,
+            });
+            connected.Should().BeTrue("the multilingual streaming endpoint must accept language hints and usage redaction");
+
+            await StreamWav(client, audioPath);
+            await client.SendFinalize();
+
+            var completed = await Task.WhenAny(finalResult.Task, Task.Delay(20000)) == finalResult.Task;
+
+            using (new AssertionScope())
+            {
+                errors.Should().BeEmpty();
+                completed.Should().BeTrue("the finalized multilingual stream must return a final result");
+            }
+
+            if (!completed)
+            {
+                Assert.Fail("The finalized multilingual stream did not return a final result.");
+            }
+
+            var result = await finalResult.Task;
+            var alternative = result.Channel?.Alternatives?.FirstOrDefault();
+            alternative.Should().NotBeNull();
+            alternative!.Languages.Should().NotBeEmpty(
+                "the server must report the language detected from the multilingual request");
+        }
+        finally
+        {
+            await client.Stop();
+        }
+    }
 }
