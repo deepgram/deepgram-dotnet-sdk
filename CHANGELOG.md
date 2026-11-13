@@ -1,5 +1,20 @@
 # Changelog
 
+## [7.5.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.5.0...7.5.1) (2026-11-13)
+
+
+### Bug Fixes
+
+* **speak,listen:** Aura TTS streaming no longer deadlocks when AutoFlushSpeakDelta is set ([4bc854d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/4bc854de4cbfcc35bbe3f4c4c3bacbf1b89f4ae6))
+* **speak:** discard stale autoflush after stop ([332d346](https://github.com/deepgram/deepgram-dotnet-sdk/commit/332d3461427d44ce489e932e0a8ec5b62c417cac))
+* **websocket:** bound teardown waits on another teardown's Close delivery ([6f5b0d7](https://github.com/deepgram/deepgram-dotnet-sdk/commit/6f5b0d7ec9edc189710b1d7b5e06d63fcd0e718b))
+* **websocket:** bound teardown waits on another teardown's Close delivery ([9453372](https://github.com/deepgram/deepgram-dotnet-sdk/commit/94533727fadd784bed0b2e2165cd5481ee3749e2)), closes [#468](https://github.com/deepgram/deepgram-dotnet-sdk/issues/468)
+* **websocket:** deliver Close to every handler when one throws ([5d86590](https://github.com/deepgram/deepgram-dotnet-sdk/commit/5d865909adeb15c14a0ed8f02472013257ed6d2d))
+* **websocket:** deliver v1 Listen and Speak events to every handler when one throws ([9a846e2](https://github.com/deepgram/deepgram-dotnet-sdk/commit/9a846e20bdd4343fef00ef442d92dda9c0711ac2))
+* **websocket:** deliver v1 Listen and Speak events to every handler when one throws ([5f2ba58](https://github.com/deepgram/deepgram-dotnet-sdk/commit/5f2ba586e77bcb38b841b53c4f2d052a7b3bf9d3)), closes [#469](https://github.com/deepgram/deepgram-dotnet-sdk/issues/469)
+* **websocket:** drop stale received frames ([8285bd9](https://github.com/deepgram/deepgram-dotnet-sdk/commit/8285bd97ff40fa0cac105cca639c5d74aaca6e31))
+* **websocket:** preserve autoflush across reconnect ([3d5b755](https://github.com/deepgram/deepgram-dotnet-sdk/commit/3d5b7553d17d38273caf1f2086098d97f6d50492))
+
 ## [7.5.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.4.1...7.5.0) (2026-11-13)
 
 
