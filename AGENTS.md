@@ -4,7 +4,7 @@ Instructions for AI coding agents (Claude Code, Cursor, Codex, Copilot) and for 
 
 ## Repository purpose
 
-This is the official .NET SDK for the Deepgram API, published to NuGet as `Deepgram` (the SDK) and `Deepgram.Microphone` (a capture helper). The latest release tag is `7.1.1`. Both packages target `net8.0` and `netstandard2.0`. The SDK is hand-written: there is no code generator, no `fern/` folder, and no `.fernignore`. Edit the source directly.
+This is the official .NET SDK for the Deepgram API, published to NuGet as `Deepgram` (the SDK) and `Deepgram.Microphone` (a capture helper). The latest release tag is `7.5.1`. Both packages target `net8.0` and `netstandard2.0`. The SDK is hand-written: there is no code generator, no `fern/` folder, and no `.fernignore`. Edit the source directly. `API_SPEC_PARITY.md` records the reviewed API-spec baseline and the process for keeping this hand-written surface aligned with generated SDKs.
 
 The package version is not stored in either project file. `Deepgram/Deepgram.csproj` has no `<Version>` element; Release Please tracks the next stable version in `version.txt` and `.github/.release-please-manifest.json`, then passes its release tag as `-p:Version=<tag>` at pack time.
 
@@ -134,7 +134,7 @@ Most examples end with `Console.ReadKey()`, so they need an interactive terminal
 
 Release Please manages stable releases from `main`; the full process is in `.github/BRANCH_AND_RELEASE_PROCESS.md`.
 
-1. `main` must stay releasable. Consumers install a tagged version from NuGet (`dotnet add package Deepgram --version 7.1.1`).
+1. `main` must stay releasable. Consumers install a tagged version from NuGet (`dotnet add package Deepgram --version 7.5.1`).
 2. Conventional commits merged to `main` cause `release-please.yml` to create or update a Release Please PR. Merging that PR creates a plain-SemVer tag, GitHub release, and changelog, then restores and builds `Deepgram.sln` with `-p:Version=<tag>`, packs both packages, and pushes them to nuget.org with the `NUGET_API_KEY` secret.
 3. Pre-release tags (`7.2.0-dev.1`, `-alpha.N`, `-beta.N`, `-rc.N`) run `CD-dev.yml`, which packs `Deepgram.DevBuild.sln` as `Deepgram.Unstable.SDK.Builds`.
 4. After a successful NuGet publication, the Release Please workflow requests a refresh of the Context7 repository index.
