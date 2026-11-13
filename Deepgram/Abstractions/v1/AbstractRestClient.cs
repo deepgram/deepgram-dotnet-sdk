@@ -248,6 +248,7 @@ public abstract class AbstractRestClient
 
             var stream = new MemoryStream();
             await response.Content.CopyToAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
 
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Succeeded");
             Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
