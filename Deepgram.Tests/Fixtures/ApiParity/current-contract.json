@@ -80,6 +80,51 @@
       "type": "Deepgram.Models.Agent.v2.WebSocket.ConversationTextResponse",
       "property": "ConversationalBehavior",
       "wireName": "conversational_behavior"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.ThinkLiveSettings",
+      "property": "Provider",
+      "wireName": "provider"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "Version",
+      "wireName": "version"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "AgentBackchannelSensitivity",
+      "wireName": "agent_backchannel_sensitivity"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "PresenceCheckMaxCount",
+      "wireName": "presence_check_max_count"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "PresenceCheckIntervalMs",
+      "wireName": "presence_check_interval_ms"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "FrustrationMaxCount",
+      "wireName": "frustration_max_count"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkLiveProvider",
+      "property": "RestrictedTerms",
+      "wireName": "restricted_terms"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.FrustrationDetectedResponse",
+      "property": "Count",
+      "wireName": "count"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.FrustrationDetectedResponse",
+      "property": "Escalated",
+      "wireName": "escalated"
     }
   ]
 }

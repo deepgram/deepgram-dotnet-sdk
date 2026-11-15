@@ -15,7 +15,9 @@ When an API definition changes, compare its OpenAPI/AsyncAPI source and override
 generated Java, JavaScript, and Python SDKs, then update the matching .NET model, client,
 exact wire regression test, documentation, parity matrix, and
 `Deepgram.Tests/Fixtures/ApiParity/current-contract.json`. The
-`ApiSpecParityContractTests` test makes a removed recorded field or wire-name change fail CI.
+`ApiSpecParityContractTests` test makes a removed recorded field or wire-name change fail CI
+on any pull request whose base is `main` or `release-v*` (the only branches this repo's CI
+builds against).
 Do not add CI that fetches mutable remote definitions.
 
 Never hardcode API keys or access tokens. Every client constructor and every `ClientFactory.Create*` method takes an optional `apiKey` and falls back to the `DEEPGRAM_API_KEY` environment variable (`DEEPGRAM_ACCESS_TOKEN` for a bearer token). Examples and tests rely on that fallback.
