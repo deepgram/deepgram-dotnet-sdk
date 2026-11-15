@@ -22,6 +22,7 @@ _Put an `x` in the boxes that apply. You can also fill these out after creating 
 - [ ] I have lint'ed all of my code using repo standards
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added necessary documentation (if appropriate)
+- [ ] For an API contract change, I compared the matching OpenAPI/AsyncAPI definition and override, updated `API_SPEC_PARITY.md` and `current-contract.json`, and added an exact wire regression test.
 
 ## Further comments
 <!--

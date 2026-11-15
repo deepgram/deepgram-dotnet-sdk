@@ -1,0 +1,75 @@
+{
+  "specSnapshot": "229defd4c32f220af07902c24efca5e94b4c47a4",
+  "contracts": [
+    {
+      "type": "Deepgram.Models.Listen.v1.REST.PreRecordedSchema",
+      "property": "LanguageHint",
+      "wireName": "language_hint"
+    },
+    {
+      "type": "Deepgram.Models.Listen.v1.REST.PreRecordedSchema",
+      "property": "RedactUsage",
+      "wireName": "redact_usage"
+    },
+    {
+      "type": "Deepgram.Models.Listen.v2.WebSocket.LiveSchema",
+      "property": "LanguageHint",
+      "wireName": "language_hint"
+    },
+    {
+      "type": "Deepgram.Models.Listen.v2.WebSocket.LiveSchema",
+      "property": "RedactUsage",
+      "wireName": "redact_usage"
+    },
+    {
+      "type": "Deepgram.Models.Flux.WebSocket.FluxSchema",
+      "property": "RedactUsage",
+      "wireName": "redact_usage"
+    },
+    {
+      "type": "Deepgram.Models.Flux.WebSocket.ConfigureSchema",
+      "property": "RedactUsage",
+      "wireName": "redact_usage"
+    },
+    {
+      "type": "Deepgram.Models.Flux.Speak.REST.SpeakSchema",
+      "property": "NormalizeVolume",
+      "wireName": "normalize_volume"
+    },
+    {
+      "type": "Deepgram.Models.Flux.Speak.WebSocket.SpeakSchema",
+      "property": "NormalizeVolume",
+      "wireName": "normalize_volume"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.Agent",
+      "property": "ThinkLive",
+      "wireName": "think_live"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.AgentUpdateThinkLiveSchema",
+      "property": "ThinkLive",
+      "wireName": "think_live"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.Function",
+      "property": "InitialAgentFiller",
+      "wireName": "initial_agent_filler"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.Function",
+      "property": "AgentFillerMaxCount",
+      "wireName": "agent_filler_max_count"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.Function",
+      "property": "AgentFillerIntervalMs",
+      "wireName": "agent_filler_interval_ms"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.ConversationTextResponse",
+      "property": "ConversationalBehavior",
+      "wireName": "conversational_behavior"
+    }
+  ]
+}

@@ -40,6 +40,10 @@ The expanded Flux TTS voice roster is not listed as a gap. The .NET SDK accepts
 model names as strings, so newly listed server models work without a generated
 enum update.
 
+`Deepgram.Tests/Fixtures/ApiParity/current-contract.json` records each supported
+public field and wire name in this matrix. `ApiSpecParityContractTests` runs in
+the ordinary test job and fails when a recorded field or its wire name disappears.
+
 ## Implementation sequence
 
 1. **Speech-to-text controls:** add Nova `language_hint` and `redact_usage`,
@@ -66,7 +70,9 @@ For an API-spec change:
 4. Add exact query-string or frame assertions, plus response dispatch coverage
    for new server events.
 5. Update this matrix, examples, README sections, and the applicable
-   code-documentation page.
+   code-documentation page. For an added or changed field, update
+   `current-contract.json` and add an exact query, frame, response, or dispatch
+   regression test before marking the matrix row Supported.
 
 Do not add CI that fetches a mutable remote specification. Keep this reviewed
 local baseline and update its snapshot in the same change that implements new
