@@ -56,14 +56,14 @@ public class ListenWebSocketConnectValidationTests
     }
 
     [Test]
-    public async Task Connect_With_LanguageHint_And_Without_A_Model_Should_Not_Throw_NullReferenceException()
+    public async Task Connect_With_LanguageHint_And_Without_A_Model_Should_Throw_DeepgramException()
     {
         var client = NewClient();
 
         Func<Task> act = async () => await client.Connect(new LiveSchema { LanguageHint = new List<string> { "en" } });
 
-        await act.Should().NotThrowAsync<NullReferenceException>(
-            "the language hint check must skip an unset model instead of dereferencing it");
+        await act.Should().ThrowAsync<DeepgramException>(
+            "the language hint guard treats an unset model as not nova-3/multi and rejects it");
     }
 
     [Test]
