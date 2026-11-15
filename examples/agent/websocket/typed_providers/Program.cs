@@ -65,7 +65,7 @@ namespace SampleApp
                 };
 
                 // Reasoning. Swap in AnthropicThinkProvider, GoogleThinkProvider,
-                // GroqThinkProvider or AwsBedrockThinkProvider as needed.
+                // GroqThinkProvider, AwsBedrockThinkProvider, or DeepgramThinkProvider as needed.
                 settings.Agent.Think = new Think
                 {
                     Provider = new OpenAiThinkProvider
@@ -74,6 +74,16 @@ namespace SampleApp
                         Temperature = 0.7,
                     },
                 };
+
+                // A Deepgram-hosted reasoning model supports version, temperature, reasoning, and
+                // voice-prompt controls. Use phonellm-mini-alpha-2-fp8 with MIP opt-out sessions.
+                // settings.Agent.Think.Provider = new DeepgramThinkProvider
+                // {
+                //     Model = "phonellm-mini-alpha-2-fp8",
+                //     Temperature = 0.2,
+                //     ReasoningMode = "none",
+                //     VoicePromptOptOut = true,
+                // };
 
                 // Think Live runs alongside the reasoning LLM for backchannels, presence checks,
                 // and frustration detection. It requires no model name: Deepgram V1 is the only

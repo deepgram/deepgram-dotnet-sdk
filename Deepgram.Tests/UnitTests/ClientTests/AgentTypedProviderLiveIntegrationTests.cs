@@ -108,6 +108,38 @@ public class AgentTypedProviderLiveIntegrationTests
     }
 
     [Test]
+    public async Task Live_Agent_Should_Accept_Typed_Deepgram_Think_Provider_Options()
+    {
+        var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping Deepgram think provider integration test.");
+
+        var settings = BaseSettings();
+        settings.MipOptOut = true;
+        settings.Agent.Listen = new Listen
+        {
+            Provider = new DeepgramListenProviderV1 { Model = "nova-3" },
+        };
+        settings.Agent.Think = new Think
+        {
+            Provider = new DeepgramThinkProvider
+            {
+                Model = "phonellm-mini-alpha-2-fp8",
+                Temperature = 0.2,
+                ReasoningMode = "none",
+                VoicePromptOptOut = true,
+            },
+        };
+        settings.Agent.Speak = new Speak { Provider = new DeepgramSpeakProvider { Model = "aura-2-thalia-en" } };
+
+        var (settingsApplied, errors) = await ConnectWith(apiKey, settings);
+
+        using (new AssertionScope())
+        {
+            settingsApplied.Should().BeTrue("the server must apply the typed Deepgram think provider options");
+            errors.Should().BeEmpty();
+        }
+    }
+
+    [Test]
     public async Task Live_Agent_Should_Accept_ThinkLive_And_Function_Fillers()
     {
         var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping Think Live integration test.");

@@ -905,6 +905,16 @@ var chargeCard = new Function
 };
 settings.Agent.Think.Functions = new List<Function> { chargeCard };
 
+// Use a Deepgram-hosted reasoning model when you need its version, temperature,
+// reasoning, or voice-prompt controls.
+settings.Agent.Think.Provider = new DeepgramThinkProvider
+{
+    Model = "phonellm-mini-alpha-2-fp8",
+    Temperature = 0.2,
+    ReasoningMode = "none",
+    VoicePromptOptOut = true,
+};
+
 // Connect settings before sending any session control message.
 await agentClient.Connect(settings);
 
