@@ -12,6 +12,11 @@
       "wireName": "redact_usage"
     },
     {
+      "type": "Deepgram.Models.Listen.v1.REST.Alternative",
+      "property": "LanguagesHinted",
+      "wireName": "languages_hinted"
+    },
+    {
       "type": "Deepgram.Models.Listen.v2.WebSocket.LiveSchema",
       "property": "LanguageHint",
       "wireName": "language_hint"
@@ -20,6 +25,11 @@
       "type": "Deepgram.Models.Listen.v2.WebSocket.LiveSchema",
       "property": "RedactUsage",
       "wireName": "redact_usage"
+    },
+    {
+      "type": "Deepgram.Models.Listen.v2.WebSocket.Alternative",
+      "property": "LanguagesHinted",
+      "wireName": "languages_hinted"
     },
     {
       "type": "Deepgram.Models.Flux.WebSocket.FluxSchema",
