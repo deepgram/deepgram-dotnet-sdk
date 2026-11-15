@@ -14,6 +14,7 @@ public static class AgentWebSocketClientExtensions
 {
     public static Task SendUpdateListen(this IAgentWebSocketClient client, AgentUpdateListenSchema message) => Send(client, message);
     public static Task SendUpdateThink(this IAgentWebSocketClient client, AgentUpdateThinkSchema message) => Send(client, message);
+    public static Task SendUpdateThinkLive(this IAgentWebSocketClient client, AgentUpdateThinkLiveSchema message) => Send(client, message);
     public static Task SendUpdateSpeak(this IAgentWebSocketClient client, AgentUpdateSpeakSchema message) => Send(client, message);
     public static Task SendUpdatePrompt(this IAgentWebSocketClient client, AgentUpdatePromptSchema message) => Send(client, message);
     public static Task SendInjectAgentMessage(this IAgentWebSocketClient client, AgentInjectAgentMessageSchema message) => Send(client, message);
@@ -60,6 +61,8 @@ public static class AgentWebSocketClientExtensions
                 throw new ArgumentException("UpdateListen requires Listen with a valid provider.", nameof(message));
             case AgentUpdateThinkSchema updateThink when updateThink.Think is null || !HasProviderTypeAndModel(updateThink.Think):
                 throw new ArgumentException("UpdateThink requires Think with provider type and model.", nameof(message));
+            case AgentUpdateThinkLiveSchema updateThinkLive when updateThinkLive.ThinkLive?.Provider is null:
+                throw new ArgumentException("UpdateThink_Live requires ThinkLive with a provider.", nameof(message));
             case AgentUpdateSpeakSchema updateSpeak when updateSpeak.Speak is null || !HasSpeakProviderType(updateSpeak.Speak):
                 throw new ArgumentException("UpdateSpeak requires Speak with a provider type.", nameof(message));
             case AgentUpdatePromptSchema updatePrompt when string.IsNullOrWhiteSpace(updatePrompt.Prompt):

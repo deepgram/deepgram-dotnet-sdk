@@ -106,4 +106,69 @@ public class AgentTypedProviderLiveIntegrationTests
             errors.Should().BeEmpty();
         }
     }
+
+    [Test]
+    public async Task Live_Agent_Should_Accept_ThinkLive_And_Function_Fillers()
+    {
+        var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping Think Live integration test.");
+
+        var settings = BaseSettings();
+        settings.Agent.Listen = new Listen
+        {
+            Provider = new DeepgramListenProviderV2
+            {
+                Model = "flux-general-en",
+                EotThreshold = 0.7,
+                EotTimeoutMs = 5000,
+            },
+        };
+        settings.Agent.Think = new Think
+        {
+            Provider = new OpenAiThinkProvider { Model = "gpt-5.4-mini" },
+            Functions = new List<Function>
+            {
+                new()
+                {
+                    Name = "lookup_order",
+                    Description = "Look up an order by identifier.",
+                    Parameters = new Dictionary<string, object>
+                    {
+                        ["type"] = "object",
+                        ["properties"] = new Dictionary<string, object>
+                        {
+                            ["order_id"] = new Dictionary<string, object> { ["type"] = "string" },
+                        },
+                        ["required"] = new List<string> { "order_id" },
+                    },
+                    DeferUntilEot = true,
+                    InitialAgentFiller = true,
+                    AgentFillerMaxCount = 2,
+                    AgentFillerIntervalMs = 3000,
+                },
+            },
+        };
+        settings.Agent.ThinkLive = new ThinkLiveSettings
+        {
+            Provider = new DeepgramThinkLiveProvider
+            {
+                AgentBackchannelSensitivity = 0.4,
+                PresenceCheckMaxCount = 3,
+                PresenceCheckIntervalMs = 5000,
+                FrustrationMaxCount = 2,
+                RestrictedTerms = new List<string> { "forbidden phrase" },
+            },
+        };
+        settings.Agent.Speak = new Speak
+        {
+            Provider = new DeepgramSpeakProvider { Version = "v2", Model = "flux-kit-en" },
+        };
+
+        var (settingsApplied, errors) = await ConnectWith(apiKey, settings);
+
+        using (new AssertionScope())
+        {
+            settingsApplied.Should().BeTrue("the server must apply typed Think Live settings");
+            errors.Should().BeEmpty();
+        }
+    }
 }

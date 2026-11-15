@@ -36,6 +36,21 @@ public class AgentUpdateThinkSchema
 }
 
 /// <summary>
+/// Replaces the active Think Live provider configuration during an Agent session.
+/// </summary>
+public class AgentUpdateThinkLiveSchema
+{
+    [JsonPropertyName("type")]
+    public string Type { get; } = AgentClientTypes.UpdateThinkLive;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("think_live")]
+    public ThinkLiveSettings? ThinkLive { get; set; }
+
+    public override string ToString() => JsonSerializer.Serialize(this, JsonSerializeOptions.DefaultOptions);
+}
+
+/// <summary>
 /// Updates the active text-to-speech configuration during an Agent session. The protocol accepts
 /// either a single <see cref="Speak"/> object or an array of Speak configurations.
 /// </summary>

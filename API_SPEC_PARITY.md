@@ -30,11 +30,11 @@ files.
 | Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | Configure-frame serialization and a gated live ConfigureSuccess assertion. |
 | Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Supported | Lowercase URL serialization, omission when unset, and a gated live batch request. |
 | Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Supported | Lowercase connection-query serialization, omission when unset, and a gated live stream. |
-| Voice Agent Think Live settings | `Agent`, typed provider models | Pending | Settings serialization preserves the complete provider payload. |
-| Voice Agent `UpdateThink_Live` | protocol schema, client, and interface | Pending | The exact control frame is sent and `ThinkLiveUpdated` dispatches to a typed subscriber. |
-| Voice Agent `FrustrationDetected` | protocol response, client, and interface | Pending | The typed payload dispatches; unknown frames remain non-fatal. |
-| Think Live function fillers | `Function` | Pending | All three filler options serialize with their documented wire names. |
-| Voice Agent `conversational_behavior` | `ConversationTextResponse` | Pending | The value deserializes and missing legacy/self-hosted values safely default to `default`. |
+| Voice Agent Think Live settings | `Agent`, typed provider models | Supported | Full payload serialization plus a gated SettingsApplied integration test. |
+| Voice Agent `UpdateThink_Live` | protocol schema and extension | Supported | Exact control-frame serialization plus typed `ThinkLiveUpdated` dispatch coverage. |
+| Voice Agent `FrustrationDetected` | protocol response and interface | Supported | Typed payload dispatch and no-subscriber forward-compat coverage. |
+| Think Live function fillers | `Function` | Supported | All wire names serialize and the gated Think Live settings test covers server acceptance. |
+| Voice Agent `conversational_behavior` | `ConversationTextResponse` | Supported | Values dispatch typed and legacy/self-hosted payloads default to `default`. |
 
 The expanded Flux TTS voice roster is not listed as a gap. The .NET SDK accepts
 model names as strings, so newly listed server models work without a generated

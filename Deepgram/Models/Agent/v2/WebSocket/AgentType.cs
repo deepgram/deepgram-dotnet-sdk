@@ -26,6 +26,8 @@ public enum AgentType
     SpeakUpdated,
     ListenUpdated,
     ThinkUpdated,
+    ThinkLiveUpdated,
+    FrustrationDetected,
     FunctionCallCancelled,
     FunctionCallResponse,
     CustomFromThinkProvider,
@@ -41,6 +43,7 @@ public static class AgentClientTypes
     public const string UpdatePrompt = "UpdatePrompt";
     public const string UpdateListen = "UpdateListen";
     public const string UpdateThink = "UpdateThink";
+    public const string UpdateThinkLive = "UpdateThink_Live";
     public const string UpdateSpeak = "UpdateSpeak";
     public const string InjectAgentMessage = "InjectAgentMessage";
     public const string InjectUserMessage = "InjectUserMessage";

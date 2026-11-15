@@ -19,7 +19,7 @@ Agent sessions need more than a transcription stream or a TTS stream. They need 
 
 ## How it works internally
 
-`SettingsSchema` contains top-level `Audio` and `Agent` objects. `Audio.Input` and `Audio.Output` carry formats like `linear16`, sample rate, and container settings. `Agent` contains nested `Listen`, `Think`, and `Speak` records, each of which exposes a `Provider`. The interesting part is `Provider.cs`: it inherits from `DynamicObject`, stores arbitrary JSON in `AdditionalProperties`, and converts C# dynamic member names to `snake_case` before serialization. That is how example code can write values like `settingsConfiguration.Agent.Think.Provider.Model = "gpt-4o-mini"` even though `Provider` only declares `Type` explicitly.
+`SettingsSchema` contains top-level `Audio` and `Agent` objects. `Audio.Input` and `Audio.Output` carry formats like `linear16`, sample rate, and container settings. `Agent` contains nested `Listen`, `Think`, `ThinkLive`, and `Speak` records. `ThinkLive` is typed because Deepgram is its only provider; it adds backchannels, presence checks, function-call fillers, and frustration detection alongside the reasoning LLM. The other provider fields remain dynamic: `Provider.cs` inherits from `DynamicObject`, stores arbitrary JSON in `AdditionalProperties`, and converts C# dynamic member names to `snake_case` before serialization.
 
 In `Deepgram/Clients/Agent/v2/Websocket/Client.cs`, `Connect(SettingsSchema, ...)` first opens the socket with `base.Connect`, then serializes `SettingsSchema` to JSON. Before sending the payload, the client removes empty nested provider objects from `agent.think`, `agent.speak`, and `agent.listen`. That cleanup avoids shipping empty `{}` objects for sections the caller did not configure. After the cleaned JSON is sent, the client can optionally start a keepalive loop and then publish events such as `WelcomeResponse`, `ConversationTextResponse`, `AgentThinkingResponse`, `AudioResponse`, `FunctionCallRequestResponse`, and `AgentAudioDoneResponse`.
 
@@ -96,6 +96,15 @@ settings.Agent.Think.Functions = new List<Function>
     {
         Name = "lookup_ticket",
         Description = "Fetch a ticket by id"
+    }
+};
+
+settings.Agent.ThinkLive = new ThinkLiveSettings
+{
+    Provider = new DeepgramThinkLiveProvider
+    {
+        FrustrationMaxCount = 2,
+        RestrictedTerms = new List<string> { "human", "transfer" }
     }
 };
 

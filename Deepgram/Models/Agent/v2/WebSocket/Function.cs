@@ -27,6 +27,18 @@ public record Function
     public bool? DeferUntilEot { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("initial_agent_filler")]
+    public bool? InitialAgentFiller { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("agent_filler_max_count")]
+    public int? AgentFillerMaxCount { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("agent_filler_interval_ms")]
+    public int? AgentFillerIntervalMs { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("endpoint")]
     public FunctionEndpoint? Endpoint { get; set; }
 
