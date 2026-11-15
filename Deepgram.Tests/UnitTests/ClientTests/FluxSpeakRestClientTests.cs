@@ -91,6 +91,20 @@ public class FluxSpeakRestClientTests
     }
 
     [Test]
+    public void Request_Url_Should_Serialize_NormalizeVolume_True()
+    {
+        var schema = new SpeakSchema
+        {
+            Model = "flux-alexis-en",
+            NormalizeVolume = true,
+        };
+
+        var url = QueryParameterUtil.FormatURL(Client.GetUri(_options), schema);
+
+        url.Should().Contain("normalize_volume=true");
+    }
+
+    [Test]
     public void Request_Url_Should_Serialize_Integer_SampleRate_And_BitRate_Without_Decimal()
     {
         var originalCulture = CultureInfo.CurrentCulture;

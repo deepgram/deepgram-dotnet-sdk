@@ -185,6 +185,7 @@ public class SpeakSchema
     public int? SampleRate { get; set; }
     public double? Speed { get; set; }
     public int? Expressivity { get; set; }
+    public bool? NormalizeVolume { get; set; }
 }
 ```
 

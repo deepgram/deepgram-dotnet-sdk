@@ -208,9 +208,9 @@ public class FluxSpeakClientTests
 
         var query = Client.BuildQueryString(schema);
 
-            query.Should().NotContain("speed=");
-            query.Should().NotContain("expressivity=");
-            query.Should().NotContain("normalize_volume=");
+        query.Should().NotContain("speed=");
+        query.Should().NotContain("expressivity=");
+        query.Should().NotContain("normalize_volume=");
     }
     #endregion
 
