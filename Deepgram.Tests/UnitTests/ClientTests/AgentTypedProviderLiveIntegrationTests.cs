@@ -171,4 +171,68 @@ public class AgentTypedProviderLiveIntegrationTests
             errors.Should().BeEmpty();
         }
     }
+
+    [Test]
+    public async Task Live_Agent_Should_Acknowledge_UpdateThinkLive()
+    {
+        var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping Think Live update integration test.");
+        var client = ClientFactory.CreateAgentProtocolClient(apiKey);
+        var settingsApplied = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var thinkLiveUpdated = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var errors = new List<ErrorResponse>();
+
+        await client.Subscribe(new EventHandler<SettingsAppliedResponse>((_, _) => settingsApplied.TrySetResult(true)));
+        await client.Subscribe(new EventHandler<ThinkLiveUpdatedResponse>((_, _) => thinkLiveUpdated.TrySetResult(true)));
+        await client.Subscribe(new EventHandler<ErrorResponse>((_, e) => { lock (errors) { errors.Add(e); } }));
+
+        var settings = BaseSettings();
+        settings.Agent.Listen = new Listen
+        {
+            Provider = new DeepgramListenProviderV2
+            {
+                Model = "flux-general-en",
+                EotThreshold = 0.7,
+                EotTimeoutMs = 5000,
+            },
+        };
+        settings.Agent.Think = new Think { Provider = new OpenAiThinkProvider { Model = "gpt-5.4-mini" } };
+        settings.Agent.ThinkLive = new ThinkLiveSettings
+        {
+            Provider = new DeepgramThinkLiveProvider { FrustrationMaxCount = 2 },
+        };
+        settings.Agent.Speak = new Speak
+        {
+            Provider = new DeepgramSpeakProvider { Version = "v2", Model = "flux-kit-en" },
+        };
+
+        try
+        {
+            (await client.Connect(settings)).Should().BeTrue("the agent must connect before Think Live is updated");
+            (await Task.WhenAny(settingsApplied.Task, Task.Delay(20000))).Should().Be(settingsApplied.Task,
+                "the server must apply the initial Think Live settings");
+
+            await client.SendUpdateThinkLive(new AgentUpdateThinkLiveSchema
+            {
+                ThinkLive = new ThinkLiveSettings
+                {
+                    Provider = new DeepgramThinkLiveProvider
+                    {
+                        AgentBackchannelSensitivity = 0.4,
+                        PresenceCheckMaxCount = 2,
+                        PresenceCheckIntervalMs = 5000,
+                        FrustrationMaxCount = 3,
+                        RestrictedTerms = new List<string> { "human", "transfer" },
+                    },
+                },
+            });
+
+            (await Task.WhenAny(thinkLiveUpdated.Task, Task.Delay(10000))).Should().Be(thinkLiveUpdated.Task,
+                "the server must acknowledge UpdateThink_Live with ThinkLiveUpdated");
+            errors.Should().BeEmpty();
+        }
+        finally
+        {
+            await client.Stop();
+        }
+    }
 }
