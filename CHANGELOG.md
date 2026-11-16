@@ -5,24 +5,15 @@
 
 ### Features
 
-* **agent:** add Think Live controls and events ([83497db](https://github.com/deepgram/deepgram-dotnet-sdk/commit/83497db2af357fd4ee6c69d5642043ede0a58695))
-* **agent:** add Think Live controls and events ([96f7482](https://github.com/deepgram/deepgram-dotnet-sdk/commit/96f7482dd3ee50e76f6e59cfafb1ff3655f0e2bc))
-* **flux-tts:** add volume normalization control ([f203725](https://github.com/deepgram/deepgram-dotnet-sdk/commit/f203725019ce0f1771fe9772fb9e8da9e0bee167))
-* **flux-tts:** add volume normalization control ([c3b2a04](https://github.com/deepgram/deepgram-dotnet-sdk/commit/c3b2a0442b40fc4c3a300826b524ff8a6a05b099))
-* **listen:** add language hints and usage redaction controls ([d590c49](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d590c497fcdecbb71e263437de7b3cbfdccf9972))
-* **listen:** add language hints and usage redaction controls ([d967afb](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d967afb93ca5f3fa9a8764a5dd39e38b5cc774c9))
-* **listen:** expose normalized language hints ([c575ebf](https://github.com/deepgram/deepgram-dotnet-sdk/commit/c575ebf6fb83010bf9bc64d466ed1e8b61d6248c))
+* **agent:** Add typed Think Live configuration, live-update controls, and typed events for Think Live updates and frustration detection. Voice Agent function settings now support initial agent fillers, filler limits, and filler intervals; conversation-text responses also expose `ConversationalBehavior`. ([83497db](https://github.com/deepgram/deepgram-dotnet-sdk/commit/83497db2af357fd4ee6c69d5642043ede0a58695))
+* **flux-tts:** Add optional `NormalizeVolume` controls to Flux TTS REST and WebSocket connections. ([f203725](https://github.com/deepgram/deepgram-dotnet-sdk/commit/f203725019ce0f1771fe9772fb9e8da9e0bee167))
+* **listen:** Add repeatable `LanguageHint` options for Nova-3 multilingual prerecorded and streaming transcription, and return normalized hints in transcription results. Add `RedactUsage` for prerecorded, streaming, and Flux STT connections and Flux STT configuration messages, so user-supplied terms can be redacted from usage records without changing transcription results. ([d590c49](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d590c497fcdecbb71e263437de7b3cbfdccf9972))
 
 
 ### Bug Fixes
 
-* **docs,test:** sync Flux Speak schema sample, cover NormalizeVolume=true ([25429e6](https://github.com/deepgram/deepgram-dotnet-sdk/commit/25429e628f38d255148985e2992b81705b5fbac6))
-* **listen:** reject LanguageHint on non-multilingual Nova-3 streaming connections ([95efb2c](https://github.com/deepgram/deepgram-dotnet-sdk/commit/95efb2c1f783d661e3875b46de0cef1cec5d1e4e))
-* **test:** assert the real exception from the LanguageHint guard ([0342e79](https://github.com/deepgram/deepgram-dotnet-sdk/commit/0342e79de40e75be30d9f97f424283e654176526))
-* **test:** backfill the parity manifest with [#490](https://github.com/deepgram/deepgram-dotnet-sdk/issues/490)'s Think Live fields ([bf01364](https://github.com/deepgram/deepgram-dotnet-sdk/commit/bf01364ee7dbf3d5dd6d796abae4e38dfef9cd67))
-* **websocket:** clean up failed v1 connection attempts ([382c7c5](https://github.com/deepgram/deepgram-dotnet-sdk/commit/382c7c5a7890c09e39238a20b1390f3d5a862636))
-* **websocket:** clean up failed v1 connection attempts ([4331171](https://github.com/deepgram/deepgram-dotnet-sdk/commit/4331171046be772abc693044f7a5dbf267a127ae))
-* **websocket:** preserve status on failed v1 upgrades ([8f25171](https://github.com/deepgram/deepgram-dotnet-sdk/commit/8f2517165f10eb41b006945972cd5beef663ce30))
+* **listen:** Reject `LanguageHint` on Nova-3 connections that are not configured for multilingual transcription. ([95efb2c](https://github.com/deepgram/deepgram-dotnet-sdk/commit/95efb2c1f783d661e3875b46de0cef1cec5d1e4e))
+* **websocket:** Clean up failed legacy Listen and Speak WebSocket connection attempts and preserve the HTTP status returned by a failed upgrade. ([382c7c5](https://github.com/deepgram/deepgram-dotnet-sdk/commit/382c7c5a7890c09e39238a20b1390f3d5a862636))
 
 ## [7.5.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.5.0...7.5.1) (2026-11-13)
 
