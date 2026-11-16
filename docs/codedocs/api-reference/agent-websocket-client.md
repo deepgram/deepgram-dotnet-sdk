@@ -97,7 +97,7 @@ implement `IAgentProtocolClient`.
 | `AgentInjectAgentMessageSchema` | `Message`, `Behavior` | Current Agent speech injection message. |
 | `AgentCustomToThinkProviderSchema` | `Content` | Experimental arbitrary JSON forwarded to a custom Think provider. |
 | `Function` | `DeferUntilEot`, `InitialAgentFiller`, `AgentFillerMaxCount`, `AgentFillerIntervalMs` | Filler options require `ThinkLive`. |
-| `DeepgramThinkProvider` | `Model`, `Version`, `Temperature`, `ReasoningMode`, `VoicePromptOptOut` | Typed Deepgram-hosted reasoning provider. |
+| `DeepgramThinkProvider` | `Model`, `Version`, `Temperature`, `ReasoningMode`, `VoicePromptOptOut` | Typed Deepgram-hosted reasoning provider. `VoicePromptOptOut` applies only to `think-fast`, which requires MIP participation. |
 
 ## Example
 

@@ -46,7 +46,7 @@ public record DeepgramThinkProvider
     public string? ReasoningMode { get; set; }
 
     /// <summary>
-    /// Requests an opt-out of Deepgram's spoken-style prompt prefix.
+    /// With <c>think-fast</c>, opt out of Deepgram's spoken-style prompt prefix.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("voice_prompt_opt_out")]

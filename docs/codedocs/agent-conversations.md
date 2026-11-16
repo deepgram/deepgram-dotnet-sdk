@@ -24,6 +24,9 @@ Agent sessions need more than a transcription stream or a TTS stream. They need 
 `DeepgramThinkProvider` is the typed exception for the reasoning stage. It accepts
 the Deepgram-hosted `think-fast` and `phonellm-mini-alpha-2-fp8` models, plus
 `Version`, `Temperature`, `ReasoningMode`, and `VoicePromptOptOut`.
+`VoicePromptOptOut` applies only to `think-fast`, which requires Model Improvement
+Program participation (`SettingsSchema.MipOptOut = false`); use
+`phonellm-mini-alpha-2-fp8` when a session opts out of the program.
 
 In `Deepgram/Clients/Agent/v2/Websocket/Client.cs`, `Connect(SettingsSchema, ...)` first opens the socket with `base.Connect`, then serializes `SettingsSchema` to JSON. Before sending the payload, the client removes empty nested provider objects from `agent.think`, `agent.speak`, and `agent.listen`. That cleanup avoids shipping empty `{}` objects for sections the caller did not configure. After the cleaned JSON is sent, the client can optionally start a keepalive loop and then publish events such as `WelcomeResponse`, `ConversationTextResponse`, `AgentThinkingResponse`, `AudioResponse`, `FunctionCallRequestResponse`, and `AgentAudioDoneResponse`.
 
