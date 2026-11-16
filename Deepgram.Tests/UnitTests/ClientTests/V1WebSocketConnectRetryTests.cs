@@ -41,7 +41,7 @@ public class V1WebSocketConnectRetryTests
                 await listenClient!.Connect(new Deepgram.Models.Listen.v1.WebSocket.LiveSchema(), token);
         }
 
-        // The server accepts TCP but never answers the WebSocket upgrade.
+        // Cancel a pending upgrade or explicitly reject it with an HTTP response.
         for (var attempt = 0; attempt < 2; attempt++)
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -54,7 +54,15 @@ public class V1WebSocketConnectRetryTests
             }
             else
             {
-                accepted.Dispose();
+                using var stream = accepted.GetStream();
+                using var reader = new StreamReader(stream, leaveOpen: true);
+                while (!string.IsNullOrEmpty(await reader.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(5))))
+                {
+                }
+                var response = System.Text.Encoding.ASCII.GetBytes(
+                    "HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+                await stream.WriteAsync(response);
+                await stream.FlushAsync();
                 Func<Task> failed = () => connect;
                 if (wrapException)
                     await failed.Should().ThrowAsync<DeepgramWebSocketException>();
