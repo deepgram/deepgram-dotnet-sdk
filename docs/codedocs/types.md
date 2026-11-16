@@ -175,7 +175,7 @@ public class SpeakSchema
 }
 ```
 
-`Deepgram.Models.Flux.Speak.REST.SpeakSchema` and `Deepgram.Models.Flux.Speak.WebSocket.SpeakSchema` configure Flux TTS on `/v2/speak`. Both require a `flux-*` model. The REST schema adds `Container`, `BitRate`, callback options, and `Priority`; the WebSocket schema emits raw audio and supports only `Encoding` and `SampleRate` output options. Both support `Speed` and beta `Expressivity`.
+`Deepgram.Models.Flux.Speak.REST.SpeakSchema` and `Deepgram.Models.Flux.Speak.WebSocket.SpeakSchema` configure Flux TTS on `/v2/speak`. Both require a `flux-*` model. The REST schema adds `Container`, `BitRate`, callback options, and `Priority`; the WebSocket schema emits raw audio and supports only `Encoding` and `SampleRate` output options. Both support `Speed`, beta `Expressivity`, and `NormalizeVolume` (enabled by default; `false` opts out while peak limiting remains active).
 
 ```csharp
 public class SpeakSchema
@@ -185,6 +185,7 @@ public class SpeakSchema
     public int? SampleRate { get; set; }
     public double? Speed { get; set; }
     public int? Expressivity { get; set; }
+    public bool? NormalizeVolume { get; set; }
 }
 ```
 

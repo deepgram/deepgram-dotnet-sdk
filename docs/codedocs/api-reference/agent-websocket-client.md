@@ -55,6 +55,7 @@ Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler)
 
 `ClientFactory.CreateAgentProtocolClient()` returns `IAgentProtocolClient`, which additionally
 provides typed subscriptions for `ListenUpdatedResponse`, `ThinkUpdatedResponse`,
+`ThinkLiveUpdatedResponse`, `FrustrationDetectedResponse`,
 `FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`,
 `AgentHistoryResponse`, `FunctionCallResponse`, and `CustomFromThinkProviderResponse`.
 
@@ -74,7 +75,7 @@ bool IsConnected()
 ```
 
 The following extension methods work with both `IAgentWebSocketClient` and
-`IAgentProtocolClient`: `SendUpdateListen`, `SendUpdateThink`, `SendUpdateSpeak`,
+`IAgentProtocolClient`: `SendUpdateListen`, `SendUpdateThink`, `SendUpdateThinkLive`, `SendUpdateSpeak`,
 `SendUpdatePrompt`, `SendInjectAgentMessage`, `SendFunctionCallResponse`, and
 `SendCustomToThinkProvider`.
 `SendForceEndTurn` is available on `IAgentProtocolClient` and, as an extension method, on the
@@ -88,14 +89,14 @@ implement `IAgentProtocolClient`.
 | Type | Important fields | Notes |
 |-----------|------|-------------|
 | `SettingsSchema` | `Experimental`, `Tags`, `MipOptOut`, `Flags`, `Audio`, `Agent` | Initial settings payload sent immediately after connect; set `Flags.History` to control History event reporting. |
-| `Agent` | `Language`, `Listen`, `Think`, `Speak`, `Greeting` | Conversation behavior. |
+| `Agent` | `Language`, `Listen`, `Think`, `ThinkLive`, `Speak`, `Greeting` | `ThinkLive` enables Deepgram backchannels, presence checks, fillers, and frustration detection. |
 | `Input` | `Encoding`, `SampleRate` | Input audio format. |
 | `Output` | `Encoding`, `SampleRate`, `Bitrate`, `Container` | Output audio format. |
 | `InjectUserMessageSchema` | `Type`, `Content` | Text injection without microphone audio. |
 | `AgentFunctionCallResponseSchema` | `Id`, `Name`, `Content` | Current response message for function-calling flows. |
 | `AgentInjectAgentMessageSchema` | `Message`, `Behavior` | Current Agent speech injection message. |
 | `AgentCustomToThinkProviderSchema` | `Content` | Experimental arbitrary JSON forwarded to a custom Think provider. |
-| `Function` | `DeferUntilEot` | Prevents speculative dispatch of irreversible functions. |
+| `Function` | `DeferUntilEot`, `InitialAgentFiller`, `AgentFillerMaxCount`, `AgentFillerIntervalMs` | Filler options require `ThinkLive`. |
 
 ## Example
 

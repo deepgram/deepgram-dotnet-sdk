@@ -93,6 +93,7 @@ public class FluxSpeakLiveIntegrationTests
             Model = "flux-alexis-en",
             Encoding = "linear16",
             SampleRate = 24000,
+            NormalizeVolume = false,
         });
         connected.Should().BeTrue("the client must connect to the live Flux TTS endpoint");
 
@@ -165,6 +166,7 @@ public class FluxSpeakLiveIntegrationTests
                 Model = "flux-alexis-en",
                 Encoding = "mp3",
                 BitRate = 48000,
+                NormalizeVolume = false,
             });
 
         using (new AssertionScope())

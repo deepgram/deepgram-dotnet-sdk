@@ -46,7 +46,7 @@ Examples end with `Console.ReadKey()`, so run them in an interactive terminal.
 ## Making changes
 
 1. Fork the repository and create a branch from `main`.
-2. Make the change, add or update a test under `Deepgram.Tests/UnitTests`, and update the affected example and `README.md` section.
+2. Make the change, add or update a test under `Deepgram.Tests/UnitTests`, and update the affected example and `README.md` section. For an API contract change, follow `API_SPEC_PARITY.md`: compare the matching OpenAPI/AsyncAPI definition and override, update the parity matrix and `Deepgram.Tests/Fixtures/ApiParity/current-contract.json`, and pin the wire behavior with an exact query, frame, response, or dispatch test.
 3. Run `dotnet test Deepgram.sln` and `dotnet build Deepgram.Dev.sln`.
 4. Commit with a [Conventional Commits](https://www.conventionalcommits.org/) message (`feat:`, `fix:`, `docs:`, `chore:`).
 5. Open a pull request against `main` and fill in `.github/PULL_REQUEST_TEMPLATE.md`.

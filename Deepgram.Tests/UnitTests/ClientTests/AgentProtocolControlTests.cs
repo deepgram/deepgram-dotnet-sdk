@@ -35,6 +35,10 @@ public class AgentProtocolControlTests
         dynamic cartesiaProvider = new Provider { Type = "cartesia" };
         cartesiaProvider.ModelId = "sonic-english";
         await client.SendUpdateThink(new AgentUpdateThinkSchema { Think = new Think { Provider = thinkProvider, Prompt = "Be concise" } });
+        await client.SendUpdateThinkLive(new AgentUpdateThinkLiveSchema
+        {
+            ThinkLive = new ThinkLiveSettings { Provider = new DeepgramThinkLiveProvider { FrustrationMaxCount = 2 } },
+        });
         await client.SendUpdateSpeak(new AgentUpdateSpeakSchema
         {
             Speak = new Speak
@@ -59,16 +63,17 @@ public class AgentProtocolControlTests
         using (new AssertionScope())
         {
             payloads.Select(document => document.RootElement.GetProperty("type").GetString()).Should().Equal(
-                "UpdateListen", "UpdateThink", "UpdateSpeak", "UpdatePrompt", "InjectAgentMessage", "FunctionCallResponse", "__customToThinkProvider");
-            payloads[4].RootElement.GetProperty("message").GetString().Should().Be("One moment");
-            payloads[4].RootElement.GetProperty("behavior").GetString().Should().Be("queue");
-            payloads[2].RootElement.GetProperty("speak").ValueKind.Should().Be(JsonValueKind.Array);
-            payloads[2].RootElement.GetProperty("speak")[0].GetProperty("provider").GetProperty("model").GetString().Should().Be("aura-2-thalia-en");
-            payloads[2].RootElement.GetProperty("speak")[1].GetProperty("provider").GetProperty("type").GetString().Should().Be("aws_polly");
-            payloads[2].RootElement.GetProperty("speak")[2].GetProperty("provider").GetProperty("model_id").GetString().Should().Be("sonic-english");
-            payloads[5].RootElement.GetProperty("id").GetString().Should().Be("call-1");
-            payloads[5].RootElement.GetProperty("content").GetString().Should().Be("{}");
-            payloads[6].RootElement.GetProperty("content").GetProperty("action").GetString().Should().Be("continue");
+                "UpdateListen", "UpdateThink", "UpdateThink_Live", "UpdateSpeak", "UpdatePrompt", "InjectAgentMessage", "FunctionCallResponse", "__customToThinkProvider");
+            payloads[2].RootElement.GetProperty("think_live").GetProperty("provider").GetProperty("version").GetString().Should().Be("v1");
+            payloads[5].RootElement.GetProperty("message").GetString().Should().Be("One moment");
+            payloads[5].RootElement.GetProperty("behavior").GetString().Should().Be("queue");
+            payloads[3].RootElement.GetProperty("speak").ValueKind.Should().Be(JsonValueKind.Array);
+            payloads[3].RootElement.GetProperty("speak")[0].GetProperty("provider").GetProperty("model").GetString().Should().Be("aura-2-thalia-en");
+            payloads[3].RootElement.GetProperty("speak")[1].GetProperty("provider").GetProperty("type").GetString().Should().Be("aws_polly");
+            payloads[3].RootElement.GetProperty("speak")[2].GetProperty("provider").GetProperty("model_id").GetString().Should().Be("sonic-english");
+            payloads[6].RootElement.GetProperty("id").GetString().Should().Be("call-1");
+            payloads[6].RootElement.GetProperty("content").GetString().Should().Be("{}");
+            payloads[7].RootElement.GetProperty("content").GetProperty("action").GetString().Should().Be("continue");
             await protocolClient.Received(1).SendForceEndTurn();
         }
 
@@ -86,6 +91,8 @@ public class AgentProtocolControlTests
         await client.Invoking(c => c.SendUpdateListen(new AgentUpdateListenSchema()))
             .Should().ThrowAsync<ArgumentException>();
         await client.Invoking(c => c.SendUpdateThink(new AgentUpdateThinkSchema()))
+            .Should().ThrowAsync<ArgumentException>();
+        await client.Invoking(c => c.SendUpdateThinkLive(new AgentUpdateThinkLiveSchema()))
             .Should().ThrowAsync<ArgumentException>();
         await client.Invoking(c => c.SendUpdateSpeak(new AgentUpdateSpeakSchema()))
             .Should().ThrowAsync<ArgumentException>();
@@ -116,6 +123,15 @@ public class AgentProtocolControlTests
 
         using var document = JsonDocument.Parse(function.ToString());
         document.RootElement.GetProperty("defer_until_eot").GetBoolean().Should().BeTrue();
+    }
+
+    [Test]
+    public void ConversationTextResponse_Should_Default_ConversationalBehavior_For_Legacy_Payloads()
+    {
+        var response = JsonSerializer.Deserialize<ConversationTextResponse>(
+            """{"type":"ConversationText","role":"assistant","content":"Hello"}""");
+
+        response!.ConversationalBehavior.Should().Be("default");
     }
 
     [Test]

@@ -128,14 +128,15 @@ namespace SampleApp
                     Console.WriteLine("Connection closed");
                 }));
 
-                // Model is required and must be a flux-* voice. Speed and Expressivity are
-                // optional GA connect params (see the mid-stream Configure below for changing
-                // speed without reconnecting).
+                // Model is required and must be a flux-* voice. Speed, Expressivity, and volume
+                // normalization are optional GA connect params (see the mid-stream Configure below
+                // for changing speed without reconnecting). Volume normalization defaults to on.
                 var schema = new SpeakSchema()
                 {
                     Model = "flux-alexis-en",
                     Encoding = "linear16",
                     SampleRate = 24000,
+                    NormalizeVolume = false,
                 };
                 bool bConnected = await speakClient.Connect(schema);
                 if (!bConnected)

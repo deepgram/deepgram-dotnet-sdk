@@ -531,6 +531,7 @@ var schema = new SpeakSchema()
     SampleRate = 24000,
     Speed = 1.0,          // optional: 0.85–1.15 in 0.05 steps
     // Expressivity = 1,  // optional (beta): -2 (calmer) to 2 (more animated)
+    NormalizeVolume = false, // optional: default true; peak limiting remains on when false
 };
 await speakClient.Connect(schema);
 
@@ -862,7 +863,8 @@ var function = new Function
 
 Use `CreateAgentProtocolClient()` when you need typed subscriptions for current Voice Agent
 protocol events. `FunctionCallCancelled` means the named client-side calls must not receive a
-response.
+response. With Think Live configured, `FrustrationDetected` reports when the Think Live model
+recognizes a frustrated user turn.
 
 ```csharp
 var agentClient = ClientFactory.CreateAgentProtocolClient();
@@ -876,10 +878,30 @@ await agentClient.Subscribe(new EventHandler<FunctionCallCancelledResponse>((_, 
     }
 }));
 
+await agentClient.Subscribe(new EventHandler<FrustrationDetectedResponse>((_, e) =>
+{
+    if (e.Escalated == true)
+    {
+        Console.WriteLine($"Escalate after frustration signal {e.Count}.");
+    }
+}));
+
+settings.Agent.ThinkLive = new ThinkLiveSettings
+{
+    Provider = new DeepgramThinkLiveProvider
+    {
+        FrustrationMaxCount = 2,
+        RestrictedTerms = new List<string> { "human", "transfer" },
+    },
+};
+
 var chargeCard = new Function
 {
     Name = "charge_card",
     DeferUntilEot = true, // Wait for a confirmed user turn before an irreversible action.
+    InitialAgentFiller = true,
+    AgentFillerMaxCount = 2,
+    AgentFillerIntervalMs = 5000,
 };
 settings.Agent.Think.Functions = new List<Function> { chargeCard };
 
@@ -889,6 +911,10 @@ await agentClient.Connect(settings);
 await agentClient.SendUpdatePrompt(new AgentUpdatePromptSchema
 {
     Prompt = "Keep answers concise and confirm before charging a card.",
+});
+await agentClient.SendUpdateThinkLive(new AgentUpdateThinkLiveSchema
+{
+    ThinkLive = settings.Agent.ThinkLive,
 });
 await agentClient.SendForceEndTurn(); // Requires a Flux STT listen provider and IAgentProtocolClient.
 ```

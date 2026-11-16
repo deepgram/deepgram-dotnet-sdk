@@ -178,6 +178,57 @@ public class AgentTypedProviderTests
     }
 
     [Test]
+    public void ThinkLive_Should_Serialize_Provider_And_Function_Fillers()
+    {
+        var settings = new SettingsSchema
+        {
+            Agent = new Agent
+            {
+                ThinkLive = new ThinkLiveSettings
+                {
+                    Provider = new DeepgramThinkLiveProvider
+                    {
+                        AgentBackchannelSensitivity = 0.5,
+                        PresenceCheckMaxCount = 3,
+                        PresenceCheckIntervalMs = 4500,
+                        FrustrationMaxCount = 2,
+                        RestrictedTerms = new List<string> { "human", "transfer" },
+                    },
+                },
+                Think = new Think
+                {
+                    Provider = new DeepgramThinkProvider { Model = "think-fast" },
+                    Functions = new List<Function>
+                    {
+                        new()
+                        {
+                            Name = "lookup",
+                            InitialAgentFiller = true,
+                            AgentFillerMaxCount = 2,
+                            AgentFillerIntervalMs = 5000,
+                        },
+                    },
+                },
+            },
+        };
+
+        var root = Serialize(settings);
+        var thinkLive = root.GetProperty("agent").GetProperty("think_live").GetProperty("provider");
+        var function = root.GetProperty("agent").GetProperty("think").GetProperty("functions")[0];
+
+        using (new AssertionScope())
+        {
+            thinkLive.GetProperty("type").GetString().Should().Be("deepgram");
+            thinkLive.GetProperty("version").GetString().Should().Be("v1");
+            thinkLive.GetProperty("agent_backchannel_sensitivity").GetDouble().Should().Be(0.5);
+            thinkLive.GetProperty("restricted_terms").EnumerateArray().Should().HaveCount(2);
+            function.GetProperty("initial_agent_filler").GetBoolean().Should().BeTrue();
+            function.GetProperty("agent_filler_max_count").GetInt32().Should().Be(2);
+            function.GetProperty("agent_filler_interval_ms").GetInt32().Should().Be(5000);
+        }
+    }
+
+    [Test]
     public void GroqThinkProvider_Should_Serialize()
     {
         var json = Serialize(new GroqThinkProvider { Model = "openai/gpt-oss-20b", ReasoningMode = "low" });

@@ -75,6 +75,21 @@ namespace SampleApp
                     },
                 };
 
+                // Think Live runs alongside the reasoning LLM for backchannels, presence checks,
+                // and frustration detection. It requires no model name: Deepgram V1 is the only
+                // supported Think Live provider.
+                settings.Agent.ThinkLive = new ThinkLiveSettings
+                {
+                    Provider = new DeepgramThinkLiveProvider
+                    {
+                        AgentBackchannelSensitivity = 0.5,
+                        PresenceCheckMaxCount = 3,
+                        PresenceCheckIntervalMs = 4500,
+                        FrustrationMaxCount = 2,
+                        RestrictedTerms = new List<string> { "human", "transfer" },
+                    },
+                };
+
                 // Text-to-speech. Version "v2" selects Flux TTS; "v1" selects Aura. Other options
                 // are CartesiaSpeakProvider, ElevenLabsSpeakProvider, OpenAiSpeakProvider and
                 // AwsPollySpeakProvider.

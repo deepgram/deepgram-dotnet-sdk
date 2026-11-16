@@ -49,6 +49,8 @@ public class AgentMessageDispatchCoverageTests
         SpeakUpdatedResponse? speakUpdated = null;
         ListenUpdatedResponse? listenUpdated = null;
         ThinkUpdatedResponse? thinkUpdated = null;
+        ThinkLiveUpdatedResponse? thinkLiveUpdated = null;
+        FrustrationDetectedResponse? frustrationDetected = null;
         FunctionCallCancelledResponse? functionCallCancelled = null;
         FunctionCallResponse? functionCallResponse = null;
         CustomFromThinkProviderResponse? customFromThinkProvider = null;
@@ -71,6 +73,8 @@ public class AgentMessageDispatchCoverageTests
         await client.Subscribe(new EventHandler<SpeakUpdatedResponse>((_, response) => speakUpdated = response));
         await client.Subscribe(new EventHandler<ListenUpdatedResponse>((_, response) => listenUpdated = response));
         await client.Subscribe(new EventHandler<ThinkUpdatedResponse>((_, response) => thinkUpdated = response));
+        await client.Subscribe(new EventHandler<ThinkLiveUpdatedResponse>((_, response) => thinkLiveUpdated = response));
+        await client.Subscribe(new EventHandler<FrustrationDetectedResponse>((_, response) => frustrationDetected = response));
         await client.Subscribe(new EventHandler<FunctionCallCancelledResponse>((_, response) => functionCallCancelled = response));
         await client.Subscribe(new EventHandler<FunctionCallResponse>((_, response) => functionCallResponse = response));
         await client.Subscribe(new EventHandler<CustomFromThinkProviderResponse>((_, response) => customFromThinkProvider = response));
@@ -85,7 +89,7 @@ public class AgentMessageDispatchCoverageTests
                          """{"type":"AgentAudioDone"}""",
                           """{"type":"AgentStartedSpeaking","total_latency":"1.2","tts_latency":"0.4","ttt_latency":"0.8"}""",
                          """{"type":"AgentThinking","content":"checking account"}""",
-                          """{"type":"ConversationText","role":"assistant","content":"Hello","languages_hinted":["en","es"],"languages":["en"]}""",
+                           """{"type":"ConversationText","role":"assistant","content":"Hello","conversational_behavior":"backchannel","languages_hinted":["en","es"],"languages":["en"]}""",
                          """{"type":"FunctionCallRequest","functions":[]}""",
                          """{"type":"UserStartedSpeaking"}""",
                          """{"type":"Welcome","request_id":"request-2"}""",
@@ -94,7 +98,9 @@ public class AgentMessageDispatchCoverageTests
                           """{"type":"PromptUpdated"}""",
                           """{"type":"SpeakUpdated"}""",
                           """{"type":"ListenUpdated"}""",
-                          """{"type":"ThinkUpdated"}""",
+                           """{"type":"ThinkUpdated"}""",
+                           """{"type":"ThinkLiveUpdated"}""",
+                           """{"type":"FrustrationDetected","count":2,"escalated":true}""",
                           """{"type":"FunctionCallCancelled","functions":[{"id":"call-1","name":"charge_card"}]}""",
                           """{"type":"FunctionCallResponse","id":"call-2","name":"lookup","content":"{}"}""",
                           """{"type":"__customFromThinkProvider","content":{"next":"continue","attempt":2}}""",
@@ -117,6 +123,7 @@ public class AgentMessageDispatchCoverageTests
             thinking!.Content.Should().Be("checking account");
             conversationText!.Role.Should().Be("assistant");
             conversationText.Content.Should().Be("Hello");
+            conversationText.ConversationalBehavior.Should().Be("backchannel");
             conversationText.LanguagesHinted.Should().Equal("en", "es");
             conversationText.Languages.Should().Equal("en");
             functionCall.Should().NotBeNull();
@@ -128,6 +135,9 @@ public class AgentMessageDispatchCoverageTests
             speakUpdated.Should().NotBeNull();
             listenUpdated.Should().NotBeNull();
             thinkUpdated.Should().NotBeNull();
+            thinkLiveUpdated.Should().NotBeNull();
+            frustrationDetected!.Count.Should().Be(2);
+            frustrationDetected.Escalated.Should().BeTrue();
             functionCallCancelled!.Functions.Should().ContainSingle();
             functionCallCancelled.Functions![0].Id.Should().Be("call-1");
             functionCallResponse!.Id.Should().Be("call-2");
@@ -188,6 +198,8 @@ public class AgentMessageDispatchCoverageTests
     [TestCase("SpeakUpdated")]
     [TestCase("ListenUpdated")]
     [TestCase("ThinkUpdated")]
+    [TestCase("ThinkLiveUpdated")]
+    [TestCase("FrustrationDetected")]
     [TestCase("FunctionCallCancelled")]
     [TestCase("FunctionCallResponse")]
     [TestCase("__customFromThinkProvider")]

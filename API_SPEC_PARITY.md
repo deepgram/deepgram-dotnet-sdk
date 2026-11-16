@@ -28,17 +28,21 @@ files.
 | `/v1/listen` WebSocket `redact_usage` | `Models/Listen/v2/WebSocket/LiveSchema` | Supported | Lowercase connection-query serialization plus a gated live multilingual stream. |
 | Flux STT connection `redact_usage` | `FluxSchema` | Supported | Lowercase `/v2/listen` query serialization plus a gated live Flux session. |
 | Flux STT Configure `redact_usage` | `ConfigureSchema` | Supported | Configure-frame serialization and a gated live ConfigureSuccess assertion. |
-| Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Pending | The `/v2/speak` URL emits a lowercase boolean. |
-| Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Pending | The `/v2/speak` WebSocket URL emits a lowercase boolean. |
-| Voice Agent Think Live settings | `Agent`, typed provider models | Pending | Settings serialization preserves the complete provider payload. |
-| Voice Agent `UpdateThink_Live` | protocol schema, client, and interface | Pending | The exact control frame is sent and `ThinkLiveUpdated` dispatches to a typed subscriber. |
-| Voice Agent `FrustrationDetected` | protocol response, client, and interface | Pending | The typed payload dispatches; unknown frames remain non-fatal. |
-| Think Live function fillers | `Function` | Pending | All three filler options serialize with their documented wire names. |
-| Voice Agent `conversational_behavior` | `ConversationTextResponse` | Pending | The value deserializes and missing legacy/self-hosted values safely default to `default`. |
+| Flux TTS REST `normalize_volume` | `Models/Flux/Speak/REST/SpeakSchema` | Supported | Lowercase URL serialization, omission when unset, and a gated live batch request. |
+| Flux TTS WebSocket `normalize_volume` | `Models/Flux/Speak/WebSocket/SpeakSchema` | Supported | Lowercase connection-query serialization, omission when unset, and a gated live stream. |
+| Voice Agent Think Live settings | `Agent`, typed provider models | Supported | Full payload serialization plus a gated SettingsApplied integration test. |
+| Voice Agent `UpdateThink_Live` | protocol schema and extension | Supported | Exact control-frame serialization plus typed `ThinkLiveUpdated` dispatch coverage. |
+| Voice Agent `FrustrationDetected` | protocol response and interface | Supported | Typed payload dispatch and no-subscriber forward-compat coverage. |
+| Think Live function fillers | `Function` | Supported | All wire names serialize and the gated Think Live settings test covers server acceptance. |
+| Voice Agent `conversational_behavior` | `ConversationTextResponse` | Supported | Values dispatch typed and legacy/self-hosted payloads default to `default`. |
 
 The expanded Flux TTS voice roster is not listed as a gap. The .NET SDK accepts
 model names as strings, so newly listed server models work without a generated
 enum update.
+
+`Deepgram.Tests/Fixtures/ApiParity/current-contract.json` records each supported
+public field and wire name in this matrix. `ApiSpecParityContractTests` runs in
+the ordinary test job and fails when a recorded field or its wire name disappears.
 
 ## Implementation sequence
 
@@ -66,7 +70,9 @@ For an API-spec change:
 4. Add exact query-string or frame assertions, plus response dispatch coverage
    for new server events.
 5. Update this matrix, examples, README sections, and the applicable
-   code-documentation page.
+   code-documentation page. For an added or changed field, update
+   `current-contract.json` and add an exact query, frame, response, or dispatch
+   regression test before marking the matrix row Supported.
 
 Do not add CI that fetches a mutable remote specification. Keep this reviewed
 local baseline and update its snapshot in the same change that implements new
