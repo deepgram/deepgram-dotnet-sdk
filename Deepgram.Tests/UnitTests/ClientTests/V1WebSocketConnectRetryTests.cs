@@ -65,7 +65,10 @@ public class V1WebSocketConnectRetryTests
                 await stream.FlushAsync();
                 Func<Task> failed = () => connect;
                 if (wrapException)
-                    await failed.Should().ThrowAsync<DeepgramWebSocketException>();
+                {
+                    var exception = await failed.Should().ThrowAsync<DeepgramWebSocketException>();
+                    exception.Which.HttpStatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+                }
                 else
                     await failed.Should().ThrowAsync<WebSocketException>();
             }

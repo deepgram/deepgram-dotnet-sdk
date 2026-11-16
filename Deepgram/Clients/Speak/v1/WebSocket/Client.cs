@@ -186,9 +186,10 @@ public class Client : IDisposable, ISpeakWebSocketClient
             Log.Error("Connect", $"{ex.GetType()} thrown {ex.Message}");
             Log.Verbose("Connect", $"Exception: {ex}");
             Log.Verbose("SpeakWSClient.Connect", "LEAVE");
+            var socket = _clientWebSocket;
             throw new DeepgramWebSocketException(
                 "Failed to connect to Deepgram API",
-                DeepgramWebSocketException.GetHttpStatusCode(_clientWebSocket),
+                socket is null ? null : DeepgramWebSocketException.GetHttpStatusCode(socket),
                 ex);
         }
         catch (Exception ex)
