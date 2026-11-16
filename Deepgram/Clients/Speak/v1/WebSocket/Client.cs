@@ -92,44 +92,46 @@ public class Client : IDisposable, ISpeakWebSocketClient
             throw new InvalidOperationException(exStr);
         }
 
+        var ownsCancelToken = cancelToken == null;
+        var connected = false;
         if (cancelToken == null)
         {
             Log.Information("Connect", "Using default connect cancellation token");
             cancelToken = new CancellationTokenSource(Constants.DefaultConnectTimeout);
         }
 
-        // create client
-        _clientWebSocket = new ClientWebSocket();
-        DeepgramWebSocketException.EnableHttpResponseDetails(_clientWebSocket);
-
-        // set headers
-        SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
-        if (_deepgramClientOptions.Headers is not null)
-        {
-            foreach (var header in _deepgramClientOptions.Headers)
-            {
-                // header names only: values may be credentials and are never logged
-
-                Log.Debug("Connect", $"Add Header {header.Key}");
-                _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
-            }
-        }
-        if (headers is not null)
-        {
-            foreach (var header in headers)
-            {
-                // header names only: values may be credentials and are never logged
-
-                Log.Debug("Connect", $"Add Header {header.Key}");
-                _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
-            }
-        }
-
-        // internal cancelation token for internal threads
-        _cancellationTokenSource = new CancellationTokenSource();
-
         try
         {
+            // create client
+            _clientWebSocket = new ClientWebSocket();
+            DeepgramWebSocketException.EnableHttpResponseDetails(_clientWebSocket);
+
+            // set headers
+            SetAuthenticationHeader(_clientWebSocket, _deepgramClientOptions);
+            if (_deepgramClientOptions.Headers is not null)
+            {
+                foreach (var header in _deepgramClientOptions.Headers)
+                {
+                    // header names only: values may be credentials and are never logged
+
+                    Log.Debug("Connect", $"Add Header {header.Key}");
+                    _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+            if (headers is not null)
+            {
+                foreach (var header in headers)
+                {
+                    // header names only: values may be credentials and are never logged
+
+                    Log.Debug("Connect", $"Add Header {header.Key}");
+                    _clientWebSocket.Options.SetRequestHeader(header.Key, header.Value);
+                }
+            }
+
+            // internal cancelation token for internal threads
+            _cancellationTokenSource = new CancellationTokenSource();
+
             var _uri = GetUri(_deepgramClientOptions, options, addons);
             Log.Debug("Connect", $"uri: {LogRedactionUtil.RedactUri(_uri)}");
 
@@ -154,6 +156,8 @@ public class Client : IDisposable, ISpeakWebSocketClient
                 Log.Debug("Connect", "Starting AutoFlush Thread...");
                 StartAutoFlushBackgroundThread();
             }
+
+            connected = true;
 
             // send a OpenResponse event
             if (_openReceived != null)
@@ -193,6 +197,20 @@ public class Client : IDisposable, ISpeakWebSocketClient
             Log.Verbose("Connect", $"Excepton: {ex}");
             Log.Verbose("SpeakWSClient.Connect", "LEAVE");
             throw;
+        }
+
+        finally
+        {
+            if (!connected)
+            {
+                DisposeCancellationTokenSource();
+                _clientWebSocket?.Dispose();
+                _clientWebSocket = null;
+            }
+            if (ownsCancelToken)
+            {
+                cancelToken.Dispose();
+            }
         }
 
         void StartSenderBackgroundThread() => _ = Task.Factory.StartNew(
