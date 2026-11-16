@@ -136,6 +136,10 @@ var response = await deepgramClient.TranscribeUrl(
     new PreRecordedSchema()
     {
         Model = "nova-3",
+        Language = "multi",
+        LanguageHint = new List<string> { "en", "es" },
+        // Redacts supplied keyterms and other user text from usage records, not the transcript.
+        RedactUsage = true,
     });
 
 // Writes to Console
@@ -266,6 +270,10 @@ await liveClient.Subscribe(
 var liveSchema = new LiveSchema()
 {
     Model = "nova-3",
+    Language = "multi",
+    LanguageHint = new List<string> { "en", "es" },
+    // Redacts supplied keyterms and other user text from usage records, not the transcript.
+    RedactUsage = true,
     // Entity Detection extracts names, phone numbers, organizations and more. Entities arrive on
     // final results only, in ResultResponse.Entities; enabling it also turns Punctuation on.
     DetectEntities = true,
@@ -451,11 +459,14 @@ var fluxSchema = new FluxSchema()
     SampleRate = 16000,
     EotThreshold = 0.7,
     Redact = "numbers", // Flux STT supports numbers or aggressive_numbers only; each redacted number becomes *
+    // Redact supplied keyterms and later Configure keyterms from usage records.
+    RedactUsage = true,
 };
 await fluxClient.Connect(fluxSchema);
 
-// Turn numeral formatting on or off for future transcripts without reconnecting.
-await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true });
+// Turn numeral formatting on or off for future transcripts without reconnecting. RedactUsage can
+// also be enabled mid-stream and remains on for the rest of the connection.
+await fluxClient.SendConfigure(new ConfigureSchema { Numerals = true, RedactUsage = true });
 
 // Stream audio to Deepgram in ~80ms chunks (2560 bytes at 16kHz linear16)
 byte[] audioChunk = GetAudioChunk(); // Your audio source

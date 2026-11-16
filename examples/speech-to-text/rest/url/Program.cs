@@ -27,7 +27,11 @@ namespace PreRecorded
                 new PreRecordedSchema()
                 {
                     Model = "nova-3",
+                    Language = "multi",
+                    LanguageHint = new List<string> { "en", "es" },
                     Keyterm = new List<string> { "Bueller" },
+                    // Redacts the keyterm from usage records without changing the transcript.
+                    RedactUsage = true,
                 },
                 null, // use the default timeout
                 customOptions);

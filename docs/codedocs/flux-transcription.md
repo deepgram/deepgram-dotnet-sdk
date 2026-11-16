@@ -56,8 +56,8 @@ await finalTurn.Task.WaitAsync(TimeSpan.FromSeconds(30));
 
 ## Configuration And Controls
 
-`FluxSchema` requires `Model`. Use `flux-general-en` for English or `flux-general-multi` for multilingual audio. For raw audio, also set `Encoding` and `SampleRate`. `EotThreshold`, `EagerEotThreshold`, and `EotTimeoutMs` tune turn detection. `LanguageHint` is valid only with `flux-general-multi`.
+`FluxSchema` requires `Model`. Use `flux-general-en` for English or `flux-general-multi` for multilingual audio. For raw audio, also set `Encoding` and `SampleRate`. `EotThreshold`, `EagerEotThreshold`, and `EotTimeoutMs` tune turn detection. `LanguageHint` is valid only with `flux-general-multi`. Set `RedactUsage = true` to redact connection keyterms and other user-supplied text from usage records without changing transcripts or response payloads.
 
-Flux accepts `Configure`, `ForceEndTurn`, and `CloseStream` client controls. `IFluxWebSocketClient` exposes `SendConfigure()` and `SendClose()`; `SendForceEndTurn()` is currently on the concrete `FluxWebSocketClient`, not the interface, to avoid breaking third-party interface implementations in 7.x.
+Flux accepts `Configure`, `ForceEndTurn`, and `CloseStream` client controls. `IFluxWebSocketClient` exposes `SendConfigure()` and `SendClose()`; `SendForceEndTurn()` is currently on the concrete `FluxWebSocketClient`, not the interface, to avoid breaking third-party interface implementations in 7.x. A Configure message can also set `RedactUsage = true`, which redacts its keyterms and later Configure keyterms from usage records for the rest of the connection.
 
 Related pages: [Streaming Transcription](/docs/streaming-transcription), [FluxWebSocketClient](/docs/api-reference/flux-websocket-client), and [the Flux example](../../examples/speech-to-text/websocket/flux/).

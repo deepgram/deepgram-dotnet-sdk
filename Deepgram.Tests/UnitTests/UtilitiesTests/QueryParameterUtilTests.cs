@@ -216,6 +216,20 @@ public class QueryParameterUtilTests
         result.Should().NotContain("diarize_model");
     }
 
+    [Test]
+    public void FormatURL_Should_Repeat_LanguageHints_And_Lowercase_RedactUsage()
+    {
+        var schema = new Deepgram.Models.Listen.v1.REST.PreRecordedSchema
+        {
+            LanguageHint = ["en", "es"],
+            RedactUsage = true,
+        };
+
+        var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, schema);
+
+        result.Should().Be("https://api.deepgram.com/?language_hint=en&language_hint=es&redact_usage=true");
+    }
+
     // FormatURL is shared by every REST client; these pin the exact string it returns.
     [Test]
     public void FormatURL_Should_Escape_Callback_Url_Exactly()

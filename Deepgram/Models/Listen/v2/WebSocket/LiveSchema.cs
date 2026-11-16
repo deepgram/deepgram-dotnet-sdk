@@ -166,6 +166,15 @@ public class LiveSchema
     public string? Language { get; set; }
 
     /// <summary>
+    /// Biases language detection toward one or more languages when using Nova-3 multilingual
+    /// (<c>Model = "nova-3"</c>, <c>Language = "multi"</c>). Each value is sent as a repeated
+    /// <c>language_hint</c> query parameter.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("language_hint")]
+    public List<string>? LanguageHint { get; set; }
+
+    /// <summary>
     /// AI model used to process submitted audio
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
@@ -222,6 +231,14 @@ public class LiveSchema
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[JsonPropertyName("redact")]
     public List<string>? Redact { get; set; }
+
+    /// <summary>
+    /// Replaces user-supplied text, including keyterms, with <c>[REDACTED]</c> in usage records.
+    /// This does not change the transcription response. Defaults to <c>false</c>.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("redact_usage")]
+    public bool? RedactUsage { get; set; }
 
     /// <summary>
     /// Find and Replace searches for terms or phrases in submitted audio and replaces them.

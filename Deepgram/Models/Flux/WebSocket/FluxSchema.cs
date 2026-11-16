@@ -97,6 +97,14 @@ public class FluxSchema
     public string? Redact { get; set; }
 
     /// <summary>
+    /// Replaces keyterms and other user-supplied text with <c>[REDACTED]</c> in usage records.
+    /// This does not affect transcription, response payloads, or tags. Defaults to <c>false</c>.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("redact_usage")]
+    public bool? RedactUsage { get; set; }
+
+    /// <summary>
     /// Removes profanity from the transcript. Default false.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

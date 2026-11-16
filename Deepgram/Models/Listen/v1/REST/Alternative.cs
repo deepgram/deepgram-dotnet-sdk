@@ -29,6 +29,13 @@ public record Alternative
     public IReadOnlyList<string>? Languages { get; set; }
 
     /// <summary>
+    /// The normalized <c>language_hint</c> values supplied with a Nova-3 multilingual request.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("languages_hinted")]
+    public IReadOnlyList<string>? LanguagesHinted { get; set; }
+
+    /// <summary>
     /// ReadOnly List of <see cref="ParagraphGroup"/> containing  separated transcript and <see cref="Paragraph"/> objects.
     /// </summary>
     /// <remark>Only used when the paragraph feature is enabled on the request</remark>
