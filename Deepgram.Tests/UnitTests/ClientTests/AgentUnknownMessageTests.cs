@@ -83,6 +83,8 @@ public class AgentUnknownMessageTests
 
     [TestCase("Warning")]
     [TestCase("History")]
+    [TestCase("ThinkLiveUpdated")]
+    [TestCase("FrustrationDetected")]
     public async Task ProcessTextMessage_With_New_Known_Type_Without_Protocol_Subscriber_Should_Remain_Unhandled(string type)
     {
         var client = new Client(_apiKey, _options);

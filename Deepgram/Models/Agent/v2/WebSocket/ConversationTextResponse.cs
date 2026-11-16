@@ -23,6 +23,10 @@ public record ConversationTextResponse
     public string? Content { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("conversational_behavior")]
+    public string? ConversationalBehavior { get; set; } = "default";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("languages_hinted")]
     public List<string>? LanguagesHinted { get; set; }
 

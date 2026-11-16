@@ -18,6 +18,26 @@ public record ThinkUpdatedResponse
     public AgentType? Type { get; } = AgentType.ThinkUpdated;
 }
 
+public record ThinkLiveUpdatedResponse
+{
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AgentType? Type { get; } = AgentType.ThinkLiveUpdated;
+}
+
+public record FrustrationDetectedResponse
+{
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public AgentType? Type { get; } = AgentType.FrustrationDetected;
+
+    [JsonPropertyName("count")]
+    public int? Count { get; set; }
+
+    [JsonPropertyName("escalated")]
+    public bool? Escalated { get; set; }
+}
+
 public record FunctionCallCancelledResponse
 {
     [JsonPropertyName("type")]

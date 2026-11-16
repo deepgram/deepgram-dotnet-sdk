@@ -47,6 +47,8 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
     private event EventHandler<SpeakUpdatedResponse>? _speakUpdatedReceived;
     private event EventHandler<ListenUpdatedResponse>? _listenUpdatedReceived;
     private event EventHandler<ThinkUpdatedResponse>? _thinkUpdatedReceived;
+    private event EventHandler<ThinkLiveUpdatedResponse>? _thinkLiveUpdatedReceived;
+    private event EventHandler<FrustrationDetectedResponse>? _frustrationDetectedReceived;
     private event EventHandler<FunctionCallCancelledResponse>? _functionCallCancelledReceived;
     private event EventHandler<FunctionCallResponse>? _functionCallResponseReceived;
     private event EventHandler<CustomFromThinkProviderResponse>? _customFromThinkProviderReceived;
@@ -503,6 +505,34 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
         try
         {
             _thinkUpdatedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<ThinkLiveUpdatedResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _thinkLiveUpdatedReceived += (sender, e) => eventHandler(sender, e);
+        }
+        finally
+        {
+            _mutexSubscribe.Release();
+        }
+        return true;
+    }
+
+    public async Task<bool> Subscribe(EventHandler<FrustrationDetectedResponse> eventHandler)
+    {
+        await _mutexSubscribe.WaitAsync();
+        try
+        {
+            _frustrationDetectedReceived += (sender, e) => eventHandler(sender, e);
         }
         finally
         {
@@ -1172,6 +1202,34 @@ public class Client : AbstractWebSocketClient, IAgentProtocolClient
                         return;
                     }
                     InvokeParallel(_thinkUpdatedReceived, thinkUpdatedResponse);
+                    break;
+                case AgentType.ThinkLiveUpdated:
+                    if (_thinkLiveUpdatedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var thinkLiveUpdatedResponse = data.Deserialize<ThinkLiveUpdatedResponse>();
+                    if (thinkLiveUpdatedResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_thinkLiveUpdatedReceived, thinkLiveUpdatedResponse);
+                    break;
+                case AgentType.FrustrationDetected:
+                    if (_frustrationDetectedReceived == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    var frustrationDetectedResponse = data.Deserialize<FrustrationDetectedResponse>();
+                    if (frustrationDetectedResponse == null)
+                    {
+                        base.ProcessTextMessage(result, ms);
+                        return;
+                    }
+                    InvokeParallel(_frustrationDetectedReceived, frustrationDetectedResponse);
                     break;
                 case AgentType.FunctionCallCancelled:
                     if (_functionCallCancelledReceived == null)

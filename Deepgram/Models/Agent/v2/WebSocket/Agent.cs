@@ -30,6 +30,10 @@ public record Agent
     public Think Think { get; set; } = new Think();
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("think_live")]
+    public ThinkLiveSettings? ThinkLive { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("speak")]
     public Speak Speak { get; set; } = new Speak();
 
