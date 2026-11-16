@@ -912,15 +912,8 @@ settings.Agent.Think.Provider = new DeepgramThinkProvider
     Model = "phonellm-mini-alpha-2-fp8",
     Temperature = 0.2,
     ReasoningMode = "none",
+    VoicePromptOptOut = true,
 };
-
-// VoicePromptOptOut applies only to think-fast, which requires MIP to remain enabled.
-// settings.MipOptOut = false;
-// settings.Agent.Think.Provider = new DeepgramThinkProvider
-// {
-//     Model = "think-fast",
-//     VoicePromptOptOut = true,
-// };
 
 // Connect settings before sending any session control message.
 await agentClient.Connect(settings);

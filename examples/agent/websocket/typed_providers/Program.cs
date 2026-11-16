@@ -82,13 +82,6 @@ namespace SampleApp
                 //     Model = "phonellm-mini-alpha-2-fp8",
                 //     Temperature = 0.2,
                 //     ReasoningMode = "none",
-                // };
-                //
-                // VoicePromptOptOut applies only to think-fast, which requires MIP to remain on:
-                // settings.MipOptOut = false;
-                // settings.Agent.Think.Provider = new DeepgramThinkProvider
-                // {
-                //     Model = "think-fast",
                 //     VoicePromptOptOut = true,
                 // };
 
