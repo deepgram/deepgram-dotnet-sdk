@@ -862,12 +862,13 @@ var function = new Function
 ### Current session controls and function safety
 
 Use `CreateAgentProtocolClient()` when you need typed subscriptions for current Voice Agent
-protocol events. `FunctionCallCancelled` means the named client-side calls must not receive a
-response. With Think Live configured, `FrustrationDetected` reports when the Think Live model
-recognizes a frustrated user turn.
+protocol events. Use `CreateAgentThinkLiveProtocolClient()` when you also need Think Live events.
+`FunctionCallCancelled` means the named client-side calls must not receive a response. With Think
+Live configured, `FrustrationDetected` reports when the Think Live model recognizes a frustrated
+user turn.
 
 ```csharp
-var agentClient = ClientFactory.CreateAgentProtocolClient();
+var agentClient = ClientFactory.CreateAgentThinkLiveProtocolClient();
 
 await agentClient.Subscribe(new EventHandler<FunctionCallCancelledResponse>((_, e) =>
 {

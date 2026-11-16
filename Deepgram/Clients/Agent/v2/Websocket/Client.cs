@@ -18,7 +18,7 @@ namespace Deepgram.Clients.Agent.v2.WebSocket;
 /// <summary>
 /// Implements version 2 of the Listen WebSocket Client.
 /// </summary>
-public class Client : AbstractWebSocketClient, IAgentProtocolClient
+public class Client : AbstractWebSocketClient, IAgentThinkLiveProtocolClient
 {
     /// <param name="apiKey">Required DeepgramApiKey</param>
     /// <param name="deepgramClientOptions"><see cref="IDeepgramClientOptions"/> for HttpClient Configuration</param>

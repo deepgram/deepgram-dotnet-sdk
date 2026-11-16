@@ -18,8 +18,6 @@ public interface IAgentProtocolClient : IAgentWebSocketClient
     Task SendForceEndTurn();
     Task<bool> Subscribe(EventHandler<ListenUpdatedResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<ThinkUpdatedResponse> eventHandler);
-    Task<bool> Subscribe(EventHandler<ThinkLiveUpdatedResponse> eventHandler);
-    Task<bool> Subscribe(EventHandler<FrustrationDetectedResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<FunctionCallCancelledResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<FunctionCallResponse> eventHandler);
     Task<bool> Subscribe(EventHandler<CustomFromThinkProviderResponse> eventHandler);
