@@ -1,5 +1,20 @@
 # Changelog
 
+## [7.6.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.5.1...7.6.0) (2026-11-16)
+
+
+### Features
+
+* **agent:** Add typed Think Live configuration, live-update controls, and typed events for Think Live updates and frustration detection. Voice Agent function settings now support initial agent fillers, filler limits, and filler intervals; conversation-text responses also expose `ConversationalBehavior`. ([83497db](https://github.com/deepgram/deepgram-dotnet-sdk/commit/83497db2af357fd4ee6c69d5642043ede0a58695))
+* **flux-tts:** Add optional `NormalizeVolume` controls to Flux TTS REST and WebSocket connections. ([f203725](https://github.com/deepgram/deepgram-dotnet-sdk/commit/f203725019ce0f1771fe9772fb9e8da9e0bee167))
+* **listen:** Add repeatable `LanguageHint` options for Nova-3 multilingual prerecorded and streaming transcription, and return normalized hints in transcription results. Add `RedactUsage` for prerecorded, streaming, and Flux STT connections and Flux STT configuration messages, so user-supplied terms can be redacted from usage records without changing transcription results. ([d590c49](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d590c497fcdecbb71e263437de7b3cbfdccf9972))
+
+
+### Bug Fixes
+
+* **listen:** Reject `LanguageHint` on Nova-3 connections that are not configured for multilingual transcription. ([95efb2c](https://github.com/deepgram/deepgram-dotnet-sdk/commit/95efb2c1f783d661e3875b46de0cef1cec5d1e4e))
+* **websocket:** Clean up failed legacy Listen and Speak WebSocket connection attempts and preserve the HTTP status returned by a failed upgrade. ([382c7c5](https://github.com/deepgram/deepgram-dotnet-sdk/commit/382c7c5a7890c09e39238a20b1390f3d5a862636))
+
 ## [7.5.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.5.0...7.5.1) (2026-11-13)
 
 
