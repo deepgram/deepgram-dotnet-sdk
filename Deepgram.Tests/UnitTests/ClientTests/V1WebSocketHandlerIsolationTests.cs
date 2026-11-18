@@ -346,6 +346,62 @@ public class V1WebSocketHandlerIsolationTests
         }
     }
 
+    // --- Stop() whose disconnect token expires while a Close handler runs (#471) ---
+
+    // The token handed to Stop() is shorter than the Close handler, so it is already cancelled when
+    // Stop() reaches CloseOutputAsync. The default 5 s token behaves the same way for a handler that
+    // takes longer than about 4.9 s; a short token keeps the test fast.
+    private static readonly TimeSpan SlowCloseHandler = TimeSpan.FromMilliseconds(800);
+    private static readonly TimeSpan ShortDisconnectTimeout = TimeSpan.FromMilliseconds(300);
+
+    [Test]
+    public async Task ListenV1_Stop_Should_Tear_Down_And_Allow_Reconnect_When_Close_Handler_Outlasts_The_Token()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new ListenV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        try
+        {
+            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => Thread.Sleep(SlowCloseHandler)));
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+
+            await client.Stop(new CancellationTokenSource(ShortDisconnectTimeout));
+
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
+            Func<Task> reconnect = () => client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+            await reconnect.Should().NotThrowAsync("the next Connect() must not see a half torn-down client");
+            client.IsConnected().Should().BeTrue();
+        }
+        finally
+        {
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task SpeakV1_Stop_Should_Tear_Down_And_Allow_Reconnect_When_Close_Handler_Outlasts_The_Token()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new SpeakV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        try
+        {
+            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => Thread.Sleep(SlowCloseHandler)));
+            await client.Connect(new SpeakModels.SpeakSchema());
+
+            await client.Stop(new CancellationTokenSource(ShortDisconnectTimeout));
+
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
+            Func<Task> reconnect = () => client.Connect(new SpeakModels.SpeakSchema());
+            await reconnect.Should().NotThrowAsync("the next Connect() must not see a half torn-down client");
+            client.IsConnected().Should().BeTrue();
+        }
+        finally
+        {
+            client.Dispose();
+        }
+    }
+
     /// <summary>
     /// Accepts WebSocket upgrades on a loopback port, then reads and discards frames until the
     /// client goes away. Enough for Connect() to succeed and Stop() to send its Close frame.

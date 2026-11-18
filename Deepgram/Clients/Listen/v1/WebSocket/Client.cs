@@ -1060,6 +1060,23 @@ public class Client : IDisposable, IListenWebSocketClient
             // OperationCanceledException if the disconnect-timeout token fires.
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
+
+            // The token can expire while a Close handler is still running, before CloseOutputAsync.
+            // Skipping the teardown here would leave the socket open and the next Connect() failing
+            // with "Client has already been initialized". Abort the socket and release it. See #471.
+            try
+            {
+                socket.Abort();
+            }
+            catch (Exception abortEx) when (abortEx is ObjectDisposedException || abortEx is WebSocketException || abortEx is InvalidOperationException)
+            {
+                Log.Verbose("Stop", $"Abort after cancel: {abortEx.GetType().Name}");
+            }
+            DisposeCancellationTokenSource();
+            if (ReferenceEquals(_clientWebSocket, socket))
+            {
+                _clientWebSocket = null;
+            }
             Log.Verbose("ListenWSClient.Stop", "LEAVE");
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException || ex is InvalidOperationException)
