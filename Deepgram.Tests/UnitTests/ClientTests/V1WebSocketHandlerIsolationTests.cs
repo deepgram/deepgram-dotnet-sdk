@@ -348,11 +348,19 @@ public class V1WebSocketHandlerIsolationTests
 
     // --- Stop() whose disconnect token expires while a Close handler runs (#471) ---
 
-    // The token handed to Stop() is shorter than the Close handler, so it is already cancelled when
-    // Stop() reaches CloseOutputAsync. The default 5 s token behaves the same way for a handler that
-    // takes longer than about 4.9 s; a short token keeps the test fast.
-    private static readonly TimeSpan SlowCloseHandler = TimeSpan.FromMilliseconds(800);
-    private static readonly TimeSpan ShortDisconnectTimeout = TimeSpan.FromMilliseconds(300);
+    private sealed class CloseGate
+    {
+        public TaskCompletionSource<bool> Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private TaskCompletionSource<bool> Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public void Wait()
+        {
+            Entered.TrySetResult(true);
+            Release.Task.GetAwaiter().GetResult();
+        }
+
+        public void Open() => Release.TrySetResult(true);
+    }
 
     [Test]
     public async Task ListenV1_Stop_Should_Tear_Down_And_Allow_Reconnect_When_Close_Handler_Outlasts_The_Token()
@@ -360,12 +368,18 @@ public class V1WebSocketHandlerIsolationTests
         using var server = new LoopbackWebSocketHandshakeServer();
         var apiKey = NewApiKey();
         var client = new ListenV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
         try
         {
-            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => Thread.Sleep(SlowCloseHandler)));
+            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => closeGate.Wait()));
             await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
 
-            await client.Stop(new CancellationTokenSource(ShortDisconnectTimeout));
+            using var stopToken = new CancellationTokenSource();
+            var stop = client.Stop(stopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            stopToken.Cancel();
+            closeGate.Open();
+            await stop;
 
             client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
             Func<Task> reconnect = () => client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
@@ -374,6 +388,7 @@ public class V1WebSocketHandlerIsolationTests
         }
         finally
         {
+            closeGate.Open();
             client.Dispose();
         }
     }
@@ -384,12 +399,18 @@ public class V1WebSocketHandlerIsolationTests
         using var server = new LoopbackWebSocketHandshakeServer();
         var apiKey = NewApiKey();
         var client = new SpeakV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
         try
         {
-            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => Thread.Sleep(SlowCloseHandler)));
+            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => closeGate.Wait()));
             await client.Connect(new SpeakModels.SpeakSchema());
 
-            await client.Stop(new CancellationTokenSource(ShortDisconnectTimeout));
+            using var stopToken = new CancellationTokenSource();
+            var stop = client.Stop(stopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            stopToken.Cancel();
+            closeGate.Open();
+            await stop;
 
             client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
             Func<Task> reconnect = () => client.Connect(new SpeakModels.SpeakSchema());
@@ -398,6 +419,75 @@ public class V1WebSocketHandlerIsolationTests
         }
         finally
         {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task ListenV1_Stale_Stop_Must_Not_Tear_Down_A_Reconnected_Client()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new ListenV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+
+            using var firstStopToken = new CancellationTokenSource();
+            var firstStop = client.Stop(firstStopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            using var cancelledStopToken = new CancellationTokenSource();
+            cancelledStopToken.Cancel();
+            await client.Stop(cancelledStopToken);
+            client.State().Should().Be(WebSocketState.None);
+
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+            closeGate.Open();
+            await firstStop;
+
+            client.IsConnected().Should().BeTrue("a stale Stop() must not release the newer connection");
+        }
+        finally
+        {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task SpeakV1_Stale_Stop_Must_Not_Tear_Down_A_Reconnected_Client()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new SpeakV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new SpeakModels.SpeakSchema());
+
+            using var firstStopToken = new CancellationTokenSource();
+            var firstStop = client.Stop(firstStopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            using var cancelledStopToken = new CancellationTokenSource();
+            cancelledStopToken.Cancel();
+            await client.Stop(cancelledStopToken);
+            client.State().Should().Be(WebSocketState.None);
+
+            await client.Connect(new SpeakModels.SpeakSchema());
+            closeGate.Open();
+            await firstStop;
+
+            client.IsConnected().Should().BeTrue("a stale Stop() must not release the newer connection");
+        }
+        finally
+        {
+            closeGate.Open();
             client.Dispose();
         }
     }
