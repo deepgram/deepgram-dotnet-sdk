@@ -19,9 +19,9 @@ Agent sessions need more than a transcription stream or a TTS stream. They need 
 
 ## How it works internally
 
-`SettingsSchema` contains top-level `Audio` and `Agent` objects. `Audio.Input` and `Audio.Output` carry formats like `linear16`, sample rate, and container settings. `Agent` contains nested `Listen`, `Think`, `ThinkLive`, and `Speak` records. `ThinkLive` is typed because Deepgram is its only provider; it adds backchannels, presence checks, function-call fillers, and frustration detection alongside the reasoning LLM. The other provider fields remain dynamic: `Provider.cs` inherits from `DynamicObject`, stores arbitrary JSON in `AdditionalProperties`, and converts C# dynamic member names to `snake_case` before serialization.
+`SettingsSchema` contains top-level `Audio` and `Agent` objects. `Audio.Input` and `Audio.Output` carry formats like `linear16`, sample rate, and container settings. `Agent` contains nested `Listen`, `Think`, `ThinkLive`, and `Speak` records. `ThinkLive` is typed because Deepgram is its only provider; it adds backchannels, presence checks, function-call fillers, and frustration detection alongside the reasoning LLM. Typed providers cover supported configurations, while `Provider.cs` also inherits from `DynamicObject`, stores arbitrary JSON in `AdditionalProperties`, and converts C# dynamic member names to `snake_case` before serialization.
 
-`DeepgramThinkProvider` is the typed exception for the reasoning stage. It accepts
+`DeepgramThinkProvider` is one of the typed reasoning providers. It accepts
 the Deepgram-hosted `think-fast` and `phonellm-mini-alpha-2-fp8` models, plus
 `Version`, `Temperature`, `ReasoningMode`, and `VoicePromptOptOut`.
 `VoicePromptOptOut` applies only to `think-fast`, which requires Model Improvement
