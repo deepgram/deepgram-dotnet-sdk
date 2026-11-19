@@ -604,7 +604,26 @@ public class Client : IDisposable, ISpeakWebSocketClient
     /// </summary>
     private void DisposeCancellationTokenSource()
     {
-        var cts = Interlocked.Exchange(ref _cancellationTokenSource, null);
+        CancelAndDispose(Interlocked.Exchange(ref _cancellationTokenSource, null));
+    }
+
+    /// <summary>
+    /// Cancels and disposes <paramref name="expected"/> only if it is still the source currently
+    /// owned by this client. A Stop() for an older socket must not tear down a later connection.
+    /// </summary>
+    private void DisposeCancellationTokenSource(CancellationTokenSource? expected)
+    {
+        if (expected == null ||
+            !ReferenceEquals(Interlocked.CompareExchange(ref _cancellationTokenSource, null, expected), expected))
+        {
+            return;
+        }
+
+        CancelAndDispose(expected);
+    }
+
+    private static void CancelAndDispose(CancellationTokenSource? cts)
+    {
         if (cts == null)
         {
             return;
@@ -628,6 +647,18 @@ public class Client : IDisposable, ISpeakWebSocketClient
         finally
         {
             cts.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Releases the snapshot taken by Stop() only while it is still the current socket. The
+    /// compare-and-exchange prevents a delayed Stop() from clearing a newer connection. See #471.
+    /// </summary>
+    private void ReleaseSocket(ClientWebSocket socket, CancellationTokenSource? cancellationTokenSource)
+    {
+        if (ReferenceEquals(Interlocked.CompareExchange(ref _clientWebSocket, null, socket), socket))
+        {
+            DisposeCancellationTokenSource(cancellationTokenSource);
         }
     }
 
@@ -1010,6 +1041,7 @@ public class Client : IDisposable, ISpeakWebSocketClient
             Log.Verbose("SpeakWSClient.Stop", "LEAVE");
             return;
         }
+        var internalCancellationToken = _cancellationTokenSource;
 
         try
         {
@@ -1050,14 +1082,10 @@ public class Client : IDisposable, ISpeakWebSocketClient
                     .ConfigureAwait(false);
             }
 
-            // clean up internal token — cancel-before-dispose so background loops observe
-            // cancellation, and atomic-claim so a concurrent Stop()/Dispose() can't race. See #390.
-            Log.Debug("Stop", "Disposing internal token...");
-            DisposeCancellationTokenSource();
-
-            // release the socket
-            Log.Debug("Stop", "Disposing WebSocket socket...");
-            _clientWebSocket = null;
+            // Release only this Stop()'s snapshot. A concurrent cancellation can make a reconnect
+            // possible while this Stop() is still delivering Close handlers. See #471.
+            Log.Debug("Stop", "Releasing WebSocket socket...");
+            ReleaseSocket(socket, internalCancellationToken);
 
             Log.Debug("Stop", "Succeeded");
             Log.Verbose("SpeakWSClient.Stop", "LEAVE");
@@ -1068,6 +1096,19 @@ public class Client : IDisposable, ISpeakWebSocketClient
             // OperationCanceledException if the disconnect-timeout token fires.
             Log.Debug("Stop", "Stop cancelled.");
             Log.Verbose("Stop", $"Stop cancelled. Info: {ex}");
+
+            // The token can expire while a Close handler is still running, before CloseOutputAsync.
+            // Skipping the teardown here would leave the socket open and the next Connect() failing
+            // with "Client has already been initialized". Abort the socket and release it. See #471.
+            try
+            {
+                socket.Abort();
+            }
+            catch (Exception abortEx) when (abortEx is ObjectDisposedException || abortEx is WebSocketException || abortEx is InvalidOperationException)
+            {
+                Log.Verbose("Stop", $"Abort after cancel: {abortEx.GetType().Name}");
+            }
+            ReleaseSocket(socket, internalCancellationToken);
             Log.Verbose("SpeakWSClient.Stop", "LEAVE");
         }
         catch (Exception ex) when (ex is ObjectDisposedException || ex is WebSocketException || ex is InvalidOperationException)

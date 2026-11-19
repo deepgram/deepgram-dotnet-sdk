@@ -346,6 +346,152 @@ public class V1WebSocketHandlerIsolationTests
         }
     }
 
+    // --- Stop() whose disconnect token expires while a Close handler runs (#471) ---
+
+    private sealed class CloseGate
+    {
+        public TaskCompletionSource<bool> Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private TaskCompletionSource<bool> Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public void Wait()
+        {
+            Entered.TrySetResult(true);
+            Release.Task.GetAwaiter().GetResult();
+        }
+
+        public void Open() => Release.TrySetResult(true);
+    }
+
+    [Test]
+    public async Task ListenV1_Stop_Should_Tear_Down_And_Allow_Reconnect_When_Close_Handler_Outlasts_The_Token()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new ListenV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+
+            using var stopToken = new CancellationTokenSource();
+            var stop = client.Stop(stopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            stopToken.Cancel();
+            closeGate.Open();
+            await stop;
+
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
+            Func<Task> reconnect = () => client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+            await reconnect.Should().NotThrowAsync("the next Connect() must not see a half torn-down client");
+            client.IsConnected().Should().BeTrue();
+        }
+        finally
+        {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task SpeakV1_Stop_Should_Tear_Down_And_Allow_Reconnect_When_Close_Handler_Outlasts_The_Token()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new SpeakV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new SpeakModels.SpeakSchema());
+
+            using var stopToken = new CancellationTokenSource();
+            var stop = client.Stop(stopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            stopToken.Cancel();
+            closeGate.Open();
+            await stop;
+
+            client.State().Should().Be(WebSocketState.None, "Stop() must release the socket even when its token expires");
+            Func<Task> reconnect = () => client.Connect(new SpeakModels.SpeakSchema());
+            await reconnect.Should().NotThrowAsync("the next Connect() must not see a half torn-down client");
+            client.IsConnected().Should().BeTrue();
+        }
+        finally
+        {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task ListenV1_Stale_Stop_Must_Not_Tear_Down_A_Reconnected_Client()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new ListenV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<ListenModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+
+            using var firstStopToken = new CancellationTokenSource();
+            var firstStop = client.Stop(firstStopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            using var cancelledStopToken = new CancellationTokenSource();
+            cancelledStopToken.Cancel();
+            await client.Stop(cancelledStopToken);
+            client.State().Should().Be(WebSocketState.None);
+
+            await client.Connect(new ListenModels.LiveSchema { Model = "nova-3" });
+            closeGate.Open();
+            await firstStop;
+
+            client.IsConnected().Should().BeTrue("a stale Stop() must not release the newer connection");
+        }
+        finally
+        {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
+    [Test]
+    public async Task SpeakV1_Stale_Stop_Must_Not_Tear_Down_A_Reconnected_Client()
+    {
+        using var server = new LoopbackWebSocketHandshakeServer();
+        var apiKey = NewApiKey();
+        var client = new SpeakV1.Client(apiKey, LoopbackOptions(apiKey, server.Port));
+        var closeGate = new CloseGate();
+        try
+        {
+            client.Subscribe((EventHandler<SpeakModels.CloseResponse>)((_, _) => closeGate.Wait()));
+            await client.Connect(new SpeakModels.SpeakSchema());
+
+            using var firstStopToken = new CancellationTokenSource();
+            var firstStop = client.Stop(firstStopToken);
+            await closeGate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+            using var cancelledStopToken = new CancellationTokenSource();
+            cancelledStopToken.Cancel();
+            await client.Stop(cancelledStopToken);
+            client.State().Should().Be(WebSocketState.None);
+
+            await client.Connect(new SpeakModels.SpeakSchema());
+            closeGate.Open();
+            await firstStop;
+
+            client.IsConnected().Should().BeTrue("a stale Stop() must not release the newer connection");
+        }
+        finally
+        {
+            closeGate.Open();
+            client.Dispose();
+        }
+    }
+
     /// <summary>
     /// Accepts WebSocket upgrades on a loopback port, then reads and discards frames until the
     /// client goes away. Enough for Connect() to succeed and Stop() to send its Close frame.
