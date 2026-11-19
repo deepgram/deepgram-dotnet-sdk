@@ -24,8 +24,6 @@ public class ClientFactoryCoverageTests
         {
             ClientFactory.CreateAgentWebSocketClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentWebSocketClient>();
             ClientFactory.CreateAgentProtocolClient(ApiKey, WebSocketOptions).Should().BeAssignableTo<V2.IAgentProtocolClient>();
-            ClientFactory.CreateAgentThinkLiveProtocolClient(ApiKey, WebSocketOptions).Should()
-                .BeAssignableTo<V2.IAgentThinkLiveProtocolClient>();
             ClientFactory.CreateAgentCatalogClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentCatalogClient>();
             ClientFactory.CreateAgentManageClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAgentManageClient>();
             ClientFactory.CreateAnalyzeClient(ApiKey, HttpOptions).Should().BeAssignableTo<V1.IAnalyzeClient>();

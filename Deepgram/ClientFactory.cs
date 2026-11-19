@@ -35,14 +35,6 @@ public static class ClientFactory
     }
 
     /// <summary>
-    /// Creates a Voice Agent client with current protocol and Think Live event subscriptions.
-    /// </summary>
-    public static V2.IAgentThinkLiveProtocolClient CreateAgentThinkLiveProtocolClient(string apiKey = "", DeepgramWsClientOptions? options = null)
-    {
-        return new AgentWebSocketClient(apiKey, options);
-    }
-
-    /// <summary>
     /// Creates a Voice Agent settings catalog client.
     /// </summary>
     public static V1.IAgentCatalogClient CreateAgentCatalogClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)

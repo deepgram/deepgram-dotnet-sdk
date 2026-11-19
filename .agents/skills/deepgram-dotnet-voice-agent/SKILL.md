@@ -121,11 +121,6 @@ Protocol events (subscribe through `ClientFactory.CreateAgentProtocolClient()`, 
 - `FunctionCallCancelledResponse`, `FunctionCallResponse`
 - `LatencyReportResponse`, `AgentWarningResponse`, `AgentHistoryResponse`
 
-Think Live protocol events (subscribe through
-`ClientFactory.CreateAgentThinkLiveProtocolClient()`, which returns
-`IAgentThinkLiveProtocolClient`):
-- `ThinkLiveUpdatedResponse`, `FrustrationDetectedResponse`
-
 Send helpers:
 - `SendInjectUserMessage(string)`
 - `SendInjectUserMessage(InjectUserMessageSchema)`

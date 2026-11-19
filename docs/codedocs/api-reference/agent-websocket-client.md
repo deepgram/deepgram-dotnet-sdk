@@ -3,7 +3,7 @@ title: "AgentWebSocketClient"
 description: "Configure live agent sessions, subscribe to agent events, and send text or audio into the conversation."
 ---
 
-Source files: `Deepgram/AgentWebSocketClient.cs`, `Deepgram/AgentWebSocketClientExtensions.cs`, `Deepgram/Clients/Interfaces/v2/IAgentWebSocketClient.cs`, `Deepgram/Clients/Interfaces/v2/IAgentProtocolClient.cs`, `Deepgram/Clients/Interfaces/v2/IAgentThinkLiveProtocolClient.cs`, `Deepgram/Clients/Agent/v2/Websocket/Client.cs`.
+Source files: `Deepgram/AgentWebSocketClient.cs`, `Deepgram/AgentWebSocketClientExtensions.cs`, `Deepgram/Clients/Interfaces/v2/IAgentWebSocketClient.cs`, `Deepgram/Clients/Interfaces/v2/IAgentProtocolClient.cs`, `Deepgram/Clients/Agent/v2/Websocket/Client.cs`.
 
 Import paths:
 
@@ -55,11 +55,9 @@ Task<bool> Subscribe(EventHandler<SpeakUpdatedResponse> eventHandler)
 
 `ClientFactory.CreateAgentProtocolClient()` returns `IAgentProtocolClient`, which additionally
 provides typed subscriptions for `ListenUpdatedResponse`, `ThinkUpdatedResponse`,
+`ThinkLiveUpdatedResponse`, `FrustrationDetectedResponse`,
 `FunctionCallCancelledResponse`, `LatencyReportResponse`, `AgentWarningResponse`,
 `AgentHistoryResponse`, `FunctionCallResponse`, and `CustomFromThinkProviderResponse`.
-`ClientFactory.CreateAgentThinkLiveProtocolClient()` returns
-`IAgentThinkLiveProtocolClient`, which also provides typed subscriptions for
-`ThinkLiveUpdatedResponse` and `FrustrationDetectedResponse`.
 
 ### Send and helper methods
 

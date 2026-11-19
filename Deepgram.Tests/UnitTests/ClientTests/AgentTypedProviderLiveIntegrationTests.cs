@@ -237,7 +237,7 @@ public class AgentTypedProviderLiveIntegrationTests
     public async Task Live_Agent_Should_Acknowledge_UpdateThinkLive()
     {
         var apiKey = RequireApiKey("DEEPGRAM_API_KEY is not set. Skipping Think Live update integration test.");
-        var client = ClientFactory.CreateAgentThinkLiveProtocolClient(apiKey);
+        var client = ClientFactory.CreateAgentProtocolClient(apiKey);
         var settingsApplied = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thinkLiveUpdated = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         var errors = new List<ErrorResponse>();
