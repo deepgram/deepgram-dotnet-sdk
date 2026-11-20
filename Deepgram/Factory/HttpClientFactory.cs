@@ -50,21 +50,36 @@ internal class HttpClientFactory
             // jitter. This is the Polly v8 equivalent of the previous AddTransientHttpErrorPolicy +
             // DecorrelatedJitterBackoffV2(1s, 5) policy, now that Polly.Extensions.Http is deprecated.
             // See #359.
-            services.AddHttpClient(id)
-                .ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
+            var httpBuilder = services.AddHttpClient(id);
+
+            // Connection reuse comes from caching the provider above and applies everywhere.
+            // Bounding the connection lifetime is an additional benefit that only makes sense
+            // where SocketsHttpHandler is the right primary handler: it is unsupported on
+            // browser (Blazor WebAssembly throws PlatformNotSupportedException), and on Android
+            // and iOS it would bypass the platform's native HTTP stack, changing TLS, proxy and
+            // client-certificate behaviour. Leave those platforms on the default handler.
+            if (!OperatingSystem.IsBrowser() && !OperatingSystem.IsAndroid() && !OperatingSystem.IsIOS())
+            {
+                httpBuilder.ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
                 {
                     PooledConnectionLifetime = HttpClientFactory.PooledConnectionLifetime,
-                })
-                .AddResilienceHandler("deepgram-retry", builder =>
-                {
-                    builder.AddRetry(new HttpRetryStrategyOptions
-                    {
-                        MaxRetryAttempts = 5,
-                        BackoffType = DelayBackoffType.Exponential,
-                        UseJitter = true,
-                        Delay = TimeSpan.FromSeconds(1),
-                    });
                 });
+
+                // PooledConnectionLifetime already rotates connections, so the factory's own
+                // handler rotation would churn them a second time.
+                httpBuilder.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+            }
+
+            httpBuilder.AddResilienceHandler("deepgram-retry", builder =>
+            {
+                builder.AddRetry(new HttpRetryStrategyOptions
+                {
+                    MaxRetryAttempts = 5,
+                    BackoffType = DelayBackoffType.Exponential,
+                    UseJitter = true,
+                    Delay = TimeSpan.FromSeconds(1),
+                });
+            });
 #endif
             return services.BuildServiceProvider();
         });

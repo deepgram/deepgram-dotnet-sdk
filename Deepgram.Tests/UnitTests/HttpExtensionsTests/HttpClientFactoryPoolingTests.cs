@@ -103,7 +103,7 @@ public class HttpClientFactoryPoolingTests
     }
 
     private static DeepgramHttpClientOptions OptionsFor(int port) =>
-        new DeepgramHttpClientOptions("fake-key", $"http://localhost:{port}/v1");
+        new DeepgramHttpClientOptions("fake-key", $"http://127.0.0.1:{port}/v1");
 
     [Test]
     public async Task Clients_Sharing_An_HttpId_Should_Reuse_One_Tcp_Connection()
