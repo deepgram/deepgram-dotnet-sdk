@@ -31,12 +31,16 @@ internal class HttpClientFactory
     /// factory used to do - gave every Deepgram client its own handler and its own connection
     /// pool, so no connection was ever reused between them. Caching the provider is what makes
     /// connection reuse possible; the client name remains a real isolation boundary.
+    ///
+    /// The value is a Lazy so the provider is built exactly once per ID. ConcurrentDictionary
+    /// may run its value factory on more than one thread and discard the losers, which would
+    /// otherwise construct and silently drop an IDisposable provider.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, IServiceProvider> _providers =
-        new ConcurrentDictionary<string, IServiceProvider>();
+    private static readonly ConcurrentDictionary<string, Lazy<IServiceProvider>> _providers =
+        new ConcurrentDictionary<string, Lazy<IServiceProvider>>();
 
     private static IServiceProvider GetProvider(string httpId) =>
-        _providers.GetOrAdd(httpId, static id =>
+        _providers.GetOrAdd(httpId, static id => new Lazy<IServiceProvider>(() =>
         {
             var services = new ServiceCollection();
 #if NETSTANDARD2_0
@@ -82,7 +86,7 @@ internal class HttpClientFactory
             });
 #endif
             return services.BuildServiceProvider();
-        });
+        }, LazyThreadSafetyMode.ExecutionAndPublication)).Value;
 
     public static HttpClient Create(string? httpId = null)
     {
