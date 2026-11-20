@@ -1,5 +1,27 @@
 # Changelog
 
+## [7.7.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.6.0...7.7.0) (2026-11-20)
+
+
+### Features
+
+* **agent:** add a Think Live protocol client ([d9c393b](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d9c393bfab3e4d0f6e5a0048d50a30f94fe73f73))
+* **agent:** complete Deepgram Think provider options ([9d493a7](https://github.com/deepgram/deepgram-dotnet-sdk/commit/9d493a7426838e5f5717f155cbf8cf9ef79b9ffb))
+* **agent:** complete Deepgram Think provider options ([135b65f](https://github.com/deepgram/deepgram-dotnet-sdk/commit/135b65f11b5190d85616035d10f4e202e778a253))
+* **http:** reuse pooled HTTP connections across REST clients and make httpId a process-lifetime pool key ([a47df71](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a47df71b559be07c80f0cafe0b78fd74eb6cb149))
+
+
+### Bug Fixes
+
+* **agent:** align voice prompt option docs with server ([910144d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/910144de02e752ab3fb50651759f0ac7fec7d67e))
+* **agent:** scope voice prompt opt-out to think-fast ([54c060e](https://github.com/deepgram/deepgram-dotnet-sdk/commit/54c060e88b9241aa9797b792df3a220e4490adff))
+* **http:** build each pooled provider once and document httpId ([fc30ca1](https://github.com/deepgram/deepgram-dotnet-sdk/commit/fc30ca1aa7e10519756f34544a8d0d83d62bbbe9))
+* **http:** keep the platform default handler on browser and mobile ([836a816](https://github.com/deepgram/deepgram-dotnet-sdk/commit/836a8164856f86d23ff9edd1a6052f4193ca59d4))
+* **http:** reuse pooled HTTP connections across REST clients ([7d8b8ad](https://github.com/deepgram/deepgram-dotnet-sdk/commit/7d8b8adcf53e898e01b4c055e2116719def4a459)), closes [#498](https://github.com/deepgram/deepgram-dotnet-sdk/issues/498)
+* **websocket:** preserve a newer v1 connection during Stop ([a570c1d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a570c1ddb44f53517fd75c46dca898cc3db472b5))
+* **websocket:** tear down v1 Listen and Speak clients when Stop() is cancelled ([d264edf](https://github.com/deepgram/deepgram-dotnet-sdk/commit/d264edf75ec7bec0aeed60af8de85c53bc4d500c))
+* **websocket:** tear down v1 Listen and Speak clients when Stop() is cancelled ([69676e3](https://github.com/deepgram/deepgram-dotnet-sdk/commit/69676e362c0084cd7cad899582d6e3fd96ffabb8)), closes [#471](https://github.com/deepgram/deepgram-dotnet-sdk/issues/471)
+
 ## [7.6.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.5.1...7.6.0) (2026-11-16)
 
 
