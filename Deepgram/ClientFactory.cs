@@ -48,7 +48,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.IAgentManageClient CreateAgentManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -60,7 +63,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.IAnalyzeClient CreateAnalyzeClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -97,7 +103,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V2.IFluxSpeakRESTClient CreateFluxSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -120,7 +129,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.IAuthClient CreateAuthClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -132,7 +144,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.IManageClient CreateManageClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -156,7 +171,10 @@ public static class ClientFactory
     /// </remarks>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     [Obsolete("Please use CreateSelfHostedDistributionCredentialsClient instead", false)]
     public static V1.ISelfHostedClient CreateSelfHostedClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
@@ -178,7 +196,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.IListenRESTClient CreateListenRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
@@ -190,7 +211,10 @@ public static class ClientFactory
     /// </summary>
     /// <param name="apiKey"></param>
     /// <param name="options"></param>
-    /// <param name="httpId"></param>
+    /// <param name="httpId">Optional name for the pooled HTTP connections this client uses.
+    /// Clients created with the same name share connections; a different name is a separate pool.
+    /// Names are retained for the lifetime of the process, so use a small fixed set of values
+    /// rather than a new one per request.</param>
     /// <returns></returns>
     public static V1.ISpeakRESTClient CreateSpeakRESTClient(string apiKey = "", DeepgramHttpClientOptions? options = null, string? httpId = null)
     {
