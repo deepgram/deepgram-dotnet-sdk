@@ -166,14 +166,39 @@ public class AgentTypedProviderTests
     }
 
     [Test]
-    public void DeepgramThinkProvider_Should_Serialize()
+    public void DeepgramThinkProvider_Should_Serialize_Phonellm_Options()
     {
-        var json = Serialize(new DeepgramThinkProvider { Model = "think-fast" });
+        var json = Serialize(new DeepgramThinkProvider
+        {
+            Model = "phonellm-mini-alpha-2-fp8",
+            Temperature = 0.2,
+            ReasoningMode = "none",
+        });
 
         using (new AssertionScope())
         {
             json.GetProperty("type").GetString().Should().Be("deepgram");
+            json.GetProperty("model").GetString().Should().Be("phonellm-mini-alpha-2-fp8");
+            json.GetProperty("version").GetString().Should().Be("v1");
+            json.GetProperty("temperature").GetDouble().Should().Be(0.2);
+            json.GetProperty("reasoning_mode").GetString().Should().Be("none");
+            json.TryGetProperty("voice_prompt_opt_out", out _).Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public void DeepgramThinkProvider_Should_Serialize_ThinkFast_VoicePromptOptOut()
+    {
+        var json = Serialize(new DeepgramThinkProvider
+        {
+            Model = "think-fast",
+            VoicePromptOptOut = true,
+        });
+
+        using (new AssertionScope())
+        {
             json.GetProperty("model").GetString().Should().Be("think-fast");
+            json.GetProperty("voice_prompt_opt_out").GetBoolean().Should().BeTrue();
         }
     }
 

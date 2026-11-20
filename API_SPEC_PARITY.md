@@ -35,6 +35,7 @@ files.
 | Voice Agent `FrustrationDetected` | protocol response and interface | Supported | Typed payload dispatch and no-subscriber forward-compat coverage. |
 | Think Live function fillers | `Function` | Supported | All wire names serialize and the gated Think Live settings test covers server acceptance. |
 | Voice Agent `conversational_behavior` | `ConversationTextResponse` | Supported | Values dispatch typed and legacy/self-hosted payloads default to `default`. |
+| Voice Agent Deepgram Think provider options | `DeepgramThinkProvider` | Supported | Full provider serialization plus a gated SettingsApplied integration test. |
 
 The expanded Flux TTS voice roster is not listed as a gap. The .NET SDK accepts
 model names as strings, so newly listed server models work without a generated

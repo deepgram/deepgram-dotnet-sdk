@@ -125,6 +125,26 @@
       "type": "Deepgram.Models.Agent.v2.WebSocket.FrustrationDetectedResponse",
       "property": "Escalated",
       "wireName": "escalated"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkProvider",
+      "property": "Version",
+      "wireName": "version"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkProvider",
+      "property": "Temperature",
+      "wireName": "temperature"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkProvider",
+      "property": "ReasoningMode",
+      "wireName": "reasoning_mode"
+    },
+    {
+      "type": "Deepgram.Models.Agent.v2.WebSocket.DeepgramThinkProvider",
+      "property": "VoicePromptOptOut",
+      "wireName": "voice_prompt_opt_out"
     }
   ]
 }
