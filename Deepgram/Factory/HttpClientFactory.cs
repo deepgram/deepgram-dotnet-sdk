@@ -135,15 +135,10 @@ internal class HttpClientFactory
     /// <param name="options">Client options containing credentials</param>
     private static void SetAuthenticationHeader(HttpClient client, IDeepgramClientOptions options)
     {
-        if (!string.IsNullOrWhiteSpace(options.AccessToken))
+        var header = GetAuthenticationHeader(options);
+        if (header != null)
         {
-            // Use Bearer token authentication (highest priority)
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
-        }
-        else if (!string.IsNullOrWhiteSpace(options.ApiKey))
-        {
-            // Use API key authentication (fallback)
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
+            client.DefaultRequestHeaders.Authorization = header;
         }
         else if (options is DeepgramHttpClientOptions { AllowAnonymous: true })
         {
@@ -155,5 +150,25 @@ internal class HttpClientFactory
             // No authentication credentials available
             Log.Warning("SetAuthenticationHeader", "No authentication credentials provided. API calls may fail.");
         }
+    }
+
+    /// <summary>
+    /// Builds the Authorization header for the credentials currently held by the options (or null if none).
+    /// Used per request so rotated credentials apply without mutating the shared HttpClient.
+    /// </summary>
+    internal static AuthenticationHeaderValue? GetAuthenticationHeader(IDeepgramClientOptions options)
+    {
+        // Snapshot once so a concurrent SetApiKey/SetAccessToken cannot yield a mixed result
+        var accessToken = options.AccessToken;
+        if (!string.IsNullOrWhiteSpace(accessToken))
+        {
+            return new AuthenticationHeaderValue("Bearer", accessToken);
+        }
+        var apiKey = options.ApiKey;
+        if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            return new AuthenticationHeaderValue("token", apiKey);
+        }
+        return null;
     }
 }
