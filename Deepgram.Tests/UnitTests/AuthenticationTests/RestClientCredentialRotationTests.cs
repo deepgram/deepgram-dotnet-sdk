@@ -91,6 +91,34 @@ public class RestClientCredentialRotationTests
     }
 
     [Test]
+    public async Task V1_Should_Never_Send_An_Unauthenticated_Request_During_Credential_Rotation()
+    {
+        var options = new DeepgramHttpClientOptions("initial_key");
+        var handler = new CapturingHandler();
+        var client = new TestClientV1(options, handler);
+        const int requestCount = 100;
+
+        var rotations = Task.Run(async () =>
+        {
+            for (var index = 0; index < requestCount; index++)
+            {
+                options.SetAccessToken($"token_{index}");
+                await Task.Yield();
+                options.SetApiKey($"key_{index}");
+                await Task.Yield();
+            }
+        });
+
+        var requests = Task.WhenAll(Enumerable.Range(0, requestCount)
+            .Select(_ => Task.Run(() => client.GetAsync<object>("projects"))));
+
+        await Task.WhenAll(rotations, requests);
+
+        handler.AuthorizationHeaders.Should().HaveCount(requestCount);
+        handler.AuthorizationHeaders.Should().OnlyContain(header => !string.IsNullOrWhiteSpace(header));
+    }
+
+    [Test]
     public async Task V1_Should_Preserve_Caller_Authorization_Header()
     {
         var options = new DeepgramHttpClientOptions("client_key");
