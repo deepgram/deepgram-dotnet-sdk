@@ -7,7 +7,7 @@ namespace Deepgram.Models.Authenticate.v1;
 /// <summary>
 /// Configuration for the Deepgram client
 /// </summary>
-public class DeepgramHttpClientOptions : IDeepgramClientOptions
+public class DeepgramHttpClientOptions : IDeepgramClientOptions, IAuthenticationHeaderOptions
 {
     /*****************************/
     // Thread Safety
@@ -300,4 +300,6 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
             return null;
         }
     }
+
+    AuthenticationHeaderValue? IAuthenticationHeaderOptions.GetAuthenticationHeader() => GetAuthenticationHeader();
 }

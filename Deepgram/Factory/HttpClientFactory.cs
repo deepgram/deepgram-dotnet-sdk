@@ -157,9 +157,9 @@ internal class HttpClientFactory
     /// </summary>
     internal static AuthenticationHeaderValue? GetAuthenticationHeader(IDeepgramClientOptions options)
     {
-        if (options is DeepgramHttpClientOptions deepgramOptions)
+        if (options is IAuthenticationHeaderOptions authenticationHeaderOptions)
         {
-            return deepgramOptions.GetAuthenticationHeader();
+            return authenticationHeaderOptions.GetAuthenticationHeader();
         }
 
         // Custom IDeepgramClientOptions implementations own their synchronization.

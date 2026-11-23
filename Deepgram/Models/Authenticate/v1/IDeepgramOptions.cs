@@ -4,6 +4,11 @@
 
 namespace Deepgram.Models.Authenticate.v1;
 
+internal interface IAuthenticationHeaderOptions
+{
+    AuthenticationHeaderValue? GetAuthenticationHeader();
+}
+
 public interface IDeepgramClientOptions
 {
     /*****************************/

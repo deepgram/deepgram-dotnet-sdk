@@ -175,4 +175,37 @@ public class RestClientCredentialRotationTests
 
         handler.AuthorizationHeaders.Should().ContainSingle().Which.Should().BeNull();
     }
+
+    [Test]
+    public async Task Should_Use_Rotated_Environment_Options_Credentials()
+    {
+        var options = new DeepgramOptionsFromEnv
+        {
+            BaseAddress = "https://api.deepgram.com/v1",
+        };
+        options.SetApiKey("old_key");
+        var handler = new CapturingHandler();
+        var client = new TestClientV1(options, handler);
+
+        options.SetAccessToken("jwt_value");
+        await client.GetAsync<object>("projects");
+
+        handler.AuthorizationHeaders.Should().ContainSingle().Which.Should().Be("Bearer jwt_value");
+    }
+
+    [Test]
+    public async Task Should_Use_Rotated_WebSocket_Options_Credentials()
+    {
+        var options = new DeepgramWsClientOptions("old_key")
+        {
+            BaseAddress = "https://api.deepgram.com/v1",
+        };
+        var handler = new CapturingHandler();
+        var client = new TestClientV1(options, handler);
+
+        options.SetAccessToken("jwt_value");
+        await client.GetAsync<object>("projects");
+
+        handler.AuthorizationHeaders.Should().ContainSingle().Which.Should().Be("Bearer jwt_value");
+    }
 }
