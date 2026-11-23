@@ -4,8 +4,8 @@
 
 using System.Text;
 using Deepgram.Clients.Interfaces.v2;
-using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Agent.v2.WebSocket;
+using Deepgram.Models.Authenticate.v1;
 using AgentConstants = Deepgram.Clients.Interfaces.v2.Constants;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;

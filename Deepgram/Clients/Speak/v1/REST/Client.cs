@@ -1,11 +1,11 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Speak.v1.REST;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Clients.Interfaces.v1;
 using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Speak.v1.REST;
 
 namespace Deepgram.Clients.Speak.v1.REST;
 
@@ -79,7 +79,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
                     response.Date = DateTime.Parse(item.Value);
                     break;
                 default:
-                    Log.Error("ToStream", $"Unknown metadata key: {key}");  
+                    Log.Error("ToStream", $"Unknown metadata key: {key}");
                     break;
             }
         }

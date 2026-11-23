@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,14 +10,14 @@ public record CredentialResponse
     /// Member information
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("member")]
+    [JsonPropertyName("member")]
     public Member? Member { get; set; }
 
     /// <summary>
     /// Distribution credentials
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("distribution_credentials")]
+    [JsonPropertyName("distribution_credentials")]
     public DistributionCredentials? DistributionCredentials { get; set; }
 
     /// <summary>

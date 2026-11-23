@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -33,14 +33,14 @@ public class SpeakSchema
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model")]
+    [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
     /// Bit Rate allows you to specify the bit rate of your desired audio.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("bit_rate")]
+    [JsonPropertyName("bit_rate")]
     public string? BitRate { get; set; }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class SpeakSchema
     /// default is nulls
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback")]
+    [JsonPropertyName("callback")]
     public string? CallBack { get; set; }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class SpeakSchema
     /// Audio container format
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("container")]
+    [JsonPropertyName("container")]
     public string? Container { get; set; }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class SpeakSchema
     /// supported encodings <see cref="AudioEncoding"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("encoding")]
+    [JsonPropertyName("encoding")]
     public string? Encoding { get; set; }
 
     /// <summary>
@@ -83,7 +83,7 @@ public class SpeakSchema
     /// only applies when Encoding has a values
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sample_rate")]
+    [JsonPropertyName("sample_rate")]
     public string? SampleRate { get; set; }
 
     /// <summary>

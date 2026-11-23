@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 using System.Globalization;
-
+using Deepgram.Clients.Flux.Speak.REST;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.Speak.REST;
-using Deepgram.Clients.Flux.Speak.REST;
 using Deepgram.Utilities;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;

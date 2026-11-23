@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.Net.WebSockets;
-
 using Deepgram.Models.Authenticate.v1;
 using ListenClient = Deepgram.Clients.Listen.v2.WebSocket.Client;
 using ListenMetadataResponse = Deepgram.Models.Listen.v2.WebSocket.MetadataResponse;
@@ -13,11 +12,11 @@ using ListenUnhandledResponse = Deepgram.Models.Listen.v2.WebSocket.UnhandledRes
 using ListenUtteranceEndResponse = Deepgram.Models.Listen.v2.WebSocket.UtteranceEndResponse;
 using SpeakAudioResponse = Deepgram.Models.Speak.v2.WebSocket.AudioResponse;
 using SpeakClearedResponse = Deepgram.Models.Speak.v2.WebSocket.ClearedResponse;
-using SpeakWebSocketClient = Deepgram.Clients.Speak.v2.WebSocket.Client;
 using SpeakFlushedResponse = Deepgram.Models.Speak.v2.WebSocket.FlushedResponse;
 using SpeakMetadataResponse = Deepgram.Models.Speak.v2.WebSocket.MetadataResponse;
 using SpeakUnhandledResponse = Deepgram.Models.Speak.v2.WebSocket.UnhandledResponse;
 using SpeakWarningResponse = Deepgram.Models.Speak.v2.WebSocket.WarningResponse;
+using SpeakWebSocketClient = Deepgram.Clients.Speak.v2.WebSocket.Client;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

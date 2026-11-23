@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Text.Json;
 using Bogus;
+using Deepgram.Models.Agent.v2.WebSocket;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using NSubstitute;
-using System.Text.Json;
-using Deepgram.Models.Agent.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -294,7 +294,7 @@ public class AgentSpeakTests
         var result = speak.ToString();
 
         // Assert
-                using (new AssertionScope())
+        using (new AssertionScope())
         {
             result.Should().NotBeNull();
             result.Should().Contain("provider");

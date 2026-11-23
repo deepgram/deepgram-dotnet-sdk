@@ -2,10 +2,10 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Auth.v1;
-using Deepgram.Clients.Interfaces.v1;
 using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Models.Auth.v1;
+using Deepgram.Models.Authenticate.v1;
 
 namespace Deepgram.Clients.Auth.v1;
 
@@ -47,7 +47,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     public async Task<GrantTokenResponse> GrantToken(GrantTokenSchema grantTokenSchema,
         CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
-        {
+    {
         if (grantTokenSchema is null)
         {
             throw new ArgumentNullException(nameof(grantTokenSchema));

@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,49 +10,49 @@ public record SyncResponse
     /// Content type of the audio file
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("content_type")]
+    [JsonPropertyName("content_type")]
     public string? ContentType { get; set; }
 
     /// <summary>
     /// Request ID for support purposes
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("request_id")]
+    [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
     /// Model UUID
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model_uuid")]
+    [JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
     /// Model name
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model_name")]
+    [JsonPropertyName("model_name")]
     public string? ModelName { get; set; }
 
     /// <summary>
     /// Character count
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("characters")]
+    [JsonPropertyName("characters")]
     public int? Characters { get; set; }
 
     /// <summary>
     /// Encoding of the audio file
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("transfer_encoding")]
+    [JsonPropertyName("transfer_encoding")]
     public string? TransferEncoding { get; set; }
 
     /// <summary>
     /// Date/time of the audio file
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("date")]
+    [JsonPropertyName("date")]
     public DateTime? Date { get; set; }
 
     /// <summary>

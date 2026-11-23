@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -36,7 +36,7 @@ public class SpeakSchema
     /// Bit Rate allows you to specify the bit rate of your desired audio.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("bit_rate")]
+    [JsonPropertyName("bit_rate")]
     public int? BitRate { get; set; }
 
     ///// <summary>
@@ -52,7 +52,7 @@ public class SpeakSchema
     /// supported encodings <see cref="AudioEncoding"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("encoding")]
+    [JsonPropertyName("encoding")]
     public string? Encoding { get; set; }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class SpeakSchema
     /// Only applies when Encoding has a value
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sample_rate")]
+    [JsonPropertyName("sample_rate")]
     public int? SampleRate { get; set; }
 
     /// <summary>

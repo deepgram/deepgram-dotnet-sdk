@@ -9,6 +9,18 @@ on:
       - main
       - release-v*
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Install dependencies
+        run: dotnet restore Deepgram.sln
+      - name: Verify formatting
+        run: dotnet format Deepgram.sln --verify-no-changes --no-restore
   test:
     runs-on: ubuntu-latest
     permissions:

@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using Deepgram.Abstractions.v2;
 using Deepgram.Models.Authenticate.v1;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

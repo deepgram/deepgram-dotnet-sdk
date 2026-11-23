@@ -299,7 +299,8 @@ public class WebSocketConnectRetryTests
             public bool IsEnabled(MelLogLevel logLevel) => false;
 
             public void Log<TState>(MelLogLevel logLevel, EventId eventId, TState state, Exception? exception,
-                Func<TState, Exception?, string> formatter) { }
+                Func<TState, Exception?, string> formatter)
+            { }
         }
 
         private sealed class Scope(ScopeTrackingLoggerProvider provider) : IDisposable

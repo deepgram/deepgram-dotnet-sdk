@@ -4,8 +4,8 @@
 
 using System.Collections.Concurrent;
 using Deepgram.Logger;
-using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.AgentManage.v1;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Exceptions.v1;
 using Microsoft.Extensions.Logging;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;

@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using Deepgram.Models.Speak.v2.WebSocket;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Deepgram.Models.Speak.v2.WebSocket;
 using AuraSpeakSchema = Deepgram.Models.Speak.v1.REST.SpeakSchema;
 using AuraTextSource = Deepgram.Models.Speak.v1.REST.TextSource;
 

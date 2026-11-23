@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,14 +10,14 @@ public record Config
     /// Requested maximum number of transcript alternatives to return.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("alternatives")]
+    [JsonPropertyName("alternatives")]
     public int? Alternatives { get; set; }
 
     /// <summary>
     /// Callback information associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback")]
+    [JsonPropertyName("callback")]
     public string? Callback { get; set; }
 
     // TODO: This is throwing an error, need to figure out how to handle this. Commenting out for now.
@@ -33,56 +33,56 @@ public record Config
     /// Indicates whether diarization was requested.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize")]
+    [JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
 
     /// <summary>
     /// ReadOnlyList of keywords associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("keywords")]
+    [JsonPropertyName("keywords")]
     public IReadOnlyList<string>? Keywords { get; set; }
 
     /// <summary>
     /// Indicates whether InterimResults was associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("interim_results")]
+    [JsonPropertyName("interim_results")]
     public bool? InterimResults { get; set; }
 
     /// <summary>
     /// Language associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("language")]
+    [JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
     /// Model associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model")]
+    [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
     /// Indicates whether multichannel processing was requested.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("multichannel")]
+    [JsonPropertyName("multichannel")]
     public bool? Multichannel { get; set; }
 
     /// <summary>
     /// Indicates whether filtering profanity was requested.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("profanity_filter")]
+    [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
 
     /// <summary>
     /// Indicates whether punctuation was requested.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("punctuate")]
+    [JsonPropertyName("punctuate")]
     public bool? Punctuate { get; set; }
 
     /// <summary>
@@ -90,35 +90,35 @@ public record Config
     /// </summary>
     // Redact is a list of strings
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("redact")]
+    [JsonPropertyName("redact")]
     public IReadOnlyList<string>? Redact { get; set; }
 
     /// <summary>
     /// ReadOnlyList of search terms associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("search")]
+    [JsonPropertyName("search")]
     public IReadOnlyList<string>? Search { get; set; }
 
     /// <summary>
     /// Indicates whether SmartFormat was associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("smart_format")]
+    [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
 
     /// <summary>
     /// ReadOnlyList of translations associated with the request.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("translation")]
+    [JsonPropertyName("translation")]
     public IReadOnlyList<string>? Translation { get; set; }
 
     /// <summary>
     /// Indicates whether utterance segmentation was requested.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("utterances")]
+    [JsonPropertyName("utterances")]
     public bool? Utterances { get; set; }
 
     /// <summary>

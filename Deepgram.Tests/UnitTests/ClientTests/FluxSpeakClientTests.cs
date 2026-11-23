@@ -4,11 +4,10 @@
 
 using System.Globalization;
 using System.Net.WebSockets;
-
+using Deepgram.Clients.Flux.Speak.WebSocket;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Exceptions.v1;
 using Deepgram.Models.Flux.Speak.WebSocket;
-using Deepgram.Clients.Flux.Speak.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using FluxSpeakConstants = Deepgram.Clients.Flux.Speak.WebSocket.Constants;
 

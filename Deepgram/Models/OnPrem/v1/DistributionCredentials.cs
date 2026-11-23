@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -17,6 +17,6 @@ namespace Deepgram.Models.OnPrem.v1;
 // *********** WARNING ***********
 /// </summary>
 [Obsolete("Please use Deepgram.Models.SelfHosted.v1.DistributionCredentials instead", false)]
-public record DistributionCredentials :  SH.DistributionCredentials
+public record DistributionCredentials : SH.DistributionCredentials
 {
 }

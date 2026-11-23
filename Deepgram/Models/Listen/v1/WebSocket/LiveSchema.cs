@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -13,7 +13,7 @@ public class LiveSchema
     /// Default is 1
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("alternatives")]
+    [JsonPropertyName("alternatives")]
     public int? Alternatives { get; set; }
 
     /// <summary>
@@ -22,14 +22,14 @@ public class LiveSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback")]
+    [JsonPropertyName("callback")]
     public string? CallBack { get; set; }
 
     /// <summary>
     /// Enables callback method
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback_method")]
+    [JsonPropertyName("callback_method")]
     public bool? CallbackMethod { get; set; }
 
     /// <summary>
@@ -38,7 +38,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/channels">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channels")]
+    [JsonPropertyName("channels")]
     public int? Channels { get; set; }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class LiveSchema
     /// default is false
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize")]
+    [JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
 
     // <summary>
@@ -55,7 +55,7 @@ public class LiveSchema
     /// default is null, only applies if Diarize is set to true
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize_version")]
+    [JsonPropertyName("diarize_version")]
     public string? DiarizeVersion { get; set; }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class LiveSchema
     /// supported encodings <see cref="AudioEncoding"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("encoding")]
+    [JsonPropertyName("encoding")]
     public string? Encoding { get; set; }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/endpointing">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("endpointing")]
+    [JsonPropertyName("endpointing")]
     public string? EndPointing { get; set; }
 
     /// <summary>
@@ -90,7 +90,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("extra")]
+    [JsonPropertyName("extra")]
     public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class LiveSchema
     ///<see href="https://developers.deepgram.com/reference/pre-recorded"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("filler_words")]
+    [JsonPropertyName("filler_words")]
     public bool? FillerWords { get; set; }
 
     /// <summary>
@@ -106,7 +106,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/interim-results">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("interim_results")]
+    [JsonPropertyName("interim_results")]
     public bool? InterimResults { get; set; }
 
     /// <summary>
@@ -114,7 +114,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/keywords">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("keywords")]
+    [JsonPropertyName("keywords")]
     public List<string>? Keywords { get; set; }
 
     /// <summary>
@@ -123,7 +123,7 @@ public class LiveSchema
     /// default value is 'en' 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("language")]
+    [JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
@@ -131,7 +131,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model")]
+    [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/multichannel">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("multichannel")]
+    [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
     /// <summary>
@@ -154,7 +154,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/numerals">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("numerals")]
+    [JsonPropertyName("numerals")]
     public bool? Numerals { get; set; }
 
     /// <summary>
@@ -164,7 +164,7 @@ public class LiveSchema
     /// for use with base model tier only
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("profanity_filter")]
+    [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
 
     /// <summary>
@@ -172,7 +172,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/punctuation">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("punctuate")]
+    [JsonPropertyName("punctuate")]
     public bool? Punctuate { get; set; }
 
     /// <summary>
@@ -181,7 +181,7 @@ public class LiveSchema
     ///  default is List<string>("false") 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("redact")]
+    [JsonPropertyName("redact")]
     public List<string>? Redact { get; set; }
 
     /// <summary>
@@ -190,7 +190,7 @@ public class LiveSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("replace")]
+    [JsonPropertyName("replace")]
     public List<string>? Replace { get; set; }
 
     /// <summary>
@@ -199,7 +199,7 @@ public class LiveSchema
     /// only applies when Encoding has a value
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sample_rate")]
+    [JsonPropertyName("sample_rate")]
     public int? SampleRate { get; set; }
 
     /// <summary>
@@ -208,7 +208,7 @@ public class LiveSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("search")]
+    [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
 
     /// <summary>
@@ -216,7 +216,7 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/smart-format">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("smart_format")]
+    [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
 
     /// <summary>
@@ -225,7 +225,7 @@ public class LiveSchema
     /// Default is a null 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("tag")]
+    [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
 
     /// <summary>
@@ -233,14 +233,14 @@ public class LiveSchema
     /// <see href="https://developers.deepgram.com/docs/understanding-end-of-speech-detection-while-streaming"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("utterance_end_ms")]
+    [JsonPropertyName("utterance_end_ms")]
     public string? UtteranceEnd { get; set; }
 
     /// <summary>
     /// Enables voice activity detection (VAD) events
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("vad_events")]
+    [JsonPropertyName("vad_events")]
     public bool? VadEvents { get; set; }
 
     /// <summary>
@@ -249,7 +249,7 @@ public class LiveSchema
     /// default value is "latest"
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("version")]
+    [JsonPropertyName("version")]
     public string? Version { get; set; }
 
     /// <summary>

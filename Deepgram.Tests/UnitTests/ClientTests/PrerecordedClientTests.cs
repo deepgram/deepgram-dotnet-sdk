@@ -1,11 +1,11 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Clients.Listen.v1.REST;
-using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Listen.v1.REST;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Listen.v1.REST;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -37,7 +37,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<UrlSource, PreRecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
         prerecordedClient.PostAsync<UrlSource, PreRecordedSchema, SyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
@@ -64,11 +64,11 @@ public class ListenRESTClientTests
         var expectedResponse = new AutoFaker<SyncResponse>().Generate();
         var prerecordedSchema = new AutoFaker<PreRecordedSchema>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
-        
+
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<UrlSource, PreRecordedSchema, SyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
         prerecordedClient.PostAsync<UrlSource, PreRecordedSchema, SyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
@@ -88,11 +88,11 @@ public class ListenRESTClientTests
         var expectedResponse = new AutoFaker<AsyncResponse>().Generate();
         var source = new AutoFaker<UrlSource>().Generate();
         var prerecordedSchema = new AutoFaker<PreRecordedSchema>().Generate();
-        
+
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<UrlSource, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
         prerecordedClient.PostAsync<UrlSource, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
@@ -126,7 +126,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<UrlSource, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>())).DoNotCallBase();
         prerecordedClient.PostAsync<UrlSource, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
@@ -156,7 +156,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>())).DoNotCallBase();
         prerecordedClient.PostAsync<PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>()).Returns(expectedResponse);
@@ -183,7 +183,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>())).DoNotCallBase();
         prerecordedClient.PostAsync<UrlSource, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<UrlSource>()).Returns(expectedResponse);
@@ -269,7 +269,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
@@ -299,7 +299,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
@@ -330,7 +330,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
@@ -364,7 +364,7 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
@@ -398,11 +398,11 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
-        
+
         var callBack = prerecordedSchema.CallBack;
 
         // Act and Assert
@@ -424,11 +424,11 @@ public class ListenRESTClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var prerecordedClient = Substitute.For<ListenRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         prerecordedClient.When(x => x.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         prerecordedClient.PostAsync<Stream, PreRecordedSchema, AsyncResponse>(url, Arg.Any<PreRecordedSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
-        
+
         prerecordedSchema.CallBack = null;
 
         // Act and Assert

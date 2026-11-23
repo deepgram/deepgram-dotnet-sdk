@@ -1,11 +1,11 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Speak.v1.REST;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Speak.v1.REST;
-using Deepgram.Clients.Speak.v1.REST;
-using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -88,7 +88,7 @@ public class SpeakClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var speakClient = Substitute.For<SpeakRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         speakClient.When(x => x.PostAsync<TextSource, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
         speakClient.PostAsync<TextSource, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<TextSource>()).Returns(expectedResponse);
@@ -118,7 +118,7 @@ public class SpeakClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var speakClient = Substitute.For<SpeakRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         speakClient.When(x => x.PostAsync<TextSource, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<TextSource>())).DoNotCallBase();
         speakClient.PostAsync<TextSource, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<TextSource>()).Returns(expectedResponse);
@@ -152,7 +152,7 @@ public class SpeakClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var speakClient = Substitute.For<SpeakRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         speakClient.When(x => x.PostAsync<Stream, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         speakClient.PostAsync<Stream, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);
@@ -178,7 +178,7 @@ public class SpeakClientTests
         // Fake Client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var speakClient = Substitute.For<SpeakRESTClient>(_apiKey, _options, null);
-        
+
         // Mock Methods
         speakClient.When(x => x.PostAsync<Stream, SpeakSchema, AsyncResponse>(Arg.Any<string>(), Arg.Any<SpeakSchema>(), Arg.Any<Stream>())).DoNotCallBase();
         speakClient.PostAsync<Stream, SpeakSchema, AsyncResponse>(url, Arg.Any<SpeakSchema>(), Arg.Any<Stream>()).Returns(expectedResponse);

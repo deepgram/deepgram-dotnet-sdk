@@ -1,11 +1,11 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Interfaces.v1;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Manage.v1;
-using Deepgram.Clients.Interfaces.v1;
-using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Clients.Manage.v1;
 
@@ -128,14 +128,14 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// Gets projects associated to ApiKey 
     /// </summary>
     /// <returns><see cref="ModelsResponse"/></returns>
-    public async Task<ModelsResponse> GetProjectModels(string projectId, ModelSchema? modelSchema = null, CancellationTokenSource ? cancellationToken = default,
+    public async Task<ModelsResponse> GetProjectModels(string projectId, ModelSchema? modelSchema = null, CancellationTokenSource? cancellationToken = default,
         Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("ManageClient.GetProjectModels", "ENTER");
 
         if (modelSchema is null)
         {
-           modelSchema = new ModelSchema();
+            modelSchema = new ModelSchema();
         }
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MODELS}");
@@ -183,7 +183,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
 
         if (modelSchema is null)
         {
-           modelSchema = new ModelSchema();
+            modelSchema = new ModelSchema();
         }
 
         var uri = GetUri(_options, $"{UriSegments.MODELS}");
@@ -308,7 +308,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("DeleteKey", $"keyId: {keyId}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/keys/{keyId}");
-        var result = await DeleteAsync<MessageResponse>(uri , cancellationToken, addons, headers);
+        var result = await DeleteAsync<MessageResponse>(uri, cancellationToken, addons, headers);
 
         Log.Information("DeleteKey", $"{uri} Succeeded");
         Log.Debug("DeleteKey", $"result: {result}");
@@ -448,7 +448,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
         Log.Information("UpdateMemberScope", $"scopeSchema:\n{scopeSchema}");
 
         var uri = GetUri(_options, $"{UriSegments.PROJECTS}/{projectId}/{UriSegments.MEMBERS}/{memberId}/{UriSegments.SCOPES}");
-        var result = await PutAsync<MemberScopeSchema, MessageResponse>(uri,scopeSchema, cancellationToken, addons, headers);
+        var result = await PutAsync<MemberScopeSchema, MessageResponse>(uri, scopeSchema, cancellationToken, addons, headers);
 
         Log.Information("UpdateMemberScope", $"{uri} Succeeded");
         Log.Debug("UpdateMemberScope", $"result: {result}");

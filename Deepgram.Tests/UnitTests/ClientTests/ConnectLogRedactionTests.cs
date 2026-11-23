@@ -1,19 +1,17 @@
-﻿// Copyright 2026 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2026 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 using System.Collections.Concurrent;
-
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Utilities;
 using Microsoft.Extensions.Logging;
-using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
-
 using FluxSchema = Deepgram.Models.Flux.WebSocket.FluxSchema;
 using FluxSpeakSchema = Deepgram.Models.Flux.Speak.WebSocket.SpeakSchema;
-using ListenSchema = Deepgram.Models.Listen.v2.WebSocket.LiveSchema;
 using LegacyListenSchema = Deepgram.Models.Listen.v1.WebSocket.LiveSchema;
+using ListenSchema = Deepgram.Models.Listen.v2.WebSocket.LiveSchema;
+using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using SpeakSchema = Deepgram.Models.Speak.v2.WebSocket.SpeakSchema;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;

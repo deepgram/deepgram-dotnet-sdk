@@ -1,11 +1,11 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Interfaces.v1;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.SelfHosted.v1;
-using Deepgram.Clients.Interfaces.v1;
-using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Clients.SelfHosted.v1;
 
@@ -91,7 +91,7 @@ public class Client(string? apiKey = null, IDeepgramClientOptions? deepgramClien
     /// <param name="projectId">Id of project</param>
     /// <param name="createSelfHostedCredentialsSchema"><see cref="CredentialsSchema"/> for credentials to be created</param>
     /// <returns><see cref="CredentialResponse"/></returns>
-    public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema credentialsSchema, 
+    public async Task<CredentialResponse> CreateCredentials(string projectId, CredentialsSchema credentialsSchema,
         CancellationTokenSource? cancellationToken = default, Dictionary<string, string>? addons = null, Dictionary<string, string>? headers = null)
     {
         Log.Verbose("SelfHostedClient.CreateCredentials", "ENTER");

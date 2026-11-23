@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -21,7 +21,7 @@ public class LocalFileWithMetadata
     /// <remarks>
     /// This property should be properly disposed of to prevent memory leaks.
     /// </remarks>
-     public MemoryStream Content { get; set; }
+    public MemoryStream Content { get; set; }
 
     /// <summary>
     /// Releases the resources used by the Content stream.

@@ -3,18 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Net.Sockets;
 using System.Net.WebSockets;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Microsoft.Extensions.Logging;
-using ListenV1 = Deepgram.Clients.Listen.v1.WebSocket;
 using ListenModels = Deepgram.Models.Listen.v1.WebSocket;
+using ListenV1 = Deepgram.Clients.Listen.v1.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
-using SpeakV1 = Deepgram.Clients.Speak.v1.WebSocket;
 using SpeakModels = Deepgram.Models.Speak.v1.WebSocket;
+using SpeakV1 = Deepgram.Clients.Speak.v1.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

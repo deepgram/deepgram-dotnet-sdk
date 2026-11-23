@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,28 +10,28 @@ public record ResultResponse
     /// Contains the channel information.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel")]
+    [JsonPropertyName("channel")]
     public Channel? Channel { get; set; }
 
     /// <summary>
     /// Channel index.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel_index")]
+    [JsonPropertyName("channel_index")]
     public IReadOnlyList<int>? ChannelIndex { get; set; }
 
     /// <summary>
     /// Duration of the result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("duration")]
+    [JsonPropertyName("duration")]
     public decimal? Duration { get; set; }
 
     /// <summary>
     /// Is the result final.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("is_final")]
+    [JsonPropertyName("is_final")]
     public bool? IsFinal { get; set; } = false;
 
     /// <summary>
@@ -53,28 +53,28 @@ public record ResultResponse
     /// Metadata information.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("metadata")]
+    [JsonPropertyName("metadata")]
     public MetaData? MetaData { get; set; }
 
     /// <summary>
     /// Is the result a partial result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("speech_final")]
+    [JsonPropertyName("speech_final")]
     public bool? SpeechFinal { get; set; }
 
     /// <summary>
     /// Start time of the result.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("start")]
+    [JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>
     /// Result event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("type")]
+    [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ListenType? Type { get; set; } = ListenType.Results;
 

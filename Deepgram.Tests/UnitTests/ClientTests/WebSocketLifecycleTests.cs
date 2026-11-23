@@ -9,13 +9,13 @@ using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Logger;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Flux.WebSocket;
-using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
 using Microsoft.Extensions.Logging;
 using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
-using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
-using SpeakModels = Deepgram.Models.Speak.v2.WebSocket;
-using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Common = Deepgram.Models.Common.v2.WebSocket;
+using FluxSpeak = Deepgram.Models.Flux.Speak.WebSocket;
+using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
+using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
+using SpeakModels = Deepgram.Models.Speak.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

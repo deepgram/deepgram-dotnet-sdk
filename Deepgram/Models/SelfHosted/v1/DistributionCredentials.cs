@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,35 +10,35 @@ public record DistributionCredentials
     /// Distribution credentials ID
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("distribution_credentials_id")]
+    [JsonPropertyName("distribution_credentials_id")]
     public string? DistributionCredentialsId { get; set; }
 
     /// <summary>
     /// Provider name
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("provider")]
+    [JsonPropertyName("provider")]
     public string? Provider { get; set; }
 
     /// <summary>
     /// Comment
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("comment")]
+    [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     /// <summary>
     /// Scopes of the credentials
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("scopes")]
+    [JsonPropertyName("scopes")]
     public IReadOnlyList<string>? Scopes { get; set; }
 
     /// <summary>
     /// Created date/time
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("created")]
+    [JsonPropertyName("created")]
     public DateTime? Created { get; set; }
 
     /// <summary>

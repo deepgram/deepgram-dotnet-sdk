@@ -2,11 +2,11 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.AgentManage.v1;
-using Deepgram.Models.Exceptions.v1;
-using Deepgram.Clients.Interfaces.v1;
 using Deepgram.Abstractions.v1;
+using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Models.AgentManage.v1;
+using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
 
 namespace Deepgram.Clients.AgentManage.v1;
 

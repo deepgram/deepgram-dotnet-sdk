@@ -11,10 +11,10 @@ using AgentModels = Deepgram.Models.Agent.v2.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
 using FluxModels = Deepgram.Models.Flux.WebSocket;
 using FluxSpeakModels = Deepgram.Models.Flux.Speak.WebSocket;
+using IExposesConnection = Deepgram.Tests.UnitTests.ClientTests.WebSocketConcurrentConnectTests.IExposesConnection;
 using ListenModels = Deepgram.Models.Listen.v2.WebSocket;
 using MelLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using SpeakModels = Deepgram.Models.Speak.v2.WebSocket;
-using IExposesConnection = Deepgram.Tests.UnitTests.ClientTests.WebSocketConcurrentConnectTests.IExposesConnection;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

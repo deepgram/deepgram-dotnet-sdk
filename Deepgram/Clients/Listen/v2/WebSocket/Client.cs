@@ -1,14 +1,14 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Abstractions.v2;
-using Abstract = Deepgram.Abstractions.v2;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Listen.v2.WebSocket;
-using Common = Deepgram.Models.Common.v2.WebSocket;
 using Deepgram.Clients.Interfaces.v2;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Exceptions.v1;
+using Deepgram.Models.Listen.v2.WebSocket;
+using Abstract = Deepgram.Abstractions.v2;
+using Common = Deepgram.Models.Common.v2.WebSocket;
 
 namespace Deepgram.Clients.Listen.v2.WebSocket;
 
@@ -799,7 +799,8 @@ public class Client : AbstractWebSocketClient, IListenWebSocketClient
 
                     var sentence = resultResponse.Channel.Alternatives[0].Transcript;
 
-                    if (resultResponse.Channel.Alternatives.Count == 0 || sentence == "") {
+                    if (resultResponse.Channel.Alternatives.Count == 0 || sentence == "")
+                    {
                         Log.Verbose("InspectMessage", $"resultResponse has empty message");
                         Log.Verbose("InspectMessage", "LEAVE");
                         return;

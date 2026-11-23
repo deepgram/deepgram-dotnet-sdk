@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -20,7 +20,7 @@ public class PreRecordedSchema
     /// Default is 1
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("alternatives")]
+    [JsonPropertyName("alternatives")]
     public int? Alternatives { get; set; }
 
     /// <summary>
@@ -29,42 +29,42 @@ public class PreRecordedSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback")]
+    [JsonPropertyName("callback")]
     public string? CallBack { get; set; }
 
     /// <summary>
     /// Enables callback method
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("callback_method")]
+    [JsonPropertyName("callback_method")]
     public bool? CallbackMethod { get; set; }
 
     /// <summary>
     /// Optional. A custom intent you want the model to detect within your input audio if present. Submit up to 100.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("custom_intent")]
+    [JsonPropertyName("custom_intent")]
     public List<string>? CustomIntent { get; set; }
 
     /// <summary>
     /// Optional. Sets how the model will interpret strings submitted to the custom_intent param. When "strict", the model will only return intents submitted using the custom_intent param. When "extended", the model will return it's own detected intents in addition those submitted using the custom_intents param.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("custom_intent_mode")]
+    [JsonPropertyName("custom_intent_mode")]
     public string? CustomIntentMode { get; set; }
 
     /// <summary>
     /// Custom Topic allows you to specify a custom topic for your submitted audio.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("custom_topic")]
+    [JsonPropertyName("custom_topic")]
     public List<string>? CustomTopic { get; set; }
 
     /// <summary>
     /// When strict, the model will only return topics submitted using the custom_topic param. When extended, the model will return its own detected topics in addition to those submitted using the custom_topic param. Default: extended
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("custom_topic_mode")]
+    [JsonPropertyName("custom_topic_mode")]
     public string? CustomTopicMode { get; set; }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/detect-entities">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("detect_entities")]
+    [JsonPropertyName("detect_entities")]
     public bool? DetectEntities { get; set; }
 
     /// <summary>
@@ -80,14 +80,14 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/language-detection">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("detect_language")]
+    [JsonPropertyName("detect_language")]
     public bool? DetectLanguage { get; set; }
 
     /// <summary>
     /// Identify and extract key topics.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("detect_topics")]
+    [JsonPropertyName("detect_topics")]
     public bool? DetectTopics { get; set; }
 
     /// <summary>
@@ -96,7 +96,7 @@ public class PreRecordedSchema
     /// default is false
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize")]
+    [JsonPropertyName("diarize")]
     public bool? Diarize { get; set; }
 
     /// <summary>
@@ -107,7 +107,7 @@ public class PreRecordedSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize_model")]
+    [JsonPropertyName("diarize_model")]
     public string? DiarizeModel { get; set; }
 
     // <summary>
@@ -115,7 +115,7 @@ public class PreRecordedSchema
     /// default is null, only applies if Diarize is set to true
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("diarize_version")]
+    [JsonPropertyName("diarize_version")]
     public string? DiarizeVersion { get; set; }
 
     // <summary>
@@ -123,7 +123,7 @@ public class PreRecordedSchema
     /// default is null, only applies if Diarize is set to true
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("dictation")]
+    [JsonPropertyName("dictation")]
     public bool? Dictation { get; set; }
 
     /// <summary>
@@ -132,7 +132,7 @@ public class PreRecordedSchema
     /// supported encodings <see cref="AudioEncoding"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("encoding")]
+    [JsonPropertyName("encoding")]
     public string? Encoding { get; set; }
 
     /// <summary>
@@ -141,7 +141,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("extra")]
+    [JsonPropertyName("extra")]
     public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>
@@ -149,14 +149,14 @@ public class PreRecordedSchema
     ///<see href="https://developers.deepgram.com/reference/pre-recorded"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("filler_words")]
+    [JsonPropertyName("filler_words")]
     public bool? FillerWords { get; set; }
 
     /// <summary>
     /// Enables intent detection
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("intents")]
+    [JsonPropertyName("intents")]
     public bool? Intents { get; set; }
 
     /// <summary>
@@ -164,7 +164,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/keywords">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("keywords")]
+    [JsonPropertyName("keywords")]
     public List<string>? Keywords { get; set; }
 
     /// <summary>
@@ -181,7 +181,7 @@ public class PreRecordedSchema
     /// default value is 'en' 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("language")]
+    [JsonPropertyName("language")]
     public string? Language { get; set; }
 
     /// <summary>
@@ -197,7 +197,7 @@ public class PreRecordedSchema
     /// Spoken measurements will be converted to their corresponding abbreviations. e.g., milligram to mg.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("measurements")]
+    [JsonPropertyName("measurements")]
     public bool? Measurements { get; set; }
 
     /// <summary>
@@ -205,7 +205,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/model">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model")]
+    [JsonPropertyName("model")]
     public string? Model { get; set; }
 
     /// <summary>
@@ -213,7 +213,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/multichannel">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("multichannel")]
+    [JsonPropertyName("multichannel")]
     public bool? MultiChannel { get; set; }
 
     /// <summary>
@@ -221,14 +221,14 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/numerals">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("numerals")]
+    [JsonPropertyName("numerals")]
     public bool? Numerals { get; set; }
 
     /// <summary>
     /// Enable paragraph detection
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("paragraphs")]
+    [JsonPropertyName("paragraphs")]
     public bool? Paragraphs { get; set; }
 
     /// <summary>
@@ -237,7 +237,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/profanity-filter">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("profanity_filter")]
+    [JsonPropertyName("profanity_filter")]
     public bool? ProfanityFilter { get; set; }
 
     /// <summary>
@@ -245,7 +245,7 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/punctuation">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("punctuate")]
+    [JsonPropertyName("punctuate")]
     public bool? Punctuate { get; set; }
 
     /// <summary>
@@ -254,7 +254,7 @@ public class PreRecordedSchema
     ///  default is List<string>("false") 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("redact")]
+    [JsonPropertyName("redact")]
     public List<string>? Redact { get; set; }
 
     /// <summary>
@@ -271,7 +271,7 @@ public class PreRecordedSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("replace")]
+    [JsonPropertyName("replace")]
     public List<string>? Replace { get; set; }
 
     /// <summary>
@@ -280,7 +280,7 @@ public class PreRecordedSchema
     /// only applies when Encoding has a value
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sample_rate")]
+    [JsonPropertyName("sample_rate")]
     public int? SampleRate { get; set; }
 
     /// <summary>
@@ -289,14 +289,14 @@ public class PreRecordedSchema
     /// default is null
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("search")]
+    [JsonPropertyName("search")]
     public List<string>? Search { get; set; }
 
     /// <summary>
     /// Enables sentiment analysis
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sentiment")]
+    [JsonPropertyName("sentiment")]
     public bool? Sentiment { get; set; }
 
     /// <summary>
@@ -304,14 +304,14 @@ public class PreRecordedSchema
     /// <see href="https://developers.deepgram.com/docs/smart-format">
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("smart_format")]
+    [JsonPropertyName("smart_format")]
     public bool? SmartFormat { get; set; }
 
     ///// <summary>
     ///// Enables summarization
     ///// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("summarize")]
+    [JsonPropertyName("summarize")]
     public string? Summarize { get; set; }
 
 
@@ -321,28 +321,28 @@ public class PreRecordedSchema
     /// Default is a null 
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("tag")]
+    [JsonPropertyName("tag")]
     public List<string>? Tag { get; set; }
 
     ///// <summary>
     ///// Enables topic detection
     ///// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("topics")]
+    [JsonPropertyName("topics")]
     public bool? Topics { get; set; }
 
     /// <summary>
     /// Length of time in seconds used to split utterances.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("utt_split")]
+    [JsonPropertyName("utt_split")]
     public double? UttSplit { get; set; }
 
     /// <summary>
     /// Enable utterance segmentation
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("utterances")]
+    [JsonPropertyName("utterances")]
     public bool? Utterances { get; set; }
 
     /// <summary>
@@ -351,7 +351,7 @@ public class PreRecordedSchema
     /// default value is "latest"
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("version")]
+    [JsonPropertyName("version")]
     public string? Version { get; set; }
 
     /// <summary>

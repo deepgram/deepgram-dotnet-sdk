@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -18,28 +18,28 @@ public record ErrorResponse
     /// Error Description
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("description")]
+    [JsonPropertyName("description")]
     public string? Description { get; set; } = "";
 
     /// <summary>
     /// Error Message
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("message")]
+    [JsonPropertyName("message")]
     public string? Message { get; set; } = "";
 
     /// <summary>
     /// Error Variant
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("variant")]
+    [JsonPropertyName("variant")]
     public string? Variant { get; set; } = "";
 
     /// <summary>
     /// Error event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("type")]
+    [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public WebSocketType? Type { get; set; } = WebSocketType.Error;
 

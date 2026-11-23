@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -30,7 +30,7 @@ public abstract class AbstractRestClient
 
         if (options == null)
         {
-            options = (IDeepgramClientOptions) new DeepgramHttpClientOptions(apiKey);
+            options = (IDeepgramClientOptions)new DeepgramHttpClientOptions(apiKey);
         }
         _httpClient = HttpClientFactory.Create(httpId);
         _httpClient = HttpClientFactory.ConfigureDeepgram(_httpClient, options);
@@ -271,10 +271,10 @@ public abstract class AbstractRestClient
             Log.Verbose("AbstractRestClient.PostRetrieveLocalFileAsync<R, S, T>", "LEAVE");
 
             return new LocalFileWithMetadata()
-                        {
-                            Metadata = result,
-                            Content = stream,
-                        };
+            {
+                Metadata = result,
+                Content = stream,
+            };
 
         }
         catch (OperationCanceledException ex)

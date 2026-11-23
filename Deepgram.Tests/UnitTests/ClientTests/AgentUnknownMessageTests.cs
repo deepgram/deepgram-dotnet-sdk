@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Bogus;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using System.Net.WebSockets;
 using System.Text;
-using Deepgram.Models.Authenticate.v1;
+using Bogus;
 using Deepgram.Clients.Agent.v2.WebSocket;
+using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Common.v2.WebSocket;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

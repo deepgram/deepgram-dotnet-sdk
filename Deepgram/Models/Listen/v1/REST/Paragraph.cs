@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,21 +10,21 @@ public record Paragraph
     /// ReadOnly of Sentence objects.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sentences")]
+    [JsonPropertyName("sentences")]
     public IReadOnlyList<Sentence>? Sentences { get; set; }
 
     /// <summary>
     /// Number of words in the paragraph
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("num_words")]
+    [JsonPropertyName("num_words")]
     public int? NumWords { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the paragraph starts.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("start")]
+    [JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>
@@ -38,21 +38,21 @@ public record Paragraph
     /// Offset in seconds from the start of the audio to where the paragraph ends.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("end")]
+    [JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// Sentiment of the paragraph
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sentiment")]
+    [JsonPropertyName("sentiment")]
     public string? Sentiment { get; set; }
 
     /// <summary>
     /// Sentiment score of the paragraph
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("sentiment_score")]
+    [JsonPropertyName("sentiment_score")]
     public double? SentimentScore { get; set; }
 
     /// <summary>

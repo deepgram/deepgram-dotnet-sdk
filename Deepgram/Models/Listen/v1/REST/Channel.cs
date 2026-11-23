@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,7 +10,7 @@ public record Channel
     /// ReadOnlyList of <see cref="Alternative"/> objects.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("alternatives")]
+    [JsonPropertyName("alternatives")]
     public IReadOnlyList<Alternative>? Alternatives { get; set; }
 
     /// <summary>
@@ -18,21 +18,21 @@ public record Channel
     /// </summary>
     /// <remark>Only available in pre-recorded requests</remark>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("detected_language")]
+    [JsonPropertyName("detected_language")]
     public string? DetectedLanguage { get; set; }
 
     /// <summary>
     /// Language confidence score for the dominant language identified in the channel.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("language_confidence")]
+    [JsonPropertyName("language_confidence")]
     public double? LanguageConfidence { get; set; }
 
     /// <summary>
     /// ReadOnlyList of Search objects.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("search")]
+    [JsonPropertyName("search")]
     public IReadOnlyList<Search>? Search { get; set; }
 
     /// <summary>

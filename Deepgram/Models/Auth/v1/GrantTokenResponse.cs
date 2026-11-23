@@ -10,14 +10,14 @@ public record GrantTokenResponse
     /// Access token for the Deepgram API
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("access_token")]
+    [JsonPropertyName("access_token")]
     public string? AccessToken { get; set; }
 
     /// <summary>
     /// TTL of the access token in seconds
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("expires_in")]
+    [JsonPropertyName("expires_in")]
     public decimal? ExpiresIn { get; set; }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,7 +10,7 @@ public record UtteranceEndResponse
     /// Utterance end event type.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("type")]
+    [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ListenType? Type { get; set; } = ListenType.UtteranceEnd;
 
@@ -18,14 +18,14 @@ public record UtteranceEndResponse
     /// Channel index information
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("channel")]
+    [JsonPropertyName("channel")]
     public int[]? Channel { get; set; }
 
     /// <summary>
     /// Timestamp of the event.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("last_word_end")]
+    [JsonPropertyName("last_word_end")]
     public decimal? LastWordEnd { get; set; }
 
     /// <summary>

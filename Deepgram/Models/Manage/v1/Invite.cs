@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,14 +10,14 @@ public record Invite
     /// Email for invite.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("email")]
+    [JsonPropertyName("email")]
     public string? Email { get; set; }
 
     /// <summary>
     /// Scope for invite.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("scope")]
+    [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 
     /// <summary>

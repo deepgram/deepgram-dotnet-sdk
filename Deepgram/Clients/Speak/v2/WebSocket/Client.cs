@@ -1,13 +1,13 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Abstractions.v2;
-using Abstract = Deepgram.Abstractions.v2;
+using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Speak.v2.WebSocket;
+using Abstract = Deepgram.Abstractions.v2;
 using Common = Deepgram.Models.Common.v2.WebSocket;
-using Deepgram.Clients.Interfaces.v2;
 
 namespace Deepgram.Clients.Speak.v2.WebSocket;
 
@@ -438,8 +438,8 @@ public class Client : AbstractWebSocketClient, ISpeakWebSocketClient
         }
 
         ControlMessage message = new ControlMessage(Constants.Close);
-            byte[] data = Encoding.UTF8.GetBytes(message.ToString());
-            await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
+        byte[] data = Encoding.UTF8.GetBytes(message.ToString());
+        await SendOnConnection(owned, new ArraySegment<byte>(data), WebSocketMessageType.Text, _cancellationToken?.Token ?? owned.Token, allowStopping: true).ConfigureAwait(false);
     }
 
     /// <summary>

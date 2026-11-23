@@ -2,6 +2,7 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Globalization;
 using Deepgram.Models.Analyze.v1;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.Listen.v1.REST;
@@ -14,7 +15,6 @@ using ListenV2LiveSchema = Deepgram.Models.Listen.v2.WebSocket.LiveSchema;
 using SpeakV1WebSocketSchema = Deepgram.Models.Speak.v1.WebSocket.SpeakSchema;
 using SpeakV2WebSocketClient = Deepgram.Clients.Speak.v2.WebSocket.Client;
 using SpeakV2WebSocketSchema = Deepgram.Models.Speak.v2.WebSocket.SpeakSchema;
-using System.Globalization;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

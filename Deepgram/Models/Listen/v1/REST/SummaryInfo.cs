@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,21 +10,21 @@ public record SummaryInfo
     /// Input tokens used
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("input_tokens")]
+    [JsonPropertyName("input_tokens")]
     public int? InputTokens { get; set; }
 
     /// <summary>
     /// Model UUID
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model_uuid")]
+    [JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
     /// Output tokens used
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("output_tokens")]
+    [JsonPropertyName("output_tokens")]
     public int? OutputTokens { get; set; }
 
     /// <summary>

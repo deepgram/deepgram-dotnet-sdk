@@ -3,13 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 using System.Globalization;
-
 using Deepgram.Abstractions.v2;
+using Deepgram.Clients.Interfaces.v2;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Exceptions.v1;
 using Deepgram.Models.Flux.Speak.WebSocket;
 using Common = Deepgram.Models.Common.v2.WebSocket;
-using Deepgram.Clients.Interfaces.v2;
-using Deepgram.Models.Exceptions.v1;
 
 namespace Deepgram.Clients.Flux.Speak.WebSocket;
 

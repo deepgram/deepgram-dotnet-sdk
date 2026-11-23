@@ -1,15 +1,14 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 
-using Deepgram.Models.Authenticate.v1;
-using OLD = Deepgram.Models.Live.v1;
-using NEW = Deepgram.Models.Listen.v1.WebSocket;
-
-using Deepgram.Clients.Interfaces.v1;
-using WS = Deepgram.Clients.Listen.v1.WebSocket;
 using System;
+using Deepgram.Clients.Interfaces.v1;
+using Deepgram.Models.Authenticate.v1;
+using NEW = Deepgram.Models.Listen.v1.WebSocket;
+using OLD = Deepgram.Models.Live.v1;
+using WS = Deepgram.Clients.Listen.v1.WebSocket;
 
 namespace Deepgram.Clients.Live.v1;
 

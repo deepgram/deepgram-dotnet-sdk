@@ -1,4 +1,4 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,14 +10,14 @@ public record UsageFieldsResponse
     /// ReadOnlyList of included tags.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("tags")]
+    [JsonPropertyName("tags")]
     public IReadOnlyList<string>? Tags { get; set; }
 
     /// <summary>
     /// ReadOnlyList of <see cref="UsageModel"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("models")]
+    [JsonPropertyName("models")]
     public IReadOnlyList<Model>? Models { get; set; }
 
     /// <summary>
@@ -32,14 +32,14 @@ public record UsageFieldsResponse
     /// ReadOnlyList of included languages
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("languages")]
+    [JsonPropertyName("languages")]
     public IReadOnlyList<string>? Languages { get; set; }
 
     /// <summary>
     /// ReadOnlyList of included features
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("features")]
+    [JsonPropertyName("features")]
     public IReadOnlyList<string>? Features { get; set; }
 
     /// <summary>

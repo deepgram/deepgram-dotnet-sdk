@@ -1,12 +1,12 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Deepgram.Models.Agent.v2.WebSocket;
 
-public class Provider: DynamicObject
+public class Provider : DynamicObject
 {
     /// <summary>
     /// The provider for the service.

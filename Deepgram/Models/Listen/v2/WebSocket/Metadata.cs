@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,21 +10,21 @@ public record MetaData
     /// The request ID is a unique identifier for the request. It is useful for troubleshooting and support.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("request_id")]
+    [JsonPropertyName("request_id")]
     public string? RequestId { get; set; }
 
     /// <summary>
     /// Model UUID
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model_uuid")]
+    [JsonPropertyName("model_uuid")]
     public string? ModelUUID { get; set; }
 
     /// <summary>
     /// IReadonlyDictionary of <see cref="ModelInfo"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("model_info")]
+    [JsonPropertyName("model_info")]
     public ModelInfo? ModelInfo { get; set; }
 
     /// <summary>
@@ -33,7 +33,7 @@ public record MetaData
     /// <see href="https://developers.deepgram.com/docs/extra-metadata"/>
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("extra")]
+    [JsonPropertyName("extra")]
     public Dictionary<string, string>? Extra { get; set; }
 
     /// <summary>

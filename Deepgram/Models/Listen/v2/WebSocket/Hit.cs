@@ -1,4 +1,4 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
@@ -10,7 +10,7 @@ public record Hit
     /// Value between 0 and 1 that indicates the model's relative confidence in this hit.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("confidence")]
+    [JsonPropertyName("confidence")]
     public double? Confidence { get; set; }
 
 
@@ -18,21 +18,21 @@ public record Hit
     /// Offset in seconds from the start of the audio to where the hit ends.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("end")]
+    [JsonPropertyName("end")]
     public decimal? End { get; set; }
 
     /// <summary>
     /// Transcript that corresponds to the time between start and end.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("snippet")]
+    [JsonPropertyName("snippet")]
     public string? Snippet { get; set; }
 
     /// <summary>
     /// Offset in seconds from the start of the audio to where the hit occurs.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[JsonPropertyName("start")]
+    [JsonPropertyName("start")]
     public decimal? Start { get; set; }
 
     /// <summary>

@@ -2,14 +2,13 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using FluentAssertions;
-using FluentAssertions.Execution;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-
+using Deepgram.Models.Agent.v2.WebSocket;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using SpeakTextSourceV1 = Deepgram.Models.Speak.v1.WebSocket.TextSource;
 using SpeakTextSourceV2 = Deepgram.Models.Speak.v2.WebSocket.TextSource;
-using Deepgram.Models.Agent.v2.WebSocket;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 

@@ -1,11 +1,11 @@
-﻿// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2021-2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using Deepgram.Abstractions.v1;
+using Deepgram.Clients.SelfHosted.v1;
 using Deepgram.Models.Authenticate.v1;
 using Deepgram.Models.SelfHosted.v1;
-using Deepgram.Clients.SelfHosted.v1;
-using Deepgram.Abstractions.v1;
 
 namespace Deepgram.Tests.UnitTests.ClientTests;
 
@@ -64,7 +64,7 @@ public class SelfHostedClientTests
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
-        
+
         // Mock methods
         onPremClient.When(x => x.GetAsync<CredentialResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.GetAsync<CredentialResponse>(url).Returns(expectedResponse);
@@ -89,11 +89,11 @@ public class SelfHostedClientTests
         var credentialsId = new Faker().Random.Guid().ToString();
         var url = AbstractRestClient.GetUri(_options, $"{UriSegments.PROJECTS}/{_projectId}/{UriSegments.SELF_HOSTED}/{credentialsId}");
         var expectedResponse = new AutoFaker<MessageResponse>().Generate();
-        
+
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
-        
+
         // Mock methods
         onPremClient.When(x => x.DeleteAsync<MessageResponse>(Arg.Any<string>())).DoNotCallBase();
         onPremClient.DeleteAsync<MessageResponse>(url).Returns(expectedResponse);
@@ -123,7 +123,7 @@ public class SelfHostedClientTests
         // Fake client
         var httpClient = MockHttpClient.CreateHttpClientWithResult(expectedResponse);
         var onPremClient = Substitute.For<SelfHostedClient>(_apiKey, _options, null);
-        
+
         // Mock methods
         onPremClient.When(x => x.PostAsync<CredentialsSchema, CredentialResponse>(Arg.Any<string>(), Arg.Any<CredentialsSchema>())).DoNotCallBase();
         onPremClient.PostAsync<CredentialsSchema, CredentialResponse>(url, Arg.Any<CredentialsSchema>()).Returns(expectedResponse);
