@@ -151,6 +151,42 @@ public class RestClientCredentialRotationTests
     }
 
     [Test]
+    public async Task V1_Should_Prefer_Caller_Authorization_Over_Global_Authorization()
+    {
+        var options = new DeepgramHttpClientOptions("client_key", headers: new Dictionary<string, string>
+        {
+            ["Authorization"] = "Bearer global_token",
+        });
+        var handler = new CapturingHandler();
+        var client = new TestClientV1(options, handler);
+
+        await client.GetAsync<object>("projects", headers: new Dictionary<string, string>
+        {
+            ["Authorization"] = "Bearer caller_token",
+        });
+
+        handler.AuthorizationHeaders.Should().ContainSingle().Which.Should().Be("Bearer caller_token");
+    }
+
+    [Test]
+    public async Task V2_Should_Prefer_Caller_Authorization_Over_Global_Authorization()
+    {
+        var options = new DeepgramHttpClientOptions("client_key", headers: new Dictionary<string, string>
+        {
+            ["Authorization"] = "Bearer global_token",
+        });
+        var handler = new CapturingHandler();
+        var client = new TestClientV2(options, handler);
+
+        await client.GetAsync<object>("projects", headers: new Dictionary<string, string>
+        {
+            ["Authorization"] = "Bearer caller_token",
+        });
+
+        handler.AuthorizationHeaders.Should().ContainSingle().Which.Should().Be("Bearer caller_token");
+    }
+
+    [Test]
     public async Task V1_Should_Clear_Authorization_After_Clearing_Credentials()
     {
         var options = new DeepgramHttpClientOptions("old_key", onPrem: true);
