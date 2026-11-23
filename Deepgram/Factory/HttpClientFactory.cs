@@ -113,8 +113,9 @@ internal class HttpClientFactory
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
 
-        // Set authentication header with priority: AccessToken > ApiKey
-        SetAuthenticationHeader(client, options);
+        // Validate authentication now; REST clients apply it to each request so credential rotation
+        // and request-specific Authorization headers work without shared-header mutation.
+        ValidateAuthentication(options);
 
         if (options.Headers is not null)
             foreach (var header in options.Headers)
@@ -128,22 +129,15 @@ internal class HttpClientFactory
     }
 
     /// <summary>
-    /// Sets the appropriate authentication header based on available credentials.
-    /// Priority: AccessToken (Bearer) > ApiKey (Token)
+    /// Validates that the client has credentials when its endpoint requires them.
     /// </summary>
-    /// <param name="client">HttpClient to configure</param>
     /// <param name="options">Client options containing credentials</param>
-    private static void SetAuthenticationHeader(HttpClient client, IDeepgramClientOptions options)
+    private static void ValidateAuthentication(IDeepgramClientOptions options)
     {
-        if (!string.IsNullOrWhiteSpace(options.AccessToken))
+        var header = GetAuthenticationHeader(options);
+        if (header != null)
         {
-            // Use Bearer token authentication (highest priority)
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.AccessToken);
-        }
-        else if (!string.IsNullOrWhiteSpace(options.ApiKey))
-        {
-            // Use API key authentication (fallback)
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", options.ApiKey);
+            return;
         }
         else if (options is DeepgramHttpClientOptions { AllowAnonymous: true })
         {
@@ -155,5 +149,30 @@ internal class HttpClientFactory
             // No authentication credentials available
             Log.Warning("SetAuthenticationHeader", "No authentication credentials provided. API calls may fail.");
         }
+    }
+
+    /// <summary>
+    /// Builds the Authorization header for the credentials currently held by the options (or null if none).
+    /// Used per request so rotated credentials apply without mutating the shared HttpClient.
+    /// </summary>
+    internal static AuthenticationHeaderValue? GetAuthenticationHeader(IDeepgramClientOptions options)
+    {
+        if (options is IAuthenticationHeaderOptions authenticationHeaderOptions)
+        {
+            return authenticationHeaderOptions.GetAuthenticationHeader();
+        }
+
+        // Custom IDeepgramClientOptions implementations own their synchronization.
+        var accessToken = options.AccessToken;
+        if (!string.IsNullOrWhiteSpace(accessToken))
+        {
+            return new AuthenticationHeaderValue("Bearer", accessToken);
+        }
+        var apiKey = options.ApiKey;
+        if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            return new AuthenticationHeaderValue("token", apiKey);
+        }
+        return null;
     }
 }

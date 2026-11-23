@@ -43,6 +43,22 @@ public abstract class AbstractRestClient
     }
 
     /// <summary>
+    /// Re-applies the current credentials (SetApiKey/SetAccessToken may have changed them) and sends the request
+    /// </summary>
+    private Task<HttpResponseMessage> SendWithCurrentAuthAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (request.Headers.Authorization == null && _httpClient.DefaultRequestHeaders.Authorization == null)
+        {
+            var auth = HttpClientFactory.GetAuthenticationHeader(_options);
+            if (auth != null)
+            {
+                request.Headers.Authorization = auth;
+            }
+        }
+        return _httpClient.SendAsync(request, cancellationToken);
+    }
+
+    /// <summary>
     /// GET Rest Request
     /// </summary>
     /// <typeparam name="T">Type of class of response expected</typeparam>
@@ -74,7 +90,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("GetAsync<T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -129,7 +145,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("GetAsync<S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -198,7 +214,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("PostRetrieveLocalFileAsync<R, S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -311,7 +327,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("PostAsync<S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -380,7 +396,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("PostAsync<R, S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -452,7 +468,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("PatchAsync<S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -518,7 +534,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("PutAsync<S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -578,7 +594,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("DeleteAsync<T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
@@ -640,7 +656,7 @@ public abstract class AbstractRestClient
 
             // do the request
             Log.Verbose("DeleteAsync<S, T>", "Calling _httpClient.SendAsync...");
-            var response = await _httpClient.SendAsync(request, cancellationToken.Token);
+            var response = await SendWithCurrentAuthAsync(request, cancellationToken.Token);
 
             var resultStr = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
