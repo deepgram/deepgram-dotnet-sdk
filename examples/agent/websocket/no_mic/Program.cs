@@ -1,12 +1,12 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Logger;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
 using System.Net.Http;
+using Deepgram.Logger;
+using Deepgram.Models.Agent.v2.WebSocket;
+using Deepgram.Models.Authenticate.v1;
 
 namespace SampleApp
 {
@@ -52,7 +52,7 @@ namespace SampleApp
                 // settingsConfiguration.Agent.Speak.Endpoint = new Endpoint();
                 // settingsConfiguration.Agent.Think.Endpoint = new Endpoint();
 
-                 bool bConnected = await agentClient.Connect(settingsConfiguration);
+                bool bConnected = await agentClient.Connect(settingsConfiguration);
                 if (!bConnected)
                 {
                     Console.WriteLine("Failed to connect to Deepgram WebSocket server.");

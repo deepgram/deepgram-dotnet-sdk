@@ -1,14 +1,14 @@
-﻿// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
+// Copyright 2024 Deepgram .NET SDK contributors. All Rights Reserved.
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
 // This example should fail, due to the arbitrary key being included in the settings payload.
 
-using Deepgram.Logger;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
 using System.Net.Http;
+using Deepgram.Logger;
+using Deepgram.Models.Agent.v2.WebSocket;
+using Deepgram.Models.Authenticate.v1;
 
 namespace SampleApp
 {
