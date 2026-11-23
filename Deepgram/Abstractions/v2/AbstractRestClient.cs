@@ -47,7 +47,7 @@ public abstract class AbstractRestClient
     /// </summary>
     private Task<HttpResponseMessage> SendWithCurrentAuthAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (request.Headers.Authorization == null)
+        if (request.Headers.Authorization == null && _httpClient.DefaultRequestHeaders.Authorization == null)
         {
             var auth = HttpClientFactory.GetAuthenticationHeader(_options);
             if (auth != null)

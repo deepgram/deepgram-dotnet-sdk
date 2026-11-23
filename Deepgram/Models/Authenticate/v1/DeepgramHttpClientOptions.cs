@@ -279,4 +279,25 @@ public class DeepgramHttpClientOptions : IDeepgramClientOptions
             Log.Information("DeepgramHttpClientOptions", "All authentication credentials cleared (OnPrem deployment)");
         }
     }
+
+    /// <summary>
+    /// Gets the current authentication header from one consistent credential snapshot.
+    /// </summary>
+    internal AuthenticationHeaderValue? GetAuthenticationHeader()
+    {
+        lock (_credentialLock)
+        {
+            if (!string.IsNullOrWhiteSpace(AccessToken))
+            {
+                return new AuthenticationHeaderValue("Bearer", AccessToken);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ApiKey))
+            {
+                return new AuthenticationHeaderValue("token", ApiKey);
+            }
+
+            return null;
+        }
+    }
 }

@@ -157,7 +157,12 @@ internal class HttpClientFactory
     /// </summary>
     internal static AuthenticationHeaderValue? GetAuthenticationHeader(IDeepgramClientOptions options)
     {
-        // Snapshot once so a concurrent SetApiKey/SetAccessToken cannot yield a mixed result
+        if (options is DeepgramHttpClientOptions deepgramOptions)
+        {
+            return deepgramOptions.GetAuthenticationHeader();
+        }
+
+        // Custom IDeepgramClientOptions implementations own their synchronization.
         var accessToken = options.AccessToken;
         if (!string.IsNullOrWhiteSpace(accessToken))
         {
