@@ -113,8 +113,9 @@ internal class HttpClientFactory
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgentUtil.GetInfo());
 
-        // Set authentication header with priority: AccessToken > ApiKey
-        SetAuthenticationHeader(client, options);
+        // Validate authentication now; REST clients apply it to each request so credential rotation
+        // and request-specific Authorization headers work without shared-header mutation.
+        ValidateAuthentication(options);
 
         if (options.Headers is not null)
             foreach (var header in options.Headers)
@@ -128,17 +129,15 @@ internal class HttpClientFactory
     }
 
     /// <summary>
-    /// Sets the appropriate authentication header based on available credentials.
-    /// Priority: AccessToken (Bearer) > ApiKey (Token)
+    /// Validates that the client has credentials when its endpoint requires them.
     /// </summary>
-    /// <param name="client">HttpClient to configure</param>
     /// <param name="options">Client options containing credentials</param>
-    private static void SetAuthenticationHeader(HttpClient client, IDeepgramClientOptions options)
+    private static void ValidateAuthentication(IDeepgramClientOptions options)
     {
         var header = GetAuthenticationHeader(options);
         if (header != null)
         {
-            client.DefaultRequestHeaders.Authorization = header;
+            return;
         }
         else if (options is DeepgramHttpClientOptions { AllowAnonymous: true })
         {
