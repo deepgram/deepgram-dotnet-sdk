@@ -2,8 +2,8 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Logger;
+using Deepgram.Models.Listen.v1.REST;
 
 namespace SampleApp
 {
@@ -32,7 +32,7 @@ namespace SampleApp
                     },
                     cancelToken);
 
-                    Console.WriteLine(response);
+                Console.WriteLine(response);
             }
             catch (OperationCanceledException)
             {

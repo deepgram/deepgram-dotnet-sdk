@@ -18,9 +18,9 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: Install dependencies
-        run: dotnet restore Deepgram.sln
+        run: dotnet restore Deepgram.Dev.sln
       - name: Verify formatting
-        run: dotnet format Deepgram.sln --verify-no-changes --no-restore
+        run: dotnet format Deepgram.Dev.sln --verify-no-changes --no-restore
   test:
     runs-on: ubuntu-latest
     permissions:

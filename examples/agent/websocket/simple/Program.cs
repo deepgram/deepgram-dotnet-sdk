@@ -2,12 +2,12 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
-using Deepgram.Logger;
-using Deepgram.Microphone;
-using Deepgram.Models.Authenticate.v1;
-using Deepgram.Models.Agent.v2.WebSocket;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Deepgram.Logger;
+using Deepgram.Microphone;
+using Deepgram.Models.Agent.v2.WebSocket;
+using Deepgram.Models.Authenticate.v1;
 using PortAudioSharp;
 
 namespace SampleApp
@@ -64,27 +64,27 @@ namespace SampleApp
                 {
                     Console.WriteLine($"----> {e.Type} received");
                 }));
-                                                await agentClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
-                {
-                    Console.WriteLine($"----> {e.Type} received");
+                await agentClient.Subscribe(new EventHandler<AudioResponse>((sender, e) =>
+{
+    Console.WriteLine($"----> {e.Type} received");
 
-                    if (e.Stream != null && e.Stream.Length > 0)
-                    {
-                        var audioData = e.Stream.ToArray();
-                        Console.WriteLine($"🔊 Queueing {audioData.Length} bytes of agent speech for playback");
+    if (e.Stream != null && e.Stream.Length > 0)
+    {
+        var audioData = e.Stream.ToArray();
+        Console.WriteLine($"🔊 Queueing {audioData.Length} bytes of agent speech for playback");
 
-                        // Play audio through speakers
-                        PlayAudioThroughSpeakers(audioData);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"⚠️ Received empty audio stream");
-                    }
-                }));
-                                await agentClient.Subscribe(new EventHandler<AgentAudioDoneResponse>((sender, e) =>
-                {
-                    Console.WriteLine($"----> {e} received - Agent finished speaking 🎤");
-                }));
+        // Play audio through speakers
+        PlayAudioThroughSpeakers(audioData);
+    }
+    else
+    {
+        Console.WriteLine($"⚠️ Received empty audio stream");
+    }
+}));
+                await agentClient.Subscribe(new EventHandler<AgentAudioDoneResponse>((sender, e) =>
+{
+    Console.WriteLine($"----> {e} received - Agent finished speaking 🎤");
+}));
                 await agentClient.Subscribe(new EventHandler<AgentStartedSpeakingResponse>((sender, e) =>
                 {
                     Console.WriteLine($"----> {e} received - Agent is speaking 🗣️");
@@ -158,7 +158,7 @@ namespace SampleApp
                 settingsConfiguration.Agent.Speak.Provider.Model = "aura-2-thalia-en";
 
                 // Add tags to test the new tagging capabilities
-                settingsConfiguration.Tags = new List<string> { "dotnet-example","live-agent-test" };
+                settingsConfiguration.Tags = new List<string> { "dotnet-example", "live-agent-test" };
 
                 // To avoid issues with empty objects, Voice and Endpoint are instantiated as null. Construct them as needed.
                 // settingsConfiguration.Agent.Speak.Provider.Voice = new CartesiaVoice();
@@ -178,28 +178,28 @@ namespace SampleApp
                 Microphone microphone = null;
                 int audioDataCounter = 0;
 
-                                try
+                try
                 {
-                                    // Create microphone with proper sample rate and debugging
-                                microphone = new Microphone(
-                    push_callback: (audioData, length) =>
-                    {
-                        audioDataCounter++;
-                        Console.WriteLine($"[MIC] Captured audio chunk #{audioDataCounter}: {length} bytes");
+                    // Create microphone with proper sample rate and debugging
+                    microphone = new Microphone(
+        push_callback: (audioData, length) =>
+        {
+            audioDataCounter++;
+            Console.WriteLine($"[MIC] Captured audio chunk #{audioDataCounter}: {length} bytes");
 
-                        // Create array with actual length
-                        byte[] actualData = new byte[length];
-                        Array.Copy(audioData, actualData, length);
+            // Create array with actual length
+            byte[] actualData = new byte[length];
+            Array.Copy(audioData, actualData, length);
 
-                        // Send to agent
-                        agentClient.SendBinary(actualData);
-                    },
-                    rate: 24000,        // Match the agent's expected input rate (24kHz)
-                    chunkSize: 8192,    // Standard chunk size
-                    channels: 1,        // Mono
-                    device_index: PortAudio.DefaultInputDevice,
-                    format: SampleFormat.Int16
-                );
+            // Send to agent
+            agentClient.SendBinary(actualData);
+        },
+        rate: 24000,        // Match the agent's expected input rate (24kHz)
+        chunkSize: 8192,    // Standard chunk size
+        channels: 1,        // Mono
+        device_index: PortAudio.DefaultInputDevice,
+        format: SampleFormat.Int16
+    );
 
                     microphone.Start();
                     Console.WriteLine("Microphone started successfully. Speak into your microphone now!");
@@ -242,7 +242,7 @@ namespace SampleApp
             }
         }
 
-                // Audio playback queue and position tracking
+        // Audio playback queue and position tracking
         private static Queue<byte[]> audioQueue = new Queue<byte[]>();
         private static byte[]? currentAudioBuffer = null;
         private static int audioPosition = 0;
@@ -321,7 +321,7 @@ namespace SampleApp
             }
         }
 
-                private static PortAudioSharp.StreamCallbackResult OutputCallback(nint input, nint output, uint frameCount, ref PortAudioSharp.StreamCallbackTimeInfo timeInfo, PortAudioSharp.StreamCallbackFlags statusFlags, nint userDataPtr)
+        private static PortAudioSharp.StreamCallbackResult OutputCallback(nint input, nint output, uint frameCount, ref PortAudioSharp.StreamCallbackTimeInfo timeInfo, PortAudioSharp.StreamCallbackFlags statusFlags, nint userDataPtr)
         {
             lock (audioLock)
             {

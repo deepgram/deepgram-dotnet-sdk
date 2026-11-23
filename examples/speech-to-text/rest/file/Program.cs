@@ -2,9 +2,9 @@
 // Use of this source code is governed by a MIT license that can be found in the LICENSE file.
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Generic;
 using Deepgram.Logger;
 using Deepgram.Models.Listen.v1.REST;
-using System.Collections.Generic;
 
 namespace PreRecorded
 {

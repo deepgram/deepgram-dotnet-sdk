@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 
 using Deepgram.Logger;
-using Deepgram.Models.Listen.v1.REST;
 using Deepgram.Models.Authenticate.v1;
+using Deepgram.Models.Listen.v1.REST;
 
 namespace SampleApp
 {
@@ -30,7 +30,7 @@ namespace SampleApp
                         Model = "nova-2",
                     });
 
-                    Console.WriteLine(response);
+                Console.WriteLine(response);
             }
             catch (Exception ex)
             {
