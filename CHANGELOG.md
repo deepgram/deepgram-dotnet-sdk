@@ -1,5 +1,16 @@
 # Changelog
 
+## [7.7.1](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.7.0...7.7.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **rest:** apply current credentials on every request ([874b2d5](https://github.com/deepgram/deepgram-dotnet-sdk/commit/874b2d59de95336db0d744a1a4cc3679d4efb9ab))
+* **rest:** apply current credentials on every request ([a85ba47](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a85ba474705c50b31e30a85bacf8fc334480888f))
+* **rest:** preserve request authentication overrides ([a25959d](https://github.com/deepgram/deepgram-dotnet-sdk/commit/a25959db0d262a4063e3324e6073c2b6c3b6b025))
+* **rest:** snapshot all SDK credentials ([83fea0f](https://github.com/deepgram/deepgram-dotnet-sdk/commit/83fea0f1285035a19dc40941efe4756c1af9a5ea))
+* **rest:** synchronize credential rotation ([9dae91b](https://github.com/deepgram/deepgram-dotnet-sdk/commit/9dae91bba4ff030c9f281a7528f0befb5031809d))
+
 ## [7.7.0](https://github.com/deepgram/deepgram-dotnet-sdk/compare/7.6.0...7.7.0) (2026-11-20)
 
 
