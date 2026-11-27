@@ -84,7 +84,7 @@ internal static class QueryParameterUtil
                             sb.Append($"{name}={HttpUtility.UrlEncode(value.ToString())}&");
                         break;
                     case DateTime time:
-                        sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd"))}&");
+                        sb.Append($"{name}={HttpUtility.UrlEncode(time.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))}&");
                         break;
                     case double number:
                         sb.Append($"{name}={HttpUtility.UrlEncode(number.ToString(CultureInfo.InvariantCulture))}&");

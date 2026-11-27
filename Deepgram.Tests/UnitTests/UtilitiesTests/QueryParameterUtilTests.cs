@@ -295,6 +295,31 @@ public class QueryParameterUtilTests
         }
     }
 
+    [TestCase("th-TH")]
+    [TestCase("ar-SA")]
+    public void FormatURL_Should_Format_DateTime_With_Invariant_Culture(string culture)
+    {
+        var originalCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+            var obj = new UsageSummarySchema
+            {
+                Start = new DateTime(2024, 1, 15),
+                End = new DateTime(2024, 2, 20)
+            };
+
+            var result = QueryParameterUtil.FormatURL(Defaults.DEFAULT_URI, obj);
+
+            result.Should().Contain("start=2024-01-15");
+            result.Should().Contain("end=2024-02-20");
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = originalCulture;
+        }
+    }
+
     private sealed class FloatDecimalSchema
     {
         [JsonPropertyName("f")]
